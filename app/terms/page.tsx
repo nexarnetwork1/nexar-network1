@@ -6,7 +6,11 @@ import { SITE } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: `Terms of Service for ${SITE.name}.`,
+  description: `Terms of Service for ${SITE.name}. Understand the conditions governing use of our decentralized token presale platform.`,
+  openGraph: {
+    title: `Terms of Service | ${SITE.name}`,
+    description: `Terms of Service for ${SITE.name}.`,
+  },
 };
 
 export default function TermsPage() {

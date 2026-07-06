@@ -6,7 +6,11 @@ import { SITE } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
   title: "Disclaimer",
-  description: `Risk disclaimer for ${SITE.name}.`,
+  description: `Risk disclaimer for ${SITE.name}. Important information about investment risks and forward-looking statements.`,
+  openGraph: {
+    title: `Disclaimer | ${SITE.name}`,
+    description: `Risk disclaimer for ${SITE.name}.`,
+  },
 };
 
 export default function DisclaimerPage() {

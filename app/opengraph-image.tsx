@@ -19,78 +19,183 @@ export default function Image() {
           padding: 80,
           background: "linear-gradient(135deg, #050505 0%, #0a0a0a 50%, #111 100%)",
           position: "relative",
+          overflow: "hidden",
         }}
       >
+        {/* Top-right glow orb */}
         <div
           style={{
             position: "absolute",
-            top: -100,
-            right: -100,
-            width: 400,
-            height: 400,
+            top: -120,
+            right: -120,
+            width: 480,
+            height: 480,
             borderRadius: "50%",
-            background: `radial-gradient(circle, ${COLORS.gold}26 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${COLORS.gold}22 0%, transparent 70%)`,
           }}
         />
+        {/* Bottom-left subtle glow */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -80,
+            left: -80,
+            width: 320,
+            height: 320,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${COLORS.gold}0d 0%, transparent 70%)`,
+          }}
+        />
+
+        {/* Logo lockup */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 16,
-            marginBottom: 32,
+            gap: 18,
+            marginBottom: 40,
           }}
         >
+          {/* Icon box */}
           <div
             style={{
-              width: 48,
-              height: 48,
-              borderRadius: 12,
-              background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldSecondary})`,
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              background: `linear-gradient(135deg, ${COLORS.gold}26, ${COLORS.goldSecondary}12)`,
+              border: `1.5px solid ${COLORS.gold}40`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 24,
-              fontWeight: 700,
-              color: "#050505",
             }}
           >
-            N
+            {/* Nexar "N" chevron mark */}
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 32 32"
+              fill="none"
+            >
+              <path
+                d="M8 22L16 6L24 22"
+                stroke={COLORS.goldSecondary}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M10.5 18H21.5"
+                stroke={COLORS.goldSecondary}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </svg>
           </div>
-          <span style={{ color: "#888", fontSize: 20, letterSpacing: 4 }}>{SITE.ticker}</span>
+
+          {/* Wordmark */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <span
+              style={{
+                color: "#ffffff",
+                fontSize: 22,
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                lineHeight: 1,
+              }}
+            >
+              NEXAR
+            </span>
+            <span
+              style={{
+                color: `${COLORS.goldSecondary}cc`,
+                fontSize: 11,
+                letterSpacing: "0.35em",
+                textTransform: "uppercase",
+                lineHeight: 1,
+              }}
+            >
+              {SITE.ticker}
+            </span>
+          </div>
         </div>
+
+        {/* Main headline */}
         <h1
           style={{
-            fontSize: 72,
+            fontSize: 68,
             fontWeight: 700,
             color: "white",
             lineHeight: 1.05,
             margin: 0,
-            maxWidth: 900,
+            maxWidth: 880,
           }}
         >
           The infrastructure for{" "}
           <span style={{ color: COLORS.gold }}>global payments</span>
         </h1>
-        <p style={{ fontSize: 24, color: "#888", marginTop: 24, maxWidth: 700 }}>
+
+        {/* Tagline */}
+        <p
+          style={{
+            fontSize: 22,
+            color: "#888",
+            marginTop: 24,
+            maxWidth: 680,
+            lineHeight: 1.5,
+          }}
+        >
           {SITE.tagline}
         </p>
+
+        {/* Bottom metadata strip */}
         <div
           style={{
             position: "absolute",
-            bottom: 60,
+            bottom: 56,
             left: 80,
+            right: 80,
             display: "flex",
-            gap: 24,
-            color: "#666",
-            fontSize: 16,
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          <span>BNB Smart Chain</span>
-          <span>·</span>
-          <span>BEP20</span>
-          <span>·</span>
-          <span>{SITE.maxSupply} Max Supply</span>
+          <div
+            style={{
+              display: "flex",
+              gap: 24,
+              color: "#555",
+              fontSize: 15,
+            }}
+          >
+            <span>BNB Smart Chain</span>
+            <span>·</span>
+            <span>BEP20</span>
+            <span>·</span>
+            <span>{SITE.maxSupply} Max Supply</span>
+          </div>
+          <span
+            style={{
+              color: `${COLORS.gold}80`,
+              fontSize: 13,
+              letterSpacing: "0.1em",
+            }}
+          >
+            nexar.network
+          </span>
         </div>
+
+        {/* Horizontal divider line */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 96,
+            left: 80,
+            right: 80,
+            height: 1,
+            background: `linear-gradient(to right, transparent, ${COLORS.gold}30, transparent)`,
+          }}
+        />
       </div>
     ),
     { ...size },

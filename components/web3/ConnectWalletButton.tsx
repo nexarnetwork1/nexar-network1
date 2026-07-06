@@ -28,8 +28,11 @@ export function ConnectWalletButton({
     return (
       <Button
         className={cn(className)}
+        variant={props.variant ?? "primary"}
+        size={props.size ?? "md"}
         disabled
-        title="Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID"
+        aria-label="Wallet connection not configured"
+        title="WalletConnect project ID not set"
         {...props}
       >
         {children ?? "Connect Wallet"}

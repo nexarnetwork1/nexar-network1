@@ -7,6 +7,10 @@ import { SITE } from "@/lib/constants/site";
 export const metadata: Metadata = {
   title: "Whitepaper",
   description: `Read the ${SITE.name} technical whitepaper covering architecture, tokenomics, ecosystem design, security model, and the path to sovereign chain infrastructure.`,
+  openGraph: {
+    title: `Technical Whitepaper | ${SITE.name}`,
+    description: `The complete ${SITE.name} vision — architecture, tokenomics, ecosystem, and the path to sovereign chain infrastructure.`,
+  },
 };
 
 const WHITEPAPER_SECTIONS = [
@@ -47,7 +51,8 @@ export default function WhitepaperPage() {
             <a
               href="/whitepaper.pdf"
               download
-              className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-gold-secondary"
+              aria-label="Download Nexar Network Whitepaper PDF"
+              className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-gold-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
             >
               <Download className="h-4 w-4" />
               Download PDF
@@ -83,14 +88,6 @@ export default function WhitepaperPage() {
               Version 1.0 · 2026
             </p>
           </div>
-
-          <p className="mt-10 text-center text-sm text-muted">
-            Full whitepaper PDF coming soon.{" "}
-            <Link href="/#ecosystem" className="text-gold hover:underline">
-              Explore the ecosystem
-            </Link>{" "}
-            in the meantime.
-          </p>
         </div>
       </Container>
     </main>

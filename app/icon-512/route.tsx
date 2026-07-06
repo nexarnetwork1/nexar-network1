@@ -19,19 +19,45 @@ export function GET() {
       >
         <div
           style={{
-            width: 360,
-            height: 360,
+            position: "absolute",
+            width: 380,
+            height: 380,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${COLORS.gold}22 0%, transparent 70%)`,
+          }}
+        />
+        <div
+          style={{
+            width: 380,
+            height: 380,
             borderRadius: 80,
-            background: `linear-gradient(135deg, ${COLORS.gold} 0%, ${COLORS.goldSecondary} 50%, ${COLORS.gold} 100%)`,
+            background: `linear-gradient(135deg, ${COLORS.gold}22 0%, ${COLORS.goldSecondary}0d 100%)`,
+            border: `2px solid ${COLORS.gold}40`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 180,
-            fontWeight: 700,
-            color: "#050505",
           }}
         >
-          N
+          <svg
+            width="200"
+            height="200"
+            viewBox="0 0 32 32"
+            fill="none"
+          >
+            <path
+              d="M8 22L16 6L24 22"
+              stroke={COLORS.goldSecondary}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10.5 18H21.5"
+              stroke={COLORS.goldSecondary}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+          </svg>
         </div>
       </div>
     ),

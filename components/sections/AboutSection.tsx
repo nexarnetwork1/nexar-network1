@@ -30,25 +30,30 @@ export function AboutSection() {
     if (reducedMotion || !graphicRef.current) return;
 
     const rings = graphicRef.current.querySelectorAll(".about-ring");
-    gsap.to(rings, {
-      rotation: 360,
-      duration: 30,
-      repeat: -1,
-      ease: "none",
-      stagger: 0.5,
+
+    const ctx = gsap.context(() => {
+      gsap.to(rings, {
+        rotation: 360,
+        duration: 30,
+        repeat: -1,
+        ease: "none",
+        stagger: 0.5,
+      });
+
+      gsap.from(".about-stat", {
+        scrollTrigger: {
+          trigger: graphicRef.current,
+          start: "top 75%",
+        },
+        scale: 0.8,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "back.out(1.4)",
+      });
     });
 
-    gsap.from(".about-stat", {
-      scrollTrigger: {
-        trigger: graphicRef.current,
-        start: "top 75%",
-      },
-      scale: 0.8,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: "back.out(1.4)",
-    });
+    return () => ctx.revert();
   }, [reducedMotion]);
 
   return (

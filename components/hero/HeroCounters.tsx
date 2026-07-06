@@ -12,9 +12,9 @@ type StatItemProps = {
 
 function StatItem({ label, children }: StatItemProps) {
   return (
-    <div className="luxury-border rounded-2xl bg-card/40 px-6 py-5 backdrop-blur-md">
+    <div className="luxury-border rounded-2xl bg-card/40 px-5 py-4 backdrop-blur-md sm:px-6 sm:py-5">
       <p className="text-[10px] tracking-[0.22em] text-muted uppercase">{label}</p>
-      <p className="mt-2 font-mono text-2xl font-medium text-white sm:text-3xl">
+      <p className="mt-2 font-mono text-xl font-medium text-white sm:text-2xl">
         {children}
       </p>
     </div>
@@ -22,7 +22,23 @@ function StatItem({ label, children }: StatItemProps) {
 }
 
 export function HeroCounters() {
-  const { web3Ready, soldAmount } = usePresaleData();
+  const { web3Ready, soldAmount, isLoading } = usePresaleData();
+
+  // Format sold amount: show live data when available, otherwise static placeholder
+  const soldDisplay = (() => {
+    if (!web3Ready) return null;
+    if (isLoading) return <span className="opacity-40">…</span>;
+    if (soldAmount > 0) {
+      return (
+        <AnimatedCounter
+          value={Math.round(soldAmount / 1_000_000)}
+          suffix="M"
+          enabled
+        />
+      );
+    }
+    return <span>Upcoming</span>;
+  })();
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
@@ -32,19 +48,11 @@ export function HeroCounters() {
       <StatItem label="Max Supply">
         <AnimatedCounter value={MAX_SUPPLY / 1_000_000} suffix="M" enabled />
       </StatItem>
-      <StatItem label="Presale Sold">
-        {web3Ready && soldAmount > 0 ? (
-          <AnimatedCounter
-            value={Math.round(soldAmount / 1_000_000)}
-            suffix="M"
-            enabled
-          />
-        ) : (
-          <span>—</span>
-        )}
+      <StatItem label="Presale">
+        {soldDisplay ?? <span>Live Soon</span>}
       </StatItem>
       <StatItem label="Network">
-        <span className="text-lg sm:text-2xl">BEP20</span>
+        <span>BEP20</span>
       </StatItem>
     </div>
   );

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { ANIMATION } from "@/lib/constants/design";
+import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
 
 type RevealProps = {
@@ -29,7 +30,13 @@ export function Reveal({
   duration = 0.8,
 }: RevealProps) {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.15 });
+  const reducedMotion = usePrefersReducedMotion();
   const offset = directionOffset[direction];
+
+  // Respect prefers-reduced-motion: skip animations entirely
+  if (reducedMotion) {
+    return <div className={cn(className)}>{children}</div>;
+  }
 
   return (
     <motion.div

@@ -17,21 +17,39 @@ export default function AppleIcon() {
           background: "#050505",
         }}
       >
+        {/* Icon container with rounded corners for apple icon */}
         <div
           style={{
-            width: 140,
-            height: 140,
-            borderRadius: 32,
-            background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.goldSecondary})`,
+            width: 148,
+            height: 148,
+            borderRadius: 34,
+            background: `linear-gradient(135deg, ${COLORS.gold}26 0%, ${COLORS.goldSecondary}0d 100%)`,
+            border: `1.5px solid ${COLORS.gold}50`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 72,
-            fontWeight: 700,
-            color: "#050505",
           }}
         >
-          N
+          <svg
+            width="72"
+            height="72"
+            viewBox="0 0 32 32"
+            fill="none"
+          >
+            <path
+              d="M8 22L16 6L24 22"
+              stroke={COLORS.goldSecondary}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10.5 18H21.5"
+              stroke={COLORS.goldSecondary}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+          </svg>
         </div>
       </div>
     ),

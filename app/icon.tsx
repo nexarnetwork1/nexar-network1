@@ -18,21 +18,50 @@ export default function Icon() {
           borderRadius: 96,
         }}
       >
+        {/* Outer glow ring */}
         <div
           style={{
-            width: 360,
-            height: 360,
-            borderRadius: 80,
-            background: `linear-gradient(135deg, ${COLORS.gold} 0%, ${COLORS.goldSecondary} 50%, ${COLORS.gold} 100%)`,
+            position: "absolute",
+            width: 380,
+            height: 380,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${COLORS.gold}22 0%, transparent 70%)`,
+          }}
+        />
+        {/* Icon container */}
+        <div
+          style={{
+            width: 320,
+            height: 320,
+            borderRadius: 72,
+            background: `linear-gradient(135deg, ${COLORS.gold}22 0%, ${COLORS.goldSecondary}0d 100%)`,
+            border: `2px solid ${COLORS.gold}40`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 180,
-            fontWeight: 700,
-            color: "#050505",
           }}
         >
-          N
+          {/* Nexar chevron-N mark */}
+          <svg
+            width="160"
+            height="160"
+            viewBox="0 0 32 32"
+            fill="none"
+          >
+            <path
+              d="M8 22L16 6L24 22"
+              stroke={COLORS.goldSecondary}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10.5 18H21.5"
+              stroke={COLORS.goldSecondary}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+          </svg>
         </div>
       </div>
     ),

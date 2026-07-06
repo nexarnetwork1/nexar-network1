@@ -28,16 +28,22 @@ export function RoadmapSection() {
   useEffect(() => {
     if (reducedMotion || !trackRef.current) return;
 
-    gsap.to(trackRef.current, {
-      x: () => -(trackRef.current!.scrollWidth - window.innerWidth + 100),
-      ease: "none",
-      scrollTrigger: {
-        trigger: trackRef.current,
-        start: "top 70%",
-        end: "bottom 30%",
-        scrub: 1,
-      },
+    const track = trackRef.current;
+
+    const ctx = gsap.context(() => {
+      gsap.to(track, {
+        x: () => -(track.scrollWidth - (track.parentElement?.clientWidth ?? window.innerWidth) + 40),
+        ease: "none",
+        scrollTrigger: {
+          trigger: track,
+          start: "top 70%",
+          end: "bottom 30%",
+          scrub: 1,
+        },
+      });
     });
+
+    return () => ctx.revert();
   }, [reducedMotion]);
 
   const completedCount = ROADMAP.filter((p) => p.status === "completed").length;

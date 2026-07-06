@@ -6,7 +6,11 @@ import { SITE } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: `Privacy Policy for ${SITE.name}.`,
+  description: `Privacy Policy for ${SITE.name}. Learn how we handle your data in our decentralized application.`,
+  openGraph: {
+    title: `Privacy Policy | ${SITE.name}`,
+    description: `Privacy Policy for ${SITE.name}.`,
+  },
 };
 
 export default function PrivacyPage() {
