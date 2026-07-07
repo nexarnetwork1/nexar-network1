@@ -9,6 +9,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { Reveal } from "@/components/ui/Reveal";
 
+const SOCIAL_LINKS = [
+  { href: FOUNDER.linkedin, icon: FaLinkedin, label: "LinkedIn" },
+];
+
 export function FounderSection() {
   return (
     <section id="founder" className="section-padding relative overflow-hidden">
@@ -28,10 +32,11 @@ export function FounderSection() {
 
               {/* Card frame */}
               <div className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-b from-card via-surface to-background">
+                {/* Founder image from public folder */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/founder.svg"
-                  alt={`${FOUNDER.name}, Founder & CEO of Nexar Network`}
+                  alt={`${FOUNDER.name}, ${FOUNDER.role}`}
                   width={400}
                   height={500}
                   className="h-auto w-full object-cover"
@@ -108,20 +113,30 @@ export function FounderSection() {
               </div>
             </Reveal>
 
-            {/* LinkedIn CTA */}
+            {/* Social Links */}
             <Reveal delay={0.4}>
-              <motion.a
-                href={FOUNDER.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                className="mt-10 inline-flex items-center gap-3 rounded-full border border-border bg-card/40 px-6 py-3 text-sm font-medium transition-all duration-300 hover:border-gold/30 hover:bg-card/70 hover:text-gold"
-                aria-label={`Connect with ${FOUNDER.name} on LinkedIn`}
-              >
-                <FaLinkedin className="h-4 w-4 text-[#0A66C2]" />
-                Connect on LinkedIn
-              </motion.a>
+              <div className="mt-10">
+                <p className="mb-4 text-xs tracking-[0.2em] text-muted uppercase">
+                  Connect
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {SOCIAL_LINKS.map(({ href, icon: Icon, label }) => (
+                    <motion.a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-2.5 text-sm font-medium transition-all duration-300 hover:border-gold/30 hover:bg-card/70 hover:text-gold"
+                      aria-label={`Connect with ${FOUNDER.name} on ${label}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {label}
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
             </Reveal>
           </div>
         </div>

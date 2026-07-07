@@ -56,7 +56,7 @@ export function Logo({ className, showText = true }: LogoProps) {
       {showText && (
         <div className="flex flex-col leading-none">
           <span className="font-heading text-sm font-semibold tracking-[0.18em] text-white uppercase">
-            Nexar
+            Nexar Network
           </span>
           <span className="font-mono text-[10px] tracking-[0.35em] text-gold-secondary/80 uppercase">
             {SITE.ticker}

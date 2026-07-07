@@ -104,7 +104,7 @@ export default function Image() {
                 lineHeight: 1,
               }}
             >
-              NEXAR
+              NEXAR NETWORK
             </span>
             <span
               style={{

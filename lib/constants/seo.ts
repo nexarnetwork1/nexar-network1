@@ -76,9 +76,12 @@ export const organizationSchema = {
   description: SITE.description,
   logo: `${SITE.url}/icon`,
   sameAs: [
-    "https://x.com/nexarnetwork",
-    "https://t.me/nexarnetwork",
-    "https://github.com/nexarnetwork",
+    "https://x.com/NexarNetwork1",
+    "https://t.me/NexarNetwork",
+    "https://github.com/nexarnetwork1",
+    "https://instagram.com/nexarnetwork1",
+    "https://facebook.com/share/1EPeMgVPpa/",
+    "https://linkedin.com/in/mahmoud-elgabry-142644419",
   ],
   founder: {
     "@type": "Person",

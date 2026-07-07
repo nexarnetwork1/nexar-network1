@@ -7,7 +7,6 @@ import {
   FaGithub,
   FaFacebook,
   FaInstagram,
-  FaYoutube,
 } from "react-icons/fa6";
 import { SITE, SOCIAL, CONTRACTS } from "@/lib/constants/site";
 import { FOOTER_LINKS } from "@/lib/constants/navigation";
@@ -20,7 +19,7 @@ const SOCIAL_ICONS = [
   { href: SOCIAL.github, icon: FaGithub, label: "GitHub" },
   { href: SOCIAL.facebook, icon: FaFacebook, label: "Facebook" },
   { href: SOCIAL.instagram, icon: FaInstagram, label: "Instagram" },
-  { href: SOCIAL.youtube, icon: FaYoutube, label: "YouTube" },
+  { href: SOCIAL.linkedin, icon: FaLinkedin, label: "LinkedIn" },
 ];
 
 export function Footer() {

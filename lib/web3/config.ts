@@ -4,7 +4,7 @@ import { cookieStorage, createStorage } from "@wagmi/core";
 import { SITE } from "@/lib/constants/site";
 
 export const projectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "75c7e540ba71f0eee23e5c45ac7fa5ae";
 
 export const bscChain = bsc;
 

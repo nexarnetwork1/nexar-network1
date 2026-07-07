@@ -19,10 +19,10 @@ export const CONTRACTS = {
 } as const;
 
 export const SOCIAL = {
-  x: "https://x.com/nexarnetwork",
-  telegram: "https://t.me/nexarnetwork",
-  github: "https://github.com/nexarnetwork",
-  facebook: "https://facebook.com/nexarnetwork",
-  instagram: "https://instagram.com/nexarnetwork",
-  youtube: "https://youtube.com/@nexarnetwork",
+  x: "https://x.com/NexarNetwork1",
+  telegram: "https://t.me/NexarNetwork",
+  github: "https://github.com/nexarnetwork1",
+  facebook: "https://facebook.com/share/1EPeMgVPpa/",
+  instagram: "https://instagram.com/nexarnetwork1",
+  linkedin: "https://linkedin.com/in/mahmoud-elgabry-142644419",
 } as const;

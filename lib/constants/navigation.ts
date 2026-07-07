@@ -3,27 +3,22 @@ import type { NavItem } from "@/types";
 export const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
-  { label: "Technology", href: "#technology" },
-  { label: "Tokenomics", href: "#tokenomics" },
-  { label: "Ecosystem", href: "#ecosystem" },
-  { label: "Roadmap", href: "#roadmap" },
-  { label: "Security", href: "#security" },
   { label: "Founder", href: "#founder" },
   { label: "Whitepaper", href: "#whitepaper" },
+  { label: "Market", href: "/market" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const FOOTER_LINKS = {
   quick: [
     { label: "About", href: "#about" },
-    { label: "Technology", href: "#technology" },
-    { label: "Tokenomics", href: "#tokenomics" },
-    { label: "Ecosystem", href: "#ecosystem" },
-    { label: "Roadmap", href: "#roadmap" },
+    { label: "Founder", href: "#founder" },
+    { label: "Whitepaper", href: "#whitepaper" },
+    { label: "Market", href: "/market" },
+    { label: "Contact", href: "/contact" },
   ],
   resources: [
     { label: "Whitepaper", href: "/whitepaper" },
-    { label: "Security", href: "#security" },
-    { label: "Founder", href: "#founder" },
     { label: "Documentation", href: "/whitepaper" },
   ],
   legal: [
