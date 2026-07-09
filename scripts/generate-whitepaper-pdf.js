@@ -1,145 +1,255 @@
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
 
-const whitepaperContent = fs.readFileSync('./public/whitepaper.txt', 'utf-8');
-const lines = whitepaperContent.split('\n');
+const INPUT = "./public/whitepaper.txt";
+const OUTPUT = "./public/whitepaper.pdf";
+
+const text = fs.readFileSync(INPUT, "utf8");
+
+const GOLD = "#D4AF37";
+const WHITE = "#FFFFFF";
+const GRAY = "#B8B8B8";
+const BLACK = "#0A0A0A";
 
 const doc = new PDFDocument({
+  size: "A4",
   margin: 60,
-  size: 'A4',
+  autoFirstPage: false,
   info: {
-    Title: 'Nexar Network Technical Whitepaper',
-    Author: 'Nexar Network',
-    Subject: 'Decentralized Payment Infrastructure',
-    Keywords: 'blockchain, payments, NXR, BNB Smart Chain',
-  }
+    Title: "Nexar Network Whitepaper",
+    Author: "Nexar Network",
+    Subject: "Blockchain Payment Infrastructure",
+    Creator: "Nexar Network",
+  },
 });
 
-doc.pipe(fs.createWriteStream('./public/whitepaper.pdf'));
+doc.pipe(fs.createWriteStream(OUTPUT));
 
-// Cover page
-doc.fontSize(32)
-   .fillColor('#D4AF37')
-   .font('Helvetica-Bold')
-   .text('NEXAR NETWORK', { align: 'center' })
-   .moveDown(0.5);
+function addDarkPage() {
+  doc.addPage({
+    margin: 60,
+  });
 
-doc.fontSize(18)
-   .fillColor('#666')
-   .font('Helvetica')
-   .text('Technical Whitepaper', { align: 'center' })
-   .moveDown(1);
+  doc.save();
 
-doc.fontSize(12)
-   .fillColor('#999')
-   .text('Version 1.0', { align: 'center' })
-   .moveDown(0.3)
-   .text('July 2026', { align: 'center' })
-   .moveDown(2);
+  doc.rect(
+    0,
+    0,
+    doc.page.width,
+    doc.page.height
+  ).fill(BLACK);
 
-doc.fontSize(10)
-   .fillColor('#666')
-   .text('Decentralized Payment Infrastructure', { align: 'center' })
-   .moveDown(3);
+  doc.restore();
 
-doc.fontSize(9)
-   .fillColor('#999')
-   .text('nexar.network', { align: 'center' });
+  doc.fillColor(WHITE);
+  doc.font("Helvetica");
+  doc.fontSize(11);
 
-doc.addPage();
+  doc.x = 60;
+  doc.y = 60;
+}
 
-let y = 80;
-let currentPage = 2;
-const pageHeight = doc.page.height;
-const marginBottom = 60;
-
-function checkPageSpace(neededSpace = 30) {
-  if (y + neededSpace > pageHeight - marginBottom) {
-    // Add page number before new page
-    doc.fontSize(9)
-       .fillColor('#999')
-       .text(`Page ${currentPage}`, 50, pageHeight - 40, { align: 'center' });
-    
-    doc.addPage();
-    y = 80;
-    currentPage++;
+function ensureSpace(height = 30) {
+  if (doc.y + height > doc.page.height - 60) {
+    addDarkPage();
   }
 }
 
-// Add page number function
-function addPageNumber() {
-  doc.fontSize(9)
-     .fillColor('#999')
-     .text(`Page ${currentPage}`, 50, pageHeight - 40, { align: 'center' });
+function heading(text) {
+  ensureSpace(60);
+
+  doc.moveDown();
+
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(18)
+    .fillColor(GOLD)
+    .text(text);
+
+  doc.moveDown(0.5);
+
+  doc
+    .strokeColor(GOLD)
+    .lineWidth(1)
+    .moveTo(60, doc.y)
+    .lineTo(535, doc.y)
+    .stroke();
+
+  doc.moveDown();
+
+  doc
+    .font("Helvetica")
+    .fontSize(11)
+    .fillColor(WHITE);
 }
 
-// Process content
-let inSection = false;
-let sectionTitle = '';
+function subHeading(text) {
+  ensureSpace(40);
 
-lines.forEach((line, index) => {
-  if (line.trim() === '') {
-    y += 8;
-    return;
-  }
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(14)
+    .fillColor(GOLD)
+    .text(text);
 
-  // Check for section headers (all caps with dashes)
-  if (line.match(/^[A-Z\s\-]+$/) && line.length > 5) {
-    checkPageSpace(50);
-    doc.fontSize(16)
-       .fillColor('#D4AF37')
-       .font('Helvetica-Bold')
-       .text(line.trim(), { align: 'left' })
-       .moveDown(0.6);
-    y = doc.y;
-    inSection = true;
-    return;
-  }
+  doc.moveDown(0.5);
 
-  // Check for subsection headers (all caps shorter)
-  if (line.match(/^[A-Z\s]+$/) && line.length > 2 && line.length < 30 && !line.includes('-')) {
-    checkPageSpace(35);
-    doc.fontSize(13)
-       .fillColor('#F5E39E')
-       .font('Helvetica-Bold')
-       .text(line.trim(), { align: 'left' })
-       .moveDown(0.4);
-    y = doc.y;
-    return;
-  }
+  doc
+    .font("Helvetica")
+    .fontSize(11)
+    .fillColor(WHITE);
+}
 
-  // Check for list items (starting with -)
-  if (line.trim().startsWith('-')) {
-    checkPageSpace(20);
-    doc.fontSize(11)
-       .fillColor('#333')
-       .font('Helvetica')
-       .text(line.trim(), {
-       align: 'left',
-       width: doc.page.width - 120,
-       lineGap: 4,
-       indent: 20
+function paragraph(text) {
+  const h = doc.heightOfString(text, {
+    width: 475,
+    align: "justify",
+    lineGap: 5,
+  });
+
+  ensureSpace(h + 20);
+
+  doc
+    .font("Helvetica")
+    .fontSize(11)
+    .fillColor(WHITE)
+    .text(text, {
+      width: 475,
+      align: "justify",
+      lineGap: 5,
     });
-    y = doc.y;
-    return;
+
+  doc.moveDown(0.5);
+}
+
+function bullet(text) {
+  const h = doc.heightOfString("• " + text, {
+    width: 455,
+    indent: 15,
+    lineGap: 4,
+  });
+
+  ensureSpace(h + 15);
+
+  doc
+    .font("Helvetica")
+    .fontSize(11)
+    .fillColor(WHITE)
+    .text("• " + text, {
+      width: 455,
+      indent: 15,
+      lineGap: 4,
+    });
+
+  doc.moveDown(0.2);
+}
+
+function cover() {
+  addDarkPage();
+
+  doc.y = 120;
+
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(34)
+    .fillColor(GOLD)
+    .text("NEXAR NETWORK", {
+      align: "center",
+    });
+
+  doc.moveDown();
+
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(22)
+    .fillColor(WHITE)
+    .text("WHITEPAPER", {
+      align: "center",
+    });
+
+  doc.moveDown();
+
+  doc
+    .font("Helvetica")
+    .fontSize(14)
+    .fillColor(GRAY)
+    .text("Building the Future of Global Payments", {
+      align: "center",
+    });
+
+  doc.moveDown(2);
+
+  doc
+    .font("Helvetica")
+    .fontSize(12)
+    .fillColor(GOLD)
+    .text("Fast • Secure • Transparent • Scalable", {
+      align: "center",
+    });
+
+  addDarkPage();
+}
+
+cover();
+
+const lines = text.split(/\r?\n/);
+
+for (const raw of lines) {
+
+  const line = raw.trim();
+
+  if (!line) {
+    doc.moveDown(0.4);
+    continue;
   }
 
-  // Regular content
-  checkPageSpace(25);
-  doc.fontSize(11)
-     .fillColor('#333')
-     .font('Helvetica')
-     .text(line.trim(), {
-       align: 'left',
-       width: doc.page.width - 120,
-       lineGap: 5
-     });
-  y = doc.y;
-});
+  // تجاهل خطوط ==== و ----
+  if (/^=+$/.test(line) || /^-+$/.test(line)) {
+    continue;
+  }
 
-// Add final page number
-addPageNumber();
+  // عناوين رئيسية (1. TITLE)
+  if (/^\d+\./.test(line)) {
+    heading(line);
+    continue;
+  }
+
+  // PHASE
+  if (/^PHASE/i.test(line)) {
+    subHeading(line);
+    continue;
+  }
+
+  // نقاط
+  if (
+    line.startsWith("•") ||
+    line.startsWith("-")
+  ) {
+    bullet(line.replace(/^[-•]\s*/, ""));
+    continue;
+  }
+
+  // عناوين قصيرة بحروف كبيرة
+  if (
+    line === line.toUpperCase() &&
+    line.length < 40 &&
+    !line.includes(".")
+  ) {
+    subHeading(line);
+    continue;
+  }
+
+  // نص عادي
+  paragraph(line);
+}
+
+console.log("Whitepaper generated.");
 
 doc.end();
 
-console.log('Whitepaper PDF generated successfully at ./public/whitepaper.pdf');
+console.log("");
+console.log("======================================");
+console.log(" Nexar Whitepaper Generated");
+console.log(" Output: ./public/whitepaper.pdf");
+console.log("======================================");
+console.log("");
