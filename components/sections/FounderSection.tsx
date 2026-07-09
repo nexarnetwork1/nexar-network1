@@ -32,10 +32,10 @@ export function FounderSection() {
 
               {/* Card frame */}
               <div className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-b from-card via-surface to-background">
-                {/* Founder image from public folder */}
+                {/* Founder image - real photo */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/founder.svg"
+                  src="/images/founder.jpg"
                   alt={`${FOUNDER.name}, ${FOUNDER.role}`}
                   width={400}
                   height={500}

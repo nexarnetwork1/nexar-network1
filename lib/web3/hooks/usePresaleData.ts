@@ -6,7 +6,6 @@ import { bsc } from "@reown/appkit/networks";
 import { formatUnits } from "viem";
 import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI } from "@/lib/web3/abi";
-import { isWeb3Configured } from "@/components/providers/Web3Provider";
 
 export type PresaleStatus = "upcoming" | "active" | "ended" | "unknown";
 
@@ -73,7 +72,7 @@ const userPresaleContracts = [
 ] as const;
 
 export function usePresaleData() {
-  const web3Ready = isWeb3Configured();
+  const web3Ready = true;
   const { address } = useAccount();
   const [now, setNow] = useState(0);
 

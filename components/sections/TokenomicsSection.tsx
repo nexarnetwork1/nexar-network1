@@ -1,16 +1,17 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Copy, Check, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Reveal } from "@/components/ui/Reveal";
 import { TOKENOMICS, MAX_SUPPLY } from "@/lib/data/tokenomics";
-import { SITE, CONTRACTS } from "@/lib/constants/site";
+import { SITE } from "@/lib/constants/site";
 import { cn } from "@/lib/utils/cn";
 
 function AllocationRing() {
@@ -66,51 +67,13 @@ function AllocationRing() {
   );
 }
 
-function CopyAddress({ address, label }: { address: string; label: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background/60 px-4 py-3">
-      <div className="min-w-0">
-        <p className="text-[10px] tracking-wide text-muted uppercase">{label}</p>
-        <p className="truncate font-mono text-xs text-white">{address}</p>
-      </div>
-      <div className="flex shrink-0 gap-1">
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:text-gold"
-          aria-label={`Copy ${label}`}
-        >
-          {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-        </button>
-        <a
-          href={`https://bscscan.com/address/${address}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:text-gold"
-          aria-label={`View ${label} on BscScan`}
-        >
-          <ExternalLink className="h-3.5 w-3.5" />
-        </a>
-      </div>
-    </div>
-  );
-}
-
 export function TokenomicsSection() {
   const barsRef = useRef<HTMLDivElement>(null);
 
   return (
     <section id="tokenomics" className="section-padding relative">
       <Container>
-        <Reveal className="mb-16">
+        <Reveal className="mb-12 sm:mb-16">
           <SectionHeading
             eyebrow="Tokenomics"
             title="Transparent allocation, fixed supply"
@@ -118,10 +81,10 @@ export function TokenomicsSection() {
           />
         </Reveal>
 
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
           <Reveal>
             <AllocationRing />
-            <div className="mt-8 grid grid-cols-2 gap-3">
+            <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-2 sm:gap-3">
               {TOKENOMICS.map((item) => (
                 <div key={item.title} className="flex items-center gap-2">
                   <span
@@ -169,19 +132,15 @@ export function TokenomicsSection() {
           </div>
         </div>
 
-        <Reveal className="mt-16">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CopyAddress address={CONTRACTS.token} label="Token Contract" />
-            <CopyAddress address={CONTRACTS.presale} label="Presale Contract" />
-          </div>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <Reveal className="mt-12 sm:mt-16">
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
             {[
               { label: "Ticker", value: SITE.ticker },
               { label: "Decimals", value: String(SITE.decimals) },
               { label: "Mint", value: SITE.mint },
               { label: "Blockchain", value: "BSC" },
             ].map((item) => (
-              <div key={item.label} className="border-t border-border pt-4">
+              <div key={item.label} className="border-t border-border pt-3 sm:pt-4">
                 <p className="text-[10px] tracking-[0.2em] text-muted uppercase">
                   {item.label}
                 </p>
@@ -190,6 +149,15 @@ export function TokenomicsSection() {
                 </p>
               </div>
             ))}
+          </div>
+          <div className="mt-6 sm:mt-8 text-center">
+            <Link
+              href="/market"
+              className="inline-flex items-center gap-2 text-sm text-gold transition-colors hover:text-gold-secondary"
+            >
+              View Contract Addresses
+              <ExternalLink className="h-4 w-4" />
+            </Link>
           </div>
         </Reveal>
       </Container>

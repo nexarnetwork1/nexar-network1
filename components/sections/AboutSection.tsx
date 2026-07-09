@@ -132,8 +132,8 @@ export function AboutSection() {
               </div>
 
               <div className="absolute -left-4 bottom-1/4 about-stat luxury-border rounded-xl bg-card/60 px-4 py-3 backdrop-blur-md">
-                <p className="text-[10px] tracking-wide text-muted uppercase">Founder</p>
-                <p className="text-sm font-medium text-white">{SITE.founder.split(" ")[0]}</p>
+                <p className="text-[10px] tracking-wide text-muted uppercase">NXR</p>
+                <p className="text-sm font-medium text-white">{SITE.ticker}</p>
               </div>
 
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 about-stat luxury-border rounded-xl bg-card/60 px-4 py-3 backdrop-blur-md">

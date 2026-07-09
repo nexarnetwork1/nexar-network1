@@ -3,29 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ExternalLink, RefreshCw } from "lucide-react";
+import { ArrowLeft, ExternalLink, RefreshCw, Copy, Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SITE, CONTRACTS } from "@/lib/constants/site";
-import { CopyButton } from "./CopyButton";
-
-const COIN_IDS = [
-  "bitcoin",
-  "ethereum",
-  "binancecoin",
-  "solana",
-  "ripple",
-  "dogecoin",
-  "tron",
-  "toncoin",
-  "cardano",
-  "avalanche-2",
-  "chainlink",
-  "sui",
-  "polkadot",
-  "litecoin",
-  "tether",
-  "usd-coin",
-];
 
 type CryptoData = {
   id: string;
@@ -43,47 +23,101 @@ const EXCHANGES = [
     name: "PancakeSwap",
     status: "Coming Soon",
     icon: "🥞",
+    url: "#",
   },
   {
-    name: "Uniswap",
+    name: "DexScreener",
     status: "Coming Soon",
-    icon: "🦄",
+    icon: "📊",
+    url: "#",
   },
   {
-    name: "Binance DEX",
+    name: "CoinMarketCap",
     status: "Coming Soon",
-    icon: "🔷",
+    icon: "📈",
+    url: "#",
+  },
+  {
+    name: "CoinGecko",
+    status: "Coming Soon",
+    icon: "🦎",
+    url: "#",
+  },
+  {
+    name: "BscScan",
+    status: "Available",
+    icon: "�",
+    url: `https://bscscan.com/token/${CONTRACTS.token}`,
   },
 ];
+
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:text-gold"
+      aria-label={label}
+    >
+      {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+    </button>
+  );
+}
 
 export default function MarketPage() {
   const [cryptoData, setCryptoData] = useState<CryptoData[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const fetchCryptoData = async () => {
-    try {
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${COIN_IDS.join(
-          ","
-        )}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`
-      );
-      const data = await response.json();
-      setCryptoData(data);
-      setLastUpdated(new Date());
-      setLoading(false);
-    } catch (error) {
-      console.error("Failed to fetch crypto data:", error);
-      setLoading(false);
+     const fetchCryptoData = async () => {
+  setLoading(true);
+
+  try {
+    const url =
+  "https://api.coingecko.com/api/v3/coins/markets" +
+  "?vs_currency=usd" +
+  "&order=market_cap_desc" +
+  "&per_page=100" +
+  "&page=1" +
+  "&sparkline=false" +
+  "&price_change_percentage=24h";
+
+    const response = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`CoinGecko ${response.status}`);
     }
-  };
+
+    const data: CryptoData[] = await response.json();
+
+    setCryptoData(data);
+    setLastUpdated(new Date());
+  } catch (error) {
+    console.error("Failed to fetch crypto data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     const fetchData = () => {
       fetchCryptoData();
     };
     fetchData();
-    const interval = setInterval(fetchData, 5000); // Refresh every 5 seconds
+    const interval = setInterval(fetchData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -247,8 +281,8 @@ export default function MarketPage() {
             <div className="mt-6 space-y-4">
               <div>
                 <p className="mb-2 text-xs tracking-wide text-muted uppercase">Token Address</p>
-                <div className="flex items-center gap-3 rounded-xl border border-border bg-background/80 px-4 py-3">
-                  <code className="flex-1 font-mono text-sm text-gold-secondary">
+                <div className="flex items-center gap-2 sm:gap-3 rounded-xl border border-border bg-background/80 px-3 sm:px-4 py-3">
+                  <code className="min-w-0 flex-1 font-mono text-xs sm:text-sm text-gold-secondary truncate">
                     {CONTRACTS.token}
                   </code>
                   <CopyButton text={CONTRACTS.token} label="Copy token address" />
@@ -256,7 +290,7 @@ export default function MarketPage() {
                     href={`https://bscscan.com/token/${CONTRACTS.token}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-lg border border-border p-2 text-muted transition-colors hover:border-gold/30 hover:text-gold"
+                    className="flex shrink-0 rounded-lg border border-border p-2 text-muted transition-colors hover:border-gold/30 hover:text-gold"
                     aria-label="View on BscScan"
                   >
                     <ExternalLink className="h-4 w-4" />
@@ -266,8 +300,8 @@ export default function MarketPage() {
 
               <div>
                 <p className="mb-2 text-xs tracking-wide text-muted uppercase">Presale Contract</p>
-                <div className="flex items-center gap-3 rounded-xl border border-border bg-background/80 px-4 py-3">
-                  <code className="flex-1 font-mono text-sm text-gold-secondary">
+                <div className="flex items-center gap-2 sm:gap-3 rounded-xl border border-border bg-background/80 px-3 sm:px-4 py-3">
+                  <code className="min-w-0 flex-1 font-mono text-xs sm:text-sm text-gold-secondary truncate">
                     {CONTRACTS.presale}
                   </code>
                   <CopyButton text={CONTRACTS.presale} label="Copy presale address" />
@@ -275,7 +309,7 @@ export default function MarketPage() {
                     href={`https://bscscan.com/address/${CONTRACTS.presale}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-lg border border-border p-2 text-muted transition-colors hover:border-gold/30 hover:text-gold"
+                    className="flex shrink-0 rounded-lg border border-border p-2 text-muted transition-colors hover:border-gold/30 hover:text-gold"
                     aria-label="View on BscScan"
                   >
                     <ExternalLink className="h-4 w-4" />
@@ -286,7 +320,7 @@ export default function MarketPage() {
           </div>
 
           {/* Token Stats */}
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Ticker</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-white">
@@ -305,6 +339,36 @@ export default function MarketPage() {
                 {SITE.maxSupply}
               </p>
             </div>
+            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+              <p className="text-xs tracking-wide text-muted uppercase">Mint Status</p>
+              <p className="mt-2 font-heading text-2xl font-semibold text-gold">
+                Disabled
+              </p>
+            </div>
+            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+              <p className="text-xs tracking-wide text-muted uppercase">Decimals</p>
+              <p className="mt-2 font-heading text-2xl font-semibold text-white">
+                18
+              </p>
+            </div>
+            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+              <p className="text-xs tracking-wide text-muted uppercase">Contract</p>
+              <p className="mt-2 font-heading text-2xl font-semibold text-emerald-400">
+                Verified
+              </p>
+            </div>
+            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+              <p className="text-xs tracking-wide text-muted uppercase">Token Type</p>
+              <p className="mt-2 font-heading text-2xl font-semibold text-white">
+                Utility
+              </p>
+            </div>
+            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+              <p className="text-xs tracking-wide text-muted uppercase">Blockchain</p>
+              <p className="mt-2 font-heading text-2xl font-semibold text-white">
+                BSC
+              </p>
+            </div>
           </div>
 
           {/* Exchanges */}
@@ -314,20 +378,28 @@ export default function MarketPage() {
               {SITE.ticker} will be listed on the following exchanges after presale
             </p>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {EXCHANGES.map((exchange) => (
-                <div
+                <a
                   key={exchange.name}
-                  className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl"
+                  href={exchange.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl transition-all hover:border-gold/30 hover:bg-card/60"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">{exchange.icon}</span>
-                    <div>
+                    <div className="flex-1">
                       <p className="font-heading text-lg font-semibold">{exchange.name}</p>
-                      <p className="text-xs text-muted">{exchange.status}</p>
+                      <p className={`text-xs ${exchange.status === "Available" ? "text-emerald-400" : "text-muted"}`}>
+                        {exchange.status}
+                      </p>
                     </div>
+                    {exchange.status === "Available" && (
+                      <ExternalLink className="h-4 w-4 text-muted" />
+                    )}
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>

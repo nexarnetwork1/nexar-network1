@@ -7,6 +7,7 @@ import {
   FaGithub,
   FaFacebook,
   FaInstagram,
+  FaLinkedin,
 } from "react-icons/fa6";
 import { SITE, SOCIAL, CONTRACTS } from "@/lib/constants/site";
 import { FOOTER_LINKS } from "@/lib/constants/navigation";
@@ -25,14 +26,14 @@ const SOCIAL_ICONS = [
 export function Footer() {
   return (
     <footer className="relative border-t border-border bg-surface/40 backdrop-blur-xl">
-      <Container className="py-16 lg:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+      <Container className="py-12 sm:py-16 lg:py-20">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <Logo />
-            <p className="mt-5 max-w-xs text-sm leading-7 text-muted">
+            <p className="mt-4 sm:mt-5 max-w-xs text-sm leading-7 text-muted">
               {SITE.description}
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
               {SOCIAL_ICONS.map(({ href, icon: Icon, label }) => (
                 <a
                   key={label}
@@ -40,7 +41,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted transition-all hover:border-gold/30 hover:text-gold"
+                  className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-border text-muted transition-all hover:border-gold/30 hover:text-gold"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -52,7 +53,7 @@ export function Footer() {
             <h4 className="text-xs font-medium tracking-[0.2em] text-white uppercase">
               Quick Links
             </h4>
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-4 sm:mt-5 space-y-2 sm:space-y-3">
               {FOOTER_LINKS.quick.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -70,7 +71,7 @@ export function Footer() {
             <h4 className="text-xs font-medium tracking-[0.2em] text-white uppercase">
               Resources
             </h4>
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-4 sm:mt-5 space-y-2 sm:space-y-3">
               {FOOTER_LINKS.resources.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -88,7 +89,7 @@ export function Footer() {
             <h4 className="text-xs font-medium tracking-[0.2em] text-white uppercase">
               Legal
             </h4>
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-4 sm:mt-5 space-y-2 sm:space-y-3">
               {FOOTER_LINKS.legal.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -103,8 +104,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
-          <p className="text-xs text-muted">
+        <div className="mt-8 sm:mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:pt-8 sm:flex-row">
+          <p className="text-xs text-muted text-center sm:text-left">
             &copy; {new Date().getFullYear()} {SITE.name}. All rights reserved.
           </p>
           <p className="font-mono text-[10px] text-muted/50">

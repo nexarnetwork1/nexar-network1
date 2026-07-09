@@ -1,17 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, ArrowUp, Search } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SITE, CONTRACTS } from "@/lib/constants/site";
-
-export const metadata: Metadata = {
-  title: "Whitepaper",
-  description: `Read the ${SITE.name} technical whitepaper covering architecture, tokenomics, ecosystem design, security model, and the path to sovereign chain infrastructure.`,
-  openGraph: {
-    title: `Technical Whitepaper | ${SITE.name}`,
-    description: `The complete ${SITE.name} vision — architecture, tokenomics, ecosystem, and the path to sovereign chain infrastructure.`,
-  },
-};
+import { useState, useEffect } from "react";
 
 const WHITEPAPER_SECTIONS = [
   { id: "executive-summary", title: "Executive Summary" },
@@ -25,6 +18,50 @@ const WHITEPAPER_SECTIONS = [
 ];
 
 export default function WhitepaperPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSection, setActiveSection] = useState("");
+  const [readingProgress, setReadingProgress] = useState(0);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / scrollHeight) * 100;
+      setReadingProgress(progress);
+      setShowBackToTop(window.scrollY > 500);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    WHITEPAPER_SECTIONS.forEach((section) => {
+      const element = document.getElementById(section.id);
+      if (element) observer.observe(element);
+    });
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
+    };
+  }, []);
+
+  const filteredSections = WHITEPAPER_SECTIONS.filter((section) =>
+    section.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <main className="nav-offset min-h-screen bg-background">
       <Container className="py-16 lg:py-24">
@@ -36,20 +73,50 @@ export default function WhitepaperPage() {
           Back to home
         </Link>
 
-        <div className="grid gap-12 lg:grid-cols-[240px_1fr]">
+        {/* Reading Progress Bar */}
+        <div className="fixed top-[5rem] left-0 right-0 z-40 h-0.5 bg-border">
+          <div
+            className="h-full bg-gradient-to-r from-gold to-gold-secondary transition-all duration-150"
+            style={{ width: `${readingProgress}%` }}
+          />
+        </div>
+
+        <div className="grid gap-12 lg:grid-cols-[280px_1fr]">
           {/* Sticky Sidebar - Desktop */}
           <aside className="hidden lg:block">
-            <div className="sticky top-24 space-y-6">
+            <div className="sticky top-28 space-y-6">
+              {/* Search */}
+              <div>
+                <p className="mb-3 text-xs font-medium tracking-[0.24em] text-gold uppercase">
+                  Search
+                </p>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+                  <input
+                    type="text"
+                    placeholder="Search sections..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background/80 pl-9 pr-4 py-2.5 text-sm text-white outline-none focus:border-gold/40"
+                  />
+                </div>
+              </div>
+
+              {/* Table of Contents */}
               <div>
                 <p className="mb-4 text-xs font-medium tracking-[0.24em] text-gold uppercase">
                   Contents
                 </p>
-                <nav className="space-y-2">
-                  {WHITEPAPER_SECTIONS.map((section) => (
+                <nav className="space-y-1">
+                  {filteredSections.map((section) => (
                     <a
                       key={section.id}
                       href={`#${section.id}`}
-                      className="block text-sm text-muted transition-colors hover:text-gold"
+                      className={`block text-sm py-1.5 px-2 rounded-lg transition-colors ${
+                        activeSection === section.id
+                          ? "bg-gold/10 text-gold"
+                          : "text-muted hover:text-white hover:bg-white/5"
+                      }`}
                     >
                       {section.title}
                     </a>
@@ -60,11 +127,11 @@ export default function WhitepaperPage() {
               <div className="pt-6 border-t border-border">
                 <a
                   href="/whitepaper.pdf"
-                  download
+                  download="Nexar-Network-Whitepaper.pdf"
                   className="inline-flex items-center gap-2 text-sm text-gold transition-colors hover:text-gold-secondary"
                 >
                   <Download className="h-4 w-4" />
-                  Download PDF
+                  Download Whitepaper
                 </a>
               </div>
             </div>
@@ -91,11 +158,11 @@ export default function WhitepaperPage() {
             <div className="mb-8 lg:hidden">
               <a
                 href="/whitepaper.pdf"
-                download
+                download="Nexar-Network-Whitepaper.pdf"
                 className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-gold-secondary"
               >
                 <Download className="h-4 w-4" />
-                Download PDF
+                Download Whitepaper
               </a>
             </div>
 
@@ -329,6 +396,18 @@ export default function WhitepaperPage() {
                 </div>
               </section>
             </article>
+
+            {/* Back to Top Button */}
+            {showBackToTop && (
+              <button
+                type="button"
+                onClick={scrollToTop}
+                className="fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface/80 backdrop-blur-xl text-gold shadow-lg transition-all hover:border-gold/30 hover:bg-gold hover:text-background"
+                aria-label="Back to top"
+              >
+                <ArrowUp className="h-5 w-5" />
+              </button>
+            )}
           </div>
         </div>
       </Container>

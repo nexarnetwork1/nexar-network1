@@ -1,0 +1,64 @@
+{
+  "name": "Nexar Network",
+  "short_name": "Nexar",
+  "description": "Decentralized payment infrastructure for the global economy",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "business"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Buy NXR",
+      "short_name": "Buy",
+      "description": "Buy NXR tokens",
+      "url": "/#buy",
+      "icons": [
+        {
+          "src": "/icon-512",
+          "sizes": "512x512"
+        }
+      ]
+    },
+    {
+      "name": "Whitepaper",
+      "short_name": "Docs",
+      "description": "Read the whitepaper",
+      "url": "/whitepaper",
+      "icons": [
+        {
+          "src": "/icon-512",
+          "sizes": "512x512"
+        }
+      ]
+    },
+    {
+      "name": "Market",
+      "short_name": "Market",
+      "description": "View market data",
+      "url": "/market",
+      "icons": [
+        {
+          "src": "/icon-512",
+          "sizes": "512x512"
+        }
+      ]
+    }
+  ]
+}

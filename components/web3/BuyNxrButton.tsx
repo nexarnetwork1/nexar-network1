@@ -15,7 +15,7 @@ import { AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
-import { useAppKit } from "@reown/appkit/react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI, ERC20_ABI } from "@/lib/web3/abi";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
@@ -38,7 +38,7 @@ export function BuyNxrModal({ open, onClose }: BuyNxrModalProps) {
 function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const { open: openWallet } = useAppKit();
+const { openConnectModal } = useConnectModal();
   const { switchChain } = useSwitchChain();
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -90,7 +90,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
   const ensureWallet = (): boolean => {
     reset();
     if (!isConnected) {
-      openWallet();
+openConnectModal?.();
       return false;
     }
     if (chainId !== bsc.id) {
@@ -196,6 +196,10 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
 
               {method === "bnb" ? (
                 <div className="space-y-4">
+                  <div className="flex items-center justify-between text-xs text-muted">
+                    <span>Balance</span>
+                    <span className="font-mono">{address ? "~0.00 BNB" : "Connect wallet"}</span>
+                  </div>
                   <label className="block">
                     <span className="mb-2 block text-xs tracking-wide text-muted uppercase">
                       BNB Amount
@@ -209,18 +213,34 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
                       className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono text-white outline-none focus:border-gold/40"
                     />
                   </label>
+                  <div className="rounded-xl border border-border bg-background/60 p-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted">Estimated NXR</span>
+                      <span className="font-mono text-gold-secondary">
+                        ~{(parseFloat(bnbAmount) * 10000).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-between text-[10px] text-muted/70">
+                      <span>Price</span>
+                      <span>1 BNB ≈ 10,000 NXR</span>
+                    </div>
+                  </div>
                   <Button
                     className="w-full"
                     size="lg"
                     glow
                     onClick={handleBuyBnb}
-                    disabled={isPending || isConfirming}
+                    disabled={isPending || isConfirming || !presaleActive}
                   >
-                    {isPending || isConfirming ? "Confirming…" : "Buy with BNB"}
+                    {isPending || isConfirming ? "Confirming…" : presaleActive ? "Buy with BNB" : "Presale Closed"}
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
+                  <div className="flex items-center justify-between text-xs text-muted">
+                    <span>Balance</span>
+                    <span className="font-mono">{address ? "~0.00 USDT" : "Connect wallet"}</span>
+                  </div>
                   <label className="block">
                     <span className="mb-2 block text-xs tracking-wide text-muted uppercase">
                       USDT Amount
@@ -234,12 +254,24 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
                       className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono text-white outline-none focus:border-gold/40"
                     />
                   </label>
+                  <div className="rounded-xl border border-border bg-background/60 p-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted">Estimated NXR</span>
+                      <span className="font-mono text-gold-secondary">
+                        ~{(parseFloat(usdtAmount) * 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-between text-[10px] text-muted/70">
+                      <span>Price</span>
+                      <span>1 USDT ≈ 100 NXR</span>
+                    </div>
+                  </div>
                   <Button
                     className="w-full"
                     size="lg"
                     glow
                     onClick={handleUsdtFlow}
-                    disabled={isPending || isConfirming}
+                    disabled={isPending || isConfirming || !presaleActive}
                   >
                     {isPending || isConfirming
                       ? step === "approve"

@@ -36,28 +36,22 @@ export function GET() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            padding: 50,
           }}
         >
-          <svg
-            width="200"
-            height="200"
-            viewBox="0 0 32 32"
-            fill="none"
-          >
-            <path
-              d="M8 22L16 6L24 22"
-              stroke={COLORS.goldSecondary}
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M10.5 18H21.5"
-              stroke={COLORS.goldSecondary}
-              strokeWidth="2.4"
-              strokeLinecap="round"
-            />
-          </svg>
+          {/* Official logo image */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://nexar.network/images/logo.png"
+            alt="Nexar Network"
+            width={280}
+            height={70}
+            style={{
+              width: "auto",
+              height: 280,
+              objectFit: "contain",
+            }}
+          />
         </div>
       </div>
     ),

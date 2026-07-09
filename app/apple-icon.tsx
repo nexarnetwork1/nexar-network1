@@ -28,28 +28,21 @@ export default function AppleIcon() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            padding: 20,
           }}
         >
-          <svg
-            width="72"
-            height="72"
-            viewBox="0 0 32 32"
-            fill="none"
-          >
-            <path
-              d="M8 22L16 6L24 22"
-              stroke={COLORS.goldSecondary}
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M10.5 18H21.5"
-              stroke={COLORS.goldSecondary}
-              strokeWidth="2.4"
-              strokeLinecap="round"
-            />
-          </svg>
+          {/* Official logo image */}
+          <img
+            src="https://nexar.network/images/logo.png"
+            alt="Nexar Network"
+            width={108}
+            height={27}
+            style={{
+              width: "auto",
+              height: 108,
+              objectFit: "contain",
+            }}
+          />
         </div>
       </div>
     ),

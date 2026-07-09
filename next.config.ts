@@ -17,9 +17,9 @@ const cspHeader = [
   // Fonts: self + Google Fonts CDN
   "font-src 'self' https://fonts.gstatic.com",
   // Images: self + data URIs (for canvas/og images) + blob
-  "img-src 'self' data: blob:",
+"img-src 'self' data: blob: https://coin-images.coingecko.com https://assets.coingecko.com",
   // Connections: self + WalletConnect relay + BSC public RPC + Reown API
-  "connect-src 'self' https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://relay.walletconnect.com wss://relay.walletconnect.com https://rpc.ankr.com https://bsc-dataseed.binance.org https://bsc-dataseed1.binance.org https://bsc-dataseed2.binance.org https://bsc-dataseed3.binance.org https://bsc-dataseed4.binance.org https://*.reown.com",
+ "connect-src 'self' https://api.coingecko.com https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://relay.walletconnect.com wss://relay.walletconnect.com https://rpc.ankr.com https://bsc-dataseed.binance.org https://bsc-dataseed1.binance.org https://bsc-dataseed2.binance.org https://bsc-dataseed3.binance.org https://bsc-dataseed4.binance.org https://*.reown.com",
   // Frames: none (no iframes needed)
   "frame-src 'none'",
   // Objects: none
@@ -34,6 +34,24 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  // Performance optimizations
+  compress: true,
+  // Image optimization
+ images: {
+  remotePatterns: [
+    {
+      protocol: "https",
+      hostname: "coin-images.coingecko.com",
+    },
+    {
+      protocol: "https",
+      hostname: "assets.coingecko.com",
+    },
+  ],
+  formats: ["image/avif", "image/webp"],
+  deviceSizes: [320, 375, 390, 414, 640, 750, 828, 1024, 1280, 1440],
+  imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+},
   async headers() {
     return [
       {
@@ -58,6 +76,14 @@ const nextConfig: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
         ],
       },

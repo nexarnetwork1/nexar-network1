@@ -11,7 +11,7 @@ import {
 import { bsc } from "@reown/appkit/networks";
 import { Gift } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAppKit } from "@reown/appkit/react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { CONTRACTS } from "@/lib/constants/site";
@@ -28,7 +28,7 @@ type ClaimNxrModalProps = {
 export function ClaimNxrModal({ open, onClose }: ClaimNxrModalProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const { open: openWallet } = useAppKit();
+const { openConnectModal } = useConnectModal();
   const { switchChain } = useSwitchChain();
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
@@ -37,7 +37,7 @@ export function ClaimNxrModal({ open, onClose }: ClaimNxrModalProps) {
   const handleClaim = () => {
     reset();
     if (!isConnected) {
-      openWallet();
+openConnectModal?.();
       return;
     }
     if (chainId !== bsc.id) {

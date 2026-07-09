@@ -3,6 +3,7 @@ import { Inter, Sora, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackgroundEffect } from "@/components/background/BackgroundEffect";
 import { AppProviders } from "@/components/providers/AppProviders";
+import { CookieConsent } from "@/components/ui/CookieConsent";
 import {
   organizationSchema,
   websiteSchema,
@@ -29,7 +30,10 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-export const metadata: Metadata = siteMetadata;
+export const metadata: Metadata = {
+  ...siteMetadata,
+  manifest: "/manifest.json",
+};
 
 export const viewport: Viewport = {
   themeColor: "#050505",
@@ -78,6 +82,7 @@ export default function RootLayout({
           <BackgroundEffect />
           <Navbar />
           <div id="main-content" className="relative z-10 flex min-h-screen flex-col">{children}</div>
+          <CookieConsent />
         </AppProviders>
       </body>
     </html>

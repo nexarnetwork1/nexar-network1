@@ -4,7 +4,7 @@ export const SITE = {
   tagline: "Build the future decentralized payment infrastructure.",
   description:
     "Nexar Network is building a premium blockchain ecosystem focused on global payments. Starting on BNB Smart Chain, evolving into sovereign payment infrastructure.",
-  url: "https://nexar.network",
+  url: "https://nexar.network.netlify.app",
   founder: "Mahmoud Elgabry",
   blockchain: "BNB Smart Chain (BEP20)",
   maxSupply: "500,000,000",

@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { SITE, CONTRACTS } from "@/lib/constants/site";
+import { SITE } from "@/lib/constants/site";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { BuyNxrButton } from "@/components/web3/BuyNxrButton";
 import { Button } from "@/components/ui/Button";
@@ -55,9 +55,9 @@ export function HeroSection() {
       id="home"
       className="relative flex min-h-[calc(100vh-var(--nxr-nav-height))] items-center overflow-hidden"
     >
-      <Container className="relative py-16 lg:py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
-          <motion.div style={{ y: contentY, opacity }} className="relative z-10">
+      <Container className="relative py-12 sm:py-16 lg:py-24">
+        <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+          <motion.div style={{ y: contentY, opacity }} className="relative z-10 order-2 lg:order-1">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -79,7 +79,7 @@ export function HeroSection() {
 
             <h1
               ref={headlineRef}
-              className="font-heading text-[clamp(2.6rem,6.5vw,5.5rem)] leading-[0.92] font-semibold tracking-[-0.04em]"
+              className="font-heading text-[clamp(2rem,6.5vw,5.5rem)] leading-[0.92] font-semibold tracking-[-0.04em]"
               style={{ perspective: "800px" }}
             >
               <span className="hero-word inline-block">The</span>{" "}
@@ -99,7 +99,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-8 max-w-lg text-lg leading-8 text-muted"
+              className="mt-6 max-w-lg text-base sm:text-lg leading-7 sm:leading-8 text-muted"
             >
               {SITE.tagline} Sovereign blockchain payment rails — starting on
               BNB Smart Chain, evolving into Nexar Chain.
@@ -109,7 +109,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-10 flex flex-wrap items-center gap-3"
+              className="mt-8 flex flex-wrap items-center gap-2 sm:gap-3"
             >
               <ConnectWalletButton size="lg" magnetic glow />
               <BuyNxrButton />
@@ -129,20 +129,11 @@ export function HeroSection() {
             >
               <HeroCounters />
             </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="mt-6 font-mono text-[10px] tracking-wide text-muted/50"
-            >
-              Token · {CONTRACTS.token.slice(0, 10)}…{CONTRACTS.token.slice(-8)}
-            </motion.p>
           </motion.div>
 
           <motion.div
             style={{ y: vizY }}
-            className="relative mx-auto aspect-square w-full max-w-[520px] lg:max-w-none"
+            className="relative mx-auto aspect-square w-full max-w-[400px] sm:max-w-[520px] lg:max-w-none order-1 lg:order-2"
           >
             <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.04)_0%,transparent_70%)] blur-2xl" />
             <BlockchainVisualization />

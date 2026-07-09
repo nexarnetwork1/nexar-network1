@@ -47,7 +47,7 @@ export default function Image() {
           }}
         />
 
-        {/* Logo lockup */}
+        {/* Logo lockup using official logo image */}
         <div
           style={{
             display: "flex",
@@ -56,68 +56,17 @@ export default function Image() {
             marginBottom: 40,
           }}
         >
-          {/* Icon box */}
-          <div
+          {/* Official logo image */}
+          <img
+            src="https://nexar.network/images/logo.png"
+            alt="Nexar Network Logo"
+            width={160}
+            height={40}
             style={{
-              width: 56,
               height: 56,
-              borderRadius: 14,
-              background: `linear-gradient(135deg, ${COLORS.gold}26, ${COLORS.goldSecondary}12)`,
-              border: `1.5px solid ${COLORS.gold}40`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: "auto",
             }}
-          >
-            {/* Nexar "N" chevron mark */}
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 32 32"
-              fill="none"
-            >
-              <path
-                d="M8 22L16 6L24 22"
-                stroke={COLORS.goldSecondary}
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M10.5 18H21.5"
-                stroke={COLORS.goldSecondary}
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-
-          {/* Wordmark */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <span
-              style={{
-                color: "#ffffff",
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                lineHeight: 1,
-              }}
-            >
-              NEXAR NETWORK
-            </span>
-            <span
-              style={{
-                color: `${COLORS.goldSecondary}cc`,
-                fontSize: 11,
-                letterSpacing: "0.35em",
-                textTransform: "uppercase",
-                lineHeight: 1,
-              }}
-            >
-              {SITE.ticker}
-            </span>
-          </div>
+          />
         </div>
 
         {/* Main headline */}

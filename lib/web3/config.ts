@@ -1,25 +1,12 @@
-import { bsc } from "@reown/appkit/networks";
-import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { cookieStorage, createStorage } from "@wagmi/core";
-import { SITE } from "@/lib/constants/site";
+import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { bsc } from "wagmi/chains";
 
 export const projectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "75c7e540ba71f0eee23e5c45ac7fa5ae";
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 
-export const bscChain = bsc;
-
-export const wagmiAdapter = new WagmiAdapter({
-  storage: createStorage({ storage: cookieStorage }),
-  ssr: true,
+export const config = getDefaultConfig({
+  appName: "Nexar Network",
   projectId,
-  networks: [bsc],
+  chains: [bsc],
+  ssr: true,
 });
-
-export const wagmiConfig = wagmiAdapter.wagmiConfig;
-
-export const appKitMetadata = {
-  name: SITE.name,
-  description: SITE.description,
-  url: SITE.url,
-  icons: [`${SITE.url}/icon-512`],
-};

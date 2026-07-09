@@ -88,6 +88,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           />
           <motion.div
             ref={dialogRef}
+            id="mobile-menu"
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
@@ -107,7 +108,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
               />
             </div>
 
-            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6">
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6" aria-label="Mobile navigation">
               {NAV_ITEMS.map((item, index) => (
                 <motion.div
                   key={item.href}
@@ -121,10 +122,11 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                     className={cn(
                       "group flex items-center justify-between rounded-2xl px-4 py-3.5",
                       "font-heading text-lg text-white/90 transition-colors hover:bg-card hover:text-gold-secondary",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     )}
                   >
                     <span>{item.label}</span>
-                    <span className="font-mono text-xs text-gold/40 transition-colors group-hover:text-gold">
+                    <span className="font-mono text-xs text-gold/40 transition-colors group-hover:text-gold" aria-hidden="true">
                       0{index + 1}
                     </span>
                   </Link>

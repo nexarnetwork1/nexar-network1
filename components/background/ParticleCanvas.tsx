@@ -17,10 +17,10 @@ function createParticles(count: number, width: number, height: number): Particle
   return Array.from({ length: count }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
-    size: Math.random() * 1.8 + 0.4,
-    speedX: (Math.random() - 0.5) * 0.25,
-    speedY: (Math.random() - 0.5) * 0.25,
-    opacity: Math.random() * 0.45 + 0.15,
+    size: Math.random() * 1.5 + 0.3,
+    speedX: (Math.random() - 0.5) * 0.15,
+    speedY: (Math.random() - 0.5) * 0.15,
+    opacity: Math.random() * 0.35 + 0.1,
   }));
 }
 
@@ -43,14 +43,14 @@ export function ParticleCanvas() {
     let isVisible = true;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
       canvas.style.height = `${window.innerHeight}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const count = isMobile ? 35 : 80;
+      const count = isMobile ? 25 : 60;
       particles = createParticles(count, window.innerWidth, window.innerHeight);
     };
 
