@@ -8,13 +8,25 @@ import { useState, useEffect } from "react";
 
 const WHITEPAPER_SECTIONS = [
   { id: "executive-summary", title: "Executive Summary" },
-  { id: "problem-statement", title: "Problem Statement" },
-  { id: "nexar-architecture", title: "Nexar Network Architecture" },
-  { id: "tokenomics", title: "Tokenomics & Allocation" },
-  { id: "ecosystem-modules", title: "Ecosystem Modules" },
-  { id: "security-compliance", title: "Security & Compliance" },
-  { id: "roadmap", title: "Roadmap & Milestones" },
-  { id: "team-governance", title: "Team & Governance" },
+  { id: "industry-overview", title: "Industry Overview" },
+  { id: "current-challenges", title: "Current Challenges" },
+  { id: "nexar-solution", title: "The Nexar Solution" },
+  { id: "vision", title: "Vision" },
+  { id: "mission", title: "Mission" },
+  { id: "core-values", title: "Core Values" },
+  { id: "why-nexar", title: "Why Nexar Network" },
+  { id: "market-opportunity", title: "Market Opportunity" },
+  { id: "technology-overview", title: "Technology Overview" },
+  { id: "token-overview", title: "Token Overview" },
+  { id: "tokenomics", title: "Tokenomics" },
+  { id: "team-vesting", title: "Team Vesting" },
+  { id: "token-utility", title: "Token Utility" },
+  { id: "ecosystem", title: "Nexar Ecosystem" },
+  { id: "roadmap", title: "Roadmap" },
+  { id: "security", title: "Security & Transparency" },
+  { id: "founder", title: "Founder" },
+  { id: "legal", title: "Legal Disclaimer" },
+  { id: "conclusion", title: "Conclusion" },
 ];
 
 export default function WhitepaperPage() {
@@ -144,13 +156,13 @@ export default function WhitepaperPage() {
                 Whitepaper
               </p>
               <h1 className="font-heading text-[clamp(2rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-[-0.03em]">
-                {SITE.name} Technical Whitepaper
+                 Nexar Network Whitepaper
               </h1>
               <p className="mt-5 text-lg leading-8 text-muted">
-                A comprehensive document covering architecture, tokenomics, ecosystem design, security model, and the path to sovereign chain infrastructure.
+               The official Nexar Network Whitepaper presenting our vision, technology, ecosystem, tokenomics, roadmap, security framework, and long-term strategy for building the future of global blockchain payments.
               </p>
               <p className="mt-4 font-mono text-xs text-muted/50">
-                Version 1.0 · July 2026
+                July 2026
               </p>
             </div>
 
@@ -169,232 +181,720 @@ export default function WhitepaperPage() {
             {/* Whitepaper Content */}
             <article className="prose prose-invert max-w-none">
               {/* Executive Summary */}
-              <section id="executive-summary" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  1. Executive Summary
-                </h2>
-                <div className="space-y-4 text-muted leading-7">
-                  <p>
-                    Nexar Network is building a premium blockchain ecosystem focused on global payments. Starting on BNB Smart Chain, the project aims to evolve into sovereign payment infrastructure designed for enterprises, merchants, and communities worldwide.
-                  </p>
-                  <p>
-                    The {SITE.ticker} token serves as the native utility token within the Nexar ecosystem, facilitating transactions, governance, and value transfer across all ecosystem modules. With a maximum supply of {SITE.maxSupply} tokens and mint functionality disabled forever, {SITE.ticker} ensures a deflationary and transparent economic model.
-                  </p>
-                  <p>
-                    This whitepaper outlines the technical architecture, tokenomics, ecosystem modules, security measures, and the strategic roadmap guiding Nexar Network from its BNB Smart Chain deployment to the eventual launch of a purpose-built Nexar Chain.
-                  </p>
-                </div>
-              </section>
+             <section id="executive-summary" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    1. Executive Summary
+  </h2>
+
+  <div className="space-y-5 text-muted leading-8">
+
+    <p>
+      Nexar Network is a blockchain-powered payment ecosystem created to
+      simplify digital payments through speed, transparency, security,
+      and long-term scalability.
+    </p>
+
+    <p>
+      The project launches with the NXR token on BNB Smart Chain,
+      establishing the foundation for a global payment infrastructure
+      capable of supporting merchants, developers, businesses,
+      decentralized applications, and eventually an independent
+      blockchain.
+    </p>
+
+    <p>
+      Rather than creating another speculative cryptocurrency,
+      Nexar Network is focused on building practical financial
+      infrastructure designed for real-world adoption.
+    </p>
+
+    <p>
+      Our long-term objective is to make blockchain payments
+      faster, more affordable, easier to integrate,
+      and accessible to everyone around the world.
+    </p>
+
+  </div>
+</section>
 
               {/* Problem Statement */}
-              <section id="problem-statement" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  2. Problem Statement
-                </h2>
-                <div className="space-y-4 text-muted leading-7">
-                  <p>
-                    Current payment infrastructure faces significant challenges: high transaction fees, slow settlement times, lack of interoperability between systems, and limited access for underserved communities. Traditional financial systems exclude billions of people from the global economy, while existing blockchain solutions often struggle with scalability, user experience, and merchant adoption.
-                  </p>
-                  <p>
-                    Enterprises require payment solutions that integrate seamlessly with existing systems while providing the benefits of blockchain technology—transparency, security, and efficiency. Merchants need low-cost, fast settlement options that work across borders without complex compliance requirements.
-                  </p>
-                  <p>
-                    Nexar Network addresses these challenges by building sovereign blockchain payment rails that prioritize usability, scalability, and enterprise-grade security while maintaining the decentralized ethos of blockchain technology.
-                  </p>
-                </div>
-              </section>
+              <section id="industry-overview" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    2. Industry Overview
+  </h2>
 
+  <div className="space-y-5 text-muted leading-8">
+
+    <p>
+      Digital finance is experiencing one of the most significant
+      technological transformations in modern history.
+      Blockchain technology enables value to move globally without
+      traditional financial intermediaries, creating faster settlement,
+      lower operational costs, greater transparency,
+      and improved accessibility.
+    </p>
+
+    <p>
+      Governments, enterprises, financial institutions,
+      and technology companies are increasingly exploring
+      blockchain infrastructure for payments, settlements,
+      decentralized applications, digital identity,
+      and financial services.
+    </p>
+
+    <p>
+      Despite rapid growth, blockchain adoption continues
+      to face practical challenges including fragmented ecosystems,
+      complicated user experiences, inconsistent transaction fees,
+      and limited merchant integration.
+    </p>
+
+    <p>
+      Nexar Network is designed to solve these problems by
+      delivering a payment-focused blockchain ecosystem built
+      around usability, security, scalability,
+      and long-term sustainability.
+    </p>
+
+  </div>
+</section>
               {/* Nexar Network Architecture */}
-              <section id="nexar-architecture" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  3. Nexar Network Architecture
-                </h2>
-                <div className="space-y-4 text-muted leading-7">
-                  <p>
-                    Nexar Network operates on a phased architecture approach. Phase 1 leverages BNB Smart Chain (BEP20) for immediate deployment and liquidity access. Phase 2 involves the development and launch of Nexar Chain, a purpose-built Layer 1 blockchain optimized for payment processing.
-                  </p>
-                  <p>
-                    The architecture is designed around modularity, allowing each ecosystem component—Wallet, Pay, Explorer, Bridge, Launchpad, and Developer API—to operate independently while benefiting from shared infrastructure and the {SITE.ticker} token economy.
-                  </p>
-                  <p>
-                    Smart contracts are deployed with security-first principles, including verified code on BscScan, disabled mint functionality, and comprehensive audit processes. The presale contract ({CONTRACTS.presale}) and token contract ({CONTRACTS.token}) are publicly verifiable.
-                  </p>
-                </div>
-              </section>
+             <section id="current-challenges" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    3. Current Challenges
+  </h2>
+
+  <div className="space-y-5 text-muted leading-8">
+    <p>
+      Although blockchain technology has advanced significantly,
+      mainstream adoption continues to face several important obstacles.
+    </p>
+
+    <ul className="list-disc space-y-2 pl-6">
+      <li>Complex wallet onboarding.</li>
+      <li>High or unpredictable transaction fees.</li>
+      <li>Slow international payment settlement.</li>
+      <li>Fragmented blockchain ecosystems.</li>
+      <li>Limited merchant adoption.</li>
+      <li>Difficult developer integration.</li>
+      <li>Poor user experience for beginners.</li>
+      <li>Lack of payment-focused infrastructure.</li>
+    </ul>
+
+    <p>
+      Many businesses continue relying on expensive payment providers
+      because blockchain integration remains technically challenging.
+      Nexar Network aims to simplify these processes through modern,
+      scalable payment infrastructure.
+    </p>
+  </div>
+</section>
 
               {/* Tokenomics & Allocation */}
-              <section id="tokenomics" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  4. Tokenomics & Allocation
-                </h2>
-                <div className="space-y-6 text-muted leading-7">
-                  <p>
-                    The {SITE.ticker} token is designed with a fixed maximum supply of {SITE.maxSupply} tokens. The mint function is permanently disabled, ensuring no additional tokens can ever be created, making {SITE.ticker} a deflationary asset by design.
-                  </p>
-                  
-                  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
-                    <h3 className="font-heading text-lg font-semibold text-white mb-4">
-                      Token Specifications
-                    </h3>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Token Name</p>
-                        <p className="text-white">{SITE.name}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Ticker</p>
-                        <p className="text-white">{SITE.ticker}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Network</p>
-                        <p className="text-white">{SITE.blockchain}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Max Supply</p>
-                        <p className="text-white">{SITE.maxSupply}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Decimals</p>
-                        <p className="text-white">18</p>
-                      </div>
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Mint Status</p>
-                        <p className="text-white">Disabled Forever</p>
-                      </div>
-                    </div>
-                  </div>
+             <section id="nexar-solution" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    4. The Nexar Solution
+  </h2>
 
-                  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
-                    <h3 className="font-heading text-lg font-semibold text-white mb-4">
-                    Contract Addresses
-                    </h3>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Token Contract</p>
-                        <code className="block text-sm text-gold-secondary break-all">{CONTRACTS.token}</code>
-                      </div>
-                      <div>
-                        <p className="text-xs tracking-wide text-muted uppercase mb-1">Presale Contract</p>
-                        <code className="block text-sm text-gold-secondary break-all">{CONTRACTS.presale}</code>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
+  <div className="space-y-5 text-muted leading-8">
+
+    <p>
+      Nexar Network introduces a blockchain payment ecosystem built
+      around simplicity, scalability, transparency,
+      and long-term sustainability.
+    </p>
+
+    <p>
+      The ecosystem launches on BNB Smart Chain while gradually
+      expanding into a complete blockchain infrastructure supporting
+      businesses, developers, merchants and global users.
+    </p>
+
+    <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+      <h3 className="mb-4 font-heading text-lg font-semibold text-white">
+        Long-Term Infrastructure
+      </h3>
+
+      <ul className="list-disc space-y-2 pl-6 text-muted">
+        <li>Nexar Wallet</li>
+        <li>Nexar Pay</li>
+        <li>Nexar Explorer</li>
+        <li>Nexar Bridge</li>
+        <li>Developer APIs</li>
+        <li>Merchant Payment Gateway</li>
+        <li>Launchpad</li>
+        <li>Cross-chain Services</li>
+        <li>Independent Nexar Blockchain</li>
+      </ul>
+    </div>
+
+    <p>
+      Every component is designed to strengthen the ecosystem while
+      maintaining affordability, security,
+      transparency and accessibility.
+    </p>
+
+  </div>
+</section>
+
+<section id="vision" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    5. Vision
+  </h2>
+
+  <div className="space-y-5 text-muted leading-8">
+    <p>
+      Our vision is to establish Nexar Network as one of the world's
+      leading blockchain ecosystems dedicated to digital payments.
+    </p>
+
+    <p>
+      We envision a future where businesses, developers,
+      and individuals can transfer value globally without unnecessary
+      costs, delays or centralized barriers.
+    </p>
+
+    <p>
+      Beyond operating as a digital asset, NXR is intended to become
+      the foundation of an independent blockchain ecosystem powering
+      payment infrastructure worldwide.
+    </p>
+  </div>
+</section>
+
+<section id="mission" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    6. Mission
+  </h2>
+
+  <div className="space-y-5 text-muted leading-8">
+    <p>
+      Our mission is to simplify blockchain payments by building
+      technology that combines security, scalability,
+      transparency and low transaction costs.
+    </p>
+
+    <ul className="list-disc space-y-2 pl-6">
+      <li>High Performance</li>
+      <li>Security</li>
+      <li>Transparency</li>
+      <li>Accessibility</li>
+      <li>Low Transaction Costs</li>
+      <li>Developer Friendly Infrastructure</li>
+      <li>Long-Term Sustainability</li>
+    </ul>
+
+    <p>
+      We believe blockchain technology should become simple enough
+      for everyday use while remaining powerful enough to support
+      large-scale financial systems.
+    </p>
+  </div>
+</section>
+
+<section id="core-values" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    7. Core Values
+  </h2>
+
+  <div className="space-y-6">
+
+    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+      <h3 className="mb-2 text-lg font-semibold text-gold">Security</h3>
+      <p className="text-muted leading-8">
+        Protecting users, digital assets and infrastructure remains our
+        highest priority.
+      </p>
+    </div>
+
+    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+      <h3 className="mb-2 text-lg font-semibold text-gold">Transparency</h3>
+      <p className="text-muted leading-8">
+        Open communication regarding development, token allocation,
+        roadmap progress and ecosystem decisions.
+      </p>
+    </div>
+
+    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+      <h3 className="mb-2 text-lg font-semibold text-gold">Innovation</h3>
+      <p className="text-muted leading-8">
+        Continuous research and development of technologies that improve
+        blockchain payment infrastructure.
+      </p>
+    </div>
+
+    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+      <h3 className="mb-2 text-lg font-semibold text-gold">Community</h3>
+      <p className="text-muted leading-8">
+        Building a decentralized ecosystem together with users,
+        developers, partners and investors.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<section id="why-nexar" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    8. Why Nexar Network
+  </h2>
+
+  <div className="space-y-5 text-muted leading-8">
+
+    <p>
+      Nexar Network focuses on solving practical payment challenges
+      instead of creating another speculative cryptocurrency.
+    </p>
+
+    <ul className="list-disc space-y-2 pl-6">
+      <li>Fast blockchain transactions</li>
+      <li>Low transaction costs</li>
+      <li>Transparent tokenomics</li>
+      <li>Merchant payment solutions</li>
+      <li>Developer-friendly APIs</li>
+      <li>Secure smart contracts</li>
+      <li>Cross-chain compatibility</li>
+      <li>Future blockchain infrastructure</li>
+      <li>Long-term ecosystem growth</li>
+    </ul>
+
+  </div>
+</section>
+
+<section id="market-opportunity" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    9. Market Opportunity
+  </h2>
+
+  <div className="space-y-5 text-muted leading-8">
+
+    <p>
+      Global digital payments continue to expand rapidly as consumers
+      and businesses increasingly adopt blockchain technology.
+    </p>
+
+    <p>
+      Enterprises require payment systems that provide lower operating
+      costs, faster settlement, global accessibility, security and
+      transparent accounting.
+    </p>
+
+    <p>
+      Nexar Network intends to position itself within this growing
+      market by delivering blockchain infrastructure designed for both
+      individuals and enterprises.
+    </p>
+
+  </div>
+</section>
+
+<section id="technology-overview" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    10. Technology Overview
+  </h2>
+
+  <div className="space-y-6 text-muted leading-8">
+
+    <p>
+      Nexar Network launches on BNB Smart Chain, leveraging its mature
+      infrastructure, fast confirmations and low transaction costs while
+      preparing for future independent blockchain development.
+    </p>
+
+    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+
+      <h3 className="mb-4 text-lg font-semibold text-white">
+        Technical Specifications
+      </h3>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+
+        <div>
+          <p className="text-xs uppercase text-muted">Blockchain</p>
+          <p className="text-white">BNB Smart Chain</p>
+        </div>
+
+        <div>
+          <p className="text-xs uppercase text-muted">Standard</p>
+          <p className="text-white">BEP-20</p>
+        </div>
+
+        <div>
+          <p className="text-xs uppercase text-muted">Decimals</p>
+          <p className="text-white">18</p>
+        </div>
+
+        <div>
+          <p className="text-xs uppercase text-muted">Maximum Supply</p>
+          <p className="text-white">500,000,000 NXR</p>
+        </div>
+
+        <div>
+          <p className="text-xs uppercase text-muted">Mint</p>
+          <p className="text-white">Disabled Forever</p>
+        </div>
+
+        <div>
+          <p className="text-xs uppercase text-muted">Consensus</p>
+          <p className="text-white">Proof of Staked Authority</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section id="token-overview" className="scroll-mt-24 mb-16">
+  <h2 className="font-heading text-2xl font-semibold text-white mb-6">
+    11. Token Overview
+  </h2>
+
+  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+    <div className="grid gap-4 sm:grid-cols-2">
+
+      <div><p className="text-xs uppercase text-muted">Project</p><p className="text-white">Nexar Network</p></div>
+
+      <div><p className="text-xs uppercase text-muted">Ticker</p><p className="text-white">NXR</p></div>
+
+      <div><p className="text-xs uppercase text-muted">Blockchain</p><p className="text-white">BNB Smart Chain (BEP-20)</p></div>
+
+      <div><p className="text-xs uppercase text-muted">Maximum Supply</p><p className="text-white">500,000,000 NXR</p></div>
+
+      <div><p className="text-xs uppercase text-muted">Decimals</p><p className="text-white">18</p></div>
+
+      <div><p className="text-xs uppercase text-muted">Mint</p><p className="text-white">Disabled Forever</p></div>
+
+    </div>
+  </div>
+</section>
+
+<section id="tokenomics" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+12. Tokenomics
+</h2>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+
+<div className="space-y-4 text-muted">
+
+<p><strong className="text-white">Liquidity</strong> — 150,000,000 NXR (30%)</p>
+
+<p><strong className="text-white">Ecosystem</strong> — 100,000,000 NXR (20%)</p>
+
+<p><strong className="text-white">Presale</strong> — 100,000,000 NXR (20%)</p>
+
+<p><strong className="text-white">Team</strong> — 75,000,000 NXR (15%)</p>
+
+<p><strong className="text-white">Marketing</strong> — 50,000,000 NXR (10%)</p>
+
+<p><strong className="text-white">Community Rewards</strong> — 25,000,000 NXR (5%)</p>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="team-vesting" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+13. Team Vesting
+</h2>
+
+<div className="space-y-5 text-muted leading-8">
+
+<p>
+The total allocation for the team equals
+75,000,000 NXR.
+</p>
+
+<p>
+Only 25,000,000 NXR will initially become available.
+The remaining 50,000,000 NXR will remain locked
+inside a dedicated vesting smart contract.
+</p>
+
+<ul className="list-disc space-y-2 pl-6">
+
+<li>12 Month Cliff</li>
+
+<li>Gradual Unlock</li>
+
+<li>Smart Contract Controlled Release</li>
+
+</ul>
+
+</div>
+
+</section>
+
+<section id="token-utility" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+14. Token Utility
+</h2>
+
+<ul className="list-disc space-y-3 pl-6 text-muted leading-8">
+
+<li>Global Payments</li>
+
+<li>Merchant Payments</li>
+
+<li>Wallet Transfers</li>
+
+<li>Community Rewards</li>
+
+<li>Ecosystem Services</li>
+
+<li>Governance (Future)</li>
+
+<li>Staking (Future)</li>
+
+<li>Validator Rewards (Future)</li>
+
+<li>Future Network Gas Fees</li>
+
+</ul>
+
+</section>
 
               {/* Ecosystem Modules */}
-              <section id="ecosystem-modules" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  5. Ecosystem Modules
-                </h2>
-                <div className="space-y-4 text-muted leading-7">
-                  <p>
-                    The Nexar ecosystem comprises seven integrated modules designed to provide a complete payment infrastructure solution:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 ml-2">
-                    <li><strong className="text-white">Wallet:</strong> Secure, user-friendly cryptocurrency wallet supporting {SITE.ticker} and major assets</li>
-                    <li><strong className="text-white">Pay:</strong> Merchant payment processing solution with instant settlement</li>
-                    <li><strong className="text-white">Explorer:</strong> Blockchain explorer for transaction transparency and verification</li>
-                    <li><strong className="text-white">Bridge:</strong> Cross-chain bridge for asset interoperability</li>
-                    <li><strong className="text-white">Launchpad:</strong> Platform for vetted project launches within the ecosystem</li>
-                    <li><strong className="text-white">Developer API:</strong> RESTful API for third-party integration</li>
-                    <li><strong className="text-white">Governance:</strong> Decentralized governance mechanism for {SITE.ticker} holders</li>
-                  </ul>
-                </div>
-              </section>
+              <section id="ecosystem" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+15. Nexar Ecosystem
+</h2>
+
+<div className="grid gap-5 md:grid-cols-2">
+
+<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<h3 className="text-gold font-semibold mb-2">Nexar Wallet</h3>
+<p className="text-muted">Secure non-custodial wallet for digital assets.</p>
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<h3 className="text-gold font-semibold mb-2">Nexar Pay</h3>
+<p className="text-muted">Merchant payment infrastructure.</p>
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<h3 className="text-gold font-semibold mb-2">Explorer</h3>
+<p className="text-muted">Blockchain explorer for transparency.</p>
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<h3 className="text-gold font-semibold mb-2">Bridge</h3>
+<p className="text-muted">Cross-chain asset transfers.</p>
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<h3 className="text-gold font-semibold mb-2">Launchpad</h3>
+<p className="text-muted">Support promising blockchain projects.</p>
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<h3 className="text-gold font-semibold mb-2">Nexar Chain</h3>
+<p className="text-muted">Future independent blockchain network.</p>
+</div>
+
+</div>
+
+</section>
 
               {/* Security & Compliance */}
-              <section id="security-compliance" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  6. Security & Compliance
-                </h2>
-                <div className="space-y-4 text-muted leading-7">
-                  <p>
-                    Security is paramount at Nexar Network. All smart contracts undergo rigorous auditing before deployment. The token contract has mint functionality permanently disabled, eliminating the risk of unexpected inflation. Contracts are verified on BscScan for full transparency.
-                  </p>
-                  <p>
-                    The presale contract implements secure purchase mechanisms supporting both BNB and USDT, with proper allowance checks and transaction validation. The integration with WalletConnect (Reown) ensures secure wallet connections without private key exposure.
-                  </p>
-                  <p>
-                    While Nexar Network prioritizes security, users are advised to follow best practices: never share private keys, verify contract addresses before transactions, and only use official channels for information and support.
-                  </p>
-                </div>
-              </section>
+            <section id="security" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+17. Security & Transparency
+</h2>
+
+<div className="space-y-5 text-muted leading-8">
+
+<p>
+Security is one of the core principles of Nexar Network.
+Every stage of development prioritizes transparency,
+reliability and long-term ecosystem protection.
+</p>
+
+<ul className="list-disc pl-6 space-y-2">
+
+<li>Verified Smart Contracts</li>
+
+<li>Transparent Token Allocation</li>
+
+<li>Dedicated Allocation Wallets</li>
+
+<li>Team Vesting Smart Contracts</li>
+
+<li>Public Roadmap</li>
+
+<li>Community Communication</li>
+
+<li>Future Independent Security Audits</li>
+
+</ul>
+
+</div>
+
+</section>
 
               {/* Roadmap & Milestones */}
-              <section id="roadmap" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  7. Roadmap & Milestones
-                </h2>
-                <div className="space-y-6 text-muted leading-7">
-                  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
-                    <h3 className="font-heading text-lg font-semibold text-white mb-3">Phase 1: Foundation</h3>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Token deployment on BNB Smart Chain</li>
-                      <li>Presale launch and execution</li>
-                      <li>Initial exchange listings</li>
-                      <li>Community building and marketing</li>
-                    </ul>
-                  </div>
+             <section id="roadmap" className="scroll-mt-24 mb-16">
 
-                  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
-                    <h3 className="font-heading text-lg font-semibold text-white mb-3">Phase 2: Ecosystem Development</h3>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Nexar Wallet beta launch</li>
-                      <li>Nexar Pay merchant integration</li>
-                      <li>Blockchain explorer deployment</li>
-                      <li>Cross-chain bridge development</li>
-                    </ul>
-                  </div>
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+16. Roadmap
+</h2>
 
-                  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
-                    <h3 className="font-heading text-lg font-semibold text-white mb-3">Phase 3: Expansion</h3>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Nexar Launchpad platform</li>
-                      <li>Developer API release</li>
-                      <li>Governance system implementation</li>
-                      <li>Nexar Chain research and development</li>
-                    </ul>
-                  </div>
+<div className="space-y-6">
 
-                  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
-                    <h3 className="font-heading text-lg font-semibold text-white mb-3">Phase 4: Sovereign Chain</h3>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Nexar Chain mainnet launch</li>
-                      <li>Migration of ecosystem modules</li>
-                      <li>Enterprise partnerships</li>
-                      <li>Global payment network expansion</li>
-                    </ul>
-                  </div>
-                </div>
-              </section>
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<h3 className="text-gold font-semibold mb-3">Phase 1 — Foundation</h3>
+<ul className="list-disc pl-6 space-y-2 text-muted">
+<li>Website Launch</li>
+<li>Whitepaper Publication</li>
+<li>Smart Contract Deployment</li>
+<li>Contract Verification</li>
+<li>Community Building</li>
+<li>Presale Preparation</li>
+</ul>
+</div>
 
-              {/* Team & Governance */}
-              <section id="team-governance" className="scroll-mt-24 mb-16">
-                <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-                  8. Team & Governance
-                </h2>
-                <div className="space-y-4 text-muted leading-7">
-                  <p>
-                    Nexar Network was founded by Mahmoud Elgabry, a blockchain entrepreneur with deep expertise in blockchain architecture, smart contract development, and financial technology. Under his leadership, the project is guided by a vision of creating sovereign blockchain payment infrastructure that serves the global economy.
-                  </p>
-                  <p>
-                    Governance of the Nexar ecosystem will evolve toward decentralization, with {SITE.ticker} token holders having voting rights on key protocol decisions. The transition to decentralized governance will be executed gradually as the ecosystem matures and the community expands.
-                  </p>
-                  <p>
-                    The team is committed to transparency, regular communication, and community engagement. Official announcements are made through verified social media channels and the official website.
-                  </p>
-                </div>
-              </section>
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<h3 className="text-gold font-semibold mb-3">Phase 2 — Growth</h3>
+<ul className="list-disc pl-6 space-y-2 text-muted">
+<li>Presale Launch</li>
+<li>Marketing Campaigns</li>
+<li>Strategic Partnerships</li>
+<li>DEX Listings</li>
+<li>Ecosystem Development</li>
+</ul>
+</div>
 
-              {/* Disclaimer */}
-              <section className="mt-16 pt-8 border-t border-border">
-                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 px-6 py-4">
-                  <p className="text-sm text-amber-200/80">
-                    <strong className="text-amber-400">Disclaimer:</strong> This whitepaper is for informational purposes only and does not constitute financial, investment, or legal advice. Cryptocurrency investments carry significant risk. The roadmap and milestones described herein are subject to change based on market conditions, regulatory requirements, and technical developments.
-                  </p>
-                </div>
-              </section>
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<h3 className="text-gold font-semibold mb-3">Phase 3 — Expansion</h3>
+<ul className="list-disc pl-6 space-y-2 text-muted">
+<li>Nexar Wallet</li>
+<li>Nexar Pay</li>
+<li>Explorer</li>
+<li>Bridge</li>
+<li>Developer APIs</li>
+</ul>
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<h3 className="text-gold font-semibold mb-3">Phase 4 — Nexar Chain</h3>
+<ul className="list-disc pl-6 space-y-2 text-muted">
+<li>Validator Network</li>
+<li>Testnet</li>
+<li>Mainnet</li>
+<li>Global Adoption</li>
+</ul>
+</div>
+
+</div>
+
+</section>
+
+<section id="founder" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+18. Founder
+</h2>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-8">
+
+<h3 className="text-2xl font-semibold text-gold mb-2">
+Mahmoud Elgabry
+</h3>
+
+<p className="text-white mb-6">
+Founder of Nexar Network
+</p>
+
+<div className="space-y-5 text-muted leading-8">
+
+<p>
+Nexar Network was founded with the objective of building
+a practical blockchain ecosystem focused on global payments
+instead of short-term speculation.
+</p>
+
+<p>
+The long-term vision is to transform Nexar Network from a
+BNB Smart Chain token into an independent blockchain
+supporting payment infrastructure, developers,
+businesses and decentralized applications.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="legal" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+19. Legal Disclaimer
+</h2>
+
+<div className="space-y-5 text-muted leading-8">
+
+<p>
+This document is provided for informational purposes only.
+Nothing contained in this whitepaper should be interpreted
+as financial, legal or investment advice.
+</p>
+
+<p>
+Participation in digital asset markets involves risk.
+Every participant should perform independent research
+before making financial decisions.
+</p>
+
+<p>
+Future development plans, timelines and ecosystem features
+may evolve as Nexar Network continues to develop.
+</p>
+
+</div>
+
+</section>
+
+<section id="conclusion" className="scroll-mt-24">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+20. Conclusion
+</h2>
+
+<div className="space-y-5 text-muted leading-8">
+
+<p>
+Nexar Network represents a long-term vision focused on
+making blockchain payments faster, more accessible,
+secure and affordable.
+</p>
+
+<p>
+Beginning on BNB Smart Chain provides immediate usability
+while laying the foundation for future innovation,
+payment infrastructure and the development of the
+independent Nexar Chain.
+</p>
+
+<p>
+Through transparency, continuous development,
+community participation and responsible growth,
+Nexar Network aims to become one of the leading
+global blockchain payment ecosystems.
+</p>
+
+</div>
+
+</section>
             </article>
 
             {/* Back to Top Button */}
