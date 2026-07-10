@@ -3,10 +3,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button, type ButtonProps } from "@/components/ui/Button";
 
-type ConnectWalletButtonProps = ButtonProps & {
-  showAddress?: boolean;
-  showNetwork?: boolean;
-};
+type ConnectWalletButtonProps = ButtonProps;
 
 export function ConnectWalletButton({
   children,
@@ -18,9 +15,10 @@ export function ConnectWalletButton({
         account,
         chain,
         mounted,
+        authenticationStatus,
         openConnectModal,
         openChainModal,
-        authenticationStatus,
+        openAccountModal,
       }) => {
         const ready =
           mounted && authenticationStatus !== "loading";
@@ -35,8 +33,8 @@ export function ConnectWalletButton({
         if (!connected) {
           return (
             <Button
-              onClick={openConnectModal}
               {...props}
+              onClick={openConnectModal}
             >
               {children ?? "Connect Wallet"}
             </Button>
@@ -46,8 +44,8 @@ export function ConnectWalletButton({
         if (chain.unsupported) {
           return (
             <Button
-              onClick={openChainModal}
               {...props}
+              onClick={openChainModal}
             >
               Switch Network
             </Button>
@@ -56,8 +54,8 @@ export function ConnectWalletButton({
 
         return (
           <Button
-            onClick={openConnectModal}
             {...props}
+            onClick={openAccountModal}
           >
             {account.displayName}
           </Button>
