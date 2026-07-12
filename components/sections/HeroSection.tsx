@@ -6,7 +6,6 @@ import gsap from "gsap";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { SITE } from "@/lib/constants/site";
-import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { BuyNxrButton } from "@/components/web3/BuyNxrButton";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -111,7 +110,6 @@ export function HeroSection() {
               transition={{ duration: 0.8, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
               className="mt-8 flex flex-wrap items-center gap-2 sm:gap-3"
             >
-              <ConnectWalletButton size="lg" magnetic glow />
               <BuyNxrButton />
               <Link href="#whitepaper">
                 <Button size="lg" variant="outline" magnetic>
@@ -135,7 +133,6 @@ export function HeroSection() {
             style={{ y: vizY }}
             className="relative mx-auto aspect-square w-full max-w-[400px] sm:max-w-[520px] lg:max-w-none order-1 lg:order-2"
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.04)_0%,transparent_70%)] blur-2xl" />
             <BlockchainVisualization />
           </motion.div>
         </div>

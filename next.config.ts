@@ -18,8 +18,8 @@ const cspHeader = [
   "font-src 'self' https://fonts.gstatic.com",
   // Images: self + data URIs (for canvas/og images) + blob
 "img-src 'self' data: blob: https://coin-images.coingecko.com https://assets.coingecko.com",
-  // Connections: self + WalletConnect relay + BSC public RPC + Reown API
- "connect-src 'self' https://api.coingecko.com https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://relay.walletconnect.com wss://relay.walletconnect.com https://rpc.ankr.com https://bsc-dataseed.binance.org https://bsc-dataseed1.binance.org https://bsc-dataseed2.binance.org https://bsc-dataseed3.binance.org https://bsc-dataseed4.binance.org https://*.reown.com",
+  // Connections: self + WalletConnect relay + BSC public RPC + Reown API + Reown explorer
+ "connect-src 'self' https://api.coingecko.com https://*.walletconnect.com wss://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.org https://relay.walletconnect.com wss://relay.walletconnect.com https://rpc.ankr.com https://bsc-dataseed.binance.org https://bsc-dataseed1.binance.org https://bsc-dataseed2.binance.org https://bsc-dataseed3.binance.org https://bsc-dataseed4.binance.org https://*.reown.com https://explorer.walletconnect.com https://*.explorer.walletconnect.com https://explorer-api.walletconnect.com",
   // Frames: none (no iframes needed)
   "frame-src 'none'",
   // Objects: none

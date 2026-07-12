@@ -1,39 +1,27 @@
-import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { QueryClient } from '@tanstack/react-query'
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { bsc, mainnet, polygon, arbitrum, avalanche } from '@reown/appkit/networks'
 
-import {
-  metaMaskWallet,
-  trustWallet,
-  coinbaseWallet,
-  walletConnectWallet,
-  okxWallet,
-  injectedWallet,
-} from "@rainbow-me/rainbowkit/wallets";
+// Get projectId from environment or use the new Reown Project ID
+export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'ed68a1decb1758bdd2fc2c67e65a21f6'
 
-import { bsc } from "wagmi/chains";
+// Create metadata for AppKit
+export const metadata = {
+  name: 'Nexar Network',
+  description: 'Next-generation decentralized network',
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://nexarnetwork.io',
+  icons: ['https://nexarnetwork.io/favicon.ico'],
+}
 
-export const projectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
-
-export const config = getDefaultConfig({
-  appName: "Nexar Network",
-
+// Create Wagmi adapter
+export const wagmiAdapter = new WagmiAdapter({
+  networks: [bsc, mainnet, polygon, arbitrum, avalanche],
   projectId,
-
-  chains: [bsc],
-
   ssr: true,
+})
 
-  wallets: [
-    {
-      groupName: "Recommended",
-      wallets: [
-        metaMaskWallet,
-        trustWallet,
-        injectedWallet,
-        okxWallet,
-        coinbaseWallet,
-        walletConnectWallet,
-      ],
-    },
-  ],
-});
+// Export wagmi config from adapter
+export const wagmiConfig = wagmiAdapter.wagmiConfig
+
+// Create QueryClient
+export const queryClient = new QueryClient()

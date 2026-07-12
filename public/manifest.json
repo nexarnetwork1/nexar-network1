@@ -60,5 +60,22 @@
         }
       ]
     }
+  ],
+  "related_applications": [
+    {
+      "platform": "playstore",
+      "id": "io.nexarnetwork.app"
+    },
+    {
+      "platform": "itunes",
+      "id": "io.nexarnetwork.app"
+    }
+  ],
+  "prefer_related_applications": false,
+  "links": [
+    {
+      "rel": "apple-touch-icon",
+      "href": "/apple-icon"
+    }
   ]
 }

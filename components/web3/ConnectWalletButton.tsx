@@ -1,7 +1,8 @@
 "use client";
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from 'wagmi'
 import { Button, type ButtonProps } from "@/components/ui/Button";
+import { getAppKit } from "@/components/web3/AppKitInit";
 
 type ConnectWalletButtonProps = ButtonProps;
 
@@ -9,58 +10,40 @@ export function ConnectWalletButton({
   children,
   ...props
 }: ConnectWalletButtonProps) {
+  const { address, isConnected, chain } = useAccount()
+
+  const appKit = getAppKit();
+
+  if (!isConnected) {
+    return (
+      <Button
+        {...props}
+        onClick={() => appKit?.open()}
+      >
+        {children ?? "Connect Wallet"}
+      </Button>
+    );
+  }
+
+  if (chain?.id !== 56) {
+    return (
+      <Button
+        {...props}
+        onClick={() => appKit?.open({ view: 'Networks' })}
+      >
+        Switch Network
+      </Button>
+    );
+  }
+
+  const shortAddress = `${address?.slice(0, 6)}...${address?.slice(-4)}`
+
   return (
-    <ConnectButton.Custom>
-      {({
-        account,
-        chain,
-        mounted,
-        authenticationStatus,
-        openConnectModal,
-        openChainModal,
-        openAccountModal,
-      }) => {
-        const ready =
-          mounted && authenticationStatus !== "loading";
-
-        const connected =
-          ready &&
-          account &&
-          chain &&
-          (!authenticationStatus ||
-            authenticationStatus === "authenticated");
-
-        if (!connected) {
-          return (
-            <Button
-              {...props}
-              onClick={openConnectModal}
-            >
-              {children ?? "Connect Wallet"}
-            </Button>
-          );
-        }
-
-        if (chain.unsupported) {
-          return (
-            <Button
-              {...props}
-              onClick={openChainModal}
-            >
-              Switch Network
-            </Button>
-          );
-        }
-
-        return (
-          <Button
-            {...props}
-            onClick={openAccountModal}
-          >
-            {account.displayName}
-          </Button>
-        );
-      }}
-    </ConnectButton.Custom>
+    <Button
+      {...props}
+      onClick={() => appKit?.open({ view: 'Account' })}
+    >
+      {shortAddress}
+    </Button>
   );
 }

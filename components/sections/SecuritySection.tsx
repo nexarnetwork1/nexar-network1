@@ -44,7 +44,7 @@ export function SecuritySection() {
         <Reveal className="mt-12">
           <div className="luxury-border rounded-2xl bg-card/30 p-8 backdrop-blur-xl">
             <div className="grid gap-6 sm:grid-cols-3">
-              <div>
+              <div className="min-w-0">
                 <p className="text-[10px] tracking-[0.2em] text-muted uppercase">
                   Token Contract
                 </p>
@@ -52,12 +52,12 @@ export function SecuritySection() {
                   href={`https://bscscan.com/address/${CONTRACTS.token}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 block font-mono text-xs text-gold transition-colors hover:text-gold-secondary"
+                  className="mt-2 block font-mono text-xs text-gold transition-colors hover:text-gold-secondary break-all"
                 >
                   {CONTRACTS.token}
                 </a>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[10px] tracking-[0.2em] text-muted uppercase">
                   Presale Contract
                 </p>
@@ -65,12 +65,12 @@ export function SecuritySection() {
                   href={`https://bscscan.com/address/${CONTRACTS.presale}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 block font-mono text-xs text-gold transition-colors hover:text-gold-secondary"
+                  className="mt-2 block font-mono text-xs text-gold transition-colors hover:text-gold-secondary break-all"
                 >
                   {CONTRACTS.presale}
                 </a>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[10px] tracking-[0.2em] text-muted uppercase">
                   Verification
                 </p>

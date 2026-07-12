@@ -4,6 +4,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { BackgroundEffect } from "@/components/background/BackgroundEffect";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
+import { AppKitInit } from "@/components/web3/AppKitInit";
 import {
   organizationSchema,
   websiteSchema,
@@ -72,6 +73,7 @@ export default function RootLayout({
           }}
         />
         <AppProviders>
+          <AppKitInit />
           {/* Skip-to-content: visible only on focus for keyboard users */}
           <a
             href="#main-content"

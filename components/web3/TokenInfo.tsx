@@ -1,7 +1,6 @@
 "use client";
 
 import { useReadContract } from "wagmi";
-import { bsc } from "@reown/appkit/networks";
 import { formatUnits } from "viem";
 import { Coins, Shield, Ban } from "lucide-react";
 import { motion } from "framer-motion";
@@ -30,7 +29,7 @@ export function TokenInfo({ className }: TokenInfoProps) {
       },
     ] as const,
     functionName: "totalSupply",
-    chainId: bsc.id,
+    chainId: 56,
     query: { enabled: web3Ready, refetchInterval: 60_000 },
   });
 

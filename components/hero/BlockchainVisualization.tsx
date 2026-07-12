@@ -130,26 +130,6 @@ export function BlockchainVisualization() {
 
       positions.forEach((pos, i) => {
         const isCenter = i === 0;
-        const glow = ctx.createRadialGradient(
-          pos.x,
-          pos.y,
-          0,
-          pos.x,
-          pos.y,
-          pos.radius * 2,
-        );
-        glow.addColorStop(
-          0,
-          isCenter ? `${COLORS.gold}4d` : `${COLORS.gold}1f`,
-        );
-        glow.addColorStop(1, "transparent");
-        ctx.fillStyle = glow;
-        ctx.fillRect(
-          pos.x - pos.radius * 2,
-          pos.y - pos.radius * 2,
-          pos.radius * 4,
-          pos.radius * 4,
-        );
 
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, pos.radius, 0, Math.PI * 2);
@@ -188,7 +168,6 @@ export function BlockchainVisualization() {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1.2, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.06)_0%,transparent_65%)]" />
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 rounded-full border border-gold/10" />
       <div

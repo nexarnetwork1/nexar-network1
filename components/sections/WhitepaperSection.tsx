@@ -34,7 +34,7 @@ export function WhitepaperSection() {
 
             <div className="mt-10 flex flex-wrap gap-3">
               <Link href="/whitepaper">
-                <Button size="lg" magnetic glow>
+                <Button size="lg" magnetic>
                   <BookOpen className="h-4 w-4" />
                   Read Online
                 </Button>
@@ -54,7 +54,6 @@ export function WhitepaperSection() {
               transition={{ duration: 0.4 }}
               className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-surface to-background p-8 backdrop-blur-xl"
             >
-              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-gold/5 blur-3xl" />
               <div className="relative">
                 <div className="mb-6 flex items-center justify-between">
                   <div>

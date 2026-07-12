@@ -19,17 +19,11 @@ export function FounderSection() {
       {/* Section divider */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
 
-      {/* Background glow */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-[radial-gradient(ellipse_at_left,rgba(212,175,55,0.04)_0%,transparent_60%)]" />
-
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
           {/* Photo column */}
           <Reveal>
             <div className="relative mx-auto w-full max-w-xs lg:max-w-none">
-              {/* Outer glow ring */}
-              <div className="absolute -inset-4 rounded-3xl bg-gold/5 blur-2xl" />
-
               {/* Card frame */}
               <div className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-b from-card via-surface to-background">
                 {/* Founder image - real photo */}

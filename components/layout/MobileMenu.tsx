@@ -135,7 +135,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             </nav>
 
             <div className="border-t border-border p-6">
-              <ConnectWalletButton className="w-full" size="lg" magnetic glow />
+              <ConnectWalletButton className="w-full" size="lg" magnetic />
             </div>
           </motion.div>
         </>
