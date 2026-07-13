@@ -18,8 +18,11 @@ createAppKit({
   defaultNetwork: bsc,
   metadata,
   features: {
-    analytics: true // Optional - defaults to your Cloud configuration
+    analytics: true, // Optional - defaults to your Cloud configuration
+    email: false, // Disable email login
+    socials: [], // Disable all social logins (Google, X, GitHub, Discord, Apple, Facebook, Farcaster)
   },
+  allWallets: 'SHOW', // Show all wallets from WalletConnect Explorer (540+ wallets)
   themeMode: 'dark',
   themeVariables: {
     '--w3m-color-mix': '#000000',
