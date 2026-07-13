@@ -5,15 +5,16 @@ import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { Web3Provider } from "@/components/providers/Web3Provider";
+import { Web3Provider } from "@/lib/web3/context";
 
 gsap.registerPlugin(ScrollTrigger);
 
 type AppProvidersProps = {
   children: React.ReactNode;
+  cookies: string | null;
 };
 
-export function AppProviders({ children }: AppProvidersProps) {
+export function AppProviders({ children, cookies }: AppProvidersProps) {
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -43,5 +44,5 @@ export function AppProviders({ children }: AppProvidersProps) {
     };
   }, [reducedMotion]);
 
-  return <Web3Provider>{children}</Web3Provider>;
+  return <Web3Provider cookies={cookies}>{children}</Web3Provider>;
 }

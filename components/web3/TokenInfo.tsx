@@ -6,7 +6,7 @@ import { Coins, Shield, Ban } from "lucide-react";
 import { motion } from "framer-motion";
 import { CONTRACTS, SITE } from "@/lib/constants/site";
 import { ERC20_ABI } from "@/lib/web3/abi";
-import { isWeb3Configured } from "@/components/providers/Web3Provider";
+import { isWeb3Configured } from "@/lib/web3/utils";
 import { cn } from "@/lib/utils/cn";
 
 type TokenInfoProps = {

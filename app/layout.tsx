@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora, Space_Grotesk } from "next/font/google";
+import { headers } from "next/headers";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackgroundEffect } from "@/components/background/BackgroundEffect";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
-import { AppKitInit } from "@/components/web3/AppKitInit";
 import {
   organizationSchema,
   websiteSchema,
@@ -43,11 +43,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersObj = await headers()
+  const cookies = headersObj.get('cookie')
+
   return (
     <html
       lang="en"
@@ -72,8 +75,7 @@ export default function RootLayout({
             __html: JSON.stringify(productSchema),
           }}
         />
-        <AppProviders>
-          <AppKitInit />
+        <AppProviders cookies={cookies}>
           {/* Skip-to-content: visible only on focus for keyboard users */}
           <a
             href="#main-content"

@@ -14,10 +14,10 @@ import { AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
-import { getAppKit } from "@/components/web3/AppKitInit";
+import { useAppKit } from '@reown/appkit/react';
 import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI, ERC20_ABI } from "@/lib/web3/abi";
-import { isWeb3Configured } from "@/components/providers/Web3Provider";
+import { isWeb3Configured } from "@/lib/web3/utils";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { cn } from "@/lib/utils/cn";
 
@@ -42,6 +42,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: txHash,
   });
+  const { open: openAppKit } = useAppKit();
 
   const { status, minPurchase, maxPurchase, usdtToken, refetch } = usePresaleData();
   const presaleActive = status === "active";
@@ -87,9 +88,8 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
 
   const ensureWallet = (): boolean => {
     reset();
-    const appKit = getAppKit();
     if (!isConnected) {
-      appKit?.open();
+      openAppKit();
       return false;
     }
     if (chainId !== 56) {

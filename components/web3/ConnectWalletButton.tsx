@@ -1,8 +1,8 @@
 "use client";
 
 import { useAccount } from 'wagmi'
+import { useAppKit } from '@reown/appkit/react'
 import { Button, type ButtonProps } from "@/components/ui/Button";
-import { getAppKit } from "@/components/web3/AppKitInit";
 
 type ConnectWalletButtonProps = ButtonProps;
 
@@ -11,14 +11,13 @@ export function ConnectWalletButton({
   ...props
 }: ConnectWalletButtonProps) {
   const { address, isConnected, chain } = useAccount()
-
-  const appKit = getAppKit();
+  const { open } = useAppKit()
 
   if (!isConnected) {
     return (
       <Button
         {...props}
-        onClick={() => appKit?.open()}
+        onClick={() => open()}
       >
         {children ?? "Connect Wallet"}
       </Button>
@@ -29,7 +28,7 @@ export function ConnectWalletButton({
     return (
       <Button
         {...props}
-        onClick={() => appKit?.open({ view: 'Networks' })}
+        onClick={() => open({ view: 'Networks' })}
       >
         Switch Network
       </Button>
@@ -41,7 +40,7 @@ export function ConnectWalletButton({
   return (
     <Button
       {...props}
-      onClick={() => appKit?.open({ view: 'Account' })}
+      onClick={() => open({ view: 'Account' })}
     >
       {shortAddress}
     </Button>

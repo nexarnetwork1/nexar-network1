@@ -12,10 +12,10 @@ import { Gift } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
-import { getAppKit } from "@/components/web3/AppKitInit";
+import { useAppKit } from '@reown/appkit/react';
 import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI } from "@/lib/web3/abi";
-import { isWeb3Configured } from "@/components/providers/Web3Provider";
+import { isWeb3Configured } from "@/lib/web3/utils";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { cn } from "@/lib/utils/cn";
 
@@ -31,12 +31,12 @@ export function ClaimNxrModal({ open, onClose }: ClaimNxrModalProps) {
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
   const { claimableAmount, purchasedAmount, refetch } = usePresaleData();
+  const { open: openAppKit } = useAppKit();
 
   const handleClaim = () => {
     reset();
-    const appKit = getAppKit();
     if (!isConnected) {
-      appKit?.open();
+      openAppKit();
       return;
     }
     if (chainId !== 56) {
