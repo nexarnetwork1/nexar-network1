@@ -8,14 +8,15 @@ import {
   useChainId,
   useSwitchChain,
 } from "wagmi";
+import { bsc } from "@reown/appkit/networks";
 import { Gift } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePrivy } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
-import { useAppKit } from '@reown/appkit/react';
 import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI } from "@/lib/web3/abi";
-import { isWeb3Configured } from "@/lib/web3/utils";
+import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { cn } from "@/lib/utils/cn";
 
@@ -27,27 +28,27 @@ type ClaimNxrModalProps = {
 export function ClaimNxrModal({ open, onClose }: ClaimNxrModalProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+const { login } = usePrivy();
   const { switchChain } = useSwitchChain();
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
   const { claimableAmount, purchasedAmount, refetch } = usePresaleData();
-  const { open: openAppKit } = useAppKit();
 
   const handleClaim = () => {
     reset();
     if (!isConnected) {
-      openAppKit();
+login();
       return;
     }
-    if (chainId !== 56) {
-      switchChain({ chainId: 56 });
+    if (chainId !== bsc.id) {
+      switchChain({ chainId: bsc.id });
       return;
     }
     writeContract({
       address: CONTRACTS.presale as `0x${string}`,
       abi: PRESALE_ABI,
       functionName: "claim",
-      chainId: 56,
+      chainId: bsc.id,
     });
   };
 
@@ -91,6 +92,7 @@ export function ClaimNxrModal({ open, onClose }: ClaimNxrModalProps) {
               <Button
                 className="w-full"
                 size="lg"
+                glow
                 onClick={handleClaim}
                 disabled={isPending || isConfirming || claimableAmount <= 0}
               >
@@ -129,6 +131,7 @@ type ClaimNxrButtonProps = {
   size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "outline" | "ghost";
   magnetic?: boolean;
+  glow?: boolean;
 };
 
 export function ClaimNxrButton({
@@ -136,6 +139,7 @@ export function ClaimNxrButton({
   size = "md",
   variant = "outline",
   magnetic = true,
+  glow = false,
 }: ClaimNxrButtonProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const { claimableAmount, purchasedAmount, web3Ready, isLoading } = usePresaleData();
@@ -173,6 +177,7 @@ export function ClaimNxrButton({
         size={size}
         variant={variant}
         magnetic={magnetic}
+        glow={glow}
         className={cn(className)}
         onClick={() => setModalOpen(true)}
       >

@@ -5,16 +5,15 @@ import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { Web3Provider } from "@/lib/web3/context";
+import { Web3Provider } from "@/components/providers/Web3Provider";
 
 gsap.registerPlugin(ScrollTrigger);
 
 type AppProvidersProps = {
   children: React.ReactNode;
-  cookies: string | null;
 };
 
-export function AppProviders({ children, cookies }: AppProvidersProps) {
+export function AppProviders({ children }: AppProvidersProps) {
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -29,11 +28,12 @@ export function AppProviders({ children, cookies }: AppProvidersProps) {
 
     lenis.on("scroll", ScrollTrigger.update);
 
-    const raf = (time: number) => {
-      lenis.raf(time * 1000);
-    };
+   const raf = (time: number) => {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
+};
 
-    gsap.ticker.add(raf);
+requestAnimationFrame(raf);
     gsap.ticker.lagSmoothing(0);
 
     ScrollTrigger.refresh();
@@ -44,5 +44,5 @@ export function AppProviders({ children, cookies }: AppProvidersProps) {
     };
   }, [reducedMotion]);
 
-  return <Web3Provider cookies={cookies}>{children}</Web3Provider>;
+  return <Web3Provider>{children}</Web3Provider>;
 }

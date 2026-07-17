@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora, Space_Grotesk } from "next/font/google";
-import { headers } from "next/headers";
 import { Navbar } from "@/components/layout/Navbar";
 import { BackgroundEffect } from "@/components/background/BackgroundEffect";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
+import { Toaster } from "sonner";
 import {
   organizationSchema,
   websiteSchema,
@@ -43,19 +43,22 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersObj = await headers()
-  const cookies = headersObj.get('cookie')
-
   return (
     <html
       lang="en"
       className={`${inter.variable} ${sora.variable} ${spaceGrotesk.variable} h-full scroll-smooth`}
     >
+
+<Toaster
+  position="bottom-center"
+  richColors
+  theme="dark"
+/>
       <body className="relative min-h-full bg-background font-sans text-white antialiased">
         <script
           type="application/ld+json"
@@ -75,7 +78,7 @@ export default async function RootLayout({
             __html: JSON.stringify(productSchema),
           }}
         />
-        <AppProviders cookies={cookies}>
+        <AppProviders>
           {/* Skip-to-content: visible only on focus for keyboard users */}
           <a
             href="#main-content"
@@ -83,7 +86,7 @@ export default async function RootLayout({
           >
             Skip to content
           </a>
-          <BackgroundEffect />
+{/* <BackgroundEffect /> */}
           <Navbar />
           <div id="main-content" className="relative z-10 flex min-h-screen flex-col">{children}</div>
           <CookieConsent />

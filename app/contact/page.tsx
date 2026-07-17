@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Mail, MessageCircle, Send } from "lucide-react";
-import { FaXTwitter, FaTelegram, FaGithub, FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa6";
+import { FaXTwitter, FaTelegram, FaGithub, FaFacebook, FaInstagram, FaDiscord, FaLinkedin } from "react-icons/fa6";
 import { Container } from "@/components/ui/Container";
 import { SITE, SOCIAL } from "@/lib/constants/site";
 
@@ -24,7 +24,7 @@ const CONTACT_CHANNELS = [
   },
   {
     name: "Telegram",
-    handle: "t.me/NexarNetwork",
+    handle: "t.me/NexarNetworkCommunity",
     href: SOCIAL.telegram,
     icon: FaTelegram,
     description: "Join our community for discussions",
@@ -56,6 +56,13 @@ const CONTACT_CHANNELS = [
     href: SOCIAL.linkedin,
     icon: FaLinkedin,
     description: "Professional network and company updates",
+  },
+  {
+    name: "Discord",
+    handle: "discord.com/invite/MVJVwKDgSh",
+    href: SOCIAL.discord,
+    icon: FaDiscord,
+    description: "Join our community for discussions",
   },
 ];
 

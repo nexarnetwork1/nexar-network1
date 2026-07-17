@@ -24,6 +24,7 @@ const WHITEPAPER_SECTIONS = [
   { id: "ecosystem", title: "Nexar Ecosystem" },
   { id: "roadmap", title: "Roadmap" },
   { id: "security", title: "Security & Transparency" },
+  { id: "official-addresses", title: "Official Wallet Addresses" },
   { id: "founder", title: "Founder" },
   { id: "legal", title: "Legal Disclaimer" },
   { id: "conclusion", title: "Conclusion" },
@@ -708,7 +709,7 @@ inside a dedicated vesting smart contract.
             <section id="security" className="scroll-mt-24 mb-16">
 
 <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-17. Security & Transparency
+16. Security & Transparency
 </h2>
 
 <div className="space-y-5 text-muted leading-8">
@@ -741,11 +742,96 @@ reliability and long-term ecosystem protection.
 
 </section>
 
+<section id="official-addresses" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+17. Official Wallet Addresses
+</h2>
+
+<div className="space-y-6 text-muted leading-8">
+
+<p>
+The following blockchain addresses are the official on-chain
+addresses of Nexar Network and are publicly disclosed for
+transparency, verification and community reference.
+</p>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+
+<h3 className="text-gold font-semibold mb-2">
+NXR Token Contract
+</h3>
+
+<p className="font-mono break-all">
+{CONTRACTS.token}
+</p>
+
+<p className="mt-3">
+Official BEP-20 smart contract of the NXR token.
+</p>
+
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+
+<h3 className="text-gold font-semibold mb-2">
+Treasury Wallet
+</h3>
+
+<p className="font-mono break-all">
+{CONTRACTS.treasury}
+</p>
+
+<p className="mt-3">
+The official Treasury Wallet is responsible for ecosystem funding,
+liquidity management, strategic reserves, operational expenses,
+partnerships and long-term development of Nexar Network.
+</p>
+
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+
+<h3 className="text-gold font-semibold mb-2">
+Presale Contract
+</h3>
+
+<p className="font-mono break-all">
+{CONTRACTS.presale}
+</p>
+
+<p className="mt-3">
+Official smart contract used for the Nexar Network presale.
+</p>
+
+</div>
+
+<div className="luxury-border rounded-2xl bg-card/40 p-6">
+
+<h3 className="text-gold font-semibold mb-2">
+Team Vesting Contract
+</h3>
+
+<p className="font-mono break-all">
+{CONTRACTS.teamVesting}
+</p>
+
+<p className="mt-3">
+Official smart contract responsible for locking and gradually
+releasing team allocations according to the official vesting schedule.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
               {/* Roadmap & Milestones */}
              <section id="roadmap" className="scroll-mt-24 mb-16">
 
 <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-16. Roadmap
+18. Roadmap
 </h2>
 
 <div className="space-y-6">
@@ -801,7 +887,7 @@ reliability and long-term ecosystem protection.
 <section id="founder" className="scroll-mt-24 mb-16">
 
 <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-18. Founder
+19. Founder
 </h2>
 
 <div className="luxury-border rounded-2xl bg-card/40 p-8">
@@ -838,7 +924,7 @@ businesses and decentralized applications.
 <section id="legal" className="scroll-mt-24 mb-16">
 
 <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-19. Legal Disclaimer
+20. Legal Disclaimer
 </h2>
 
 <div className="space-y-5 text-muted leading-8">
@@ -867,7 +953,7 @@ may evolve as Nexar Network continues to develop.
 <section id="conclusion" className="scroll-mt-24">
 
 <h2 className="font-heading text-2xl font-semibold text-white mb-6">
-20. Conclusion
+21. Conclusion
 </h2>
 
 <div className="space-y-5 text-muted leading-8">

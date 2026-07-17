@@ -17,10 +17,11 @@ export const FOOTER_LINKS = {
     { label: "Market", href: "/market" },
     { label: "Contact", href: "/contact" },
   ],
-  resources: [
-    { label: "Whitepaper", href: "/whitepaper" },
-    { label: "Documentation", href: "/whitepaper" },
-  ],
+resources: [
+  { label: "Whitepaper", href: "/whitepaper" },
+  { label: "Official Addresses", href: "/official-addresses" },
+  { label: "Documentation", href: "/whitepaper" },
+],
   legal: [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },

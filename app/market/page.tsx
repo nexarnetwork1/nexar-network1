@@ -218,7 +218,7 @@ export default function MarketPage() {
                           Unable to load market data. Please try again later.
                         </td>
                       </tr>
-                    ) : (
+                    ) : 
                       cryptoData.map((coin) => (
                         <tr
                           key={coin.id}
@@ -264,7 +264,7 @@ export default function MarketPage() {
                           </td>
                         </tr>
                       ))
-                    )}
+                    }
                   </tbody>
                 </table>
               </div>

@@ -1,12 +1,13 @@
 "use client";
 
 import { useReadContract } from "wagmi";
+import { bsc } from "@reown/appkit/networks";
 import { formatUnits } from "viem";
 import { Coins, Shield, Ban } from "lucide-react";
 import { motion } from "framer-motion";
 import { CONTRACTS, SITE } from "@/lib/constants/site";
 import { ERC20_ABI } from "@/lib/web3/abi";
-import { isWeb3Configured } from "@/lib/web3/utils";
+import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { cn } from "@/lib/utils/cn";
 
 type TokenInfoProps = {
@@ -29,7 +30,7 @@ export function TokenInfo({ className }: TokenInfoProps) {
       },
     ] as const,
     functionName: "totalSupply",
-    chainId: 56,
+    chainId: bsc.id,
     query: { enabled: web3Ready, refetchInterval: 60_000 },
   });
 

@@ -5,6 +5,7 @@ import {
   FaXTwitter,
   FaTelegram,
   FaGithub,
+  FaDiscord,
   FaFacebook,
   FaInstagram,
   FaLinkedin,
@@ -21,6 +22,7 @@ const SOCIAL_ICONS = [
   { href: SOCIAL.facebook, icon: FaFacebook, label: "Facebook" },
   { href: SOCIAL.instagram, icon: FaInstagram, label: "Instagram" },
   { href: SOCIAL.linkedin, icon: FaLinkedin, label: "LinkedIn" },
+  { href: SOCIAL.discord, icon: FaDiscord, label: "Discord" },
 ];
 
 export function Footer() {

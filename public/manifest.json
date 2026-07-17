@@ -8,19 +8,18 @@
   "theme_color": "#050505",
   "orientation": "portrait-primary",
   "icons": [
-    {
-      "src": "/icon-512",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/apple-icon",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
+  {
+    "src": "/icon.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any maskable"
+  },
+  {
+    "src": "/apple-icon.png",
+    "sizes": "180x180",
+    "type": "image/png"
+  }
+],
   "categories": ["finance", "business"],
   "screenshots": [],
   "shortcuts": [
@@ -31,7 +30,7 @@
       "url": "/#buy",
       "icons": [
         {
-          "src": "/icon-512",
+          "src": "/icon.png",
           "sizes": "512x512"
         }
       ]
@@ -43,7 +42,7 @@
       "url": "/whitepaper",
       "icons": [
         {
-          "src": "/icon-512",
+          "src": "/icon.png",
           "sizes": "512x512"
         }
       ]
@@ -55,27 +54,10 @@
       "url": "/market",
       "icons": [
         {
-          "src": "/icon-512",
+          "src": "/icon,png",
           "sizes": "512x512"
         }
       ]
-    }
-  ],
-  "related_applications": [
-    {
-      "platform": "playstore",
-      "id": "io.nexarnetwork.app"
-    },
-    {
-      "platform": "itunes",
-      "id": "io.nexarnetwork.app"
-    }
-  ],
-  "prefer_related_applications": false,
-  "links": [
-    {
-      "rel": "apple-touch-icon",
-      "href": "/apple-icon"
     }
   ]
 }

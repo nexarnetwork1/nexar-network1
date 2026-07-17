@@ -1,8 +1,9 @@
 "use client";
 
-import { useAccount } from 'wagmi'
-import { useAppKit } from '@reown/appkit/react'
+import { useState } from "react";
+import { usePrivy } from "@privy-io/react-auth";
 import { Button, type ButtonProps } from "@/components/ui/Button";
+import { WalletMenu } from "./WalletMenu";
 
 type ConnectWalletButtonProps = ButtonProps;
 
@@ -10,39 +11,39 @@ export function ConnectWalletButton({
   children,
   ...props
 }: ConnectWalletButtonProps) {
-  const { address, isConnected, chain } = useAccount()
-  const { open } = useAppKit()
+  const { login, ready, authenticated } = usePrivy();
 
-  if (!isConnected) {
+  const [connecting, setConnecting] = useState(false);
+
+  if (!ready) {
     return (
-      <Button
-        {...props}
-        onClick={() => open()}
-      >
-        {children ?? "Connect Wallet"}
+      <Button {...props} disabled>
+        Loading...
       </Button>
     );
   }
 
-  if (chain?.id !== 56) {
-    return (
-      <Button
-        {...props}
-        onClick={() => open({ view: 'Networks' })}
-      >
-        Switch Network
-      </Button>
-    );
+  if (authenticated) {
+    return <WalletMenu />;
   }
-
-  const shortAddress = `${address?.slice(0, 6)}...${address?.slice(-4)}`
 
   return (
     <Button
       {...props}
-      onClick={() => open({ view: 'Account' })}
+      disabled={connecting}
+      onClick={async () => {
+        if (connecting) return;
+
+        setConnecting(true);
+
+        try {
+          await login();
+        } finally {
+          setConnecting(false);
+        }
+      }}
     >
-      {shortAddress}
+      {connecting ? "Connecting..." : children ?? "Connect Wallet"}
     </Button>
   );
 }

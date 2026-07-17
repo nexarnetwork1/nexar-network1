@@ -155,7 +155,7 @@ export function TokenomicsSection() {
               href="/market"
               className="inline-flex items-center gap-2 text-sm text-gold transition-colors hover:text-gold-secondary"
             >
-              View Contract Addresses
+              View All Official Contracts
               <ExternalLink className="h-4 w-4" />
             </Link>
           </div>

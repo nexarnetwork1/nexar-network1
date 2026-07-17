@@ -9,15 +9,16 @@ import {
   useChainId,
   useSwitchChain,
 } from "wagmi";
+import { bsc } from "wagmi/chains";
 import { parseEther, parseUnits, formatUnits } from "viem";
 import { AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
-import { useAppKit } from '@reown/appkit/react';
+import { usePrivy } from "@privy-io/react-auth";
 import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI, ERC20_ABI } from "@/lib/web3/abi";
-import { isWeb3Configured } from "@/lib/web3/utils";
+import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { cn } from "@/lib/utils/cn";
 
@@ -37,12 +38,12 @@ export function BuyNxrModal({ open, onClose }: BuyNxrModalProps) {
 function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+const { login } = usePrivy();
   const { switchChain } = useSwitchChain();
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: txHash,
   });
-  const { open: openAppKit } = useAppKit();
 
   const { status, minPurchase, maxPurchase, usdtToken, refetch } = usePresaleData();
   const presaleActive = status === "active";
@@ -67,7 +68,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
     abi: ERC20_ABI,
     functionName: "allowance",
     args: address && usdtToken ? [address, CONTRACTS.presale as `0x${string}`] : undefined,
-    chainId: 56,
+    chainId: bsc.id,
     query: { enabled: Boolean(address && usdtToken && open) },
   });
 
@@ -89,11 +90,11 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
   const ensureWallet = (): boolean => {
     reset();
     if (!isConnected) {
-      openAppKit();
+login();
       return false;
     }
-    if (chainId !== 56) {
-      switchChain({ chainId: 56 });
+    if (chainId !== bsc.id) {
+      switchChain({ chainId: bsc.id });
       return false;
     }
     return true;
@@ -109,7 +110,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
         abi: PRESALE_ABI,
         functionName: "buyWithBnb",
         value: parseEther(trimmed),
-        chainId: 56,
+        chainId: bsc.id,
       });
     } catch {
       // parseEther failed — invalid input, silently ignore
@@ -127,7 +128,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
         abi: PRESALE_ABI,
         functionName: "buyWithUsdt",
         args: [usdtAmountWei],
-        chainId: 56,
+        chainId: bsc.id,
       });
       return;
     }
@@ -138,7 +139,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
       abi: ERC20_ABI,
       functionName: "approve",
       args: [CONTRACTS.presale as `0x${string}`, usdtAmountWei],
-      chainId: 56,
+      chainId: bsc.id,
     });
   };
 
@@ -227,6 +228,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
                   <Button
                     className="w-full"
                     size="lg"
+                    glow
                     onClick={handleBuyBnb}
                     disabled={isPending || isConfirming || !presaleActive}
                   >
@@ -267,6 +269,7 @@ function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
                   <Button
                     className="w-full"
                     size="lg"
+                    glow
                     onClick={handleUsdtFlow}
                     disabled={isPending || isConfirming || !presaleActive}
                   >
@@ -322,6 +325,7 @@ type BuyNxrButtonProps = {
   size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "outline" | "ghost";
   magnetic?: boolean;
+  glow?: boolean;
   children?: React.ReactNode;
   disabled?: boolean;
 };
@@ -331,6 +335,7 @@ export function BuyNxrButton({
   size = "lg",
   variant = "secondary",
   magnetic = true,
+  glow = true,
   children,
   disabled,
 }: BuyNxrButtonProps) {
@@ -341,6 +346,7 @@ export function BuyNxrButton({
         size={size}
         variant={variant}
         magnetic={magnetic}
+        glow={glow}
         className={className}
         disabled
         title="Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID"
@@ -356,6 +362,7 @@ export function BuyNxrButton({
         size={size}
         variant={variant}
         magnetic={magnetic}
+        glow={glow}
         className={className}
         onClick={() => setModalOpen(true)}
         disabled={disabled}

@@ -69,17 +69,21 @@ export default function PrivacyPage() {
                 4. Third-Party Services
               </h2>
               <p>
-                We use WalletConnect (Reown) to facilitate wallet connections. Please review their privacy policy at{" "}
-                <a
-                  href="https://reown.com/privacy-policy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gold hover:underline"
-                >
-                  reown.com/privacy-policy
-                </a>
-                .
-              </p>
+
+  We use <strong>Privy</strong> to provide secure wallet authentication and
+  wallet connection services. When you choose to connect a wallet, certain
+  technical information may be processed by Privy in accordance with their
+  privacy policy. Please review it at{" "}
+  <a
+    href="https://www.privy.io/privacy-policy"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-gold hover:underline"
+  >
+    privy.io/privacy-policy
+  </a>
+  .
+</p>
             </section>
 
             <section>

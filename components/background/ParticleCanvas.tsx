@@ -13,7 +13,11 @@ type Particle = {
   opacity: number;
 };
 
-function createParticles(count: number, width: number, height: number): Particle[] {
+function createParticles(
+  count: number,
+  width: number,
+  height: number
+): Particle[] {
   return Array.from({ length: count }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
@@ -41,17 +45,26 @@ export function ParticleCanvas() {
     let animationFrame = 0;
     let particles: Particle[] = [];
     let isVisible = true;
+    let observer: IntersectionObserver | undefined;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+      const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        isMobile ? 1.5 : 2
+      );
+
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
       canvas.style.height = `${window.innerHeight}px`;
+
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const count = isMobile ? 25 : 60;
-      particles = createParticles(count, window.innerWidth, window.innerHeight);
+      particles = createParticles(
+        isMobile ? 25 : 60,
+        window.innerWidth,
+        window.innerHeight
+      );
     };
 
     const draw = () => {
@@ -60,7 +73,12 @@ export function ParticleCanvas() {
         return;
       }
 
-      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      context.clearRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+      );
 
       for (const particle of particles) {
         particle.x += particle.speedX;
@@ -72,31 +90,49 @@ export function ParticleCanvas() {
         if (particle.y > window.innerHeight) particle.y = 0;
 
         context.beginPath();
-        context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        context.fillStyle = `${COLORS.gold}${Math.round(particle.opacity * 255).toString(16).padStart(2, "0")}`;
+        context.arc(
+          particle.x,
+          particle.y,
+          particle.size,
+          0,
+          Math.PI * 2
+        );
+
+        context.fillStyle =
+          `${COLORS.gold}${Math.round(
+            particle.opacity * 255
+          )
+            .toString(16)
+            .padStart(2, "0")}`;
+
         context.fill();
       }
 
       animationFrame = requestAnimationFrame(draw);
     };
 
-    // Pause rendering when canvas is scrolled out of view
-    const observer = new IntersectionObserver(
-      (entries) => {
-        isVisible = entries[0]?.isIntersecting ?? true;
-      },
-      { threshold: 0 },
-    );
-    observer.observe(canvas);
+    if ("IntersectionObserver" in window) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          isVisible = entries[0]?.isIntersecting ?? true;
+        },
+        {
+          threshold: 0,
+        }
+      );
+
+      observer.observe(canvas);
+    }
 
     resize();
     draw();
 
     window.addEventListener("resize", resize);
+
     return () => {
       cancelAnimationFrame(animationFrame);
       window.removeEventListener("resize", resize);
-      observer.disconnect();
+      observer?.disconnect();
     };
   }, [reducedMotion, isMobile]);
 

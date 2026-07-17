@@ -58,6 +58,7 @@ export function Navbar() {
               variant="primary"
               size="sm"
               magnetic
+              glow
               className="hidden sm:inline-flex"
             />
 

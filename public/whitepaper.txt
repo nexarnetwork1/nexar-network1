@@ -635,9 +635,45 @@ Future Infrastructure
 
 • Global Adoption Strategy
 
+============================================================
+17. OFFICIAL WALLET ADDRESSES
+============================================================
+
+Transparency is one of the core principles of Nexar Network. To ensure full accountability and allow independent verification, the official blockchain addresses used throughout the ecosystem are publicly disclosed below.
+
+NXR TOKEN CONTRACT
+
+The official BEP-20 smart contract deployed on BNB Smart Chain for the NXR token.
+
+Contract Address:
+0xc37c9eeAB826e5bcB4ed2b798123915Cd596c909
+
+TREASURY WALLET
+
+The official treasury wallet responsible for managing ecosystem funds, strategic reserves, operational expenses, partnerships, and long-term development.
+
+Wallet Address:
+0xaCc4915C896Cd4E0d18C65fe5e10DcFBAe190f12
+
+PRESALE CONTRACT
+
+The official smart contract responsible for managing the Nexar Network token presale.
+
+Contract Address:
+0x9B3674dfE84b908B88BAf7285c8744531d678c9c
+
+TEAM VESTING CONTRACT
+
+The official vesting contract that securely locks the team's token allocation according to the project's vesting schedule.
+
+Contract Address:
+0x55D0402D6E81F598cdAdC3132Fe4982912FdB787
+
+All addresses listed above are official Nexar Network addresses and can be independently verified on BscScan.
+
 
 ============================================================
-17. SECURITY & TRANSPARENCY
+18. SECURITY & TRANSPARENCY
 ============================================================
 
 Security represents one of the core principles of
@@ -667,7 +703,7 @@ security audits may be conducted to further strengthen
 the platform.
 
 ============================================================
-18. FOUNDER
+19. FOUNDER
 ============================================================
 
 Mahmoud Elgabry
@@ -700,7 +736,7 @@ The project is guided by the principles of:
 • Long-Term Vision
 
 ============================================================
-19. LEGAL DISCLAIMER
+20. LEGAL DISCLAIMER
 ============================================================
 
 This document is provided solely for informational
@@ -727,7 +763,7 @@ performance, exchange listings, adoption,
 or token value.
 
 ============================================================
-20. CONCLUSION
+21. CONCLUSION
 ============================================================
 
 Nexar Network represents a long-term vision focused on
@@ -755,13 +791,16 @@ Official Website
 https://nexarnetwork.com
 
 Email
-contact@nexarnetwork.com
+contact@nexarnetwork1@gmail.com
 
 X (Twitter)
 https://x.com/NexarNetwork1
 
 Telegram
-https://t.me/NexarNetwork
+https://t.me/NexarNetworkCommunity
+
+Discord
+https://discord.gg/MVJVwKDgSh
 
 GitHub
 https://github.com/nexarnetwork1

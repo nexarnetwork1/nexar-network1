@@ -15,11 +15,12 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   magnetic?: boolean;
+  glow?: boolean;
 };
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gold text-background border border-gold/30 hover:bg-gold-secondary hover:text-background",
+    "bg-gold text-background border border-gold/30 shadow-[0_0_30px_-8px_rgba(212,175,55,0.55)] hover:shadow-[0_0_40px_-6px_rgba(212,175,55,0.7)] hover:bg-gold-secondary hover:text-background",
   secondary:
     "bg-surface/80 text-white border border-border backdrop-blur-md hover:border-gold/30 hover:bg-card",
   outline:
@@ -41,6 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant = "primary",
       size = "md",
       magnetic = false,
+      glow = false,
       children,
       onMouseMove,
       onMouseLeave,
@@ -82,6 +84,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:pointer-events-none disabled:opacity-50",
           variantStyles[variant],
           sizeStyles[size],
+          // Glow: rendered via box-shadow so it works outside overflow-hidden boundaries
+          glow &&
+            "shadow-[0_0_0_0_rgba(212,175,55,0)] hover:shadow-[0_0_28px_4px_rgba(212,175,55,0.22)]",
           className,
         )}
         onMouseMove={handleMouseMove}
