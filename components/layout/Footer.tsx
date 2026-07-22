@@ -2,14 +2,18 @@
 
 import Link from "next/link";
 import {
-  FaXTwitter,
-  FaTelegram,
-  FaGithub,
-  FaDiscord,
-  FaFacebook,
-  FaInstagram,
-  FaLinkedin,
+FaXTwitter,
+FaTelegram,
+FaGithub,
+FaFacebook,
+FaInstagram,
+FaLinkedin,
+FaDiscord,
+FaTiktok,
 } from "react-icons/fa6";
+
+import { SiBinance } from "react-icons/si";
+
 import { SITE, SOCIAL, CONTRACTS } from "@/lib/constants/site";
 import { FOOTER_LINKS } from "@/lib/constants/navigation";
 import { Container } from "@/components/ui/Container";
@@ -17,13 +21,16 @@ import { Logo } from "@/components/ui/Logo";
 
 const SOCIAL_ICONS = [
   { href: SOCIAL.x, icon: FaXTwitter, label: "X" },
+  { href: SOCIAL.binanceSquare, icon: SiBinance, label: "Binance Square" },
   { href: SOCIAL.telegram, icon: FaTelegram, label: "Telegram" },
-  { href: SOCIAL.github, icon: FaGithub, label: "GitHub" },
-  { href: SOCIAL.facebook, icon: FaFacebook, label: "Facebook" },
+  { href: SOCIAL.tiktok, icon: FaTiktok, label: "TikTok" },
   { href: SOCIAL.instagram, icon: FaInstagram, label: "Instagram" },
-  { href: SOCIAL.linkedin, icon: FaLinkedin, label: "LinkedIn" },
+  { href: SOCIAL.facebook, icon: FaFacebook, label: "Facebook" },
   { href: SOCIAL.discord, icon: FaDiscord, label: "Discord" },
+  { href: SOCIAL.github, icon: FaGithub, label: "GitHub" },
+  { href: SOCIAL.linkedin, icon: FaLinkedin, label: "LinkedIn" },
 ];
+
 
 export function Footer() {
   return (

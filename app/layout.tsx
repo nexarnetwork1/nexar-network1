@@ -5,6 +5,7 @@ import { BackgroundEffect } from "@/components/background/BackgroundEffect";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
 import { Toaster } from "sonner";
+import AnnouncementBanner from "@/components/news/AnnouncementBanner";
 import {
   organizationSchema,
   websiteSchema,
@@ -87,8 +88,16 @@ export default function RootLayout({
             Skip to content
           </a>
 {/* <BackgroundEffect /> */}
-          <Navbar />
-          <div id="main-content" className="relative z-10 flex min-h-screen flex-col">{children}</div>
+         <Navbar />
+
+<AnnouncementBanner />
+
+<div
+  id="main-content"
+  className="relative z-10 flex min-h-screen flex-col"
+>
+  {children}
+</div>
           <CookieConsent />
         </AppProviders>
       </body>
