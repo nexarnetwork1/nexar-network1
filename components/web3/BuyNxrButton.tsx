@@ -21,6 +21,9 @@ import { PRESALE_ABI, ERC20_ABI } from "@/lib/web3/abi";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { cn } from "@/lib/utils/cn";
+import { ClaimNxrButton, ClaimNxrModal } from "@/components/web3/ClaimNxrButton";
+import { createPortal } from "react-dom";
+import Image from "next/image";
 
 type BuyNxrModalProps = {
   open: boolean;
@@ -145,10 +148,19 @@ login();
 
   if (!isWeb3Configured()) return null;
 
-  return (
-    <AnimatePresence>
-      {open && (
-        <>
+const [mounted, setMounted] = useState(false);
+
+useEffect(() => {
+  setMounted(true);
+}, []);
+
+if (!mounted) return null;
+if (typeof document === "undefined") return null;
+
+return createPortal(
+  <AnimatePresence>
+    {open && (
+      <>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -167,6 +179,18 @@ login();
                 <h3 className="font-heading text-xl font-semibold">Buy NXR</h3>
                 <CloseButton onClick={onClose} size="sm" label="Close buy modal" />
               </div>
+
+           <div className="mb-5 border-b border-border pb-4">
+
+  <div className="flex flex-wrap items-center justify-center gap-5">
+    <Image src="/wallets/metamask.png" alt="MetaMask" width={24} height={24} />
+    <Image src="/wallets/trustwallet.png" alt="Trust Wallet" width={24} height={24} />
+    <Image src="/wallets/binancewallet.png" alt="Binance Wallet" width={24} height={24} />
+    <Image src="/wallets/safepal.png" alt="SafePal" width={24} height={24} />
+    <Image src="/wallets/tokenpocket.png" alt="TokenPocket" width={24} height={24} />
+  </div>
+
+</div>
 
               {!presaleActive && (
                 <div className="mb-5 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
@@ -316,8 +340,9 @@ login();
           </motion.div>
         </>
       )}
-    </AnimatePresence>
-  );
+  </AnimatePresence>,
+document.body
+);
 }
 
 type BuyNxrButtonProps = {
@@ -340,6 +365,8 @@ export function BuyNxrButton({
   disabled,
 }: BuyNxrButtonProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const { status } = usePresaleData();
+const [claimOpen, setClaimOpen] = useState(false);
   if (!isWeb3Configured()) {
     return (
       <Button
@@ -357,19 +384,51 @@ export function BuyNxrButton({
   }
 
   return (
-    <>
-      <Button
-        size={size}
-        variant={variant}
-        magnetic={magnetic}
-        glow={glow}
-        className={className}
-        onClick={() => setModalOpen(true)}
-        disabled={disabled}
-      >
-        {children ?? "Buy NXR"}
-      </Button>
-      <BuyNxrModal open={modalOpen} onClose={() => setModalOpen(false)} />
-    </>
+  <>
+  <Button
+    size={size}
+    variant={variant}
+    magnetic={magnetic}
+    glow={glow}
+    className={className}
+    onClick={() => {
+      if (status === "ended") {
+        setClaimOpen(true);
+      } else {
+        setModalOpen(true);
+      }
+    }}
+    disabled={disabled}
+  >
+    {status === "ended"
+      ? "Claim NXR"
+      : (children ?? "Buy NXR")}
+  </Button>
+
+<div className="mt-2 mx-auto w-fit border-t border-border pt-2 px-1">
+
+  <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+    <Image src="/wallets/metamask.png" alt="MetaMask" width={24} height={24} className="sm:w-8 sm:h-8" />
+    <Image src="/wallets/trustwallet.png" alt="Trust Wallet" width={24} height={24} className="sm:w-8 sm:h-8" />
+    <Image src="/wallets/binancewallet.png" alt="Binance Wallet" width={24} height={24} className="sm:w-8 sm:h-8" />
+    <Image src="/wallets/safepal.png" alt="SafePal" width={24} height={24} className="sm:w-8 sm:h-8" />
+    <Image src="/wallets/tokenpocket.png" alt="TokenPocket" width={24} height={24} className="sm:w-8 sm:h-8" />
+  </div>
+
+  <p className="mt-2 text-center text-[9px] sm:text-[10px] text-muted-foreground">
+    Use the same wallet for buying and claiming.
+  </p>
+</div>
+
+  <BuyNxrModal
+    open={modalOpen}
+    onClose={() => setModalOpen(false)}
+  />
+
+  <ClaimNxrModal
+    open={claimOpen}
+    onClose={() => setClaimOpen(false)}
+  />
+</>
   );
 }

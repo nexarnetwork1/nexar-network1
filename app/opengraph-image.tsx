@@ -58,7 +58,7 @@ export default function Image() {
         >
           {/* Official logo image */}
           <img
-            src="https://nexar.network/images/logo.png"
+            src="https://www.nexarnetwork.org/images/logo.png"
             alt="Nexar Network Logo"
             width={160}
             height={40}

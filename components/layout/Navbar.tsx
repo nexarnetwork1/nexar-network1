@@ -10,6 +10,8 @@ import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
 import { MobileMenu } from "./MobileMenu";
+import Image from "next/image";
+import Marquee from "react-fast-marquee";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -19,7 +21,7 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+          "fixed inset-x-0 top-0 z-30 transition-all duration-500",
           scrolled
             ? "border-b border-border/80 bg-background/70 py-3 backdrop-blur-2xl"
             : "border-b border-transparent bg-transparent py-5",
@@ -74,9 +76,62 @@ export function Navbar() {
             </button>
           </div>
         </Container>
-      </header>
+     </header>
 
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
+<div className="fixed top-[72px] left-0 z-20 w-full border-y border-gold/20 bg-black/90 backdrop-blur-md">
+
+  <Marquee
+    speed={35}
+    gradient={false}
+    pauseOnHover={true}
+    autoFill={true}
+    className="py-2"
+  >
+
+    <div className="flex items-center gap-10 px-6">
+
+      <div className="flex items-center gap-2 whitespace-nowrap">
+        <Image src="/wallets/metamask.png" alt="MetaMask" width={20} height={20} />
+        <span>MetaMask</span>
+      </div>
+
+      <div className="flex items-center gap-2 whitespace-nowrap">
+        <Image src="/wallets/trustwallet.png" alt="Trust Wallet" width={20} height={20} />
+        <span>Trust Wallet</span>
+      </div>
+
+      <div className="flex items-center gap-2 whitespace-nowrap">
+        <Image src="/wallets/binancewallet.png" alt="Binance Wallet" width={20} height={20} />
+        <span>Binance Wallet</span>
+      </div>
+
+      <div className="flex items-center gap-2 whitespace-nowrap">
+        <Image src="/wallets/safepal.png" alt="SafePal" width={20} height={20} />
+        <span>SafePal</span>
+      </div>
+
+      <div className="flex items-center gap-2 whitespace-nowrap">
+        <Image src="/wallets/tokenpocket.png" alt="TokenPocket" width={20} height={20} />
+        <span>TokenPocket</span>
+      </div>
+
+      <span className="text-gold font-semibold">
+        🚀 JOIN OUR PUBLIC PRESALE NOW
+      </span>
+
+      <span>⚡ FAST</span>
+
+      <span>🔒 SECURE</span>
+
+      <span>🌍 BUILDING THE FUTURE OF GLOBAL PAYMENTS</span>
+
+    </div>
+
+  </Marquee>
+
+</div>
+
+<MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
     </>
   );
 }
