@@ -18,7 +18,7 @@ const cspHeader = [
   // السماح بتحميل صور المحافظ
   "img-src 'self' data: blob: https://coin-images.coingecko.com https://assets.coingecko.com https://explorer-api.walletconnect.com https://explorer-api.walletconnect.org https://registry.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org",
 
-  "connect-src 'self' \
+"connect-src 'self' \
 https://api.coingecko.com \
 https://*.walletconnect.com \
 wss://*.walletconnect.com \
@@ -39,8 +39,9 @@ https://auth.privy.io \
 https://*.privy.io \
 https://privy.io \
 https://*.privy.com \
-wss://*.privy.io",
-
+wss://*.privy.io \
+https://*.supabase.co \
+wss://*.supabase.co",
   "frame-src 'self' https://auth.privy.io",
 
   "object-src 'none'",

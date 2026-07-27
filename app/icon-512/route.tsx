@@ -42,7 +42,7 @@ export function GET() {
           {/* Official logo image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://nexar.network/images/logo.png"
+            src="https://www.nexarnetwork.org/images/logo.png"
             alt="Nexar Network"
             width={280}
             height={70}

@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Mail, MessageCircle, Send } from "lucide-react";
-import { FaXTwitter, FaTelegram, FaGithub, FaFacebook, FaInstagram, FaDiscord, FaLinkedin } from "react-icons/fa6";
+import {
+FaXTwitter,
+FaTelegram,
+FaGithub,
+FaFacebook,
+FaInstagram,
+FaLinkedin,
+FaDiscord,
+FaTiktok,
+} from "react-icons/fa6";
+
+import { SiBinance } from "react-icons/si";
 import { Container } from "@/components/ui/Container";
 import { SITE, SOCIAL } from "@/lib/constants/site";
 
@@ -16,53 +27,67 @@ export const metadata: Metadata = {
 
 const CONTACT_CHANNELS = [
   {
-    name: "Twitter / X",
+    name: "X",
     handle: "@NexarNetwork1",
     href: SOCIAL.x,
     icon: FaXTwitter,
-    description: "Follow for latest updates and announcements",
+    description: "Latest announcements",
+  },
+  {
+    name: "Binance Square",
+    handle: "Nexar Network",
+    href: SOCIAL.binanceSquare,
+    icon: SiBinance,
+    description: "Official Binance Square",
   },
   {
     name: "Telegram",
     handle: "t.me/NexarNetworkCommunity",
     href: SOCIAL.telegram,
     icon: FaTelegram,
-    description: "Join our community for discussions",
+    description: "Official Community",
   },
   {
-    name: "GitHub",
-    handle: "github.com/nexarnetwork1",
-    href: SOCIAL.github,
-    icon: FaGithub,
-    description: "View our open-source code and contribute",
+    name: "TikTok",
+    handle: "@nexarnetwork",
+    href: SOCIAL.tiktok,
+    icon: FaTiktok,
+    description: "Official TikTok",
   },
   {
     name: "Instagram",
     handle: "@nexarnetwork1",
     href: SOCIAL.instagram,
     icon: FaInstagram,
-    description: "Visual updates and behind-the-scenes content",
+    description: "Official Instagram",
   },
   {
     name: "Facebook",
     handle: "Nexar Network",
     href: SOCIAL.facebook,
     icon: FaFacebook,
-    description: "Connect with us on Facebook",
+    description: "Official Facebook",
+  },
+  {
+    name: "Discord",
+    handle: "Nexar Network",
+    href: SOCIAL.discord,
+    icon: FaDiscord,
+    description: "Official Discord",
+  },
+  {
+    name: "GitHub",
+    handle: "github.com/nexarnetwork1",
+    href: SOCIAL.github,
+    icon: FaGithub,
+    description: "Open Source",
   },
   {
     name: "LinkedIn",
     handle: "Mahmoud Elgabry",
     href: SOCIAL.linkedin,
     icon: FaLinkedin,
-    description: "Professional network and company updates",
-  },
-  {
-    name: "Discord",
-    handle: "discord.com/invite/MVJVwKDgSh",
-    href: SOCIAL.discord,
-    icon: FaDiscord,
-    description: "Join our community for discussions",
+    description: "Founder",
   },
 ];
 

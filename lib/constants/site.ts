@@ -4,7 +4,7 @@ export const SITE = {
   tagline: "Build the future decentralized payment infrastructure.",
   description:
     "Nexar Network is building a premium blockchain ecosystem focused on global payments. Starting on BNB Smart Chain, evolving into sovereign payment infrastructure.",
-  url: "https://nexarnetwork-hazel.vercel.app/",
+  url: "https://www.nexarnetwork.org",
   founder: "Mahmoud Elgabry",
   blockchain: "BNB Smart Chain (BEP20)",
   maxSupply: "500,000,000",
@@ -23,9 +23,11 @@ export const CONTRACTS = {
 export const SOCIAL = {
   x: "https://x.com/NexarNetwork1",
   telegram: "https://t.me/NexarNetworkCommunity",
-  discord: "https://discord.gg/MVJVwKDgSh",
+  binanceSquare: "https://app.binance.com/uni-qr/cpro/nexarnetworkofficial?l=en&r=T29U688W&uc=app_square_share_link&us=copylink",
+  tiktok: "https://www.tiktok.com/@nexarnetwork?_r=1&_t=ZS-98DcjM8zOEv",
   github: "https://github.com/nexarnetwork1",
-  facebook: "https://facebook.com/share/1EPeMgVPpa/",
-  instagram: "https://instagram.com/nexarnetwork1",
+  facebook: "https://www.facebook.com/share/1EPeMgVPpa/",
+  instagram: "https://www.instagram.com/nexarnetwork1",
+  discord: "https://discord.gg/MVJVwKDgSh",
   linkedin: "https://linkedin.com/in/mahmoud-elgabry-142644419",
 } as const;

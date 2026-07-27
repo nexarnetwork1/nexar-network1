@@ -10,13 +10,26 @@ import { Reveal } from "@/components/ui/Reveal";
 
 const WHITEPAPER_SECTIONS = [
   "Executive Summary",
-  "Problem Statement",
-  "Nexar Network Architecture",
-  "Tokenomics & Allocation",
-  "Ecosystem Modules",
-  "Security & Compliance",
-  "Roadmap & Milestones",
-  "Team & Governance",
+  "Industry Overview",
+  "Current Challenges",
+  "The Nexar Solution",
+  "Vision",
+  "Mission",
+  "Core Values",
+  "Why Nexar Network",
+  "Market Opportunity",
+  "Technology Overview",
+  "Token Overview",
+  "Tokenomics",
+  "Team Vesting",
+  "Token Utility",
+  "Nexar Ecosystem",
+  "Roadmap",
+  "Security & Transparency",
+  "Official Wallet Addresses",
+  "Founder",
+  "Legal Disclaimer",
+  "Conclusion",
 ];
 
 export function WhitepaperSection() {

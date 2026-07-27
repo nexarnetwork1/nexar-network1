@@ -11,7 +11,7 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function HomePage() {
   return (
-    <main className="nav-offset flex flex-1 flex-col">
+    <main className="flex flex-1 flex-col">
       <HeroSection />
       <AboutSection />
       <WhyNexarSection />
