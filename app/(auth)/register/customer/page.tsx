@@ -53,7 +53,6 @@ export default function CustomerRegisterPage() {
     <AuthCard
       title="Customer registration"
       subtitle="Browse, buy, and pay with crypto or card"
-      className="max-w-lg"
     >
       <OAuthButtons intent="customer" />
 
@@ -63,7 +62,7 @@ export default function CustomerRegisterPage() {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3" noValidate>
         <Input
           {...register("fullName")}
           label="Full name"

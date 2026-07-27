@@ -12,6 +12,7 @@ import { CloseButton } from "@/components/ui/CloseButton";
 import { Button } from "@/components/ui/Button";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 type CardPaymentPopupProps = {
   clientSecret: string;
@@ -91,6 +92,7 @@ export function CardPaymentPopup({
   onClose,
   onSuccess,
 }: CardPaymentPopupProps) {
+  useScrollLock(true);
   const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
   const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 

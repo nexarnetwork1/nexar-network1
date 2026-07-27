@@ -8,6 +8,7 @@ import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { NavLink } from "@/components/layout/NavLink";
 import { Logo } from "@/components/ui/Logo";
 import { CloseButton } from "@/components/ui/CloseButton";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 type MobileMenuProps = {
   open: boolean;
@@ -20,6 +21,8 @@ const FOCUSABLE_SELECTORS =
 export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useScrollLock(open);
 
   // Move focus into dialog when it opens
   useEffect(() => {
@@ -108,7 +111,11 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
               />
             </div>
 
-            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6" aria-label="Mobile navigation">
+            <nav
+              className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6"
+              aria-label="Mobile navigation"
+              data-scroll-lock-scrollable
+            >
               {NAV_ITEMS.map((item, index) => (
                 <motion.div
                   key={item.href}

@@ -1,4 +1,3 @@
-import { PageAmbientBackground } from "@/components/ui/PageAmbientBackground";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { WhyNexarSection } from "@/components/sections/WhyNexarSection";
@@ -13,7 +12,6 @@ import { Footer } from "@/components/layout/Footer";
 export default function HomePage() {
   return (
     <main className="nav-offset relative flex flex-1 flex-col">
-      <PageAmbientBackground variant="home" />
       <HeroSection />
       <AboutSection />
       <WhyNexarSection />

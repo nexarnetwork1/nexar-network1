@@ -67,7 +67,6 @@ export default function MerchantRegisterPage() {
     <AuthCard
       title="Merchant registration"
       subtitle="Accept payments and sell products on Nexar Network"
-      className="max-w-lg"
     >
       <OAuthButtons intent="merchant" />
 
@@ -77,7 +76,7 @@ export default function MerchantRegisterPage() {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={onFormSubmit} className="space-y-4" noValidate>
+      <form onSubmit={onFormSubmit} className="space-y-3" noValidate>
         <Input
           {...register("merchantName")}
           label="Merchant name"

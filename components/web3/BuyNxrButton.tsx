@@ -36,9 +36,6 @@ export function BuyNxrButton({
           ? "Presale Soon"
           : (children ?? "Buy NXR");
 
-  const isDisabled =
-    disabled || (!canClaim && (status === "sold_out" || status === "loading" || status === "error"));
-
   return (
     <Button
       size={size}
@@ -46,7 +43,7 @@ export function BuyNxrButton({
       magnetic={magnetic}
       glow={glow}
       className={className}
-      disabled={isDisabled}
+      disabled={disabled}
       onClick={() => router.push("/presale")}
     >
       {label}

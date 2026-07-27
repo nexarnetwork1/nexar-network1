@@ -6,7 +6,6 @@ import gsap from "gsap";
 import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { SITE } from "@/lib/constants/site";
-import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { BuyNxrButton } from "@/components/web3/BuyNxrButton";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -112,11 +111,10 @@ export function HeroSection() {
               transition={{ duration: 0.8, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
               className="mt-8 flex flex-wrap items-center gap-2 sm:gap-3"
             >
-              <ConnectWalletButton size="lg" magnetic glow />
               <BuyNxrButton />
-              <Link href="/#whitepaper">
+              <Link href="/#about">
                 <Button size="lg" variant="outline" magnetic>
-                  Whitepaper
+                  Learn More
                   <ArrowUpRight className="h-4 w-4" />
                 </Button>
               </Link>

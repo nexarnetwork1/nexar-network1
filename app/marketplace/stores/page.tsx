@@ -6,7 +6,6 @@ import {
 import { getMarketplaceCategories } from "@/modules/catalog/repository";
 import { StoreCard } from "@/components/marketplace/StoreCard";
 import { MarketplaceEmptyState } from "@/components/marketplace/MarketplaceEmptyState";
-import { PageAmbientBackground } from "@/components/ui/PageAmbientBackground";
 import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 
 type Props = {
@@ -53,9 +52,8 @@ export default async function MarketplaceStoresPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="relative min-h-screen bg-background">
-      <PageAmbientBackground variant="marketplace" />
-      <div className="relative border-b border-border bg-surface/30 backdrop-blur-md">
+    <div className="relative min-h-screen">
+      <div className="nav-offset relative border-b border-border bg-surface/30 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <h1 className="font-heading text-3xl font-semibold md:text-4xl">Marketplace Stores</h1>
           <p className="mt-2 max-w-2xl text-muted">

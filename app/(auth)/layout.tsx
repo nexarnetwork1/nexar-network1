@@ -1,5 +1,4 @@
 import { Container } from "@/components/ui/Container";
-import { PageAmbientBackground } from "@/components/ui/PageAmbientBackground";
 
 export default function AuthLayout({
   children,
@@ -7,11 +6,8 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <PageAmbientBackground variant="login" />
-      <Container className="relative flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center py-10 sm:py-14">
-        {children}
-      </Container>
-    </>
+    <Container className="relative flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center justify-center py-8 sm:py-10">
+      {children}
+    </Container>
   );
 }

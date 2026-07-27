@@ -13,6 +13,7 @@ import { CurrencyAmount, UsdAmount } from "@/components/payments/CurrencyAmount"
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { truncateAddress } from "@/utils";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import type { PaymentSession } from "@/types";
 
 type PaymentPopupProps = {
@@ -75,6 +76,7 @@ export function PaymentPopup({
   merchantWallet,
   onClose,
 }: PaymentPopupProps) {
+  useScrollLock(true);
   const router = useRouter();
   const [session, setSession] = useState(initialSession);
   const [countdown, setCountdown] = useState("");

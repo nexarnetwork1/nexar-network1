@@ -72,13 +72,13 @@ export default function LoginForm() {
 
       <OAuthButtons redirectTo={redirect} />
 
-      <div className="my-6 flex items-center gap-4">
+      <div className="my-5 flex items-center gap-3">
         <span className="h-px flex-1 bg-border" />
         <span className="text-xs text-muted uppercase tracking-wider">or</span>
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3" noValidate>
         <Input
           {...register("email")}
           type="email"

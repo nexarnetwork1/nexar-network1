@@ -179,6 +179,11 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+
+  html.scroll-locked,
+  html.scroll-locked body {
+    overflow: hidden;
+  }
 }
 
 @keyframes shimmer {

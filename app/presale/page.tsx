@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { PageAmbientBackground } from "@/components/ui/PageAmbientBackground";
 import { PresalePanel } from "@/components/web3/PresalePanel";
 import { PresalePortfolio } from "@/components/web3/PresalePortfolio";
 import { PresaleTransactionHistory } from "@/components/web3/PresaleTransactionHistory";
@@ -13,7 +12,6 @@ import { CONTRACTS } from "@/lib/constants/site";
 export default function PresalePage() {
   return (
     <main className="nav-offset relative min-h-screen">
-      <PageAmbientBackground variant="presale" />
       <Container className="relative py-12 lg:py-20">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs font-medium tracking-[0.24em] uppercase text-gold">Public Presale</p>

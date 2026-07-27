@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { PresalePanel } from "@/components/web3/PresalePanel";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { cn } from "@/lib/utils/cn";
 
 type ClaimNxrModalProps = {
@@ -14,10 +15,16 @@ type ClaimNxrModalProps = {
 };
 
 export function ClaimNxrModal({ open, onClose }: ClaimNxrModalProps) {
+  useScrollLock(open);
+
   if (!open || !isWeb3Configured()) return null;
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto"
+        data-scroll-lock-scrollable
+        onClick={(e) => e.stopPropagation()}
+      >
         <PresalePanel />
       </div>
     </div>

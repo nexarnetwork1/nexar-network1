@@ -29,7 +29,11 @@ const baseContracts = [
 
 export function usePresaleData() {
   const { address, isConnected, chainId: walletChainId } = useAccount();
-  const { data: block } = useBlock({ chainId, watch: true });
+  const { data: block } = useBlock({
+    chainId,
+    watch: true,
+    query: { retry: 2, staleTime: 30_000 },
+  });
   const [loadTimedOut, setLoadTimedOut] = useState(false);
 
   const {
@@ -39,7 +43,7 @@ export function usePresaleData() {
     refetch: refetchBase,
   } = useReadContracts({
     contracts: baseContracts,
-    query: { refetchInterval: 15_000 },
+    query: { refetchInterval: 15_000, retry: 2 },
   });
 
   useEffect(() => {
@@ -47,7 +51,7 @@ export function usePresaleData() {
       setLoadTimedOut(false);
       return;
     }
-    const id = window.setTimeout(() => setLoadTimedOut(true), 20_000);
+    const id = window.setTimeout(() => setLoadTimedOut(true), 10_000);
     return () => window.clearTimeout(id);
   }, [isBaseLoading, isBaseError]);
 
@@ -150,19 +154,20 @@ export function usePresaleData() {
   const usdtDecimals = (usdtDecimalsData?.[0]?.result as number | undefined) ?? 18;
 
   const blockTimestamp = block ? Number(block.timestamp) : null;
+  const nowTimestamp = blockTimestamp ?? Math.floor(Date.now() / 1000);
 
   let status: PresaleStatus = "loading";
-  if (isBaseError || loadTimedOut) {
-    status = "error";
-  } else if (
-    blockTimestamp !== null &&
+  const hasBaseData =
     !isBaseLoading &&
     presaleStart !== undefined &&
     presaleEnd !== undefined &&
     totalSold !== undefined &&
-    hardCap !== undefined
-  ) {
-    const now = blockTimestamp;
+    hardCap !== undefined;
+
+  if (isBaseError || loadTimedOut) {
+    status = "error";
+  } else if (hasBaseData) {
+    const now = nowTimestamp;
     if (now < Number(presaleStart)) status = "upcoming";
     else if (now > Number(presaleEnd)) status = "ended";
     else if (totalSold >= hardCap) status = "sold_out";
@@ -175,10 +180,10 @@ export function usePresaleData() {
   const progress = capAmount > 0 ? Math.min((soldAmount / capAmount) * 100, 100) : 0;
 
   const countdownSeconds =
-    blockTimestamp !== null && status === "upcoming" && presaleStart
-      ? Number(presaleStart) - blockTimestamp
-      : blockTimestamp !== null && status === "live" && presaleEnd
-        ? Number(presaleEnd) - blockTimestamp
+    status === "upcoming" && presaleStart
+      ? Number(presaleStart) - nowTimestamp
+      : status === "live" && presaleEnd
+        ? Number(presaleEnd) - nowTimestamp
         : 0;
 
   const nxrPerUsdt =

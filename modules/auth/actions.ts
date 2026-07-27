@@ -27,6 +27,111 @@ import {
 } from "@/lib/security/brute-force";
 import type { UserRole } from "@/types";
 
+function slugifyStoreName(name: string, userId: string): string {
+  const base =
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || `store-${userId.slice(0, 8)}`;
+  return base;
+}
+
+async function resolveUniqueStoreSlug(
+  admin: ReturnType<typeof createAdminClient>,
+  storeName: string,
+  userId: string
+): Promise<string> {
+  let slug = slugifyStoreName(storeName, userId);
+  let counter = 0;
+
+  while (true) {
+    const { data } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
+    if (!data) return slug;
+    counter += 1;
+    slug = `${slugifyStoreName(storeName, userId)}-${counter}`;
+  }
+}
+
+async function persistCustomerProfile(
+  userId: string,
+  fullName: string,
+  walletAddress: string
+): Promise<ActionResult | null> {
+  try {
+    const admin = createAdminClient();
+    const { error } = await admin
+      .from("profiles")
+      .update({
+        full_name: fullName,
+        wallet_address: walletAddress.toLowerCase(),
+        role: "customer",
+        profile_completed: true,
+      })
+      .eq("id", userId);
+
+    if (error) return { success: false, error: error.message };
+    return null;
+  } catch {
+    return {
+      success: false,
+      error: "Registration saved but profile setup failed. Contact support.",
+    };
+  }
+}
+
+async function persistMerchantRegistration(
+  userId: string,
+  data: {
+    merchantName: string;
+    storeName: string;
+    businessType: string;
+    walletAddress: string;
+    mode: "marketplace" | "payments_only";
+    logoUrl?: string | null;
+  }
+): Promise<ActionResult | null> {
+  try {
+    const admin = createAdminClient();
+
+    const { error: profileError } = await admin
+      .from("profiles")
+      .update({
+        full_name: data.merchantName,
+        wallet_address: data.walletAddress.toLowerCase(),
+        role: "merchant",
+        profile_completed: true,
+      })
+      .eq("id", userId);
+
+    if (profileError) return { success: false, error: profileError.message };
+
+    await admin.auth.admin.updateUserById(userId, {
+      app_metadata: { role: "merchant" },
+    });
+
+    const slug = await resolveUniqueStoreSlug(admin, data.storeName, userId);
+
+    const { error: storeError } = await admin.from("stores").insert({
+      owner_id: userId,
+      name: data.storeName,
+      slug,
+      business_type: data.businessType,
+      logo_url: data.logoUrl ?? null,
+      mode: data.mode,
+      status: "pending",
+      wallet_address: data.walletAddress.toLowerCase(),
+    });
+
+    if (storeError) return { success: false, error: storeError.message };
+    return null;
+  } catch {
+    return {
+      success: false,
+      error: "Registration saved but merchant setup failed. Contact support.",
+    };
+  }
+}
+
 export type ActionResult = {
   success: boolean;
   error?: string;
@@ -135,7 +240,11 @@ export async function registerCustomerAction(
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      data: { full_name: parsed.data.fullName },
+      data: {
+        full_name: parsed.data.fullName,
+        wallet_address: parsed.data.walletAddress.toLowerCase(),
+        role: "customer",
+      },
     },
   });
 
@@ -148,6 +257,13 @@ export async function registerCustomerAction(
   }
 
   if (!data.session) {
+    const pendingError = await persistCustomerProfile(
+      data.user.id,
+      parsed.data.fullName,
+      parsed.data.walletAddress
+    );
+    if (pendingError) return pendingError;
+
     return {
       success: true,
       needsEmailConfirmation: true,
@@ -203,7 +319,14 @@ export async function registerMerchantAction(
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      data: { full_name: parsed.data.merchantName },
+      data: {
+        full_name: parsed.data.merchantName,
+        role: "merchant",
+        store_name: parsed.data.storeName,
+        business_type: parsed.data.businessType,
+        wallet_address: parsed.data.walletAddress.toLowerCase(),
+        mode: parsed.data.mode,
+      },
     },
   });
 
@@ -216,6 +339,15 @@ export async function registerMerchantAction(
   }
 
   if (!data.session) {
+    const pendingError = await persistMerchantRegistration(data.user.id, {
+      merchantName: parsed.data.merchantName,
+      storeName: parsed.data.storeName,
+      businessType: parsed.data.businessType,
+      walletAddress: parsed.data.walletAddress,
+      mode: parsed.data.mode,
+    });
+    if (pendingError) return pendingError;
+
     return {
       success: true,
       needsEmailConfirmation: true,
@@ -263,15 +395,17 @@ export async function registerMerchantAction(
     // Service role key not configured in dev — profile.role is source of truth
   }
 
-  const slug = parsed.data.storeName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+  let slug: string;
+  try {
+    slug = await resolveUniqueStoreSlug(createAdminClient(), parsed.data.storeName, data.user.id);
+  } catch {
+    slug = slugifyStoreName(parsed.data.storeName, data.user.id);
+  }
 
   const { error: storeError } = await supabase.from("stores").insert({
     owner_id: data.user.id,
     name: parsed.data.storeName,
-    slug: slug || `store-${data.user.id.slice(0, 8)}`,
+    slug,
     business_type: parsed.data.businessType,
     logo_url: logoUrl,
     mode: parsed.data.mode,
@@ -346,15 +480,17 @@ export async function completeProfileAction(
       // Service role key not configured in dev
     }
 
-    const slug = parsed.data.storeName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    let slug: string;
+    try {
+      slug = await resolveUniqueStoreSlug(createAdminClient(), parsed.data.storeName, user.id);
+    } catch {
+      slug = slugifyStoreName(parsed.data.storeName, user.id);
+    }
 
     const { error: storeError } = await supabase.from("stores").insert({
       owner_id: user.id,
       name: parsed.data.storeName,
-      slug: slug || `store-${user.id.slice(0, 8)}`,
+      slug,
       business_type: parsed.data.businessType,
       mode: parsed.data.mode,
       status: "pending",

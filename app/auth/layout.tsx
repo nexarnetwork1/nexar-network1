@@ -6,7 +6,7 @@ export default function AuthSectionLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Container className="flex min-h-[calc(100vh-var(--nxr-nav-height))] items-center py-16">
+    <Container className="relative flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center justify-center py-8 sm:py-10">
       {children}
     </Container>
   );

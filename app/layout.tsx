@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Sora, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { NewsTicker } from "@/components/layout/NewsTicker";
-import { BackgroundEffect } from "@/components/background/BackgroundEffect";
+import { GlobalBackground } from "@/components/ui/GlobalBackground";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
 import { Toaster } from "sonner";
@@ -90,7 +90,7 @@ export default async function RootLayout({
           >
             Skip to content
           </a>
-{/* <BackgroundEffect /> */}
+          <GlobalBackground variant="default" />
          <Navbar />
 
 <NewsTicker announcements={tickerAnnouncements} />
