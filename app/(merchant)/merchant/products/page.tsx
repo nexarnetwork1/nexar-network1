@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantProductsWithInventory } from "@/modules/catalog/repository";
 import { toggleProductFormAction, deleteProductFormAction } from "@/modules/catalog/actions";
+import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { Button } from "@/components/ui/Button";
 
 export default async function MerchantProductsPage() {
@@ -95,7 +96,12 @@ export default async function MerchantProductsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    {product.currency} {Number(product.price).toFixed(2)}
+                    <ProductPrice
+                      price={Number(product.price)}
+                      compareAtPrice={product.compare_at_price}
+                      currency={product.currency}
+                      size="sm"
+                    />
                   </td>
                   <td className="px-4 py-3">
                     <span

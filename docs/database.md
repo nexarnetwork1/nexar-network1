@@ -28,6 +28,7 @@ PostgreSQL on Supabase. Normalized schema with RLS on every public table. Busine
 | `20260727000010_qr_payload_backfill.sql` | Normalize legacy `nexar://` QR payloads |
 | `20260727000011_cancel_pending_order.sql` | `cancel_pending_order` RPC for unpaid customer orders |
 | `20260727000012_merchant_cancel_pending_order.sql` | `merchant_cancel_pending_order` RPC for store owners |
+| `20260727000013_product_compare_at_price.sql` | Optional `compare_at_price` for product sale display |
 
 Apply with:
 

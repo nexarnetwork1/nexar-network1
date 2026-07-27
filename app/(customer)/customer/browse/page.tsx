@@ -5,6 +5,7 @@ import {
 } from "@/modules/catalog/repository";
 import { productSearchSchema } from "@/modules/catalog/validators";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { ProductPrice } from "@/components/catalog/ProductPrice";
 
 type Props = {
   searchParams: Promise<{ q?: string; page?: string; category?: string; sort?: string }>;
@@ -132,9 +133,11 @@ export default async function BrowsePage({ searchParams }: Props) {
                 <Link href={`/customer/browse/${product.id}`}>
                   <h2 className="mt-1 font-medium hover:text-gold">{product.name}</h2>
                 </Link>
-                <p className="mt-2 font-heading text-lg text-gold">
-                  {product.currency} {Number(product.price).toFixed(2)}
-                </p>
+                <ProductPrice
+                  price={Number(product.price)}
+                  compareAtPrice={product.compare_at_price}
+                  currency={product.currency}
+                />
                 <div className="mt-4">
                   <AddToCartButton productId={product.id} stock={product.stock} />
                 </div>

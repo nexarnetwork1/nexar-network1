@@ -1,14 +1,23 @@
 import { z } from "zod";
 
-export const productSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters").max(200),
-  description: z.string().max(5000).optional(),
-  price: z.coerce.number().positive("Price must be greater than 0"),
-  currency: z.string().length(3).default("USD"),
-  stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
-  isActive: z.coerce.boolean().default(true),
-  categoryId: z.string().optional(),
-});
+export const productSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters").max(200),
+    description: z.string().max(5000).optional(),
+    price: z.coerce.number().positive("Price must be greater than 0"),
+    compareAtPrice: z.preprocess(
+      (val) => (val === "" || val === null || val === undefined ? undefined : val),
+      z.coerce.number().positive().optional()
+    ),
+    currency: z.string().length(3).default("USD"),
+    stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
+    isActive: z.coerce.boolean().default(true),
+    categoryId: z.string().optional(),
+  })
+  .refine((data) => !data.compareAtPrice || data.compareAtPrice > data.price, {
+    message: "Compare-at price must be higher than sale price",
+    path: ["compareAtPrice"],
+  });
 
 export const productCategorySchema = z.object({
   name: z.string().min(2, "Name is required").max(100),

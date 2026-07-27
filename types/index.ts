@@ -188,6 +188,7 @@ export type Product = {
   name: string;
   description: string | null;
   price: number;
+  compare_at_price: number | null;
   currency: string;
   image_url: string | null;
   stock: number;

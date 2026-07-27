@@ -6,7 +6,7 @@ Operational checklist for deploying Nexar Network to production.
 
 ```bash
 cp .env.production.example .env.local   # reference only — set vars in host dashboard
-supabase db push                         # apply all 12 migrations to production Supabase
+supabase db push                         # apply all 13 migrations to production Supabase
 npm run prelaunch                        # typecheck + lint + build
 ```
 
@@ -71,7 +71,19 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
 
 **Transactional email:** Set `RESEND_API_KEY` and `EMAIL_FROM` for invoice and payment notifications.
 
-Use Netlify scheduled functions, GitHub Actions, or Supabase Edge Function scheduler.
+Use Netlify scheduled functions (see `netlify/functions/`), GitHub Actions, or Supabase Edge Function scheduler.
+
+**Option A2 — Netlify scheduled functions (included in repo)**
+
+Three functions in `netlify/functions/` call the Next.js cron API routes using `CRON_SECRET`:
+
+| Function | Schedule | Endpoint |
+|---|---|---|
+| `cron-expire-sessions` | Every minute | `/api/cron/expire-sessions` |
+| `cron-verify-payments` | Every 2 minutes | `/api/cron/verify-payments` |
+| `cron-retry-settlements` | Every 15 minutes | `/api/cron/retry-settlements` |
+
+Set `CRON_SECRET` in the Netlify dashboard. Functions use `URL` / `DEPLOY_PRIME_URL` automatically.
 
 **Option B — pg_cron (Supabase Pro)**
 

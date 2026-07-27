@@ -33,7 +33,7 @@
 - [x] Rate limiting on auth, API, and webhook routes (middleware)
 - [x] CSRF utilities available (`lib/security/csrf.ts`)
 - [x] Input validation via Zod on server actions
-- [x] No public invoice or payment pages (RLS-scoped)
+- [x] Public pay/store pages use token/slug resolution (no raw IDs exposed)
 - [x] Audit logs on checkout, payment, and admin mutations
 - [x] Global error boundary with Sentry reporting
 - [x] Local QR generation (no third-party QR API)

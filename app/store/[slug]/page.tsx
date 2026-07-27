@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStoreBySlug } from "@/modules/stores/repository";
 import { searchMarketplaceProducts } from "@/modules/catalog/repository";
+import { ProductPrice } from "@/components/catalog/ProductPrice";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -41,9 +42,12 @@ export default async function PublicStorePage({ params }: Props) {
             className="rounded-2xl border border-border bg-card/40 p-4 transition hover:border-gold/30"
           >
             <h2 className="font-medium">{product.name}</h2>
-            <p className="mt-2 text-gold">
-              {product.currency} {Number(product.price).toFixed(2)}
-            </p>
+            <ProductPrice
+              price={Number(product.price)}
+              compareAtPrice={product.compare_at_price}
+              currency={product.currency}
+              size="sm"
+            />
           </Link>
         ))}
       </div>

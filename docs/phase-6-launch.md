@@ -7,6 +7,7 @@
 - **Rate limiting** — middleware limits on auth, API, and webhook routes
 - **Health check** — `GET /api/health` with Supabase, payments, and monitoring checks
 - **Cron endpoint** — `GET /api/cron/expire-sessions` (Bearer `CRON_SECRET`)
+- **Netlify scheduled crons** — `netlify/functions/cron-*.ts` (expire, verify, retry settlements)
 - **CSP** — no external QR API dependency (local `qrcode.react`)
 - **Netlify** — `@netlify/plugin-nextjs` configured in `netlify.toml`
 - **RLS audit script** — `scripts/rls-audit.sql`
@@ -32,7 +33,7 @@ Set all variables from `.env.example` in Netlify/Vercel dashboard.
 
 Critical:
 - `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `PAYMENT_MASTER_SEED`
 - `TREASURY_WALLET_ADDRESS`

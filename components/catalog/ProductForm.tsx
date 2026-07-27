@@ -40,6 +40,7 @@ export function ProductForm({
       name: product?.name ?? "",
       description: product?.description ?? "",
       price: product?.price ?? 0,
+      compareAtPrice: product?.compare_at_price ?? undefined,
       currency: product?.currency ?? "USD",
       stock: product?.stock ?? 0,
       isActive: product?.is_active ?? true,
@@ -85,8 +86,16 @@ export function ProductForm({
           type="number"
           step="0.01"
           min="0.01"
-          label="Price"
+          label="Sale price"
           error={errors.price?.message}
+        />
+        <Input
+          {...register("compareAtPrice", { valueAsNumber: true })}
+          type="number"
+          step="0.01"
+          min="0.01"
+          label="Compare-at price (optional)"
+          error={errors.compareAtPrice?.message}
         />
         <Input
           {...register("currency")}
