@@ -52,6 +52,9 @@ export default async function CustomerLayout({
             <Link href="/customer/purchases" className="text-muted hover:text-white">
               History
             </Link>
+            <Link href="/customer/payment-methods" className="text-muted hover:text-white">
+              Payment methods
+            </Link>
             <Link href="/customer/profile" className="text-muted hover:text-white">
               Profile
             </Link>

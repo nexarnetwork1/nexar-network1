@@ -23,11 +23,20 @@ export const productCategorySchema = z.object({
   name: z.string().min(2, "Name is required").max(100),
 });
 
+export const updateCategorySchema = z.object({
+  categoryId: z.string().uuid("Invalid category"),
+  name: z.string().min(2, "Name is required").max(100),
+});
+
 export const productSearchSchema = z.object({
   q: z.string().max(200).optional(),
   storeSlug: z.string().max(100).optional(),
   categorySlug: z.string().max(100).optional(),
   sort: z.enum(["newest", "price_asc", "price_desc", "name"]).default("newest"),
+  onSale: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((v) => v === "true"),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });

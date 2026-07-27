@@ -88,6 +88,10 @@ export async function searchMarketplaceProducts(
     query = query.eq("category_id", category.id);
   }
 
+  if (input.onSale) {
+    query = query.eq("is_on_sale", true);
+  }
+
   if (input.q?.trim()) {
     query = query.textSearch("search_vector", input.q.trim(), {
       type: "websearch",

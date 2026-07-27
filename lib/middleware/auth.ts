@@ -7,9 +7,14 @@ type Profile = {
   profile_completed: boolean;
 };
 
+type AuthUser = {
+  id: string;
+  email_confirmed_at?: string | null;
+};
+
 export function handleAuthRouting(
   request: NextRequest,
-  user: { id: string } | null,
+  user: AuthUser | null,
   profile: Profile | null,
   supabaseResponse: NextResponse
 ): NextResponse | null {
@@ -30,6 +35,25 @@ export function handleAuthRouting(
   }
 
   if (user && profile) {
+    const emailVerified = Boolean(user.email_confirmed_at);
+    const isVerifyRoute = pathname === authConfig.emailVerificationRoute;
+
+    if (
+      !emailVerified &&
+      !isVerifyRoute &&
+      !authConfig.publicAuthRoutes.some((route) => pathname.startsWith(route))
+    ) {
+      return NextResponse.redirect(
+        new URL(authConfig.emailVerificationRoute, request.url)
+      );
+    }
+
+    if (emailVerified && isVerifyRoute) {
+      return NextResponse.redirect(
+        new URL(getDashboardPath(profile.role), request.url)
+      );
+    }
+
     if (
       !profile.profile_completed &&
       pathname !== authConfig.profileCompletionRoute
@@ -39,7 +63,7 @@ export function handleAuthRouting(
       );
     }
 
-    if (isAuthRoute && profile.profile_completed) {
+    if (isAuthRoute && profile.profile_completed && emailVerified) {
       const redirectParam = request.nextUrl.searchParams.get("redirect");
       const destination =
         redirectParam && isValidRedirect(redirectParam)

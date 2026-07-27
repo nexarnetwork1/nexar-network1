@@ -33,7 +33,9 @@ export async function middleware(request: NextRequest) {
 
   const authResponse = handleAuthRouting(
     request,
-    user,
+    user
+      ? { id: user.id, email_confirmed_at: user.email_confirmed_at }
+      : null,
     profile,
     supabaseResponse
   );

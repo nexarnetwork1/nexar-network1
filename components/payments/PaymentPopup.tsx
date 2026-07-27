@@ -161,7 +161,7 @@ export function PaymentPopup({
       setCancelling(false);
       return;
     }
-    setSession((s) => ({ ...s, status: "expired" }));
+    setSession((s) => ({ ...s, status: "cancelled" }));
     setCancelling(false);
     onClose();
   }
@@ -256,7 +256,9 @@ export function PaymentPopup({
               Done
             </Button>
           )}
-          {(session.status === "expired" || session.status === "failed") && (
+          {(session.status === "expired" ||
+            session.status === "failed" ||
+            session.status === "cancelled") && (
             <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
               Close
             </Button>

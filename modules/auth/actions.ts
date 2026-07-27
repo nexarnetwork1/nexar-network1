@@ -18,7 +18,8 @@ import {
 } from "./validators";
 import { writeSecurityLog } from "@/modules/audit/security";
 import { writeAuditLog } from "@/modules/audit/repository";
-import { enforceSingleSession, trackUserSession } from "./session";
+import { enforceSingleSession, trackUserSession, revokeCurrentSessionsOnLogout } from "./session";
+import { setRememberMePreference } from "@/lib/auth/remember-me";
 import type { UserRole } from "@/types";
 
 export type ActionResult = {
@@ -54,12 +55,18 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     return { success: false, error: error.message };
   }
 
+  if (!data.user.email_confirmed_at) {
+    await supabase.auth.signOut();
+    return {
+      success: false,
+      error: "Please confirm your email before signing in.",
+      needsEmailConfirmation: true,
+    };
+  }
+
   await enforceSingleSession(data.user.id);
   await trackUserSession(data.user.id).catch(() => undefined);
-
-  if (!rememberMe) {
-    // Session still uses Supabase cookie; single-session revokes other devices when enabled
-  }
+  await setRememberMePreference(rememberMe);
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -355,6 +362,8 @@ export async function signOutAction(): Promise<void> {
       .eq("id", user.id)
       .single();
 
+    await revokeCurrentSessionsOnLogout(user.id).catch(() => undefined);
+
     await writeAuditLog({
       actorId: user.id,
       actorRole: profile?.role ?? "customer",
@@ -610,6 +619,57 @@ export async function changeWalletAction(
     actorId: user.id,
     actorRole: "customer",
     action: "profile.wallet_changed",
+    entityType: "profile",
+    entityId: user.id,
+  }).catch(() => undefined);
+
+  return { success: true };
+}
+
+export async function revokeSessionAction(
+  sessionId: string
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const { error } = await supabase.rpc("revoke_user_session", {
+    p_session_id: sessionId,
+  });
+
+  if (error) return { success: false, error: error.message };
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorRole: "customer",
+    action: "auth.session_revoked",
+    entityType: "user_session",
+    entityId: sessionId,
+  }).catch(() => undefined);
+
+  return { success: true };
+}
+
+export async function revokeOtherSessionsAction(): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const { error } = await supabase.rpc("revoke_other_user_sessions");
+
+  if (error) return { success: false, error: error.message };
+
+  try {
+    const admin = createAdminClient();
+    await admin.auth.admin.signOut(user.id, "others");
+  } catch {
+    // Service role not configured in dev
+  }
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorRole: "customer",
+    action: "auth.sessions_revoked_all",
     entityType: "profile",
     entityId: user.id,
   }).catch(() => undefined);

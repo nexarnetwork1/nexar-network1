@@ -8,7 +8,13 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
 
 type Props = {
-  searchParams: Promise<{ q?: string; page?: string; category?: string; sort?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    page?: string;
+    category?: string;
+    sort?: string;
+    sale?: string;
+  }>;
 };
 
 export default async function BrowsePage({ searchParams }: Props) {
@@ -18,27 +24,46 @@ export default async function BrowsePage({ searchParams }: Props) {
     page: rawParams.page,
     categorySlug: rawParams.category,
     sort: rawParams.sort,
+    onSale: rawParams.sale,
     limit: 20,
   });
 
-  const { q, page, limit, categorySlug, sort } = parsed.success
+  const { q, page, limit, categorySlug, sort, onSale } = parsed.success
     ? parsed.data
-    : { q: undefined, page: 1, limit: 20, categorySlug: undefined, sort: "newest" as const };
+    : {
+        q: undefined,
+        page: 1,
+        limit: 20,
+        categorySlug: undefined,
+        sort: "newest" as const,
+        onSale: undefined,
+      };
 
   const [{ products, total }, categories] = await Promise.all([
-    searchMarketplaceProducts({ q, page, limit, categorySlug, sort }),
+    searchMarketplaceProducts({ q, page, limit, categorySlug, sort, onSale }),
     getMarketplaceCategories(),
   ]);
 
   const totalPages = Math.ceil(total / limit);
 
-  function browseHref(nextPage?: number, nextCategory?: string, nextSort?: string) {
+  function browseHref(options?: {
+    page?: number;
+    category?: string;
+    sort?: string;
+    sale?: boolean;
+  }) {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
-    if (nextPage && nextPage > 1) params.set("page", String(nextPage));
+    const nextPage = options?.page ?? page;
+    const nextCategory = options?.category ?? categorySlug;
+    const nextSort = options?.sort ?? sort;
+    const nextSale = options?.sale ?? onSale;
+
+    if (nextPage > 1) params.set("page", String(nextPage));
     if (nextCategory) params.set("category", nextCategory);
     if (nextSort && nextSort !== "newest") params.set("sort", nextSort);
-    else if (sort && sort !== "newest") params.set("sort", sort);
+    if (nextSale) params.set("sale", "true");
+
     const query = params.toString();
     return query ? `/customer/browse?${query}` : "/customer/browse";
   }
@@ -48,15 +73,16 @@ export default async function BrowsePage({ searchParams }: Props) {
       <h1 className="font-heading text-3xl font-semibold">Browse products</h1>
       <p className="mt-2 text-muted">Discover products from Nexar marketplace merchants</p>
 
-      <form className="mt-8 flex gap-3">
+      <form className="mt-8 flex flex-wrap gap-3">
         <input
           name="q"
           type="search"
           defaultValue={q ?? ""}
           placeholder="Search products…"
-          className="flex-1 rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm text-white outline-none focus:border-gold/40"
+          className="min-w-[200px] flex-1 rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm text-white outline-none focus:border-gold/40"
         />
         {categorySlug && <input type="hidden" name="category" value={categorySlug} />}
+        {onSale && <input type="hidden" name="sale" value="true" />}
         <select
           name="sort"
           defaultValue={sort}
@@ -75,33 +101,41 @@ export default async function BrowsePage({ searchParams }: Props) {
         </button>
       </form>
 
-      {categories.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Link
+          href={browseHref({ page: 1, category: undefined, sale: false })}
+          className={`rounded-full px-3 py-1 text-xs ${
+            !categorySlug && !onSale
+              ? "bg-gold text-background"
+              : "border border-border text-muted hover:text-white"
+          }`}
+        >
+          All
+        </Link>
+        <Link
+          href={browseHref({ page: 1, category: undefined, sale: true })}
+          className={`rounded-full px-3 py-1 text-xs ${
+            onSale
+              ? "bg-emerald-500 text-background"
+              : "border border-border text-muted hover:text-white"
+          }`}
+        >
+          On sale
+        </Link>
+        {categories.map((category) => (
           <Link
-            href={browseHref(1, undefined)}
+            key={category.id}
+            href={browseHref({ page: 1, category: category.slug })}
             className={`rounded-full px-3 py-1 text-xs ${
-              !categorySlug
+              categorySlug === category.slug
                 ? "bg-gold text-background"
                 : "border border-border text-muted hover:text-white"
             }`}
           >
-            All
+            {category.name}
           </Link>
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={browseHref(1, category.slug)}
-              className={`rounded-full px-3 py-1 text-xs ${
-                categorySlug === category.slug
-                  ? "bg-gold text-background"
-                  : "border border-border text-muted hover:text-white"
-              }`}
-            >
-              {category.name}
-            </Link>
-          ))}
-        </div>
-      )}
+        ))}
+      </div>
 
       {products.length === 0 ? (
         <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center text-muted">
@@ -114,7 +148,7 @@ export default async function BrowsePage({ searchParams }: Props) {
               key={product.id}
               className="overflow-hidden rounded-2xl border border-border bg-card/40 transition-colors hover:border-gold/20"
             >
-              <Link href={`/customer/browse/${product.id}`}>
+              <Link href={`/customer/browse/${product.id}`} className="relative block">
                 {product.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -127,6 +161,11 @@ export default async function BrowsePage({ searchParams }: Props) {
                     No image
                   </div>
                 )}
+                {product.is_on_sale && (
+                  <span className="absolute left-3 top-3 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold uppercase text-background">
+                    Sale
+                  </span>
+                )}
               </Link>
               <div className="p-4">
                 <p className="text-xs text-muted">{product.store.name}</p>
@@ -137,6 +176,7 @@ export default async function BrowsePage({ searchParams }: Props) {
                   price={Number(product.price)}
                   compareAtPrice={product.compare_at_price}
                   currency={product.currency}
+                  showBadge
                 />
                 <div className="mt-4">
                   <AddToCartButton productId={product.id} stock={product.stock} />
@@ -152,7 +192,7 @@ export default async function BrowsePage({ searchParams }: Props) {
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={browseHref(p, categorySlug)}
+              href={browseHref({ page: p })}
               className={`rounded-lg px-3 py-1 text-sm ${
                 p === page
                   ? "bg-gold text-background"

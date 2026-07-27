@@ -101,6 +101,7 @@ export default async function MerchantProductsPage() {
                       compareAtPrice={product.compare_at_price}
                       currency={product.currency}
                       size="sm"
+                      showBadge
                     />
                   </td>
                   <td className="px-4 py-3">

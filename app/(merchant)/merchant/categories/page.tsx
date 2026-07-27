@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getStoreCategories } from "@/modules/catalog/repository";
 import { createCategoryAction } from "@/modules/catalog/actions";
+import { CategoryRow } from "@/components/catalog/CategoryRow";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
@@ -42,13 +43,7 @@ export default async function MerchantCategoriesPage() {
 
       <ul className="mt-8 space-y-2">
         {categories.map((category) => (
-          <li
-            key={category.id}
-            className="flex items-center justify-between rounded-xl border border-border bg-card/40 px-4 py-3"
-          >
-            <span>{category.name}</span>
-            <span className="font-mono text-xs text-muted">{category.slug}</span>
-          </li>
+          <CategoryRow key={category.id} category={category} />
         ))}
         {categories.length === 0 && (
           <li className="text-muted">No categories yet.</li>

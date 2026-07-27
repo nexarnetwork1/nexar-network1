@@ -19,7 +19,7 @@
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` set for settlement worker
 - [ ] BSC RPC URL configured (dedicated node recommended for production)
 - [ ] Exchange rates updated before launch
-- [ ] Cron scheduled: `GET /api/cron/expire-sessions` every minute
+- [x] Netlify scheduled crons for payment expiry, verification, settlement retry
 
 ## Infrastructure
 - [ ] All env vars from `.env.example` configured in hosting provider

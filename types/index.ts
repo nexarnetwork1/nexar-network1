@@ -194,6 +194,7 @@ export type Product = {
   stock: number;
   category_id: string | null;
   is_active: boolean;
+  is_on_sale?: boolean;
   created_at: string;
   updated_at: string;
 };

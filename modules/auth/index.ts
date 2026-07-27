@@ -12,6 +12,8 @@ export {
   updateProfileAction,
   changeEmailAction,
   changeWalletAction,
+  revokeSessionAction,
+  revokeOtherSessionsAction,
 } from "./actions";
 export type { ActionResult } from "./actions";
 export {

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
-import { productSchema, productCategorySchema } from "./validators";
+import { productSchema, productCategorySchema, updateCategorySchema } from "./validators";
 import type { ActionResult } from "@/modules/auth/actions";
 
 export type CatalogActionResult = ActionResult & {
@@ -130,6 +130,89 @@ export async function createCategoryAction(
   revalidatePath("/merchant/categories");
   revalidatePath("/merchant/products/new");
   return { success: true, redirectTo: "/merchant/categories" };
+}
+
+export async function updateCategoryAction(
+  categoryId: string,
+  formData: FormData
+): Promise<CatalogActionResult> {
+  const profile = await requireRole(["merchant"]);
+  const store = await getMerchantStore(profile.id);
+
+  if (!store) {
+    return { success: false, error: "Store not found" };
+  }
+
+  const parsed = updateCategorySchema.safeParse({
+    categoryId,
+    name: formData.get("name"),
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const baseSlug = slugifyCategory(parsed.data.name);
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("product_categories")
+    .update({ name: parsed.data.name, slug: baseSlug })
+    .eq("id", categoryId)
+    .eq("store_id", store.id);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/merchant/categories");
+  revalidatePath("/merchant/products");
+  return { success: true };
+}
+
+export async function deleteCategoryAction(
+  categoryId: string
+): Promise<CatalogActionResult> {
+  const profile = await requireRole(["merchant"]);
+  const store = await getMerchantStore(profile.id);
+
+  if (!store) {
+    return { success: false, error: "Store not found" };
+  }
+
+  const supabase = await createClient();
+
+  await supabase
+    .from("products")
+    .update({ category_id: null })
+    .eq("category_id", categoryId)
+    .eq("store_id", store.id);
+
+  const { error } = await supabase
+    .from("product_categories")
+    .delete()
+    .eq("id", categoryId)
+    .eq("store_id", store.id);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/merchant/categories");
+  revalidatePath("/merchant/products");
+  return { success: true };
+}
+
+export async function updateCategoryFormAction(formData: FormData): Promise<void> {
+  const categoryId = formData.get("categoryId");
+  if (typeof categoryId !== "string" || !categoryId) return;
+  await updateCategoryAction(categoryId, formData);
+}
+
+export async function deleteCategoryFormAction(formData: FormData): Promise<void> {
+  const categoryId = formData.get("categoryId");
+  if (typeof categoryId !== "string" || !categoryId) return;
+  await deleteCategoryAction(categoryId);
 }
 
 export async function createProductAction(

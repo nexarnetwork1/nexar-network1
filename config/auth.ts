@@ -7,8 +7,9 @@ export const authConfig = {
     admin: "/admin/dashboard",
   },
   profileCompletionRoute: "/auth/complete-profile",
-  authRoutes: ["/login", "/register", "/signup", "/forgot-password", "/reset-password"],
-  publicAuthRoutes: ["/auth/callback", "/auth/complete-profile", "/forgot-password", "/reset-password"],
+  authRoutes: ["/login", "/register", "/signup", "/forgot-password", "/reset-password", "/verify-email"],
+  publicAuthRoutes: ["/auth/callback", "/auth/complete-profile", "/forgot-password", "/reset-password", "/verify-email"],
+  emailVerificationRoute: "/verify-email",
   publicRoutes: ["/store", "/pay", "/api/qr", "/api/pay", "/api/health", "/api/csrf"],
 } as const;
 
