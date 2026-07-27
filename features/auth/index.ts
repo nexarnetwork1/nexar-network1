@@ -1,3 +1,6 @@
+export * from "./hooks";
+export * from "./components";
+
 export {
   loginSchema,
   customerRegisterSchema,
@@ -9,4 +12,10 @@ export {
   type CompleteProfileInput,
 } from "@/schemas";
 
-export { loginAction, registerCustomerAction, registerMerchantAction, completeProfileAction, signOutAction } from "@/modules/auth/actions";
+export {
+  loginAction,
+  registerCustomerAction,
+  registerMerchantAction,
+  completeProfileAction,
+  signOutAction,
+} from "@/modules/auth/actions";

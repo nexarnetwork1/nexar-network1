@@ -1,11 +1,11 @@
-import { getExchangeRates, getSupportedCurrencies } from "@/modules/platform/repository";
+import { getExchangeRates, getActiveSupportedCurrencies } from "@/modules/platform/repository";
 import { ExchangeRateForm } from "@/components/admin/ExchangeRateForm";
 import { formatDateTime } from "@/utils/format";
 
 export default async function AdminExchangeRatesPage() {
   const [rates, currencies] = await Promise.all([
     getExchangeRates(),
-    getSupportedCurrencies(),
+    getActiveSupportedCurrencies(),
   ]);
 
   const latestByAsset: Record<string, typeof rates[0]> = {};

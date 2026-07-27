@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
 import { CartBadge } from "@/components/cart/CartBadge";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
+import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
 
@@ -58,6 +59,9 @@ export default async function CustomerLayout({
             <Link href="/customer/profile" className="text-muted hover:text-white">
               Profile
             </Link>
+            <Link href="/customer/disputes" className="text-muted hover:text-white">
+              Disputes
+            </Link>
             <NotificationBadge userId={profile.id} />
           </nav>
           <form action={signOutAction}>
@@ -67,7 +71,9 @@ export default async function CustomerLayout({
           </form>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-6 py-10">{children}</main>
+      <main className="mx-auto max-w-7xl px-6 py-10">
+        <CustomerRealtimeProvider>{children}</CustomerRealtimeProvider>
+      </main>
     </div>
   );
 }

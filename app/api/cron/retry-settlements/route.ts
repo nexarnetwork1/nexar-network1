@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { retryFailedSettlements } from "@/modules/settlement/worker";
+import { verifyCronSecret, cronUnauthorizedResponse } from "@/lib/security/cron-auth";
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = verifyCronSecret(request);
+  if (!auth.authorized) {
+    return cronUnauthorizedResponse();
   }
 
   const result = await retryFailedSettlements(20);

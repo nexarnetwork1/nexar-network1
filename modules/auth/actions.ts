@@ -20,6 +20,11 @@ import { writeSecurityLog } from "@/modules/audit/security";
 import { writeAuditLog } from "@/modules/audit/repository";
 import { enforceSingleSession, trackUserSession, revokeCurrentSessionsOnLogout } from "./session";
 import { setRememberMePreference } from "@/lib/auth/remember-me";
+import {
+  checkAccountLockout,
+  recordFailedLoginAttempt,
+  clearLoginAttempts,
+} from "@/lib/security/brute-force";
 import type { UserRole } from "@/types";
 
 export type ActionResult = {
@@ -39,6 +44,15 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  const lockout = checkAccountLockout(parsed.data.email);
+  if (lockout.locked) {
+    const minutes = Math.ceil((lockout.retryAfterMs ?? 0) / 60_000);
+    return {
+      success: false,
+      error: `Account temporarily locked. Try again in ${minutes} minute(s).`,
+    };
+  }
+
   const supabase = await createClient();
   const rememberMe = formData.get("rememberMe") === "true";
 
@@ -48,12 +62,27 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
   });
 
   if (error) {
+    const attempt = recordFailedLoginAttempt(parsed.data.email);
     await writeSecurityLog({
       eventType: "failed_login",
-      metadata: { email: parsed.data.email, message: error.message },
+      metadata: {
+        email: parsed.data.email,
+        message: error.message,
+        attempts: attempt.attempts,
+        locked: attempt.locked,
+      },
     }).catch(() => undefined);
+    if (attempt.locked) {
+      const minutes = Math.ceil((attempt.retryAfterMs ?? 0) / 60_000);
+      return {
+        success: false,
+        error: `Too many failed attempts. Account locked for ${minutes} minute(s).`,
+      };
+    }
     return { success: false, error: error.message };
   }
+
+  clearLoginAttempts(parsed.data.email);
 
   if (!data.user.email_confirmed_at) {
     await supabase.auth.signOut();

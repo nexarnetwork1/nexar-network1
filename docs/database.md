@@ -29,6 +29,13 @@ PostgreSQL on Supabase. Normalized schema with RLS on every public table. Busine
 | `20260727000011_cancel_pending_order.sql` | `cancel_pending_order` RPC for unpaid customer orders |
 | `20260727000012_merchant_cancel_pending_order.sql` | `merchant_cancel_pending_order` RPC for store owners |
 | `20260727000013_product_compare_at_price.sql` | Optional `compare_at_price` for product sale display |
+| `20260727000014_auth_sessions_policy.sql` | Session insert policy + revoke RPCs |
+| `20260727000015_cancel_session_status.sql` | Cancel session uses `cancelled` status |
+| `20260727000016_database_completion.sql` | Sessions view, inventory sync, refund RPC, RLS gaps, schema validation |
+| `20260727000017_production_performance.sql` | High-traffic indexes for payments, settlements, orders, audit |
+| `20260727000018_platform_extensions.sql` | Escrow, disputes, withdrawals, coupons, webhooks, loyalty/POS/chains |
+| `20260727000019_escrow_payment_integration.sql` | Escrow hold integrated into complete_payment |
+| `20260727000020_realtime_search_completion.sql` | Wallet/settlement realtime + expanded global search |
 
 Apply with:
 
@@ -76,6 +83,47 @@ erDiagram
 ## Tables
 
 Every table includes `id` (UUID), `created_at`, and `updated_at` unless noted as append-only.
+
+### Requested Entity Mapping
+
+| Requested name | Implementation |
+|---|---|
+| profiles | Table `profiles` |
+| customers | View over `profiles` + `customer_profiles` |
+| merchants | View over `profiles` + `merchant_profiles` |
+| stores | Table `stores` |
+| store_settings | Table `store_settings` |
+| products | Table `products` |
+| product_categories | Table `product_categories` |
+| product_images | Table `product_images` |
+| inventory | Table `inventory` |
+| shopping_cart | View over `carts` |
+| cart_items | Table `cart_items` |
+| orders | Table `orders` |
+| order_items | Table `order_items` (append-only, no `updated_at`) |
+| payments | View over `payment_sessions` |
+| payment_attempts | Table `payment_attempts` |
+| payment_methods | Table `payment_methods` |
+| payment_status_history | Table `payment_status_history` |
+| invoices | Table `invoices` |
+| invoice_items | Table `invoice_items` |
+| wallets | Table `wallets` |
+| wallet_transactions | Table `wallet_transactions` (append-only ledger) |
+| treasury_wallet | Table `treasury_wallet` (service role only) |
+| platform_fees | View over `settlements` |
+| exchange_rates | Table `exchange_rates` |
+| supported_currencies | Table `supported_currencies` |
+| supported_crypto | Table `supported_crypto` |
+| supported_fiat | Table `supported_fiat` |
+| merchant_promotions | Table `merchant_promotions` |
+| merchant_fee_plans | Table `merchant_fee_plans` |
+| qr_codes | Table `qr_codes` |
+| notifications | Table `notifications` |
+| audit_logs | Table `audit_logs` (append-only) |
+| security_logs | Table `security_logs` |
+| sessions | View over `user_sessions` |
+| api_keys | Table `api_keys` (future) |
+| contact_messages | Table `contact_messages` |
 
 ### Identity & Profiles
 
@@ -178,6 +226,7 @@ Fee resolution order: `merchant_fee_plans` → `fee_schedules` → active `merch
 | **security_logs** | Failed login, blocked IP, rate limit, invalid token, permission denied |
 | **notifications** | In-app notifications per user |
 | **user_sessions** | Application session tracking (distinct from Supabase Auth) |
+| **sessions** *(view)* | Alias over `user_sessions` |
 | **api_keys** | Future API access (admin-managed, hashed keys) |
 | **contact_messages** | Public contact form submissions |
 
@@ -233,6 +282,10 @@ Only `service_role` may call `complete_payment()` — called after backend verif
 | `calculate_platform_fee(amount, method, store_id)` | authenticated | Preview fee breakdown |
 | `expire_stale_payment_sessions()` | service_role / cron | Expire sessions past 5 minutes |
 | `expire_merchant_promotions()` | service_role / cron | Deactivate expired promotions |
+| `process_refund(order_id, reason, actor_id)` | service_role | Atomic refund with wallet reversal |
+| `log_audit_event(...)` | authenticated | Standardized audit log write |
+| `log_security_event(...)` | authenticated, anon | Standardized security log write |
+| `validate_database_schema()` | service_role | Post-migration schema checks |
 
 ### Private Helpers
 
@@ -265,6 +318,7 @@ Only `service_role` may call `complete_payment()` — called after backend verif
 | `platform_fees` | Platform fee revenue from settlements |
 | `v_merchant_revenue` | Per-store revenue aggregation |
 | `v_customer_purchase_history` | Customer order history |
+| `sessions` | Session alias over `user_sessions` |
 
 ---
 
@@ -294,7 +348,7 @@ RLS is enabled on **every** public table. Authorization reads `profiles.role` vi
 | merchant_promotions | deny | own R | R/W | deny |
 | qr_codes | active R | own R/W | all | deny |
 | notifications | own R/W | own R/W | all | deny |
-| audit_logs | deny | store-related R | all R | deny |
+| audit_logs | own + store R | store-related R | all R | deny |
 | security_logs | deny | deny | R | deny |
 | user_sessions | own R/W | own R/W | all | deny |
 | api_keys | deny | deny | R/W | deny |
@@ -336,19 +390,40 @@ Run `scripts/rls-audit.sql` in Supabase SQL editor to verify RLS coverage in pro
 
 ## Validation
 
-All 8 migrations were validated against PostgreSQL 16:
-
-- 40 public tables created
-- 0 tables without RLS
-- 7 reporting views created
-- Atomic payment function compiles and grants correctly
-
-Local validation stub (for CI):
+Run after applying all 17 migrations:
 
 ```bash
-# Requires Docker
+supabase db push
+supabase migration list
+```
+
+In Supabase SQL Editor:
+
+```sql
+SELECT * FROM public.validate_database_schema() ORDER BY check_name;
+```
+
+Or run the full audit script: `scripts/validate-database.sql` and `scripts/rls-audit.sql`.
+
+Expected results:
+- **35** physical tables in `public` schema
+- **8** views (including `sessions`)
+- **0** tables without RLS
+- Treasury wallet singleton present
+- Fee schedules seeded: NXR 3.5%, crypto_other 5%, card 2.9%
+- 8 supported currencies (USD, EUR, EGP, NXR, BNB, USDT, BTC, ETH)
+
+Local validation (requires Docker):
+
+```bash
 docker run -d --name nexar-pg-test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=nexar postgres:16-alpine
-# Apply auth/storage stubs, then run migrations in order
+sleep 8
+docker exec -i nexar-pg-test psql -U postgres -d nexar < scripts/migration-test-stubs.sql
+for f in supabase/migrations/*.sql; do
+  docker exec -i nexar-pg-test psql -U postgres -d nexar -v ON_ERROR_STOP=1 < "$f"
+done
+docker exec nexar-pg-test psql -U postgres -d nexar -c "SELECT * FROM public.validate_database_schema();"
+docker rm -f nexar-pg-test
 ```
 
 ---

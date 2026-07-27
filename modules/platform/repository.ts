@@ -122,6 +122,17 @@ export async function getSupportedCurrencies() {
   const { data, error } = await admin
     .from("supported_currencies")
     .select("*")
+    .order("sort_order");
+
+  if (error) return [];
+  return data;
+}
+
+export async function getActiveSupportedCurrencies() {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("supported_currencies")
+    .select("*")
     .eq("is_active", true)
     .order("sort_order");
 
@@ -151,4 +162,105 @@ export async function getRecentPaymentStatusHistory(limit = 50) {
 
   if (error) return [];
   return data;
+}
+
+export async function getCustomers() {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("profiles")
+    .select("*, customer_profile:customer_profiles(*)")
+    .eq("role", "customer")
+    .order("created_at", { ascending: false });
+
+  if (error) return [];
+  return data;
+}
+
+export async function getCustomerById(id: string) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("profiles")
+    .select("*, customer_profile:customer_profiles(*)")
+    .eq("id", id)
+    .eq("role", "customer")
+    .maybeSingle();
+
+  if (error) return null;
+  return data;
+}
+
+export async function getMerchantDetail(storeId: string) {
+  const admin = createAdminClient();
+  const { data: store, error } = await admin
+    .from("stores")
+    .select(`
+      *,
+      owner:profiles(id, full_name, email, wallet_address, created_at),
+      store_settings(*),
+      qr_codes(*),
+      promotions:merchant_promotions(*)
+    `)
+    .eq("id", storeId)
+    .maybeSingle();
+
+  if (error || !store) return null;
+
+  const { data: merchantProfile } = await admin
+    .from("merchant_profiles")
+    .select("*")
+    .eq("profile_id", store.owner_id)
+    .maybeSingle();
+
+  return { ...store, merchant_profile: merchantProfile };
+}
+
+export async function getAllProducts(limit = 200) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("products")
+    .select("*, store:stores(id, name, slug, status)")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return data;
+}
+
+export async function getTreasurySummary() {
+  const admin = createAdminClient();
+
+  const [{ data: wallet }, { data: settings }] = await Promise.all([
+    admin
+      .from("wallets")
+      .select("id, address, label, created_at, updated_at")
+      .eq("owner_type", "treasury")
+      .maybeSingle(),
+    admin.from("platform_settings").select("treasury_wallet_address, updated_at").limit(1).maybeSingle(),
+  ]);
+
+  if (!wallet) {
+    return { wallet: null, transactions: [], totalFees: 0, address: settings?.treasury_wallet_address ?? null };
+  }
+
+  const [{ data: transactions }, { data: settlements }] = await Promise.all([
+    admin
+      .from("wallet_transactions")
+      .select("*")
+      .eq("wallet_id", wallet.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    admin
+      .from("settlements")
+      .select("platform_fee")
+      .eq("status", "completed"),
+  ]);
+
+  const totalFees = (settlements ?? []).reduce((s, r) => s + Number(r.platform_fee), 0);
+
+  return {
+    wallet,
+    transactions: transactions ?? [],
+    totalFees,
+    address: wallet.address ?? settings?.treasury_wallet_address ?? null,
+  };
 }

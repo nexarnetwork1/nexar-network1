@@ -66,13 +66,13 @@ import { orders } from "@/modules";
 const result = await orders.actions.createOrder(cartId);
 ```
 
-### From Services (future)
+### From Services (scaffold — implement per phase)
 
 ```ts
-import { OrderService } from "@/services/order.service";
+import { OrderService } from "@/services";
 
 const service = new OrderService();
-const order = await service.checkout(cartId, customerId);
+// Workflows added in Phase 3+
 ```
 
 ### From Features (UI layer)
@@ -96,5 +96,5 @@ import { auth } from "@/modules";
 1. Create `modules/<name>/` with index, validators, repository
 2. Add migration in `supabase/migrations/`
 3. Export from `modules/index.ts`
-4. Create matching feature in `features/<name>/`
+4. Create matching feature in `features/<name>/` with `hooks/` and `components/` subfolders
 5. Add service class in `services/<name>.service.ts` when workflows grow complex

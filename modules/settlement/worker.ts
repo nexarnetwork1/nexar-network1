@@ -10,6 +10,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getTokenAddress, type CryptoAsset } from "@/lib/blockchain/bsc-client";
 import { deriveSessionDepositAddress } from "@/lib/blockchain/deposit";
 import { getExchangeRate } from "./fee-calculator";
+import { treasuryLogger } from "@/lib/logging/treasury-logger";
+import { notifyAdminAlert } from "@/lib/monitoring/alerts";
 
 const ERC20_TRANSFER = [
   {
@@ -131,6 +133,13 @@ export async function executeSettlement(params: {
       .update({ status: "completed", completed_at: new Date().toISOString() })
       .eq("id", params.settlementId);
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    treasuryLogger.error("Settlement execution failed", {
+      settlementId: params.settlementId,
+      sessionId: params.sessionId,
+      error: message,
+    });
+
     await admin
       .from("settlements")
       .update({ status: "failed" })
@@ -140,7 +149,13 @@ export async function executeSettlement(params: {
       action: "settlement.failed",
       entity_type: "settlement",
       entity_id: params.settlementId,
-      metadata: { error: String(err), session_id: params.sessionId },
+      metadata: { error: message, session_id: params.sessionId },
+    });
+
+    await notifyAdminAlert({
+      type: "treasury_transfer_failed",
+      message: `Settlement ${params.settlementId} failed`,
+      metadata: { sessionId: params.sessionId, error: message },
     });
 
     throw err;
@@ -160,6 +175,89 @@ export async function getTreasuryWallet(): Promise<`0x${string}` | null> {
 }
 
 export async function retryFailedSettlements(limit = 10): Promise<{
+  attempted: number;
+  succeeded: number;
+  failed: number;
+}> {
+  const pending = await processPendingSettlements(limit);
+  const retried = await retryFailedSettlementsInternal(limit);
+  return {
+    attempted: pending.attempted + retried.attempted,
+    succeeded: pending.succeeded + retried.succeeded,
+    failed: pending.failed + retried.failed,
+  };
+}
+
+export async function processPendingSettlements(limit = 10): Promise<{
+  attempted: number;
+  succeeded: number;
+  failed: number;
+}> {
+  const admin = createAdminClient();
+  const treasury = await getTreasuryWallet();
+  if (!treasury) return { attempted: 0, succeeded: 0, failed: 0 };
+
+  const { data: settlements } = await admin
+    .from("settlements")
+    .select(
+      "id, payment_session_id, order_id, platform_fee, merchant_amount, order:orders(merchant_wallet_snapshot)"
+    )
+    .eq("status", "pending")
+    .limit(limit);
+
+  let attempted = 0;
+  let succeeded = 0;
+  let failed = 0;
+
+  for (const settlement of settlements ?? []) {
+    const { data: escrow } = await admin
+      .from("escrows")
+      .select("status")
+      .eq("order_id", settlement.order_id)
+      .maybeSingle();
+
+    if (escrow && escrow.status !== "released") continue;
+
+    const { data: session } = await admin
+      .from("payment_sessions")
+      .select("id, method")
+      .eq("id", settlement.payment_session_id)
+      .single();
+
+    if (!session || session.method === "card") continue;
+
+    const order = settlement.order as { merchant_wallet_snapshot?: string } | null;
+    if (!order?.merchant_wallet_snapshot) continue;
+
+    attempted += 1;
+    try {
+      const { privateKey } = deriveSessionDepositAddress(session.id);
+      await executeSettlement({
+        settlementId: settlement.id,
+        sessionId: session.id,
+        depositPrivateKey: privateKey,
+        merchantWallet: order.merchant_wallet_snapshot as `0x${string}`,
+        treasuryWallet: treasury,
+        platformFeeUsd: Number(settlement.platform_fee),
+        merchantAmountUsd: Number(settlement.merchant_amount),
+        asset: session.method as CryptoAsset,
+      });
+      succeeded += 1;
+    } catch (err) {
+      failed += 1;
+      const message = err instanceof Error ? err.message : String(err);
+      await notifyAdminAlert({
+        type: "merchant_transfer_failed",
+        message: `Pending settlement failed for ${settlement.id}`,
+        metadata: { error: message },
+      }).catch(() => undefined);
+    }
+  }
+
+  return { attempted, succeeded, failed };
+}
+
+async function retryFailedSettlementsInternal(limit = 10): Promise<{
   attempted: number;
   succeeded: number;
   failed: number;
@@ -214,8 +312,14 @@ export async function retryFailedSettlements(limit = 10): Promise<{
         asset: session.method as CryptoAsset,
       });
       succeeded += 1;
-    } catch {
+    } catch (err) {
       failed += 1;
+      const message = err instanceof Error ? err.message : String(err);
+      await notifyAdminAlert({
+        type: "merchant_transfer_failed",
+        message: `Settlement retry failed for ${settlement.id}`,
+        metadata: { error: message },
+      }).catch(() => undefined);
     }
   }
 

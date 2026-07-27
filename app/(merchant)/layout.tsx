@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { signOutAction } from "@/modules/auth/actions";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
+import { MerchantRealtimeProvider } from "@/components/realtime/MerchantRealtimeProvider";
 import { Button } from "@/components/ui/Button";
 
 export default async function MerchantLayout({
@@ -55,8 +56,29 @@ export default async function MerchantLayout({
             <Link href="/merchant/revenue" className="text-muted hover:text-white">
               Revenue
             </Link>
+            <Link href="/merchant/wallet" className="text-muted hover:text-white">
+              Wallet
+            </Link>
+            <Link href="/merchant/customers" className="text-muted hover:text-white">
+              Customers
+            </Link>
+            <Link href="/merchant/stores" className="text-muted hover:text-white">
+              Stores
+            </Link>
+            <Link href="/merchant/disputes" className="text-muted hover:text-white">
+              Disputes
+            </Link>
+            <Link href="/merchant/withdrawals" className="text-muted hover:text-white">
+              Withdrawals
+            </Link>
             <Link href="/merchant/analytics" className="text-muted hover:text-white">
               Analytics
+            </Link>
+            <Link href="/merchant/coupons" className="text-muted hover:text-white">
+              Coupons
+            </Link>
+            <Link href="/merchant/webhooks" className="text-muted hover:text-white">
+              Webhooks
             </Link>
             <NotificationBadge userId={profile.id} href="/merchant/notifications" />
             <Link href="/merchant/profile" className="text-muted hover:text-white">
@@ -70,7 +92,9 @@ export default async function MerchantLayout({
           </form>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-6 py-10">{children}</main>
+      <main className="mx-auto max-w-7xl px-6 py-10">
+        <MerchantRealtimeProvider>{children}</MerchantRealtimeProvider>
+      </main>
     </div>
   );
 }

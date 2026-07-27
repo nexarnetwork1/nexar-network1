@@ -36,7 +36,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         limit: 20,
         categorySlug: undefined,
         sort: "newest" as const,
-        onSale: undefined,
+        onSale: false,
       };
 
   const [{ products, total }, categories] = await Promise.all([

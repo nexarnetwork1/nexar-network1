@@ -33,10 +33,10 @@ export const productSearchSchema = z.object({
   storeSlug: z.string().max(100).optional(),
   categorySlug: z.string().max(100).optional(),
   sort: z.enum(["newest", "price_asc", "price_desc", "name"]).default("newest"),
-  onSale: z
-    .enum(["true", "false"])
-    .optional()
-    .transform((v) => v === "true"),
+  onSale: z.preprocess(
+    (val) => val === "true" || val === true,
+    z.boolean().default(false)
+  ),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });

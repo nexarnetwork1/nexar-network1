@@ -1,4 +1,5 @@
-import { createNotification } from "@/modules/notifications/repository";
+import { enqueueWebhookDelivery } from "@/modules/webhooks/repository";
+import { dispatchNotification } from "@/modules/notifications/dispatch";
 import { getOrderById } from "@/modules/orders/repository";
 import { getStoreById } from "@/modules/stores/repository";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -13,25 +14,7 @@ export async function notifyPaymentCompleted(params: {
   const order = await getOrderById(params.orderId);
   if (!order) return;
 
-  await createNotification({
-    userId: order.customer_id,
-    type: "payment",
-    title: "Payment confirmed",
-    body: `Your payment of $${params.amountUsd.toFixed(2)} was received.`,
-    metadata: { order_id: params.orderId, session_id: params.sessionId },
-  }).catch(() => undefined);
-
   const store = await getStoreById(order.store_id);
-  if (store) {
-    await createNotification({
-      userId: store.owner_id,
-      type: "payment",
-      title: "New payment received",
-      body: `Order ${params.orderId.slice(0, 8)}… paid${params.merchantAmount ? ` — $${params.merchantAmount.toFixed(2)} net` : ""}.`,
-      metadata: { order_id: params.orderId, session_id: params.sessionId },
-    }).catch(() => undefined);
-  }
-
   const admin = createAdminClient();
   const { data: profiles } = await admin
     .from("profiles")
@@ -40,6 +23,39 @@ export async function notifyPaymentCompleted(params: {
 
   const customer = profiles?.find((p) => p.id === order.customer_id);
   const merchant = profiles?.find((p) => p.id === store?.owner_id);
+
+  await dispatchNotification({
+    event: "payment.received",
+    userId: order.customer_id,
+    title: "Payment confirmed",
+    body: `Your payment of $${params.amountUsd.toFixed(2)} was received.`,
+    type: "payment",
+    metadata: { order_id: params.orderId, session_id: params.sessionId },
+    email: customer?.email ? { to: customer.email } : undefined,
+  }).catch(() => undefined);
+
+  if (store) {
+    await dispatchNotification({
+      event: "payment.received",
+      userId: store.owner_id,
+      title: "New payment received",
+      body: `Order ${params.orderId.slice(0, 8)}… paid${params.merchantAmount ? ` — $${params.merchantAmount.toFixed(2)} net` : ""}.`,
+      type: "payment",
+      metadata: { order_id: params.orderId, session_id: params.sessionId },
+      email: merchant?.email ? { to: merchant.email } : undefined,
+    }).catch(() => undefined);
+
+    await enqueueWebhookDelivery({
+      storeId: store.id,
+      event: "payment.success",
+      payload: {
+        order_id: params.orderId,
+        session_id: params.sessionId,
+        amount_usd: params.amountUsd,
+        merchant_amount: params.merchantAmount,
+      },
+    }).catch(() => undefined);
+  }
 
   if (customer?.email) {
     await sendPaymentReceivedEmail({

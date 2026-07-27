@@ -2,23 +2,17 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logger } from "@/lib/logging/logger";
 import { securityLogger } from "@/lib/logging/security-logger";
-
-function authorizeCron(request: Request): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-
-  const authHeader = request.headers.get("authorization");
-  return authHeader === `Bearer ${secret}`;
-}
+import { verifyCronSecret, cronUnauthorizedResponse } from "@/lib/security/cron-auth";
 
 export async function GET(request: Request) {
-  if (!authorizeCron(request)) {
+  const auth = verifyCronSecret(request);
+  if (!auth.authorized) {
     securityLogger.log({
       event: "unauthorized_access",
       path: "/api/cron/expire-sessions",
       metadata: { reason: "invalid_cron_secret" },
     });
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return cronUnauthorizedResponse();
   }
 
   try {

@@ -1,9 +1,21 @@
 import { ZodError } from "zod";
+import { isProduction } from "@/config/env";
 import { captureException } from "@/lib/monitoring/sentry";
 import { logger } from "@/lib/logging/logger";
 import { AppError, isAppError, toAppError } from "./app-error";
 import { validationErrorResponse } from "./validation-response";
 import { apiErrorResponse } from "./api-response";
+
+function toPublicError(appError: AppError): AppError {
+  if (isProduction() && appError.statusCode >= 500) {
+    return new AppError(
+      "An internal error occurred. Please try again later.",
+      appError.code,
+      appError.statusCode
+    );
+  }
+  return appError;
+}
 
 export type ErrorHandlerContext = {
   source?: string;
@@ -37,7 +49,7 @@ export async function handleError(
     });
   }
 
-  return apiErrorResponse(appError);
+  return apiErrorResponse(toPublicError(appError));
 }
 
 export function handleServerActionError(
@@ -60,9 +72,10 @@ export function handleServerActionError(
     void captureException(appError, context);
   }
 
+  const publicError = toPublicError(appError);
   return {
     success: false,
-    error: appError.message,
-    code: appError.code,
+    error: publicError.message,
+    code: publicError.code,
   };
 }

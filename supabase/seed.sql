@@ -22,3 +22,7 @@
 
 -- 5) Smoke-test atomic payment RPC (service role only):
 -- SELECT public.complete_payment('<session-uuid>', '<tx-hash>', 1.0);
+
+-- 6) Validate schema after migrations:
+-- SELECT * FROM public.validate_database_schema() ORDER BY check_name;
+-- Or run scripts/validate-database.sql in Supabase SQL Editor.

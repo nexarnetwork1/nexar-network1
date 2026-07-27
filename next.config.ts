@@ -52,6 +52,7 @@ wss://*.supabase.co",
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   turbopack: {
     root: projectRoot,
   },

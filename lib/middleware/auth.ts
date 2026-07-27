@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
-import { authConfig, securityConfig } from "@/config";
+import { authConfig } from "@/config";
+import { hasRoleAccess, isProtectedRoute } from "./authorization";
 
 type Profile = {
   role: string;
@@ -20,9 +21,7 @@ export function handleAuthRouting(
 ): NextResponse | null {
   const { pathname } = request.nextUrl;
 
-  const isProtected = securityConfig.protectedPrefixes.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-  );
+  const isProtected = isProtectedRoute(pathname);
 
   const isAuthRoute = authConfig.authRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
@@ -72,19 +71,10 @@ export function handleAuthRouting(
       return NextResponse.redirect(new URL(destination, request.url));
     }
 
-    if (isProtected) {
-      const role = profile.role as keyof typeof securityConfig.roleRoutes;
-      const allowedPrefixes = securityConfig.roleRoutes[role] ?? [];
-
-      const hasAccess = allowedPrefixes.some(
-        (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    if (isProtected && !hasRoleAccess(pathname, profile.role)) {
+      return NextResponse.redirect(
+        new URL(getDashboardPath(profile.role), request.url)
       );
-
-      if (!hasAccess) {
-        return NextResponse.redirect(
-          new URL(getDashboardPath(profile.role), request.url)
-        );
-      }
     }
   }
 

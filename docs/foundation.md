@@ -37,7 +37,8 @@ This document describes the foundation layer prepared before business logic impl
 | `utils/` | Pure utility functions |
 | `constants/` | App constants and route definitions |
 | `config/` | Typed configuration modules |
-| `lib/middleware/` | Modular middleware helpers (auth, rate limiting) |
+| `lib/middleware/` | Modular middleware helpers (auth, authorization, rate limiting) |
+| `middleware/` | Stable re-export barrel for middleware helpers |
 | `store/` | Zustand global state (UI only) |
 | `styles/` | Style entry points |
 | `public/` | Static assets served by Next.js |
@@ -85,7 +86,8 @@ const form = useZodForm({ schema: loginSchema, defaultValues: { email: "", passw
 
 | Control | Location |
 |---|---|
-| Middleware auth | `lib/middleware/auth.ts` |
+| Authentication | `lib/middleware/auth.ts` |
+| Authorization | `lib/middleware/authorization.ts` |
 | Rate limiting | `lib/middleware/rate-limit.ts` |
 | CSRF | `lib/security/csrf.ts` |
 | Input sanitization | `lib/security/sanitize.ts` |
@@ -139,12 +141,12 @@ Core packages added for foundation:
 - `class-variance-authority` + `@radix-ui/react-slot` — Shadcn UI base
 - `tailwindcss-animate` — Shadcn animations
 
-Already present from Prompt 1: Next.js, React, TypeScript, TailwindCSS, Supabase, Zod, TanStack Query, Framer Motion, Lucide, Sentry, Sonner (toast).
+Already present from Prompt 1: Next.js, React, TypeScript, TailwindCSS, Supabase, Zod, TanStack Query, Framer Motion, Lucide, Sentry, Sonner (toast — used instead of react-hot-toast), PDFKit (invoice PDF generation).
 
 ## What Is NOT Implemented Yet
 
-- Domain service classes (only `BaseService` scaffold)
-- Feature UI components (only index placeholders)
+- Domain service workflows (scaffold classes only — extend in later phases)
+- Feature-specific hooks and components (placeholder folders only)
 - Email sending integration
 - Business workflows in services layer
 

@@ -50,7 +50,12 @@ export type NotificationType =
   | "invoice"
   | "promotion"
   | "security"
-  | "system";
+  | "system"
+  | "dispute"
+  | "withdrawal"
+  | "verification"
+  | "escrow"
+  | "refund";
 
 export type SecurityEventType =
   | "failed_login"
@@ -336,7 +341,19 @@ export type MerchantProfile = {
   profile_id: string;
   business_name: string | null;
   tax_id: string | null;
-  verification_status: "pending" | "verified" | "rejected" | "suspended";
+  verification_status:
+    | "pending"
+    | "under_review"
+    | "verified"
+    | "rejected"
+    | "suspended"
+    | "blacklisted";
+  verification_level: MerchantVerificationLevel;
+  kyc_provider: string | null;
+  kyc_reference: string | null;
+  verified_at: string | null;
+  blacklisted_at: string | null;
+  blacklist_reason: string | null;
   total_revenue_usd: number;
   total_orders: number;
   created_at: string;
@@ -466,6 +483,197 @@ export type ContactMessage = {
   message: string;
   status: ContactMessageStatus;
   user_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EscrowStatus = "pending" | "held" | "released" | "refunded" | "cancelled";
+
+export type Escrow = {
+  id: string;
+  order_id: string;
+  payment_session_id: string | null;
+  settlement_id: string | null;
+  store_id: string;
+  customer_id: string;
+  amount: number;
+  currency: string;
+  status: EscrowStatus;
+  release_conditions: Record<string, unknown>;
+  held_at: string | null;
+  released_at: string | null;
+  refunded_at: string | null;
+  cancelled_at: string | null;
+  released_by: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DisputeStatus =
+  | "open"
+  | "under_review"
+  | "awaiting_info"
+  | "approved"
+  | "rejected"
+  | "resolved"
+  | "closed";
+
+export type Dispute = {
+  id: string;
+  order_id: string;
+  escrow_id: string | null;
+  customer_id: string;
+  store_id: string;
+  status: DisputeStatus;
+  reason: string;
+  resolution: string | null;
+  refund_amount: number | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DisputeMessage = {
+  id: string;
+  dispute_id: string;
+  sender_id: string;
+  sender_role: UserRole;
+  message: string;
+  created_at: string;
+};
+
+export type DisputeEvidence = {
+  id: string;
+  dispute_id: string;
+  uploaded_by: string;
+  file_url: string;
+  file_type: string | null;
+  description: string | null;
+  created_at: string;
+};
+
+export type MerchantVerificationLevel = "basic" | "business" | "enterprise";
+
+export type WithdrawalStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "processing"
+  | "completed"
+  | "cancelled";
+
+export type WithdrawalRequest = {
+  id: string;
+  merchant_id: string;
+  store_id: string;
+  amount: number;
+  currency: string;
+  wallet_address: string;
+  chain_id: number;
+  status: WithdrawalStatus;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  rejection_reason: string | null;
+  tx_hash: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CouponType = "percentage" | "fixed";
+export type CouponScope = "merchant" | "platform";
+
+export type Coupon = {
+  id: string;
+  code: string;
+  coupon_type: CouponType;
+  coupon_scope: CouponScope;
+  store_id: string | null;
+  value: number;
+  currency: string;
+  usage_limit: number | null;
+  used_count: number;
+  min_order_usd: number;
+  is_active: boolean;
+  expires_at: string | null;
+  created_by: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type WebhookEvent =
+  | "payment.success"
+  | "payment.failure"
+  | "refund"
+  | "order.created"
+  | "invoice.paid";
+
+export type MerchantWebhook = {
+  id: string;
+  store_id: string;
+  url: string;
+  secret_prefix: string;
+  events: WebhookEvent[];
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type WebhookDeliveryStatus = "pending" | "delivered" | "failed" | "retrying";
+
+export type SettlementReportPeriod = "daily" | "weekly" | "monthly";
+
+export type SettlementReport = {
+  id: string;
+  store_id: string | null;
+  period_type: SettlementReportPeriod;
+  period_start: string;
+  period_end: string;
+  metrics: SettlementReportMetrics;
+  generated_by: string | null;
+  generated_at: string;
+};
+
+export type SettlementReportMetrics = {
+  gross_revenue: number;
+  platform_fees: number;
+  net_revenue: number;
+  refunds: number;
+  escrow_balance: number;
+  completed_orders: number;
+  failed_payments: number;
+};
+
+export type SupportedChain = {
+  chain_id: number;
+  name: string;
+  symbol: string;
+  rpc_url: string | null;
+  explorer_url: string | null;
+  is_active: boolean;
+  fee_config: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SearchResult = {
+  type: string;
+  id: string;
+  title: string;
+  ref: string;
+};
+
+export type NotificationPreference = {
+  id: string;
+  user_id: string;
+  channel: "in_app" | "email" | "sms" | "push" | "telegram";
+  event_type: string;
+  enabled: boolean;
   created_at: string;
   updated_at: string;
 };

@@ -33,6 +33,31 @@ export const userRoleSchema = z.object({
   role: z.enum(["customer", "merchant", "admin"]),
 });
 
+export const productModerationSchema = z.object({
+  productId: z.string().uuid(),
+  isActive: z.coerce.boolean(),
+});
+
+export const currencyToggleSchema = z.object({
+  currencyId: z.string().uuid(),
+  isActive: z.coerce.boolean(),
+});
+
+export const createPromotionSchema = z.object({
+  storeId: z.string().uuid(),
+  discountPercent: z.coerce.number().min(1).max(100),
+  months: z.coerce.number().int().min(1).max(12).default(3),
+});
+
+export const banUserSchema = z.object({
+  userId: z.string().uuid(),
+  ban: z.coerce.boolean(),
+});
+
+export type ProductModerationInput = z.infer<typeof productModerationSchema>;
+export type CurrencyToggleInput = z.infer<typeof currencyToggleSchema>;
+export type CreatePromotionInput = z.infer<typeof createPromotionSchema>;
+
 export type PlatformSettingsInput = z.infer<typeof platformSettingsSchema>;
 export type FeeScheduleInput = z.infer<typeof feeScheduleSchema>;
 export type ExchangeRateInput = z.infer<typeof exchangeRateSchema>;

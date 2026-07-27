@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { getAllPaymentSessions, getAllSettlements, getRecentPaymentStatusHistory } from "@/modules/platform/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { RetrySettlementsButton } from "@/components/admin/RetrySettlementsButton";
+import { ExportButton } from "@/components/admin/ExportButton";
 import { formatDateTime } from "@/utils/format";
 
 export default async function AdminPaymentsPage() {
@@ -11,11 +13,22 @@ export default async function AdminPaymentsPage() {
   ]);
 
   const failedSettlements = settlements.filter((s) => s.status === "failed");
+  const failedPayments = sessions.filter((s) => s.status === "failed");
+  const pendingPayments = sessions.filter((s) =>
+    ["waiting", "pending", "waiting_confirmation"].includes(s.status)
+  );
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-yellow-400">Payments</h1>
-      <p className="mt-2 text-zinc-400">Payment sessions and settlements</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-yellow-400">Payments</h1>
+          <p className="mt-2 text-zinc-400">
+            {sessions.length} sessions · {pendingPayments.length} pending · {failedPayments.length} failed
+          </p>
+        </div>
+        <ExportButton resource="payments" />
+      </div>
 
       <h2 className="mt-10 text-lg font-semibold">Recent sessions</h2>
       <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">

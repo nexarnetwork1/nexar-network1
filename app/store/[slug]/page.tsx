@@ -19,6 +19,7 @@ export default async function PublicStorePage({ params }: Props) {
     page: 1,
     limit: 12,
     sort: "newest",
+    onSale: false,
   });
 
   return (

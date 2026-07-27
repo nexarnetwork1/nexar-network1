@@ -112,6 +112,96 @@ export async function getCustomerPurchaseHistory(
   return (data ?? []) as CustomerPurchaseRow[];
 }
 
+export async function getCustomerWalletSummaryAdmin(profileId: string) {
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const admin = createAdminClient();
+
+  const { data: wallets } = await admin
+    .from("wallets")
+    .select("*")
+    .eq("owner_type", "customer")
+    .eq("owner_id", profileId)
+    .order("is_primary", { ascending: false });
+
+  const primary = (wallets ?? []).find((w) => w.is_primary) ?? wallets?.[0];
+  let transactions: WalletTransaction[] = [];
+  if (primary) {
+    const { data } = await admin
+      .from("wallet_transactions")
+      .select("*")
+      .eq("wallet_id", primary.id)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    transactions = (data ?? []) as WalletTransaction[];
+  }
+
+  const { data: profile } = await admin
+    .from("customer_profiles")
+    .select("*")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+
+  return {
+    profile: profile as CustomerProfile | null,
+    wallets: (wallets ?? []) as Wallet[],
+    transactions,
+  };
+}
+
+export async function getCustomerPurchaseHistoryAdmin(
+  profileId: string,
+  limit = 50
+): Promise<CustomerPurchaseRow[]> {
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("v_customer_purchase_history")
+    .select("*")
+    .eq("customer_id", profileId)
+    .eq("status", "paid")
+    .order("paid_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) return [];
+  return (data ?? []) as CustomerPurchaseRow[];
+}
+
+export async function getMerchantWalletSummaryAdmin(profileId: string) {
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const admin = createAdminClient();
+
+  const { data: wallets } = await admin
+    .from("wallets")
+    .select("*")
+    .eq("owner_type", "merchant")
+    .eq("owner_id", profileId)
+    .order("is_primary", { ascending: false });
+
+  const primary = (wallets ?? []).find((w) => w.is_primary) ?? wallets?.[0];
+  let transactions: WalletTransaction[] = [];
+  if (primary) {
+    const { data } = await admin
+      .from("wallet_transactions")
+      .select("*")
+      .eq("wallet_id", primary.id)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    transactions = (data ?? []) as WalletTransaction[];
+  }
+
+  const { data: profile } = await admin
+    .from("merchant_profiles")
+    .select("*")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+
+  return {
+    profile: profile as MerchantProfile | null,
+    wallets: (wallets ?? []) as Wallet[],
+    transactions,
+  };
+}
+
 export async function getMerchantWalletSummary(profileId: string): Promise<{
   profile: MerchantProfile | null;
   wallets: Wallet[];

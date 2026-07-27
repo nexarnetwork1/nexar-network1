@@ -3,30 +3,76 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOutAction } from "@/modules/auth/actions";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
 
-const platformLinks = [
-  { name: "Dashboard", href: "/admin/dashboard" },
+const overviewLinks = [
+  { name: "Overview", href: "/admin/dashboard" },
+  { name: "Revenue", href: "/admin/revenue" },
   { name: "Analytics", href: "/admin/analytics" },
-  { name: "Users", href: "/admin/users" },
+];
+
+const managementLinks = [
   { name: "Merchants", href: "/admin/merchants" },
+  { name: "Customers", href: "/admin/customers" },
+  { name: "Users", href: "/admin/users" },
   { name: "Orders", href: "/admin/orders" },
   { name: "Invoices", href: "/admin/invoices" },
   { name: "Payments", href: "/admin/payments" },
+  { name: "Products", href: "/admin/products" },
+  { name: "Marketplace", href: "/admin/marketplace" },
+];
+
+const platformLinks = [
+  { name: "Treasury", href: "/admin/treasury" },
+  { name: "Coupons", href: "/admin/coupons" },
   { name: "Platform Fees", href: "/admin/platform-fees" },
   { name: "Exchange Rates", href: "/admin/exchange-rates" },
+  { name: "Currencies", href: "/admin/currencies" },
   { name: "Promotions", href: "/admin/promotions" },
+  { name: "Settings", href: "/admin/settings" },
+];
+
+const securityLinks = [
   { name: "Audit Logs", href: "/admin/audit-logs" },
-  { name: "Contact", href: "/admin/contact" },
   { name: "Security", href: "/admin/security" },
+  { name: "System Health", href: "/admin/system-health" },
+  { name: "Contact", href: "/admin/contact" },
 ];
 
-const cmsLinks = [
-  { name: "News", href: "/admin/news" },
+const operationsLinks = [
+  { name: "Escrow", href: "/admin/escrow" },
+  { name: "Disputes", href: "/admin/disputes" },
+  { name: "Verification", href: "/admin/verification" },
+  { name: "Withdrawals", href: "/admin/withdrawals" },
+  { name: "Settlement Reports", href: "/admin/settlement-reports" },
 ];
 
-export function AdminSidebar() {
+const cmsLinks = [{ name: "News", href: "/admin/news" }];
+
+function NavSection({ title, links }: { title: string; links: { name: string; href: string }[] }) {
   const pathname = usePathname();
 
+  return (
+    <>
+      <p className="mt-4 px-4 py-2 text-xs uppercase tracking-wider text-zinc-500">{title}</p>
+      {links.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className={`block rounded-xl px-4 py-2.5 text-sm transition ${
+            pathname === link.href || pathname.startsWith(`${link.href}/`)
+              ? "bg-yellow-500 text-black font-semibold"
+              : "text-zinc-300 hover:bg-zinc-900"
+          }`}
+        >
+          {link.name}
+        </Link>
+      ))}
+    </>
+  );
+}
+
+export function AdminSidebar() {
   return (
     <aside className="w-72 shrink-0 border-r border-yellow-500/20 bg-black/40 min-h-[calc(100vh-96px)]">
       <div className="border-b border-yellow-500/20 p-6">
@@ -35,39 +81,12 @@ export function AdminSidebar() {
       </div>
 
       <nav className="space-y-1 p-4">
-        <p className="px-4 py-2 text-xs uppercase tracking-wider text-zinc-500">
-          Platform
-        </p>
-        {platformLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`block rounded-xl px-4 py-2.5 text-sm transition ${
-              pathname === link.href || pathname.startsWith(`${link.href}/`)
-                ? "bg-yellow-500 text-black font-semibold"
-                : "text-zinc-300 hover:bg-zinc-900"
-            }`}
-          >
-            {link.name}
-          </Link>
-        ))}
-
-        <p className="mt-4 px-4 py-2 text-xs uppercase tracking-wider text-zinc-500">
-          CMS
-        </p>
-        {cmsLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`block rounded-xl px-4 py-2.5 text-sm transition ${
-              pathname === link.href
-                ? "bg-yellow-500 text-black font-semibold"
-                : "text-zinc-300 hover:bg-zinc-900"
-            }`}
-          >
-            {link.name}
-          </Link>
-        ))}
+        <NavSection title="Overview" links={overviewLinks} />
+        <NavSection title="Management" links={managementLinks} />
+        <NavSection title="Platform" links={platformLinks} />
+        <NavSection title="Operations" links={operationsLinks} />
+        <NavSection title="Security" links={securityLinks} />
+        <NavSection title="CMS" links={cmsLinks} />
       </nav>
     </aside>
   );
@@ -75,8 +94,8 @@ export function AdminSidebar() {
 
 export function AdminHeader() {
   return (
-    <div className="flex items-center justify-between border-b border-yellow-500/20 px-8 py-4">
-      <p className="text-sm text-zinc-400">admin@nexarnetwork.org</p>
+    <div className="flex items-center justify-between gap-4 border-b border-yellow-500/20 px-8 py-4">
+      <GlobalSearch apiPath="/api/search" />
       <form action={signOutAction}>
         <button
           type="submit"
