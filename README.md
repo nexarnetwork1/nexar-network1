@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nexar Network
 
-## Getting Started
+Production fintech + crypto payment platform built on Next.js and Supabase.
 
-First, run the development server:
+## Features
+
+- **Auth** — Email, Google, Apple; customer & merchant registration
+- **Marketplace** — Product catalog, search, cart, checkout
+- **Payments** — Crypto (NXR, BNB, USDT) via popup with QR; automatic fee split
+- **Invoices** — PDF generation, role-scoped access (no public pages)
+- **Admin** — Users, merchants, orders, fees, exchange rates, audit logs
+
+## Stack
+
+- Next.js 16 · React 19 · TypeScript · TailwindCSS
+- Supabase (PostgreSQL, Auth, Storage, Realtime)
+- BNB Smart Chain (BEP-20)
+- viem for blockchain interaction
+
+## Quick start
 
 ```bash
+cp .env.example .env.local
+# Fill in Supabase credentials
+
+npm install
+supabase db push
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Doc | Description |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | System design |
+| [docs/database.md](docs/database.md) | Schema & RLS |
+| [docs/security.md](docs/security.md) | Security model |
+| [docs/payment-flow.md](docs/payment-flow.md) | Payment sequence |
+| [docs/security-checklist.md](docs/security-checklist.md) | Production checklist |
+| [docs/phase-6-launch.md](docs/phase-6-launch.md) | Deployment guide |
 
-## Learn More
+## Key routes
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Role |
+|---|---|
+| `/login` | All users |
+| `/customer/browse` | Customer |
+| `/merchant/products` | Merchant |
+| `/admin/dashboard` | Admin |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Admin setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```sql
+UPDATE public.profiles
+SET role = 'admin', profile_completed = true
+WHERE email = 'your@email.com';
+```
 
-## Deploy on Vercel
+## Health check
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+GET /api/health
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+Private — Nexar Network

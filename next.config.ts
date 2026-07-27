@@ -16,7 +16,7 @@ const cspHeader = [
 
 
   // السماح بتحميل صور المحافظ
-  "img-src 'self' data: blob: https://coin-images.coingecko.com https://assets.coingecko.com https://explorer-api.walletconnect.com https://explorer-api.walletconnect.org https://registry.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org",
+  "img-src 'self' data: blob: https://coin-images.coingecko.com https://assets.coingecko.com https://explorer-api.walletconnect.com https://explorer-api.walletconnect.org https://registry.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org https://api.qrserver.com",
 
 "connect-src 'self' \
 https://api.coingecko.com \
@@ -79,6 +79,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "registry.walletconnect.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.qrserver.com",
       },
     ],
     formats: ["image/avif", "image/webp"],

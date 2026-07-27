@@ -2,7 +2,8 @@ import { supabaseServer } from "@/lib/supabase/server";
 import Link from "next/link";
 
 export default async function NewsPage() {
-  const { data: news } = await supabaseServer
+  const supabase = await supabaseServer();
+  const { data: news } = await supabase
     .from("news")
     .select("*")
     .order("created_at", { ascending: false });

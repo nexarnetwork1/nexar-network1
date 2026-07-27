@@ -1,0 +1,33 @@
+import type { Metadata } from "next";
+import { Container } from "@/components/ui/Container";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+
+export const metadata: Metadata = {
+  title: "About | Nexar Network",
+  description: "Learn about Nexar Network — a fintech and crypto payment ecosystem.",
+};
+
+export default function AboutPage() {
+  return (
+    <main className="py-24">
+      <Container>
+        <SectionHeading
+          eyebrow="About"
+          title="Nexar Network"
+          description="A production fintech and crypto payment ecosystem built for merchants and customers worldwide."
+        />
+        <div className="mt-12 max-w-3xl space-y-6 text-muted">
+          <p>
+            Nexar Network connects traditional commerce with blockchain payments,
+            enabling merchants to accept crypto and card payments while maintaining
+            platform-controlled settlement and transparent fee structures.
+          </p>
+          <p>
+            This page will be expanded with company mission, team, and roadmap
+            content in a future phase.
+          </p>
+        </div>
+      </Container>
+    </main>
+  );
+}

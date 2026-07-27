@@ -11,7 +11,8 @@ type Props = {
 export default async function NewsArticlePage({ params }: Props) {
   const { slug } = await params;
 
-  const { data: article } = await supabaseServer
+  const supabase = await supabaseServer();
+  const { data: article } = await supabase
     .from("news")
     .select("*")
     .eq("slug", slug)
