@@ -31,6 +31,7 @@
   --nxr-radius-full: 9999px;
 
   --nxr-nav-height: 5rem;
+  --nxr-announcement-height: 4rem;
   --nxr-section-gap: clamp(5rem, 10vw, 9rem);
 
   color-scheme: dark;
@@ -67,6 +68,7 @@
   html {
     scroll-behavior: smooth;
     scrollbar-gutter: stable;
+    overflow-y: scroll;
   }
 
   html.lenis,
@@ -157,10 +159,6 @@
     padding-block: var(--nxr-section-gap);
   }
 
-  .nav-offset {
-    padding-top: var(--nxr-nav-height);
-  }
-
   .mask-radial-fade {
     mask-image: radial-gradient(circle at center, black, transparent 72%);
   }
@@ -176,6 +174,26 @@
 
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  .scroll-auto {
+    scroll-behavior: auto;
+  }
+
+  .overflow-x-hidden {
+    overflow-x: hidden;
+  }
+
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
+
+  .overflow-auto {
+    overflow: auto;
   }
 }
 

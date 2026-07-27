@@ -31,7 +31,7 @@ export default function AnnouncementBanner() {
   if (closed || loading || !news) return null;
 
   return (
-    <section className="relative z-40 mt-20 border-b border-yellow-500/20 bg-gradient-to-r from-yellow-500/10 via-zinc-900 to-zinc-900">
+    <section className="relative z-40 border-b border-yellow-500/20 bg-gradient-to-r from-yellow-500/10 via-zinc-900 to-zinc-900">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
 
         <div className="flex items-start gap-4">

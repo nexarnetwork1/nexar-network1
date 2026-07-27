@@ -6,6 +6,7 @@ import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
 import { Toaster } from "sonner";
 import AnnouncementBanner from "@/components/news/AnnouncementBanner";
+import { ToastProvider } from "@/components/ui/toast/ToastProvider";
 import {
   organizationSchema,
   websiteSchema,
@@ -54,12 +55,6 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${sora.variable} ${spaceGrotesk.variable} h-full scroll-smooth`}
     >
-
-<Toaster
-  position="bottom-center"
-  richColors
-  theme="dark"
-/>
       <body className="relative min-h-full bg-background font-sans text-white antialiased">
         <script
           type="application/ld+json"
@@ -80,6 +75,12 @@ export default function RootLayout({
           }}
         />
         <AppProviders>
+          <ToastProvider>
+          <Toaster
+          position="bottom-center"
+          richColors
+          theme="dark"
+        />
           {/* Skip-to-content: visible only on focus for keyboard users */}
           <a
             href="#main-content"
@@ -95,10 +96,12 @@ export default function RootLayout({
 <div
   id="main-content"
   className="relative z-10 flex min-h-screen flex-col"
+  style={{ paddingTop: 'calc(var(--nxr-nav-height) + var(--nxr-announcement-height))' }}
 >
   {children}
 </div>
           <CookieConsent />
+          </ToastProvider>
         </AppProviders>
       </body>
     </html>

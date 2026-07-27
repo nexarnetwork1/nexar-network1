@@ -130,7 +130,7 @@ export default function Image() {
               letterSpacing: "0.1em",
             }}
           >
-            nexar.network
+            nexarnetwork.org
           </span>
         </div>
 
