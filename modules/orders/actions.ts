@@ -8,6 +8,7 @@ import { getOrCreateCart, getCartWithItems } from "@/modules/cart/repository";
 import { generateAndStoreInvoicePdf } from "@/modules/invoices/pdf";
 import { createNotification } from "@/modules/notifications/repository";
 import { getStoreById } from "@/modules/stores/repository";
+import { getMarketplaceProduct } from "@/modules/catalog/repository";
 import { auditLogger } from "@/lib/logging/audit-logger";
 import { sendInvoiceReadyEmail } from "@/lib/email/send";
 import type { ActionResult } from "@/modules/auth/actions";
@@ -165,10 +166,58 @@ export async function checkoutAction(): Promise<CheckoutResult> {
   revalidatePath("/customer/cart");
   revalidatePath("/customer/orders");
   revalidatePath("/customer/invoices");
+  revalidatePath("/merchant/orders");
+  revalidatePath("/admin/orders");
 
   if (orderIds.length === 1) {
-    redirect(`/customer/orders/${orderIds[0]}`);
+    redirect(`/customer/orders/${orderIds[0]}?confirmed=1`);
   }
 
   redirect("/customer/orders");
+}
+
+export async function buyNowAction(
+  productId: string,
+  quantity: number
+): Promise<CheckoutResult> {
+  const profile = await requireRole(["customer"]);
+  const product = await getMarketplaceProduct(productId);
+
+  if (!product) {
+    return { success: false, error: "Product not available" };
+  }
+
+  if (product.stock < quantity) {
+    return { success: false, error: "Insufficient stock" };
+  }
+
+  const cart = await getOrCreateCart(profile.id);
+  if (!cart) {
+    return { success: false, error: "Could not create cart" };
+  }
+
+  const supabase = await createClient();
+  const { data: existing } = await supabase
+    .from("cart_items")
+    .select("id")
+    .eq("cart_id", cart.id)
+    .eq("product_id", productId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("cart_items")
+      .update({ quantity })
+      .eq("id", existing.id);
+    if (error) return { success: false, error: error.message };
+  } else {
+    const { error } = await supabase.from("cart_items").insert({
+      cart_id: cart.id,
+      product_id: productId,
+      quantity,
+    });
+    if (error) return { success: false, error: error.message };
+  }
+
+  return checkoutAction();
 }

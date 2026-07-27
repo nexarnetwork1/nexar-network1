@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { ProductWithStore } from "@/types";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
+import { Button } from "@/components/ui/Button";
 import { useWishlist } from "@/hooks/useWishlist";
 
 type ProductCardProps = {
@@ -94,10 +95,18 @@ export function ProductCard({ product, showNewBadge }: ProductCardProps) {
           showBadge
         />
 
-        <div className="mt-4 flex items-center gap-2">
-          <div className="flex-1">
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="col-span-1">
             <AddToCartButton productId={product.id} stock={product.stock} />
           </div>
+          <Link href={`/customer/browse/${product.id}`} className="col-span-1">
+            <Button type="button" variant="secondary" className="w-full">
+              View Details
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-3 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={() => toggle(product.id)}
@@ -117,13 +126,6 @@ export function ProductCard({ product, showNewBadge }: ProductCardProps) {
             <Share2 className="h-4 w-4" />
           </button>
         </div>
-
-        <Link
-          href={`/customer/browse/${product.id}`}
-          className="mt-3 block text-center text-xs text-gold hover:underline"
-        >
-          View Details
-        </Link>
       </div>
     </article>
   );

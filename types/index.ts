@@ -223,6 +223,8 @@ export type Inventory = {
   updated_at: string;
 };
 
+export type ProductSpecifications = Record<string, string | number | boolean | null>;
+
 export type Product = {
   id: string;
   store_id: string;
@@ -236,6 +238,7 @@ export type Product = {
   category_id: string | null;
   is_active: boolean;
   is_on_sale?: boolean;
+  specifications?: ProductSpecifications;
   created_at: string;
   updated_at: string;
 };

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCartWithItems } from "@/modules/cart/repository";
 import { CartItemRow } from "@/components/cart/CartItemRow";
-import { CheckoutButton } from "@/components/orders/CheckoutButton";
+import { CartOrderSummary } from "@/components/cart/CartOrderSummary";
 import { Button } from "@/components/ui/Button";
 import { groupCartItemsByStore } from "@/utils/cart";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
@@ -14,13 +14,6 @@ export default async function CartPage() {
 
   const { items } = await getCartWithItems(profile.id);
   const storeGroups = groupCartItemsByStore(items);
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + Number(item.product.price) * item.quantity,
-    0
-  );
-
-  const currency = items[0]?.product.currency ?? "USD";
   const storeCount = storeGroups.length;
 
   return (
@@ -49,7 +42,8 @@ export default async function CartPage() {
               >
                 <h2 className="font-heading text-lg font-semibold">{group.storeName}</h2>
                 <p className="mt-1 text-sm text-muted">
-                  Store subtotal: <CurrencyAmount amount={group.subtotal} currency={currency} size={16} />
+                  Store subtotal:{" "}
+                  <CurrencyAmount amount={group.subtotal} currency={items[0]?.product.currency ?? "USD"} size={16} />
                 </p>
                 <div className="mt-4">
                   {group.items.map((item) => (
@@ -60,43 +54,7 @@ export default async function CartPage() {
             ))}
           </div>
 
-          <div className="rounded-2xl border border-border bg-card/40 p-6">
-            <h2 className="font-heading text-lg font-semibold">Order summary</h2>
-            <div className="mt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted">Subtotal</span>
-                <CurrencyAmount amount={subtotal} currency={currency} size={16} amountClassName="font-medium" />
-              </div>
-              <div className="flex justify-between text-muted">
-                <span>Platform fees</span>
-                <span>At checkout</span>
-              </div>
-              <div className="flex justify-between text-muted">
-                <span>Discounts / coupons</span>
-                <span>—</span>
-              </div>
-              <div className="flex justify-between text-muted">
-                <span>Shipping</span>
-                <span>—</span>
-              </div>
-              <div className="flex justify-between text-muted">
-                <span>Tax</span>
-                <span>—</span>
-              </div>
-              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold">
-                <span>Grand total</span>
-                <CurrencyAmount amount={subtotal} currency={currency} size={16} amountClassName="font-semibold" />
-              </div>
-            </div>
-            {storeCount > 1 && (
-              <p className="mt-3 text-xs text-muted">
-                Checkout creates {storeCount} separate orders (one per store).
-              </p>
-            )}
-            <div className="mt-6">
-              <CheckoutButton />
-            </div>
-          </div>
+          <CartOrderSummary items={items} storeCount={storeCount} />
         </div>
       )}
     </div>

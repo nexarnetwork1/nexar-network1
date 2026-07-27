@@ -34,7 +34,9 @@ export default async function AdminOrdersPage() {
             {orders.map((order) => (
               <tr key={order.id} className="border-b border-white/5">
                 <td className="px-4 py-3 font-mono text-yellow-400/80">
-                  {order.id.slice(0, 8)}…
+                  <Link href={`/admin/orders/${order.id}`} className="hover:underline">
+                    {order.id.slice(0, 8)}…
+                  </Link>
                 </td>
                 <td className="px-4 py-3">{order.store.name}</td>
                 <td className="px-4 py-3">

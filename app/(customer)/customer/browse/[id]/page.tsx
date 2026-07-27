@@ -5,8 +5,10 @@ import {
   searchMarketplaceProducts,
 } from "@/modules/catalog/repository";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { BuyNowButton } from "@/components/orders/BuyNowButton";
 import { ProductImageGallery } from "@/components/catalog/ProductImageGallery";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
+import { ProductSpecificationsTable } from "@/components/catalog/ProductSpecificationsTable";
 import { ProductDetailClient } from "@/components/marketplace/ProductDetailClient";
 
 type Props = {
@@ -35,6 +37,8 @@ export default async function ProductDetailPage({ params }: Props) {
     )
     .slice(0, 4)
     .map((p) => ({ ...p, images: [] }));
+
+  const specifications = (product.specifications ?? {}) as Record<string, string>;
 
   return (
     <ProductDetailClient product={product} related={related}>
@@ -69,8 +73,11 @@ export default async function ProductDetailPage({ params }: Props) {
             size="lg"
           />
 
-          <p className="mt-2 flex items-center gap-2 text-sm text-muted">
-            <span>{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</span>
+          <p className="mt-2 text-sm text-muted">
+            Available quantity:{" "}
+            <span className="font-medium text-white">
+              {product.stock > 0 ? product.stock : "Out of stock"}
+            </span>
           </p>
 
           <p className="mt-1 text-xs text-muted">SKU: {product.id.slice(0, 8).toUpperCase()}</p>
@@ -84,8 +91,11 @@ export default async function ProductDetailPage({ params }: Props) {
             </div>
           )}
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <ProductSpecificationsTable specifications={specifications} />
+
+          <div className="mt-8 flex flex-wrap items-end gap-3">
             <AddToCartButton productId={product.id} stock={product.stock} showQuantity />
+            <BuyNowButton productId={product.id} stock={product.stock} />
             <Link
               href={`/store/${product.store.slug}`}
               className="inline-flex items-center rounded-xl border border-border px-5 py-2.5 text-sm hover:border-gold/30"

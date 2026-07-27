@@ -138,6 +138,20 @@ export function ProductForm({
         </label>
       </div>
 
+      <Textarea
+        name="specifications"
+        label="Specifications (one per line: Key: Value)"
+        rows={4}
+        defaultValue={
+          product?.specifications
+            ? Object.entries(product.specifications)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join("\n")
+            : ""
+        }
+        placeholder={"Weight: 250g\nMaterial: Stainless steel"}
+      />
+
       <ImageDropzone
         onFileChange={setImageFile}
         currentImageUrl={product?.image_url}

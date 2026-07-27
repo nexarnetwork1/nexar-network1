@@ -58,6 +58,7 @@ export function StorefrontClient({
 
   const banner = profile.banner_url;
   const primary = profile.primary_color ?? "#D4AF37";
+  const secondary = profile.secondary_color ?? "#1a1a1a";
 
   return (
     <div>
@@ -66,7 +67,7 @@ export function StorefrontClient({
         style={{
           background: banner
             ? undefined
-            : `linear-gradient(135deg, ${primary}44, #0a0a0a)`,
+            : `linear-gradient(135deg, ${primary}44, ${secondary})`,
         }}
       >
         {banner && (
@@ -154,9 +155,10 @@ export function StorefrontClient({
             onClick={() => setTab(t)}
             className={`px-4 py-2 text-sm capitalize transition ${
               tab === t
-                ? "border-b-2 border-gold text-gold"
+                ? "border-b-2 text-gold"
                 : "text-muted hover:text-white"
             }`}
+            style={tab === t ? { borderColor: primary } : undefined}
           >
             {t}
           </button>

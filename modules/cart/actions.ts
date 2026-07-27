@@ -6,6 +6,7 @@ import { requireRole } from "@/modules/users/repository";
 import { getMarketplaceProduct } from "@/modules/catalog/repository";
 import { getOrCreateCart, getCartWithItems } from "./repository";
 import { addToCartSchema, updateCartItemSchema } from "./validators";
+import { validateCoupon } from "@/modules/coupons/repository";
 import type { ActionResult } from "@/modules/auth/actions";
 
 export async function addToCartAction(formData: FormData): Promise<ActionResult> {
@@ -140,4 +141,20 @@ export async function clearCartAction(): Promise<ActionResult> {
 
   revalidatePath("/customer/cart");
   return { success: true };
+}
+
+export async function validateCartCouponAction(
+  code: string,
+  orderTotalUsd: number
+): Promise<ActionResult & { discountUsd?: number; message?: string }> {
+  await requireRole(["customer"]);
+  const result = await validateCoupon(code, undefined, orderTotalUsd);
+  if (!result.valid) {
+    return { success: false, error: result.error ?? "Invalid coupon" };
+  }
+  return {
+    success: true,
+    discountUsd: result.discountUsd,
+    message: `Saved $${result.discountUsd?.toFixed(2)} (preview — applied at checkout)`,
+  };
 }

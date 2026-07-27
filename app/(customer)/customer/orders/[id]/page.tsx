@@ -3,16 +3,20 @@ import { redirect, notFound } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getOrderById } from "@/modules/orders/repository";
 import { getInvoicePaymentOptions } from "@/modules/payments/repository";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PayNowButton } from "@/components/payments/PayNowButton";
 import { CancelOrderButton } from "@/components/orders/CancelOrderButton";
+import { OrderConfirmationBanner } from "@/components/orders/OrderConfirmationBanner";
 import { Button } from "@/components/ui/Button";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ confirmed?: string }>;
+};
 
-export default async function CustomerOrderDetailPage({ params }: Props) {
+export default async function CustomerOrderDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { confirmed } = await searchParams;
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
@@ -30,8 +34,13 @@ export default async function CustomerOrderDetailPage({ params }: Props) {
 
       <div className="mt-4 flex flex-wrap items-center gap-4">
         <h1 className="font-heading text-3xl font-semibold">Order details</h1>
-        <StatusBadge status={order.status} />
       </div>
+
+      <OrderConfirmationBanner
+        status={order.status}
+        invoiceNumber={invoice?.invoice_number}
+        confirmed={confirmed === "1"}
+      />
 
       <dl className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-border bg-card/40 p-4">

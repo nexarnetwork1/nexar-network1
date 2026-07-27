@@ -81,6 +81,20 @@ function slugifyCategory(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
+function parseSpecifications(raw: FormDataEntryValue | null): Record<string, string> {
+  const text = String(raw ?? "").trim();
+  if (!text) return {};
+  const specs: Record<string, string> = {};
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const colon = trimmed.indexOf(":");
+    if (colon <= 0) continue;
+    specs[trimmed.slice(0, colon).trim()] = trimmed.slice(colon + 1).trim();
+  }
+  return specs;
+}
+
 export async function createCategoryAction(
   formData: FormData
 ): Promise<CatalogActionResult> {
@@ -244,6 +258,8 @@ export async function createProductAction(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  const specifications = parseSpecifications(formData.get("specifications"));
+
   let imageUrl: string | null = null;
   const imageFile = formData.get("image") as File | null;
   if (imageFile && imageFile.size > 0) {
@@ -264,6 +280,7 @@ export async function createProductAction(
       is_active: parsed.data.isActive,
       image_url: imageUrl,
       category_id: parsed.data.categoryId || null,
+      specifications,
     })
     .select("id")
     .single();
@@ -304,6 +321,8 @@ export async function updateProductAction(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  const specifications = parseSpecifications(formData.get("specifications"));
+
   let imageUrl: string | undefined;
   const imageFile = formData.get("image") as File | null;
   if (imageFile && imageFile.size > 0) {
@@ -320,6 +339,7 @@ export async function updateProductAction(
     currency: parsed.data.currency,
     stock: parsed.data.stock,
     is_active: parsed.data.isActive,
+    specifications,
   };
 
   if (parsed.data.categoryId) {
