@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { initiatePaymentAction } from "@/modules/payments/actions";
+import {
+  cryptoPaymentMethods,
+  initiatePaymentSchema,
+  type CryptoPaymentMethod,
+} from "@/modules/payments/validators";
 import { PaymentPopup } from "@/components/payments/PaymentPopup";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
@@ -14,14 +19,12 @@ type PayNowButtonProps = {
   amountUsd: number;
 };
 
-const CRYPTO_METHODS = ["NXR", "BNB", "USDT"] as const;
-
 export function PayNowButton({
   invoiceId,
   invoiceNumber,
   storeName,
 }: PayNowButtonProps) {
-  const [method, setMethod] = useState<string>("USDT");
+  const [method, setMethod] = useState<CryptoPaymentMethod>("USDT");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [session, setSession] = useState<PaymentSession | null>(null);
@@ -31,7 +34,17 @@ export function PayNowButton({
     setLoading(true);
     setError(null);
 
-    const result = await initiatePaymentAction(invoiceId, method);
+    const parsed = initiatePaymentSchema.safeParse({ invoiceId, method });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Invalid payment method");
+      setLoading(false);
+      return;
+    }
+
+    const result = await initiatePaymentAction(
+      parsed.data.invoiceId,
+      parsed.data.method
+    );
 
     if (!result.success || !result.sessionId) {
       setError(result.error ?? "Failed to start payment");
@@ -75,7 +88,7 @@ export function PayNowButton({
         <div className="rounded-xl border border-border bg-card/40 p-4">
           <p className="text-sm text-muted">Select payment method</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {CRYPTO_METHODS.map((m) => (
+            {cryptoPaymentMethods.map((m) => (
               <button
                 key={m}
                 type="button"

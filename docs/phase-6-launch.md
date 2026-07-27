@@ -2,15 +2,18 @@
 
 ## Completed in codebase
 
-- **Sentry** — optional error monitoring via `lib/monitoring/sentry.ts` (set `SENTRY_DSN`)
+- **Sentry** — `instrumentation.ts` + `lib/monitoring/sentry.ts` (set `SENTRY_DSN`)
 - **Global error boundary** — `app/global-error.tsx`
 - **Rate limiting** — middleware limits on auth, API, and webhook routes
-- **Health check** — `GET /api/health`
-- **CSP** — updated for payment QR images (`api.qrserver.com`)
+- **Health check** — `GET /api/health` with Supabase, payments, and monitoring checks
+- **Cron endpoint** — `GET /api/cron/expire-sessions` (Bearer `CRON_SECRET`)
+- **CSP** — no external QR API dependency (local `qrcode.react`)
 - **Netlify** — `@netlify/plugin-nextjs` configured in `netlify.toml`
 - **RLS audit script** — `scripts/rls-audit.sql`
-- **Security checklist** — `docs/security-checklist.md`
-- **Wallet & revenue pages** — customer wallet, merchant revenue (real data)
+- **Session expiry SQL** — `scripts/schedule-expire-sessions.sql`
+- **Security checklist** — `docs/security-checklist.md` (updated)
+- **Launch runbook** — `docs/launch-runbook.md`
+- **Prelaunch script** — `npm run prelaunch` (typecheck + lint + build)
 
 ## Production deployment
 
@@ -35,6 +38,7 @@ Critical:
 - `TREASURY_WALLET_ADDRESS`
 - `BSC_RPC_URL`
 - `SENTRY_DSN`
+- `CRON_SECRET`
 
 ### 3. Netlify
 
@@ -53,7 +57,7 @@ Deploy via Netlify with `netlify.toml` configuration.
 4. Activate test merchant store
 5. Run end-to-end payment test on BSC testnet or mainnet
 6. Monitor `/api/health` and Sentry dashboard
-7. Schedule `expire_stale_payment_sessions` cron in Supabase
+7. Schedule cron: `GET /api/cron/expire-sessions` every minute (see `docs/launch-runbook.md`)
 
 ## Load testing (manual)
 

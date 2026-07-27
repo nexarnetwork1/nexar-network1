@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/modules/users/repository";
 import { getOrCreateCart, getCartWithItems } from "@/modules/cart/repository";
 import { generateAndStoreInvoicePdf } from "@/modules/invoices/pdf";
+import { auditLogger } from "@/lib/logging/audit-logger";
 import type { ActionResult } from "@/modules/auth/actions";
 
 type CheckoutResult = ActionResult & {
@@ -47,6 +48,19 @@ export async function checkoutAction(): Promise<CheckoutResult> {
     };
 
     orderIds.push(result.order_id);
+
+    auditLogger.log({
+      action: "order.checkout",
+      entityType: "order",
+      entityId: result.order_id,
+      actorId: profile.id,
+      actorRole: profile.role,
+      metadata: {
+        store_id: storeId,
+        invoice_id: result.invoice_id,
+        invoice_number: result.invoice_number,
+      },
+    });
 
     try {
       await generateAndStoreInvoicePdf(result.invoice_id, profile.id);

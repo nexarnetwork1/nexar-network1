@@ -15,6 +15,8 @@ import {
   getTreasuryWallet,
 } from "@/modules/settlement/worker";
 import { getOrderById } from "@/modules/orders/repository";
+import { auditLogger } from "@/lib/logging/audit-logger";
+import { initiatePaymentSchema, verifyPaymentSchema } from "./validators";
 import type { CryptoAsset } from "@/lib/blockchain/bsc-client";
 import type { ActionResult } from "@/modules/auth/actions";
 
@@ -26,18 +28,20 @@ export async function initiatePaymentAction(
   invoiceId: string,
   method: string
 ): Promise<PaymentActionResult> {
-  await requireRole(["customer"]);
+  const profile = await requireRole(["customer"]);
 
-  const validMethods = ["NXR", "BNB", "USDT"];
-  if (!validMethods.includes(method)) {
-    return { success: false, error: "Invalid payment method" };
+  const parsed = initiatePaymentSchema.safeParse({ invoiceId, method });
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
+
+  const { invoiceId: validInvoiceId, method: validMethod } = parsed.data;
 
   const supabase = await createClient();
   const { data: invoice, error: invoiceError } = await supabase
     .from("invoices")
     .select("*")
-    .eq("id", invoiceId)
+    .eq("id", validInvoiceId)
     .single();
 
   if (invoiceError || !invoice) {
@@ -48,7 +52,7 @@ export async function initiatePaymentAction(
     return { success: false, error: "Invoice is not payable" };
   }
 
-  const rate = await getExchangeRate(method);
+  const rate = await getExchangeRate(validMethod);
   const cryptoAmount = usdToCrypto(Number(invoice.amount), rate);
 
   const sessionId = crypto.randomUUID();
@@ -59,24 +63,37 @@ export async function initiatePaymentAction(
   try {
     const derived = deriveSessionDepositAddress(sessionId);
     depositAddress = derived.address;
-    qrPayload = buildQrPayload(depositAddress, cryptoAmount, method as CryptoAsset);
+    qrPayload = buildQrPayload(depositAddress, cryptoAmount, validMethod as CryptoAsset);
   } catch {
     return { success: false, error: "Payment system not configured" };
   }
 
-  const { data, error } = await supabase.rpc("create_payment_session", {
+  const { error } = await supabase.rpc("create_payment_session", {
     p_session_id: sessionId,
-    p_invoice_id: invoiceId,
-    p_method: method,
+    p_invoice_id: validInvoiceId,
+    p_method: validMethod,
     p_deposit_address: depositAddress,
     p_qr_payload: qrPayload,
     p_crypto_amount: cryptoAmount,
-    p_currency: method,
+    p_currency: validMethod,
   });
 
   if (error) {
     return { success: false, error: error.message };
   }
+
+  auditLogger.log({
+    action: "payment.session.created",
+    entityType: "payment_session",
+    entityId: sessionId,
+    actorId: profile.id,
+    actorRole: profile.role,
+    metadata: {
+      invoice_id: validInvoiceId,
+      method: validMethod,
+      amount_usd: invoice.amount,
+    },
+  });
 
   revalidatePath(`/customer/orders/${invoice.order_id}`);
   return { success: true, sessionId };
@@ -85,13 +102,18 @@ export async function initiatePaymentAction(
 export async function verifyPaymentAction(
   sessionId: string
 ): Promise<PaymentActionResult> {
-  await requireRole(["customer"]);
+  const profile = await requireRole(["customer"]);
+
+  const parsed = verifyPaymentSchema.safeParse({ sessionId });
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
 
   const supabase = await createClient();
   const { data: session, error } = await supabase
     .from("payment_sessions")
     .select("*, invoice:invoices(*), order:orders(*)")
-    .eq("id", sessionId)
+    .eq("id", parsed.data.sessionId)
     .single();
 
   if (error || !session) {
@@ -124,13 +146,13 @@ export async function verifyPaymentAction(
     (await findIncomingTxHash(
       session.deposit_address as `0x${string}`,
       session.method as CryptoAsset
-    )) ?? `verified-${sessionId}`;
+    )) ?? `verified-${parsed.data.sessionId}`;
 
   const admin = createAdminClient();
   const { data: result, error: completeError } = await admin.rpc(
     "complete_payment",
     {
-      p_session_id: sessionId,
+      p_session_id: parsed.data.sessionId,
       p_tx_hash: txHash,
       p_verified_amount: received,
     }
@@ -151,10 +173,10 @@ export async function verifyPaymentAction(
 
   if (order && treasury && order.merchant_wallet_snapshot) {
     try {
-      const { privateKey } = deriveSessionDepositAddress(sessionId);
+      const { privateKey } = deriveSessionDepositAddress(parsed.data.sessionId);
       await executeSettlement({
         settlementId: settlement.settlement_id,
-        sessionId,
+        sessionId: parsed.data.sessionId,
         depositPrivateKey: privateKey,
         merchantWallet: order.merchant_wallet_snapshot as `0x${string}`,
         treasuryWallet: treasury,
@@ -164,9 +186,24 @@ export async function verifyPaymentAction(
       });
     } catch (err) {
       const { captureException } = await import("@/lib/monitoring/sentry");
-      await captureException(err, { sessionId, phase: "settlement" });
+      await captureException(err, { sessionId: parsed.data.sessionId, phase: "settlement" });
     }
   }
+
+  auditLogger.log({
+    action: "payment.completed",
+    entityType: "payment_session",
+    entityId: parsed.data.sessionId,
+    actorId: profile.id,
+    actorRole: profile.role,
+    metadata: {
+      order_id: session.order_id,
+      settlement_id: settlement.settlement_id,
+      tx_hash: txHash,
+      platform_fee: settlement.platform_fee,
+      merchant_amount: settlement.merchant_amount,
+    },
+  });
 
   revalidatePath(`/customer/orders/${session.order_id}`);
   revalidatePath("/customer/invoices");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/AuthCard";
@@ -8,23 +8,44 @@ import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
+import { useZodForm } from "@/hooks/useZodForm";
+import { merchantRegisterSchema, type MerchantRegisterInput } from "@/schemas";
 import { registerMerchantAction } from "@/modules/auth/actions";
+import { objectToFormData } from "@/utils/form-data";
 
 export default function MerchantRegisterPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const logoRef = useRef<HTMLInputElement>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useZodForm<MerchantRegisterInput>({
+    schema: merchantRegisterSchema,
+    defaultValues: {
+      merchantName: "",
+      storeName: "",
+      businessType: "",
+      email: "",
+      password: "",
+      walletAddress: "",
+      mode: "marketplace",
+    },
+  });
 
-    const result = await registerMerchantAction(new FormData(e.currentTarget));
+  async function onSubmit(data: MerchantRegisterInput) {
+    setServerError(null);
+
+    const formData = objectToFormData(data);
+    const logoFile = logoRef.current?.files?.[0];
+    if (logoFile) formData.set("logo", logoFile);
+
+    const result = await registerMerchantAction(formData);
 
     if (!result.success) {
-      setError(result.error ?? "Registration failed");
-      setLoading(false);
+      setServerError(result.error ?? "Registration failed");
       return;
     }
 
@@ -51,23 +72,50 @@ export default function MerchantRegisterPage() {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input name="merchantName" label="Merchant name" placeholder="Your business name" required />
-        <Input name="storeName" label="Store name" placeholder="My Store" required />
-        <Input name="businessType" label="Business type" placeholder="Retail, Services, etc." required />
-        <Input name="email" type="email" label="Email" placeholder="merchant@example.com" required />
-        <Input name="password" type="password" label="Password" placeholder="Min. 8 characters" required minLength={8} />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <Input
-          name="walletAddress"
+          {...register("merchantName")}
+          label="Merchant name"
+          placeholder="Your business name"
+          error={errors.merchantName?.message}
+        />
+        <Input
+          {...register("storeName")}
+          label="Store name"
+          placeholder="My Store"
+          error={errors.storeName?.message}
+        />
+        <Input
+          {...register("businessType")}
+          label="Business type"
+          placeholder="Retail, Services, etc."
+          error={errors.businessType?.message}
+        />
+        <Input
+          {...register("email")}
+          type="email"
+          label="Email"
+          placeholder="merchant@example.com"
+          error={errors.email?.message}
+        />
+        <Input
+          {...register("password")}
+          type="password"
+          label="Password"
+          placeholder="Min. 8 characters"
+          error={errors.password?.message}
+        />
+        <Input
+          {...register("walletAddress")}
           label="Wallet address (BSC)"
           placeholder="0x..."
-          required
           spellCheck={false}
+          error={errors.walletAddress?.message}
         />
         <Select
-          name="mode"
+          {...register("mode")}
           label="Store mode"
-          required
+          error={errors.mode?.message}
           options={[
             { value: "marketplace", label: "Marketplace — list products publicly" },
             { value: "payments_only", label: "Payments only — QR / invoice payments" },
@@ -78,6 +126,7 @@ export default function MerchantRegisterPage() {
             Logo (optional)
           </label>
           <input
+            ref={logoRef}
             id="logo"
             name="logo"
             type="file"
@@ -86,10 +135,10 @@ export default function MerchantRegisterPage() {
           />
         </div>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {serverError && <p className="text-sm text-red-400">{serverError}</p>}
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Creating account…" : "Create merchant account"}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Creating account…" : "Create merchant account"}
         </Button>
       </form>
 

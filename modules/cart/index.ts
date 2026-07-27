@@ -12,3 +12,4 @@ export {
 } from "./actions";
 
 export { addToCartSchema, updateCartItemSchema } from "./validators";
+export type { AddToCartInput, UpdateCartItemInput } from "./validators";

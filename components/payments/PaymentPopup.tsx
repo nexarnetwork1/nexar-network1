@@ -2,10 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { verifyPaymentAction } from "@/modules/payments/actions";
+import { PaymentQrCode } from "@/components/payments/PaymentQrCode";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
+import { truncateAddress } from "@/utils";
 import type { PaymentSession } from "@/types";
 
 type PaymentPopupProps = {
@@ -65,6 +68,7 @@ export function PaymentPopup({
           const updated = payload.new as PaymentSession;
           setSession(updated);
           if (updated.status === "paid") {
+            toast.success("Payment received");
             router.refresh();
           }
         }
@@ -85,6 +89,7 @@ export function PaymentPopup({
 
     if (result.success) {
       setSession((s) => ({ ...s, status: "paid" }));
+      toast.success("Payment confirmed");
       if (result.redirectTo) {
         router.push(result.redirectTo);
         router.refresh();
@@ -126,10 +131,7 @@ export function PaymentPopup({
         aria-labelledby="payment-popup-title"
         className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
       >
-        <CloseButton
-          onClick={onClose}
-          className="absolute right-4 top-4"
-        />
+        <CloseButton onClick={onClose} className="absolute right-4 top-4" />
 
         <h2 id="payment-popup-title" className="font-heading text-xl font-semibold text-gold">
           Pay invoice
@@ -169,16 +171,12 @@ export function PaymentPopup({
             <p className="mt-2 break-all font-mono text-xs text-gold-secondary">
               {session.deposit_address}
             </p>
+            <p className="mt-1 text-xs text-muted">
+              {truncateAddress(session.deposit_address, 6)}
+            </p>
             {session.qr_payload && (
               <div className="mt-4 flex justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(session.qr_payload)}`}
-                  alt="Payment QR code"
-                  width={180}
-                  height={180}
-                  className="rounded-lg"
-                />
+                <PaymentQrCode value={session.qr_payload} />
               </div>
             )}
           </div>

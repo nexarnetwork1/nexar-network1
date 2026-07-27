@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { searchMarketplaceProducts } from "@/modules/catalog/repository";
+import { productSearchSchema } from "@/modules/catalog/validators";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 type Props = {
@@ -7,16 +8,20 @@ type Props = {
 };
 
 export default async function BrowsePage({ searchParams }: Props) {
-  const params = await searchParams;
-  const page = Number(params.page ?? 1);
-
-  const { products, total } = await searchMarketplaceProducts({
-    q: params.q,
-    page,
+  const rawParams = await searchParams;
+  const parsed = productSearchSchema.safeParse({
+    q: rawParams.q,
+    page: rawParams.page,
     limit: 20,
   });
 
-  const totalPages = Math.ceil(total / 20);
+  const { q, page, limit } = parsed.success
+    ? parsed.data
+    : { q: undefined, page: 1, limit: 20 };
+
+  const { products, total } = await searchMarketplaceProducts({ q, page, limit });
+
+  const totalPages = Math.ceil(total / limit);
 
   return (
     <div>
@@ -27,7 +32,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         <input
           name="q"
           type="search"
-          defaultValue={params.q ?? ""}
+          defaultValue={q ?? ""}
           placeholder="Search products…"
           className="flex-1 rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm text-white outline-none focus:border-gold/40"
         />
@@ -86,7 +91,7 @@ export default async function BrowsePage({ searchParams }: Props) {
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Link
               key={p}
-              href={`/customer/browse?page=${p}${params.q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
+              href={`/customer/browse?page=${p}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
               className={`rounded-lg px-3 py-1 text-sm ${
                 p === page
                   ? "bg-gold text-background"

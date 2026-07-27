@@ -3,50 +3,99 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useZodForm } from "@/hooks/useZodForm";
+import { addToCartSchema } from "@/modules/cart/validators";
 import { addToCartAction } from "@/modules/cart/actions";
+import { objectToFormData } from "@/utils/form-data";
+import type { ZodSchema } from "zod";
+import { z } from "zod";
+
+const addToCartFormSchema = addToCartSchema;
+type AddToCartFormInput = z.infer<typeof addToCartFormSchema>;
 
 type AddToCartButtonProps = {
   productId: string;
   stock: number;
   disabled?: boolean;
+  showQuantity?: boolean;
 };
 
-export function AddToCartButton({ productId, stock, disabled }: AddToCartButtonProps) {
+export function AddToCartButton({
+  productId,
+  stock,
+  disabled,
+  showQuantity = false,
+}: AddToCartButtonProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  async function handleAdd() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useZodForm<AddToCartFormInput>({
+    schema: addToCartFormSchema as ZodSchema<AddToCartFormInput>,
+    defaultValues: { productId, quantity: 1 },
+  });
+
+  async function onSubmit(data: AddToCartFormInput) {
     if (stock < 1) return;
-    setLoading(true);
-    setError(null);
+    setServerError(null);
 
-    const formData = new FormData();
-    formData.set("productId", productId);
-    formData.set("quantity", "1");
-
-    const result = await addToCartAction(formData);
+    const result = await addToCartAction(objectToFormData(data));
 
     if (!result.success) {
-      setError(result.error ?? "Failed to add to cart");
-      setLoading(false);
+      setServerError(result.error ?? "Failed to add to cart");
       return;
     }
 
     router.refresh();
-    setLoading(false);
+  }
+
+  if (stock < 1) {
+    return (
+      <Button type="button" disabled>
+        Out of stock
+      </Button>
+    );
+  }
+
+  if (!showQuantity) {
+    async function handleQuickAdd() {
+      await onSubmit({ productId, quantity: 1 });
+    }
+
+    return (
+      <div>
+        <Button
+          type="button"
+          onClick={handleQuickAdd}
+          disabled={disabled || isSubmitting}
+        >
+          {isSubmitting ? "Adding…" : "Add to cart"}
+        </Button>
+        {serverError && <p className="mt-2 text-sm text-red-400">{serverError}</p>}
+      </div>
+    );
   }
 
   return (
-    <div>
-      <Button
-        type="button"
-        onClick={handleAdd}
-        disabled={disabled || loading || stock < 1}
-      >
-        {stock < 1 ? "Out of stock" : loading ? "Adding…" : "Add to cart"}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex items-end gap-2" noValidate>
+      <input type="hidden" {...register("productId")} />
+      <Input
+        {...register("quantity", { valueAsNumber: true })}
+        type="number"
+        min={1}
+        max={Math.min(stock, 99)}
+        label="Qty"
+        className="w-20"
+        error={errors.quantity?.message}
+      />
+      <Button type="submit" disabled={disabled || isSubmitting}>
+        {isSubmitting ? "Adding…" : "Add to cart"}
       </Button>
-      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
-    </div>
+      {serverError && <p className="text-sm text-red-400">{serverError}</p>}
+    </form>
   );
 }

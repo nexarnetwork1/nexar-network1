@@ -40,6 +40,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | [docs/payment-flow.md](docs/payment-flow.md) | Payment sequence |
 | [docs/security-checklist.md](docs/security-checklist.md) | Production checklist |
 | [docs/phase-6-launch.md](docs/phase-6-launch.md) | Deployment guide |
+| [docs/launch-runbook.md](docs/launch-runbook.md) | Production runbook |
 
 ## Key routes
 
@@ -62,6 +63,23 @@ WHERE email = 'your@email.com';
 
 ```
 GET /api/health
+```
+
+Returns `healthy`, `degraded`, or `unhealthy` with per-service checks (Supabase, payments, monitoring).
+
+## Cron (payment session expiry)
+
+```
+GET /api/cron/expire-sessions
+Authorization: Bearer <CRON_SECRET>
+```
+
+Schedule every minute in production. See [docs/launch-runbook.md](docs/launch-runbook.md).
+
+## Pre-launch validation
+
+```bash
+npm run prelaunch   # typecheck + lint + build
 ```
 
 ## License

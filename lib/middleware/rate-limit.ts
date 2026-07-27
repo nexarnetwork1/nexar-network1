@@ -15,6 +15,10 @@ export function applyRateLimit(request: NextRequest): Response | null {
   const ip = getClientIp(request);
   const { pathname } = request.nextUrl;
 
+  if (pathname.startsWith("/api/cron")) {
+    return null;
+  }
+
   if (pathname.startsWith("/api/webhooks")) {
     const { allowed } = rateLimit(`webhook:${ip}`, "api");
     if (!allowed) {

@@ -34,14 +34,19 @@ export const merchantRegisterSchema = z.object({
   mode: z.enum(["marketplace", "payments_only"]),
 });
 
+const optionalText = z
+  .string()
+  .optional()
+  .transform((value) => (value?.trim() ? value.trim() : undefined));
+
 export const completeProfileSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100),
   walletAddress: z
     .string()
     .regex(walletRegex, "Invalid BSC wallet address"),
   role: z.enum(["customer", "merchant"]).optional(),
-  storeName: z.string().min(2).max(100).optional(),
-  businessType: z.string().min(2).max(100).optional(),
+  storeName: optionalText.pipe(z.string().min(2).max(100).optional()),
+  businessType: optionalText.pipe(z.string().min(2).max(100).optional()),
   mode: z.enum(["marketplace", "payments_only"]).optional(),
 }).refine(
   (data) => {

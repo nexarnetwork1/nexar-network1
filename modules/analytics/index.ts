@@ -1,2 +1,2 @@
-export { getPlatformStats } from "./repository";
-export type { PlatformStats } from "./repository";
+export { getPlatformStats, getMonthlyRevenue } from "./repository";
+export type { PlatformStats, MonthlyRevenue } from "./repository";

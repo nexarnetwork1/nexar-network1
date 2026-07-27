@@ -7,7 +7,10 @@ import { AuthCard } from "@/components/auth/AuthCard";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { useZodForm } from "@/hooks/useZodForm";
+import { loginSchema, type LoginInput } from "@/schemas";
 import { loginAction } from "@/modules/auth/actions";
+import { objectToFormData } from "@/utils/form-data";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -15,22 +18,27 @@ export default function LoginForm() {
   const redirect = searchParams.get("redirect") ?? undefined;
   const message = searchParams.get("message");
 
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useZodForm<LoginInput>({
+    schema: loginSchema,
+    defaultValues: { email: "", password: "" },
+  });
 
-    const formData = new FormData(e.currentTarget);
+  async function onSubmit(data: LoginInput) {
+    setServerError(null);
+
+    const formData = objectToFormData(data);
     if (redirect) formData.set("redirect", redirect);
 
     const result = await loginAction(formData);
 
     if (!result.success) {
-      setError(result.error ?? "Login failed");
-      setLoading(false);
+      setServerError(result.error ?? "Login failed");
       return;
     }
 
@@ -54,28 +62,28 @@ export default function LoginForm() {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <Input
-          name="email"
+          {...register("email")}
           type="email"
           label="Email"
           placeholder="you@example.com"
-          required
           autoComplete="email"
+          error={errors.email?.message}
         />
         <Input
-          name="password"
+          {...register("password")}
           type="password"
           label="Password"
           placeholder="••••••••"
-          required
           autoComplete="current-password"
+          error={errors.password?.message}
         />
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {serverError && <p className="text-sm text-red-400">{serverError}</p>}
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Signing in…" : "Sign in"}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
       </form>
 

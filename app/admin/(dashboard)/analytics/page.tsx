@@ -1,9 +1,13 @@
-import { getPlatformStats } from "@/modules/analytics/repository";
+import { getPlatformStats, getMonthlyRevenue } from "@/modules/analytics/repository";
 import { getAllSettlements } from "@/modules/platform/repository";
+import { RevenueChart } from "@/components/admin/RevenueChart";
 
 export default async function AdminAnalyticsPage() {
-  const stats = await getPlatformStats();
-  const settlements = await getAllSettlements();
+  const [stats, settlements, monthlyRevenue] = await Promise.all([
+    getPlatformStats(),
+    getAllSettlements(),
+    getMonthlyRevenue(6),
+  ]);
 
   const completedSettlements = settlements.filter((s) => s.status === "completed");
   const failedSettlements = settlements.filter((s) => s.status === "failed");
@@ -12,6 +16,11 @@ export default async function AdminAnalyticsPage() {
     <div>
       <h1 className="text-3xl font-bold text-yellow-400">Analytics</h1>
       <p className="mt-2 text-zinc-400">Platform performance overview</p>
+
+      <section className="mt-8">
+        <h2 className="mb-4 text-lg font-semibold">Revenue & fees (6 months)</h2>
+        <RevenueChart data={monthlyRevenue} />
+      </section>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Total revenue (paid orders)" value={`$${stats.totalRevenue.toFixed(2)}`} />
@@ -22,11 +31,14 @@ export default async function AdminAnalyticsPage() {
         <StatCard label="Active stores" value={String(stats.activeStores)} />
         <StatCard label="Completed settlements" value={String(completedSettlements.length)} />
         <StatCard label="Failed settlements" value={String(failedSettlements.length)} />
-        <StatCard label="Payment success rate" value={
-          stats.totalPayments > 0
-            ? `${Math.round((stats.paidPayments / stats.totalPayments) * 100)}%`
-            : "—"
-        } />
+        <StatCard
+          label="Payment success rate"
+          value={
+            stats.totalPayments > 0
+              ? `${Math.round((stats.paidPayments / stats.totalPayments) * 100)}%`
+              : "—"
+          }
+        />
       </div>
     </div>
   );

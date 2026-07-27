@@ -7,23 +7,36 @@ import { AuthCard } from "@/components/auth/AuthCard";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { useZodForm } from "@/hooks/useZodForm";
+import { customerRegisterSchema, type CustomerRegisterInput } from "@/schemas";
 import { registerCustomerAction } from "@/modules/auth/actions";
+import { objectToFormData } from "@/utils/form-data";
 
 export default function CustomerRegisterPage() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useZodForm<CustomerRegisterInput>({
+    schema: customerRegisterSchema,
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      walletAddress: "",
+    },
+  });
 
-    const result = await registerCustomerAction(new FormData(e.currentTarget));
+  async function onSubmit(data: CustomerRegisterInput) {
+    setServerError(null);
+
+    const result = await registerCustomerAction(objectToFormData(data));
 
     if (!result.success) {
-      setError(result.error ?? "Registration failed");
-      setLoading(false);
+      setServerError(result.error ?? "Registration failed");
       return;
     }
 
@@ -50,22 +63,39 @@ export default function CustomerRegisterPage() {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input name="fullName" label="Full name" placeholder="John Doe" required />
-        <Input name="email" type="email" label="Email" placeholder="you@example.com" required />
-        <Input name="password" type="password" label="Password" placeholder="Min. 8 characters" required minLength={8} />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <Input
-          name="walletAddress"
+          {...register("fullName")}
+          label="Full name"
+          placeholder="John Doe"
+          error={errors.fullName?.message}
+        />
+        <Input
+          {...register("email")}
+          type="email"
+          label="Email"
+          placeholder="you@example.com"
+          error={errors.email?.message}
+        />
+        <Input
+          {...register("password")}
+          type="password"
+          label="Password"
+          placeholder="Min. 8 characters"
+          error={errors.password?.message}
+        />
+        <Input
+          {...register("walletAddress")}
           label="Wallet address (BSC)"
           placeholder="0x..."
-          required
           spellCheck={false}
+          error={errors.walletAddress?.message}
         />
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {serverError && <p className="text-sm text-red-400">{serverError}</p>}
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Creating account…" : "Create customer account"}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Creating account…" : "Create customer account"}
         </Button>
       </form>
 

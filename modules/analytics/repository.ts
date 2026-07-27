@@ -16,16 +16,17 @@ export type PlatformStats = {
   paidPayments: number;
 };
 
+export type MonthlyRevenue = {
+  month: string;
+  revenue: number;
+  fees: number;
+  orders: number;
+};
+
 export async function getPlatformStats(): Promise<PlatformStats> {
   const admin = createAdminClient();
 
-  const [
-    profiles,
-    stores,
-    orders,
-    settlements,
-    payments,
-  ] = await Promise.all([
+  const [profiles, stores, orders, settlements, payments] = await Promise.all([
     admin.from("profiles").select("role", { count: "exact", head: false }),
     admin.from("stores").select("status"),
     admin.from("orders").select("status, subtotal, platform_fee"),
@@ -58,4 +59,38 @@ export async function getPlatformStats(): Promise<PlatformStats> {
     totalPayments: paymentData.length,
     paidPayments: paymentData.filter((p) => p.status === "paid").length,
   };
+}
+
+export async function getMonthlyRevenue(months = 6): Promise<MonthlyRevenue[]> {
+  const admin = createAdminClient();
+  const since = new Date();
+  since.setMonth(since.getMonth() - months);
+
+  const { data: orders } = await admin
+    .from("orders")
+    .select("subtotal, platform_fee, paid_at, created_at, status")
+    .eq("status", "paid")
+    .gte("paid_at", since.toISOString())
+    .order("paid_at", { ascending: true });
+
+  const buckets = new Map<string, MonthlyRevenue>();
+
+  for (const order of orders ?? []) {
+    const date = new Date(order.paid_at ?? order.created_at);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+    const existing = buckets.get(key) ?? {
+      month: key,
+      revenue: 0,
+      fees: 0,
+      orders: 0,
+    };
+
+    existing.revenue += Number(order.subtotal);
+    existing.fees += Number(order.platform_fee);
+    existing.orders += 1;
+    buckets.set(key, existing);
+  }
+
+  return Array.from(buckets.values()).sort((a, b) => a.month.localeCompare(b.month));
 }

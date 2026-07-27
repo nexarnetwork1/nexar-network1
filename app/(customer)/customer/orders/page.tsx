@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerOrders } from "@/modules/orders/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { formatDate } from "@/utils/format";
 
 export default async function CustomerOrdersPage() {
   const profile = await getCurrentProfile();
@@ -50,7 +51,7 @@ export default async function CustomerOrdersPage() {
                     <StatusBadge status={order.status} />
                   </td>
                   <td className="px-4 py-3 text-muted">
-                    {new Date(order.created_at).toLocaleDateString()}
+                    {formatDate(order.created_at)}
                   </td>
                 </tr>
               ))}

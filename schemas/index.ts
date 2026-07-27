@@ -18,3 +18,35 @@ export {
   idParamSchema,
   type PaginationInput,
 } from "./common";
+
+export {
+  productSchema,
+  productSearchSchema,
+  type ProductInput,
+  type ProductSearchInput,
+} from "@/modules/catalog/validators";
+
+export {
+  addToCartSchema,
+  updateCartItemSchema,
+  type AddToCartInput,
+  type UpdateCartItemInput,
+} from "@/modules/cart/validators";
+
+export {
+  initiatePaymentSchema,
+  verifyPaymentSchema,
+  cryptoPaymentMethods,
+  type InitiatePaymentInput,
+  type VerifyPaymentInput,
+  type CryptoPaymentMethod,
+} from "@/modules/payments/validators";
+
+export {
+  platformSettingsSchema,
+  feeScheduleSchema,
+  exchangeRateSchema,
+  type PlatformSettingsInput,
+  type FeeScheduleInput,
+  type ExchangeRateInput,
+} from "@/modules/platform/validators";

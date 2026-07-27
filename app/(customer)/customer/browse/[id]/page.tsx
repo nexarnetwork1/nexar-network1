@@ -54,6 +54,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <AddToCartButton
               productId={product.id}
               stock={product.stock}
+              showQuantity
             />
           </div>
         </div>
