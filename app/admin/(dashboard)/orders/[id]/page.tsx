@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
-import { getCurrentProfile } from "@/modules/users/repository";
+import { notFound } from "next/navigation";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { getOrderById } from "@/modules/orders/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
@@ -9,8 +9,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function AdminOrderDetailPage({ params }: Props) {
   const { id } = await params;
-  const profile = await getCurrentProfile();
-  if (!profile || profile.role !== "admin") redirect("/login");
+  await requireSuperAdmin();
 
   const order = await getOrderById(id);
   if (!order) notFound();

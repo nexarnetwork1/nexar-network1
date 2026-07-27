@@ -11,7 +11,11 @@ export type SuperAdminSession = {
 };
 
 function sessionSecret(): string {
-  return env.CRON_SECRET ?? env.SUPABASE_SERVICE_ROLE_KEY ?? "dev-only-secret";
+  if (env.CRON_SECRET) return env.CRON_SECRET;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("CRON_SECRET is required for super admin sessions in production");
+  }
+  return "dev-only-secret";
 }
 
 export function normalizeWalletAddress(address: string): Address {

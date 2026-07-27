@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { getCurrentProfile } from "@/modules/users/repository";
 import { getAllInvoices } from "@/modules/invoices/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminInvoicesPage() {
-  const profile = await getCurrentProfile();
-  if (!profile || profile.role !== "admin") redirect("/login");
+  await requireSuperAdmin();
 
   const invoices = await getAllInvoices();
 

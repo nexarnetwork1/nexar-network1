@@ -10,16 +10,12 @@ import {
   buildQrPayload,
 } from "@/lib/blockchain/deposit";
 import { verifyCryptoPayment, findIncomingTxHash } from "@/lib/blockchain/verify-payment";
-import {
-  executeSettlement,
-  getTreasuryWallet,
-} from "@/modules/settlement/worker";
-import { getOrderById } from "@/modules/orders/repository";
 import { auditLogger } from "@/lib/logging/audit-logger";
+import { canCompletePaymentSession } from "@/lib/payments/guards";
+import { finalizeCryptoPayment } from "@/lib/payments/finalize-crypto-payment";
 import { initiatePaymentSchema, verifyPaymentSchema } from "./validators";
 import { getInvoicePaymentOptions } from "./repository";
 import { getStripe, isStripeConfigured } from "@/lib/stripe/server";
-import { notifyPaymentCompleted } from "./notify";
 import type { CryptoAsset } from "@/lib/blockchain/bsc-client";
 import type { ActionResult } from "@/modules/auth/actions";
 
@@ -222,12 +218,19 @@ export async function verifyPaymentAction(
     return { success: true, redirectTo: `/customer/orders/${session.order_id}` };
   }
 
-  if (session.status !== "waiting") {
-    return { success: false, error: `Payment ${session.status}` };
+  const guard = canCompletePaymentSession({
+    status: session.status,
+    expiresAt: session.expires_at,
+  });
+  if (!guard.valid) {
+    return { success: false, error: guard.reason };
   }
 
-  if (new Date(session.expires_at) < new Date()) {
-    return { success: false, error: "Payment expired" };
+  const order = session.order as { customer_id?: string } | null;
+  const invoice = session.invoice as { customer_id?: string } | null;
+  const customerId = order?.customer_id ?? invoice?.customer_id;
+  if (customerId !== profile.id) {
+    return { success: false, error: "Unauthorized" };
   }
 
   const { verified, received } = await verifyCryptoPayment(
@@ -246,46 +249,14 @@ export async function verifyPaymentAction(
       session.method as CryptoAsset
     )) ?? `verified-${parsed.data.sessionId}`;
 
-  const admin = createAdminClient();
-  const { data: result, error: completeError } = await admin.rpc(
-    "complete_payment",
-    {
-      p_session_id: parsed.data.sessionId,
-      p_tx_hash: txHash,
-      p_verified_amount: received,
-    }
-  );
+  const finalized = await finalizeCryptoPayment({
+    sessionId: parsed.data.sessionId,
+    txHash,
+    verifiedAmount: received,
+  });
 
-  if (completeError) {
-    return { success: false, error: completeError.message };
-  }
-
-  const settlement = result as {
-    settlement_id: string;
-    platform_fee: number;
-    merchant_amount: number;
-  };
-
-  const order = await getOrderById(session.order_id);
-  const treasury = await getTreasuryWallet();
-
-  if (order && treasury && order.merchant_wallet_snapshot) {
-    try {
-      const { privateKey } = deriveSessionDepositAddress(parsed.data.sessionId);
-      await executeSettlement({
-        settlementId: settlement.settlement_id,
-        sessionId: parsed.data.sessionId,
-        depositPrivateKey: privateKey,
-        merchantWallet: order.merchant_wallet_snapshot as `0x${string}`,
-        treasuryWallet: treasury,
-        platformFeeUsd: settlement.platform_fee,
-        merchantAmountUsd: settlement.merchant_amount,
-        asset: session.method as CryptoAsset,
-      });
-    } catch (err) {
-      const { captureException } = await import("@/lib/monitoring/sentry");
-      await captureException(err, { sessionId: parsed.data.sessionId, phase: "settlement" });
-    }
+  if (!finalized.success) {
+    return { success: false, error: finalized.error };
   }
 
   auditLogger.log({
@@ -295,23 +266,13 @@ export async function verifyPaymentAction(
     actorId: profile.id,
     actorRole: profile.role,
     metadata: {
-      order_id: session.order_id,
-      settlement_id: settlement.settlement_id,
-      tx_hash: txHash,
-      platform_fee: settlement.platform_fee,
-      merchant_amount: settlement.merchant_amount,
+      order_id: finalized.orderId,
+      settlement_id: finalized.settlementId,
+      tx_hash: finalized.txHash,
+      platform_fee: finalized.platformFee,
+      merchant_amount: finalized.merchantAmount,
     },
   });
-
-  const orderForNotify = order ?? (await getOrderById(session.order_id));
-  if (orderForNotify) {
-    await notifyPaymentCompleted({
-      sessionId: parsed.data.sessionId,
-      orderId: session.order_id,
-      amountUsd: Number(session.amount_usd),
-      merchantAmount: settlement.merchant_amount,
-    });
-  }
 
   revalidatePath(`/customer/orders/${session.order_id}`);
   revalidatePath("/customer/invoices");

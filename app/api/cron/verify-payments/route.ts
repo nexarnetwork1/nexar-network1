@@ -4,6 +4,7 @@ import { verifyCryptoPayment, findIncomingTxHash } from "@/lib/blockchain/verify
 import { verifyCronSecret, cronUnauthorizedResponse } from "@/lib/security/cron-auth";
 import { paymentLogger } from "@/lib/logging/payment-logger";
 import { notifyAdminAlert } from "@/lib/monitoring/alerts";
+import { finalizeCryptoPayment } from "@/lib/payments/finalize-crypto-payment";
 import type { CryptoAsset } from "@/lib/blockchain/bsc-client";
 
 export async function GET(request: Request) {
@@ -49,17 +50,17 @@ export async function GET(request: Request) {
           session.method as CryptoAsset
         )) ?? `cron-verified-${session.id}`;
 
-      const { error: completeError } = await admin.rpc("complete_payment", {
-        p_session_id: session.id,
-        p_tx_hash: txHash,
-        p_verified_amount: Number(session.amount),
+      const finalized = await finalizeCryptoPayment({
+        sessionId: session.id,
+        txHash,
+        verifiedAmount: Number(session.amount),
       });
 
-      if (completeError) {
+      if (!finalized.success) {
         failures += 1;
         paymentLogger.warn("complete_payment RPC failed", {
           sessionId: session.id,
-          error: completeError.message,
+          error: finalized.error,
         });
         continue;
       }

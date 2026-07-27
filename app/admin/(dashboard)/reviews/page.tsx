@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { getAllReviewsForModeration } from "@/modules/reviews/repository";
 import { moderateReviewAction } from "@/modules/reviews/actions";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +15,7 @@ async function rejectReview(formData: FormData) {
 }
 
 export default async function AdminReviewsPage() {
+  await requireSuperAdmin();
   const { productReviews, storeReviews } = await getAllReviewsForModeration(30);
 
   return (

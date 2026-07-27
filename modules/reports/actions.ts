@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireRole } from "@/modules/users/repository";
+import { requireRole, requireSuperAdmin } from "@/modules/users/repository";
 import { dispatchNotification } from "@/modules/notifications/dispatch";
 import type { ActionResult } from "@/modules/auth/actions";
 import type { ReportTarget } from "@/types";
@@ -50,7 +50,7 @@ export async function reportContentAction(formData: FormData): Promise<ActionRes
 }
 
 export async function resolveReportAction(formData: FormData): Promise<ActionResult> {
-  const profile = await requireRole(["admin"]);
+  await requireSuperAdmin();
   const reportId = formData.get("reportId");
   const status = formData.get("status");
 
@@ -63,7 +63,7 @@ export async function resolveReportAction(formData: FormData): Promise<ActionRes
     .from("content_reports")
     .update({
       status,
-      reviewed_by: profile.id,
+      reviewed_by: null,
       reviewed_at: new Date().toISOString(),
     })
     .eq("id", reportId);

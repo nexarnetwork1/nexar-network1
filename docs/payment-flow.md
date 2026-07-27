@@ -11,13 +11,14 @@ Customer clicks Pay
   → Payment popup opens (QR, amount, countdown, status)
 
 Customer pays (crypto or card)
-  → Verification (chain watcher or Stripe webhook)
+  → Verification (chain watcher cron, manual verify, or Stripe webhook)
   → Fee calculated (with promotion if applicable)
-  → Platform fee → Treasury wallet
-  → Net amount → Merchant wallet
+  → Platform fee recorded → Treasury ledger (on-chain via settlement worker)
+  → Merchant amount held in escrow (DB)
   → Invoice updated (paid)
   → Order updated (paid)
-  → Settlement record completed
+  → Settlement record pending
+  → On-chain payout after escrow release (retry-settlements cron)
   → Audit log written
   → Realtime pushes status to popup
 ```

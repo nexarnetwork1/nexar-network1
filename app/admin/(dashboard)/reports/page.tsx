@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { getAllReports } from "@/modules/reports/repository";
 import { resolveReportAction } from "@/modules/reports/actions";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +15,7 @@ async function dismissReport(formData: FormData) {
 }
 
 export default async function AdminReportsPage() {
+  await requireSuperAdmin();
   const reports = await getAllReports(50);
   const pending = reports.filter((r) => r.status === "pending");
 

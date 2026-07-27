@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireRole } from "@/modules/users/repository";
+import { requireRole, requireSuperAdmin } from "@/modules/users/repository";
 import { dispatchNotification } from "@/modules/notifications/dispatch";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -160,7 +160,7 @@ export async function merchantReplyReviewAction(formData: FormData): Promise<Act
 }
 
 export async function moderateReviewAction(formData: FormData): Promise<ActionResult> {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const reviewId = formData.get("reviewId");
   const reviewType = formData.get("reviewType");
   const status = formData.get("status");

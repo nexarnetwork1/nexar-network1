@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getDashboardPath } from "@/lib/auth/redirect";
+import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
 import {
   loginSchema,
   customerRegisterSchema,
@@ -109,7 +109,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
 
   const redirectParam = formData.get("redirect") as string | null;
   const redirectTo =
-    redirectParam && redirectParam.startsWith("/")
+    redirectParam && isValidRedirect(redirectParam)
       ? redirectParam
       : getDashboardPath(profile?.role);
 

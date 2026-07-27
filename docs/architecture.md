@@ -21,6 +21,8 @@ Production fintech + crypto payment ecosystem on Next.js App Router and Supabase
 | Cards | Stripe Connect |
 | Realtime | Supabase Realtime (payment popup status) |
 
+See also: [Smart Contract Integration Guide](./smart-contract-integration.md), [Payment Flow](./payment-flow.md).
+
 ## Pattern: Modular Monolith
 
 Domain logic lives in `modules/`. Each module owns types, validators, repository, service, and server actions. UI in `app/` and `components/` stays thin.
