@@ -92,6 +92,26 @@ export async function searchMarketplaceProducts(
     query = query.eq("is_on_sale", true);
   }
 
+  if (input.currency) {
+    query = query.eq("currency", input.currency.toUpperCase());
+  }
+
+  if (input.minPrice != null) {
+    query = query.gte("price", input.minPrice);
+  }
+
+  if (input.maxPrice != null) {
+    query = query.lte("price", input.maxPrice);
+  }
+
+  if (input.inStock) {
+    query = query.gt("stock", 0);
+  }
+
+  if (input.merchantSlug) {
+    query = query.eq("store.slug", input.merchantSlug);
+  }
+
   if (input.q?.trim()) {
     query = query.textSearch("search_vector", input.q.trim(), {
       type: "websearch",
@@ -108,6 +128,10 @@ export async function searchMarketplaceProducts(
       break;
     case "name":
       query = query.order("name", { ascending: true });
+      break;
+    case "featured":
+    case "best_selling":
+      query = query.order("created_at", { ascending: false });
       break;
     default:
       query = query.order("created_at", { ascending: false });

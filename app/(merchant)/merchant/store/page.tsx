@@ -4,6 +4,7 @@ import { getMerchantStore, getStoreSettings, getStoreQrCodes } from "@/modules/s
 import { getActiveStorePromotion } from "@/modules/promotions/repository";
 import { StoreQrCodes } from "@/components/merchant/StoreQrCodes";
 import { StoreSettingsForm } from "@/components/merchant/StoreSettingsForm";
+import { StoreMarketplaceProfileForm } from "@/components/merchant/StoreMarketplaceProfileForm";
 import { formatDate } from "@/utils/format";
 
 export default async function MerchantStorePage() {
@@ -50,6 +51,13 @@ export default async function MerchantStorePage() {
           <dd className="mt-1 break-all font-mono text-sm">{store.wallet_address}</dd>
         </div>
       </dl>
+
+      {settings && store.mode === "marketplace" && (
+        <>
+          <h2 className="mt-10 font-heading text-lg font-semibold">Storefront</h2>
+          <StoreMarketplaceProfileForm settings={settings} />
+        </>
+      )}
 
       {settings && (
         <>

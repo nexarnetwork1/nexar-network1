@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateCartItemAction, removeCartItemAction } from "@/modules/cart/actions";
 import { updateCartItemSchema } from "@/modules/cart/validators";
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 import type { CartItemWithProduct } from "@/types";
 
 type CartItemRowProps = {
@@ -75,10 +77,17 @@ export function CartItemRow({ item }: CartItemRowProps) {
 
       <div className="flex flex-1 flex-col justify-between">
         <div>
-          <p className="text-xs text-muted">{item.product.store.name}</p>
+          <Link href={`/store/${item.product.store.slug}`} className="flex items-center gap-2 text-xs text-muted hover:text-gold">
+            {item.product.store.logo_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={item.product.store.logo_url} alt="" className="h-4 w-4 rounded-full object-cover" />
+            )}
+            {item.product.store.name}
+          </Link>
           <h3 className="font-medium">{item.product.name}</h3>
-          <p className="mt-1 text-sm text-gold">
-            {item.product.currency} {Number(item.product.price).toFixed(2)}
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-gold">
+            <CurrencyLogo code={item.product.currency} size={16} />
+            {Number(item.product.price).toFixed(2)}
           </p>
         </div>
 
@@ -117,8 +126,9 @@ export function CartItemRow({ item }: CartItemRowProps) {
       </div>
 
       <div className="text-right">
-        <p className="font-medium">
-          {item.product.currency} {lineTotal.toFixed(2)}
+        <p className="flex items-center justify-end gap-1 font-medium">
+          <CurrencyLogo code={item.product.currency} size={16} showLabel={false} />
+          {lineTotal.toFixed(2)}
         </p>
       </div>
     </div>

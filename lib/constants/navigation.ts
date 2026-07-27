@@ -6,7 +6,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Founder", href: "#founder" },
   { label: "Whitepaper", href: "#whitepaper" },
   { label: "Market", href: "/market" },
-  { label: "Marketplace", href: "/marketplace" },
+  { label: "Marketplace", href: "/marketplace/stores" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -16,7 +16,7 @@ export const FOOTER_LINKS = {
     { label: "Founder", href: "#founder" },
     { label: "Whitepaper", href: "#whitepaper" },
     { label: "Market", href: "/market" },
-    { label: "Marketplace", href: "/marketplace" },
+    { label: "Marketplace", href: "/marketplace/stores" },
     { label: "Contact", href: "/contact" },
   ],
 resources: [

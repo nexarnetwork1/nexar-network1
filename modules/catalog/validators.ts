@@ -32,11 +32,21 @@ export const productSearchSchema = z.object({
   q: z.string().max(200).optional(),
   storeSlug: z.string().max(100).optional(),
   categorySlug: z.string().max(100).optional(),
-  sort: z.enum(["newest", "price_asc", "price_desc", "name"]).default("newest"),
+  sort: z
+    .enum(["newest", "price_asc", "price_desc", "name", "best_selling", "featured"])
+    .default("newest"),
   onSale: z.preprocess(
     (val) => val === "true" || val === true,
     z.boolean().default(false)
   ),
+  currency: z.string().length(3).optional(),
+  minPrice: z.coerce.number().min(0).optional(),
+  maxPrice: z.coerce.number().optional(),
+  inStock: z.preprocess(
+    (val) => val === "true" || val === true,
+    z.boolean().default(false)
+  ),
+  merchantSlug: z.string().max(100).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });

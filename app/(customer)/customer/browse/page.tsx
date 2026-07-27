@@ -3,9 +3,10 @@ import {
   searchMarketplaceProducts,
   getMarketplaceCategories,
 } from "@/modules/catalog/repository";
+import { getFeaturedStores } from "@/modules/marketplace/repository";
 import { productSearchSchema } from "@/modules/catalog/validators";
-import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { ProductPrice } from "@/components/catalog/ProductPrice";
+import { ProductCard } from "@/components/marketplace/ProductCard";
+import { StoreCard } from "@/components/marketplace/StoreCard";
 
 type Props = {
   searchParams: Promise<{
@@ -14,6 +15,11 @@ type Props = {
     category?: string;
     sort?: string;
     sale?: string;
+    currency?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    stock?: string;
+    merchant?: string;
   }>;
 };
 
@@ -25,10 +31,15 @@ export default async function BrowsePage({ searchParams }: Props) {
     categorySlug: rawParams.category,
     sort: rawParams.sort,
     onSale: rawParams.sale,
+    currency: rawParams.currency,
+    minPrice: rawParams.minPrice,
+    maxPrice: rawParams.maxPrice,
+    inStock: rawParams.stock,
+    merchantSlug: rawParams.merchant,
     limit: 20,
   });
 
-  const { q, page, limit, categorySlug, sort, onSale } = parsed.success
+  const filters = parsed.success
     ? parsed.data
     : {
         q: undefined,
@@ -37,100 +48,110 @@ export default async function BrowsePage({ searchParams }: Props) {
         categorySlug: undefined,
         sort: "newest" as const,
         onSale: false,
+        currency: undefined,
+        minPrice: undefined,
+        maxPrice: undefined,
+        inStock: false,
+        merchantSlug: undefined,
       };
 
-  const [{ products, total }, categories] = await Promise.all([
-    searchMarketplaceProducts({ q, page, limit, categorySlug, sort, onSale }),
+  const [{ products, total }, categories, featuredStores] = await Promise.all([
+    searchMarketplaceProducts(filters),
     getMarketplaceCategories(),
+    getFeaturedStores(3),
   ]);
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(total / filters.limit);
 
-  function browseHref(options?: {
-    page?: number;
-    category?: string;
-    sort?: string;
-    sale?: boolean;
-  }) {
+  function browseHref(options?: Record<string, string | number | boolean | undefined>) {
     const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    const nextPage = options?.page ?? page;
-    const nextCategory = options?.category ?? categorySlug;
-    const nextSort = options?.sort ?? sort;
-    const nextSale = options?.sale ?? onSale;
-
-    if (nextPage > 1) params.set("page", String(nextPage));
-    if (nextCategory) params.set("category", nextCategory);
-    if (nextSort && nextSort !== "newest") params.set("sort", nextSort);
-    if (nextSale) params.set("sale", "true");
-
+    const merged = { ...filters, ...options };
+    if (merged.q) params.set("q", String(merged.q));
+    if (merged.page && merged.page > 1) params.set("page", String(merged.page));
+    if (merged.categorySlug) params.set("category", String(merged.categorySlug));
+    if (merged.sort && merged.sort !== "newest") params.set("sort", String(merged.sort));
+    if (merged.onSale) params.set("sale", "true");
+    if (merged.currency) params.set("currency", String(merged.currency));
+    if (merged.minPrice) params.set("minPrice", String(merged.minPrice));
+    if (merged.maxPrice) params.set("maxPrice", String(merged.maxPrice));
+    if (merged.inStock) params.set("stock", "true");
+    if (merged.merchantSlug) params.set("merchant", String(merged.merchantSlug));
     const query = params.toString();
     return query ? `/customer/browse?${query}` : "/customer/browse";
   }
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold">Browse products</h1>
-      <p className="mt-2 text-muted">Discover products from Nexar marketplace merchants</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-3xl font-semibold">Marketplace</h1>
+          <p className="mt-2 text-muted">Discover products from Nexar merchants</p>
+        </div>
+        <Link
+          href="/marketplace/stores"
+          className="text-sm text-gold hover:underline"
+        >
+          Browse stores →
+        </Link>
+      </div>
 
-      <form className="mt-8 flex flex-wrap gap-3">
+      {featuredStores.length > 0 && !filters.q && filters.page === 1 && (
+        <section className="mt-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
+            Featured Stores
+          </h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            {featuredStores.map((store) => (
+              <StoreCard key={store.id} store={store} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <form className="mt-8 grid gap-3 rounded-2xl border border-border bg-card/20 p-4 md:grid-cols-2 lg:grid-cols-4">
         <input
           name="q"
           type="search"
-          defaultValue={q ?? ""}
+          defaultValue={filters.q ?? ""}
           placeholder="Search products…"
-          className="min-w-[200px] flex-1 rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm text-white outline-none focus:border-gold/40"
+          className="rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm outline-none focus:border-gold/40 lg:col-span-2"
         />
-        {categorySlug && <input type="hidden" name="category" value={categorySlug} />}
-        {onSale && <input type="hidden" name="sale" value="true" />}
-        <select
-          name="sort"
-          defaultValue={sort}
-          className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm"
-        >
+        <select name="sort" defaultValue={filters.sort} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm">
           <option value="newest">Newest</option>
+          <option value="featured">Featured</option>
+          <option value="best_selling">Best Selling</option>
           <option value="price_asc">Price: low to high</option>
           <option value="price_desc">Price: high to low</option>
           <option value="name">Name</option>
         </select>
-        <button
-          type="submit"
-          className="rounded-xl border border-gold/30 bg-gold/10 px-6 py-3 text-sm font-medium text-gold hover:bg-gold/20"
-        >
-          Search
+        <select name="currency" defaultValue={filters.currency ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm">
+          <option value="">All currencies</option>
+          {["USD", "NXR", "BNB", "USDT", "BTC", "ETH"].map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <input name="minPrice" type="number" step="0.01" placeholder="Min price" defaultValue={filters.minPrice ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm" />
+        <input name="maxPrice" type="number" step="0.01" placeholder="Max price" defaultValue={filters.maxPrice ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm" />
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="stock" defaultChecked={filters.inStock} /> In stock only
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="sale" defaultChecked={filters.onSale} /> On sale
+        </label>
+        <button type="submit" className="rounded-xl border border-gold/30 bg-gold/10 px-6 py-3 text-sm font-medium text-gold lg:col-span-2">
+          Apply filters
         </button>
       </form>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        <Link
-          href={browseHref({ page: 1, category: undefined, sale: false })}
-          className={`rounded-full px-3 py-1 text-xs ${
-            !categorySlug && !onSale
-              ? "bg-gold text-background"
-              : "border border-border text-muted hover:text-white"
-          }`}
-        >
+        <Link href={browseHref({ categorySlug: undefined, onSale: false, page: 1 })} className={`rounded-full px-3 py-1 text-xs ${!filters.categorySlug && !filters.onSale ? "bg-gold text-background" : "border border-border text-muted"}`}>
           All
-        </Link>
-        <Link
-          href={browseHref({ page: 1, category: undefined, sale: true })}
-          className={`rounded-full px-3 py-1 text-xs ${
-            onSale
-              ? "bg-emerald-500 text-background"
-              : "border border-border text-muted hover:text-white"
-          }`}
-        >
-          On sale
         </Link>
         {categories.map((category) => (
           <Link
             key={category.id}
-            href={browseHref({ page: 1, category: category.slug })}
-            className={`rounded-full px-3 py-1 text-xs ${
-              categorySlug === category.slug
-                ? "bg-gold text-background"
-                : "border border-border text-muted hover:text-white"
-            }`}
+            href={browseHref({ categorySlug: category.slug, page: 1 })}
+            className={`rounded-full px-3 py-1 text-xs ${filters.categorySlug === category.slug ? "bg-gold text-background" : "border border-border text-muted"}`}
           >
             {category.name}
           </Link>
@@ -144,45 +165,7 @@ export default async function BrowsePage({ searchParams }: Props) {
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => (
-            <article
-              key={product.id}
-              className="overflow-hidden rounded-2xl border border-border bg-card/40 transition-colors hover:border-gold/20"
-            >
-              <Link href={`/customer/browse/${product.id}`} className="relative block">
-                {product.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="aspect-square w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex aspect-square items-center justify-center bg-surface text-muted">
-                    No image
-                  </div>
-                )}
-                {product.is_on_sale && (
-                  <span className="absolute left-3 top-3 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold uppercase text-background">
-                    Sale
-                  </span>
-                )}
-              </Link>
-              <div className="p-4">
-                <p className="text-xs text-muted">{product.store.name}</p>
-                <Link href={`/customer/browse/${product.id}`}>
-                  <h2 className="mt-1 font-medium hover:text-gold">{product.name}</h2>
-                </Link>
-                <ProductPrice
-                  price={Number(product.price)}
-                  compareAtPrice={product.compare_at_price}
-                  currency={product.currency}
-                  showBadge
-                />
-                <div className="mt-4">
-                  <AddToCartButton productId={product.id} stock={product.stock} />
-                </div>
-              </div>
-            </article>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}
@@ -190,15 +173,7 @@ export default async function BrowsePage({ searchParams }: Props) {
       {totalPages > 1 && (
         <div className="mt-8 flex justify-center gap-2">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <Link
-              key={p}
-              href={browseHref({ page: p })}
-              className={`rounded-lg px-3 py-1 text-sm ${
-                p === page
-                  ? "bg-gold text-background"
-                  : "border border-border text-muted hover:text-white"
-              }`}
-            >
+            <Link key={p} href={browseHref({ page: p })} className={`rounded-lg px-3 py-1 text-sm ${p === filters.page ? "bg-gold text-background" : "border border-border text-muted"}`}>
               {p}
             </Link>
           ))}

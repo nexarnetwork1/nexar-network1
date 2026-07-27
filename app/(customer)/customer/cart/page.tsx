@@ -61,10 +61,32 @@ export default async function CartPage() {
           </div>
 
           <div className="rounded-2xl border border-border bg-card/40 p-6">
-            <h2 className="font-heading text-lg font-semibold">Summary</h2>
-            <div className="mt-4 flex justify-between text-sm">
-              <span className="text-muted">Subtotal</span>
-              <span className="font-medium">{formatCurrency(subtotal, currency)}</span>
+            <h2 className="font-heading text-lg font-semibold">Order summary</h2>
+            <div className="mt-4 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted">Subtotal</span>
+                <span className="font-medium">{formatCurrency(subtotal, currency)}</span>
+              </div>
+              <div className="flex justify-between text-muted">
+                <span>Platform fees</span>
+                <span>At checkout</span>
+              </div>
+              <div className="flex justify-between text-muted">
+                <span>Discounts / coupons</span>
+                <span>—</span>
+              </div>
+              <div className="flex justify-between text-muted">
+                <span>Shipping</span>
+                <span>—</span>
+              </div>
+              <div className="flex justify-between text-muted">
+                <span>Tax</span>
+                <span>—</span>
+              </div>
+              <div className="flex justify-between border-t border-border pt-3 text-base font-semibold">
+                <span>Grand total</span>
+                <span>{formatCurrency(subtotal, currency)}</span>
+              </div>
             </div>
             {storeCount > 1 && (
               <p className="mt-3 text-xs text-muted">

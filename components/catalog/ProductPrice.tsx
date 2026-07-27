@@ -1,9 +1,12 @@
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
+
 type Props = {
   price: number;
   compareAtPrice?: number | null;
   currency: string;
   size?: "sm" | "md" | "lg";
   showBadge?: boolean;
+  showCurrencyLogo?: boolean;
 };
 
 const sizeClasses = {
@@ -18,6 +21,7 @@ export function ProductPrice({
   currency,
   size = "md",
   showBadge = false,
+  showCurrencyLogo = false,
 }: Props) {
   const salePrice = Number(price);
   const listPrice =
@@ -30,6 +34,9 @@ export function ProductPrice({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex flex-wrap items-baseline gap-2">
+        {showCurrencyLogo && (
+          <CurrencyLogo code={currency} size={size === "lg" ? 24 : 18} />
+        )}
         <span className={`font-heading text-gold ${classes.price}`}>
           {currency} {salePrice.toFixed(2)}
         </span>

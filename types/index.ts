@@ -137,6 +137,24 @@ export type Store = {
   updated_at: string;
 };
 
+export type StoreMarketplaceProfile = {
+  banner_url?: string | null;
+  description?: string | null;
+  primary_color?: string | null;
+  secondary_color?: string | null;
+  website?: string | null;
+  facebook?: string | null;
+  instagram?: string | null;
+  twitter?: string | null;
+  tiktok?: string | null;
+  business_phone?: string | null;
+  business_email?: string | null;
+  business_address?: string | null;
+  business_hours?: Record<string, string> | null;
+  featured?: boolean;
+  policies?: string | null;
+};
+
 export type StoreSettings = {
   id: string;
   store_id: string;
@@ -146,8 +164,18 @@ export type StoreSettings = {
   default_currency: string;
   accepts_crypto: boolean;
   accepts_card: boolean;
+  marketplace_profile?: StoreMarketplaceProfile;
   created_at: string;
   updated_at: string;
+};
+
+export type StoreDirectoryEntry = Store & {
+  settings: Pick<StoreSettings, "accepts_crypto" | "accepts_card" | "default_currency" | "marketplace_profile"> | null;
+  product_count: number;
+  sales_count: number;
+  rating: number;
+  verification_status: string | null;
+  is_top_seller: boolean;
 };
 
 export type MerchantPromotion = {
