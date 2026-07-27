@@ -7,6 +7,7 @@ import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useScrolled } from "@/hooks/useScrolled";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
+import { SuperAdminNavLink } from "@/components/layout/SuperAdminNavLink";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
 import { MobileMenu } from "./MobileMenu";
@@ -56,6 +57,7 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <SuperAdminNavLink />
             <ConnectWalletButton
               variant="primary"
               size="sm"

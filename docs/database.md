@@ -36,6 +36,7 @@ PostgreSQL on Supabase. Normalized schema with RLS on every public table. Busine
 | `20260727000018_platform_extensions.sql` | Escrow, disputes, withdrawals, coupons, webhooks, loyalty/POS/chains |
 | `20260727000019_escrow_payment_integration.sql` | Escrow hold integrated into complete_payment |
 | `20260727000020_realtime_search_completion.sql` | Wallet/settlement realtime + expanded global search |
+| `20260727000021_production_platform_settings.sql` | Platform settings expansion, treasury seed, admin wallet challenges |
 
 Apply with:
 

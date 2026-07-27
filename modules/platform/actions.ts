@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { auditLogger } from "@/lib/logging/audit-logger";
 import { writeAuditLog } from "@/modules/audit/repository";
 import {
@@ -21,10 +21,8 @@ import { buildQrPayload } from "@/lib/qr/payload";
 import type { ActionResult } from "@/modules/auth/actions";
 import type { StoreStatus } from "@/types";
 
-import type { UserRole } from "@/types";
-
 async function logAdminAction(
-  profile: { id: string; role: UserRole },
+  session: { walletAddress: string },
   action: string,
   entityType: string,
   entityId?: string,
@@ -34,22 +32,20 @@ async function logAdminAction(
     action,
     entityType,
     entityId,
-    actorId: profile.id,
-    actorRole: profile.role,
-    metadata,
+    metadata: { wallet_address: session.walletAddress, ...metadata },
   });
   await writeAuditLog({
-    actorId: profile.id,
-    actorRole: profile.role,
+    actorId: null,
+    actorRole: "admin",
     action,
     entityType,
     entityId,
-    metadata,
+    metadata: { wallet_address: session.walletAddress, ...metadata },
   });
 }
 
 async function assertAdmin() {
-  return requireRole(["admin"]);
+  return requireSuperAdmin();
 }
 
 async function ensureStoreQrCodes(
@@ -88,13 +84,21 @@ async function ensureStoreQrCodes(
 export async function updatePlatformSettingsAction(
   formData: FormData
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
 
   const parsed = platformSettingsSchema.safeParse({
     treasuryWallet: formData.get("treasuryWallet") || "",
     supportEmail: formData.get("supportEmail"),
     nxrToken: formData.get("nxrToken") || "",
     usdtToken: formData.get("usdtToken") || "",
+    maintenanceMode: formData.get("maintenanceMode") === "on",
+    platformStatus: formData.get("platformStatus") || "operational",
+    minPaymentUsd: formData.get("minPaymentUsd") || undefined,
+    maxPaymentUsd: formData.get("maxPaymentUsd") || undefined,
+    emailNotificationsEnabled: formData.get("emailNotificationsEnabled") === "on",
+    telegramNotificationsEnabled: formData.get("telegramNotificationsEnabled") === "on",
+    merchantPromotionDiscountPercent: formData.get("merchantPromotionDiscountPercent") || undefined,
+    merchantPromotionDurationDays: formData.get("merchantPromotionDurationDays") || undefined,
   });
 
   if (!parsed.success) {
@@ -104,7 +108,7 @@ export async function updatePlatformSettingsAction(
   const admin = createAdminClient();
   const { data: settings } = await admin
     .from("platform_settings")
-    .select("id")
+    .select("*")
     .limit(1)
     .single();
 
@@ -112,27 +116,58 @@ export async function updatePlatformSettingsAction(
     return { success: false, error: "Platform settings not found" };
   }
 
+  const nextTreasury = parsed.data.treasuryWallet || null;
+  const treasuryChanged =
+    nextTreasury !== settings.treasury_wallet_address;
+
   const { error } = await admin
     .from("platform_settings")
     .update({
-      treasury_wallet_address: parsed.data.treasuryWallet || null,
+      treasury_wallet_address: nextTreasury,
       support_email: parsed.data.supportEmail,
       nxr_token_address: parsed.data.nxrToken || null,
       usdt_token_address: parsed.data.usdtToken || null,
+      maintenance_mode: parsed.data.maintenanceMode ?? settings.maintenance_mode,
+      platform_status: parsed.data.platformStatus ?? settings.platform_status,
+      min_payment_usd: parsed.data.minPaymentUsd ?? settings.min_payment_usd,
+      max_payment_usd: parsed.data.maxPaymentUsd ?? settings.max_payment_usd,
+      email_notifications_enabled:
+        parsed.data.emailNotificationsEnabled ?? settings.email_notifications_enabled,
+      telegram_notifications_enabled:
+        parsed.data.telegramNotificationsEnabled ?? settings.telegram_notifications_enabled,
+      merchant_promotion_discount_percent:
+        parsed.data.merchantPromotionDiscountPercent ??
+        settings.merchant_promotion_discount_percent,
+      merchant_promotion_duration_days:
+        parsed.data.merchantPromotionDurationDays ??
+        settings.merchant_promotion_duration_days,
     })
     .eq("id", settings.id);
 
   if (error) return { success: false, error: error.message };
 
-  auditLogger.log({
-    action: "admin.platform_settings.updated",
-    entityType: "platform_settings",
-    entityId: settings.id,
-    actorId: profile.id,
-    actorRole: profile.role,
+  await logAdminAction(session, "admin.platform_settings.changed", "platform_settings", settings.id, {
+    before: {
+      treasury_wallet_address: settings.treasury_wallet_address,
+      platform_status: settings.platform_status,
+      maintenance_mode: settings.maintenance_mode,
+    },
+    after: {
+      treasury_wallet_address: nextTreasury,
+      platform_status: parsed.data.platformStatus,
+      maintenance_mode: parsed.data.maintenanceMode,
+    },
   });
 
+  if (treasuryChanged) {
+    await logAdminAction(session, "admin.treasury_wallet.changed", "platform_settings", settings.id, {
+      before: settings.treasury_wallet_address,
+      after: nextTreasury,
+    });
+  }
+
   revalidatePath("/admin/platform-fees");
+  revalidatePath("/admin/settings");
   revalidatePath("/admin/security");
   return { success: true };
 }
@@ -141,7 +176,7 @@ export async function updateFeeScheduleAction(
   paymentType: string,
   baseRate: number
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
 
   const parsed = feeScheduleSchema.safeParse({ paymentType, baseRate });
   if (!parsed.success) {
@@ -156,14 +191,7 @@ export async function updateFeeScheduleAction(
 
   if (error) return { success: false, error: error.message };
 
-  auditLogger.log({
-    action: "admin.fee_schedule.created",
-    entityType: "fee_schedule",
-    entityId: data?.id,
-    actorId: profile.id,
-    actorRole: profile.role,
-    metadata: parsed.data,
-  });
+  await logAdminAction(session, "admin.fee_schedule.created", "fee_schedule", data?.id, parsed.data);
 
   revalidatePath("/admin/platform-fees");
   return { success: true };
@@ -172,7 +200,7 @@ export async function updateFeeScheduleAction(
 export async function updateExchangeRateAction(
   formData: FormData
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
 
   const parsed = exchangeRateSchema.safeParse({
     baseCurrency: formData.get("baseCurrency"),
@@ -197,13 +225,7 @@ export async function updateExchangeRateAction(
 
   if (error) return { success: false, error: error.message };
 
-  auditLogger.log({
-    action: "admin.exchange_rate.updated",
-    entityType: "exchange_rate",
-    actorId: profile.id,
-    actorRole: profile.role,
-    metadata: parsed.data,
-  });
+  await logAdminAction(session, "admin.exchange_rate.updated", "exchange_rate", undefined, parsed.data);
 
   revalidatePath("/admin/exchange-rates");
   return { success: true };
@@ -213,7 +235,7 @@ export async function updateStoreStatusAction(
   storeId: string,
   status: StoreStatus
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
 
   const parsed = storeStatusSchema.safeParse({ storeId, status });
   if (!parsed.success) {
@@ -260,13 +282,8 @@ export async function updateStoreStatusAction(
     }).catch(() => undefined);
   }
 
-  auditLogger.log({
-    action: "admin.store.status_updated",
-    entityType: "store",
-    entityId: parsed.data.storeId,
-    actorId: profile.id,
-    actorRole: profile.role,
-    metadata: { status: parsed.data.status },
+  await logAdminAction(session, "admin.store.status_updated", "store", parsed.data.storeId, {
+    status: parsed.data.status,
   });
 
   revalidatePath("/admin/merchants");
@@ -277,7 +294,7 @@ export async function updateUserRoleAction(
   userId: string,
   role: "customer" | "merchant" | "admin"
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
 
   const parsed = userRoleSchema.safeParse({ userId, role });
   if (!parsed.success) {
@@ -300,13 +317,8 @@ export async function updateUserRoleAction(
     // app_metadata sync optional
   }
 
-  auditLogger.log({
-    action: "admin.user.role_updated",
-    entityType: "profile",
-    entityId: parsed.data.userId,
-    actorId: profile.id,
-    actorRole: profile.role,
-    metadata: { role: parsed.data.role },
+  await logAdminAction(session, "admin.user.role_updated", "profile", parsed.data.userId, {
+    role: parsed.data.role,
   });
 
   revalidatePath("/admin/users");
@@ -317,7 +329,7 @@ export async function togglePromotionAction(
   promotionId: string,
   isActive: boolean
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
   const admin = createAdminClient();
 
   const { error } = await admin
@@ -327,13 +339,8 @@ export async function togglePromotionAction(
 
   if (error) return { success: false, error: error.message };
 
-  auditLogger.log({
-    action: "admin.promotion.toggled",
-    entityType: "merchant_promotion",
-    entityId: promotionId,
-    actorId: profile.id,
-    actorRole: profile.role,
-    metadata: { is_active: isActive },
+  await logAdminAction(session, "admin.promotion.toggled", "merchant_promotion", promotionId, {
+    is_active: isActive,
   });
 
   revalidatePath("/admin/promotions");
@@ -343,18 +350,12 @@ export async function togglePromotionAction(
 export async function retryFailedSettlementsAction(): Promise<
   ActionResult & { attempted?: number; succeeded?: number; failed?: number }
 > {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
   const { retryFailedSettlements } = await import("@/modules/settlement/worker");
 
   const result = await retryFailedSettlements(20);
 
-  auditLogger.log({
-    action: "admin.settlements.retry",
-    entityType: "settlement",
-    actorId: profile.id,
-    actorRole: profile.role,
-    metadata: result,
-  });
+  await logAdminAction(session, "admin.settlements.retry", "settlement", undefined, result);
 
   revalidatePath("/admin/analytics");
   return { success: true, ...result };
@@ -364,7 +365,7 @@ export async function moderateProductAction(
   productId: string,
   isActive: boolean
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
   const parsed = productModerationSchema.safeParse({ productId, isActive });
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
@@ -378,7 +379,7 @@ export async function moderateProductAction(
 
   if (error) return { success: false, error: error.message };
 
-  await logAdminAction(profile, "admin.product.moderated", "product", parsed.data.productId, {
+  await logAdminAction(session, "admin.product.moderated", "product", parsed.data.productId, {
     is_active: parsed.data.isActive,
   });
 
@@ -391,7 +392,7 @@ export async function toggleCurrencyAction(
   currencyId: string,
   isActive: boolean
 ): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
   const parsed = currencyToggleSchema.safeParse({ currencyId, isActive });
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
@@ -405,7 +406,7 @@ export async function toggleCurrencyAction(
 
   if (error) return { success: false, error: error.message };
 
-  await logAdminAction(profile, "admin.currency.toggled", "supported_currency", parsed.data.currencyId, {
+  await logAdminAction(session, "admin.currency.toggled", "supported_currency", parsed.data.currencyId, {
     is_active: parsed.data.isActive,
   });
 
@@ -414,7 +415,7 @@ export async function toggleCurrencyAction(
 }
 
 export async function createPromotionAction(formData: FormData): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
   const parsed = createPromotionSchema.safeParse({
     storeId: formData.get("storeId"),
     discountPercent: formData.get("discountPercent"),
@@ -444,21 +445,17 @@ export async function createPromotionAction(formData: FormData): Promise<ActionR
 
   if (error) return { success: false, error: error.message };
 
-  await logAdminAction(profile, "admin.promotion.created", "merchant_promotion", data?.id, parsed.data);
+  await logAdminAction(session, "admin.promotion.created", "merchant_promotion", data?.id, parsed.data);
 
   revalidatePath("/admin/promotions");
   return { success: true };
 }
 
 export async function banUserAction(userId: string, ban: boolean): Promise<ActionResult> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
   const parsed = banUserSchema.safeParse({ userId, ban });
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  }
-
-  if (parsed.data.userId === profile.id) {
-    return { success: false, error: "Cannot ban yourself" };
   }
 
   const admin = createAdminClient();
@@ -468,7 +465,7 @@ export async function banUserAction(userId: string, ban: boolean): Promise<Actio
 
   if (error) return { success: false, error: error.message };
 
-  await logAdminAction(profile, parsed.data.ban ? "admin.user.banned" : "admin.user.unbanned", "profile", parsed.data.userId);
+  await logAdminAction(session, parsed.data.ban ? "admin.user.banned" : "admin.user.unbanned", "profile", parsed.data.userId);
 
   revalidatePath("/admin/customers");
   revalidatePath("/admin/users");
@@ -477,7 +474,7 @@ export async function banUserAction(userId: string, ban: boolean): Promise<Actio
 }
 
 export async function resetUserPasswordAction(userId: string): Promise<ActionResult & { link?: string }> {
-  const profile = await assertAdmin();
+  const session = await assertAdmin();
 
   const admin = createAdminClient();
   const { data: target } = await admin
@@ -497,7 +494,7 @@ export async function resetUserPasswordAction(userId: string): Promise<ActionRes
 
   if (error) return { success: false, error: error.message };
 
-  await logAdminAction(profile, "admin.user.password_reset", "profile", userId);
+  await logAdminAction(session, "admin.user.password_reset", "profile", userId);
 
   revalidatePath("/admin/customers");
   revalidatePath("/admin/users");

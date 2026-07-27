@@ -98,6 +98,14 @@ export type PlatformSettings = {
   support_email: string;
   card_provider: string;
   card_platform_fee_percent: number;
+  maintenance_mode: boolean;
+  platform_status: "operational" | "degraded" | "maintenance";
+  min_payment_usd: number | null;
+  max_payment_usd: number | null;
+  email_notifications_enabled: boolean;
+  telegram_notifications_enabled: boolean;
+  merchant_promotion_discount_percent: number;
+  merchant_promotion_duration_days: number;
   updated_at: string;
   updated_by: string | null;
 };

@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { getAllDisputes } from "@/modules/disputes/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function AdminDisputesPage() {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const disputes = await getAllDisputes();
 
   return (

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, UserRole } from "@/types";
+import { requireSuperAdminSession } from "@/lib/admin/super-admin";
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   const supabase = await createClient();
@@ -29,4 +30,9 @@ export async function requireRole(roles: UserRole[]): Promise<Profile> {
     throw new Error("Unauthorized");
   }
   return profile;
+}
+
+/** Super Admin access via treasury wallet signature session. */
+export async function requireSuperAdmin() {
+  return requireSuperAdminSession();
 }

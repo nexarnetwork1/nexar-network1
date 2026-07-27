@@ -1,5 +1,5 @@
 import { withErrorHandler } from "@/api";
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { toCsv, csvResponse } from "@/utils/export/csv";
 import { getTreasurySummary } from "@/modules/platform/repository";
@@ -20,7 +20,7 @@ async function handler(
   _request: Request,
   context?: { params: Promise<Record<string, string>> }
 ): Promise<Response> {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const params = await (context?.params ?? Promise.resolve({ resource: "" }));
   const resource = params.resource;
   if (!RESOURCES.includes(resource as Resource)) {

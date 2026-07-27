@@ -1,11 +1,11 @@
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { getPendingWithdrawals } from "@/modules/withdrawals/repository";
 import { adminReviewWithdrawalAction } from "@/modules/withdrawals/actions";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 
 export default async function AdminWithdrawalsPage() {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const withdrawals = await getPendingWithdrawals();
 
   return (

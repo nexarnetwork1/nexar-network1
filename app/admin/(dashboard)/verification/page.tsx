@@ -1,4 +1,4 @@
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { getPendingVerifications } from "@/modules/verification/repository";
 import { adminUpdateVerificationAction } from "@/modules/verification/actions";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function AdminVerificationPage() {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const pending = await getPendingVerifications();
   const admin = createAdminClient();
   const { data: profiles } = await admin

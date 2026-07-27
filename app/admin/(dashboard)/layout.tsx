@@ -1,16 +1,17 @@
 import { redirect } from "next/navigation";
-import { getCurrentProfile } from "@/modules/users/repository";
-import { AdminSidebar, AdminHeader } from "@/components/admin/AdminSidebar";
+import { getSuperAdminSession } from "@/lib/admin/super-admin";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default async function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const profile = await getCurrentProfile();
+  const session = await getSuperAdminSession();
 
-  if (!profile || profile.role !== "admin") {
-    redirect("/login?redirect=/admin/dashboard");
+  if (!session) {
+    redirect("/?admin=wallet-required");
   }
 
   return (
@@ -18,7 +19,7 @@ export default async function AdminDashboardLayout({
       <div className="flex">
         <AdminSidebar />
         <div className="flex-1">
-          <AdminHeader />
+          <AdminHeader walletAddress={session.walletAddress} />
           <main className="p-8">{children}</main>
         </div>
       </div>

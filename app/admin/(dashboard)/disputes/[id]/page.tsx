@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import {
   getDisputeById,
   getDisputeMessages,
@@ -18,7 +18,7 @@ export default async function AdminDisputeDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const { id } = await params;
   const dispute = await getDisputeById(id);
   if (!dispute) notFound();

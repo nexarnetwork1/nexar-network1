@@ -10,7 +10,7 @@ export const authConfig = {
   authRoutes: ["/login", "/register", "/signup", "/forgot-password", "/reset-password", "/verify-email"],
   publicAuthRoutes: ["/auth/callback", "/auth/complete-profile", "/forgot-password", "/reset-password", "/verify-email"],
   emailVerificationRoute: "/verify-email",
-  publicRoutes: ["/store", "/pay", "/api/qr", "/api/pay", "/api/health", "/api/csrf"],
+  publicRoutes: ["/store", "/pay", "/api/qr", "/api/pay", "/api/health", "/api/csrf", "/marketplace", "/market"],
 } as const;
 
 export type AuthProvider = (typeof authConfig.providers)[number];

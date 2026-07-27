@@ -9,7 +9,7 @@ export const securityConfig = {
     checkout: { limit: 10, windowMs: 60_000 },
     api: { limit: 100, windowMs: 60_000 },
   },
-  protectedPrefixes: ["/customer", "/merchant", "/admin", "/dashboard", "/profile", "/wallet", "/orders", "/invoices"],
+  protectedPrefixes: ["/customer", "/merchant", "/admin", "/dashboard", "/profile", "/wallet", "/orders", "/invoices", "/settings", "/treasury", "/security"],
   roleRoutes: {
     customer: ["/customer", "/dashboard", "/profile", "/wallet", "/orders", "/invoices"],
     merchant: ["/merchant"],

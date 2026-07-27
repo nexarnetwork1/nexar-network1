@@ -7,10 +7,10 @@ import {
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { RealtimeScope } from "@/components/realtime/RealtimeScope";
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 
 export default async function AdminDashboardPage() {
-  const profile = await requireRole(["admin"]);
+  const session = await requireSuperAdmin();
   const [overview, stats, transactions] = await Promise.all([
     getDashboardOverview(),
     getPlatformStats(),
@@ -19,7 +19,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <RealtimeScope userId={profile.id} />
+      <RealtimeScope userId={session.walletAddress} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-yellow-400">Platform overview</h1>

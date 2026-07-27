@@ -1,4 +1,4 @@
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import {
   settlementReportToCsv,
   settlementReportToExcelXml,
@@ -11,7 +11,7 @@ export async function GET(
   request: Request,
   context: { params: Promise<{ id: string; format: string }> }
 ) {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const { id, format } = await context.params;
   const admin = createAdminClient();
   const { data: report } = await admin.from("settlement_reports").select("*").eq("id", id).single();

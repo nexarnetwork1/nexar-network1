@@ -1,10 +1,10 @@
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { getPlatformCoupons } from "@/modules/coupons/repository";
 import { createCouponFormAction } from "@/modules/coupons/actions";
 import { Button } from "@/components/ui/Button";
 
 export default async function AdminCouponsPage() {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const coupons = await getPlatformCoupons();
 
   return (

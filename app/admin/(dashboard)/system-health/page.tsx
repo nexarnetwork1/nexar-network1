@@ -1,9 +1,9 @@
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { runSystemHealthChecks } from "@/lib/monitoring/system-health";
 import { SystemHealthPanel } from "@/components/admin/SystemHealthPanel";
 
 export default async function AdminSystemHealthPage() {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const health = await runSystemHealthChecks();
 
   return (

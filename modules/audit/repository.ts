@@ -8,7 +8,7 @@ export type AuditChangeContext = RequestAuditContext & {
 };
 
 export async function writeAuditLog(params: {
-  actorId: string;
+  actorId?: string | null;
   actorRole: UserRole;
   action: string;
   entityType: string;
@@ -27,7 +27,7 @@ export async function writeAuditLog(params: {
   };
 
   await supabase.from("audit_logs").insert({
-    actor_id: params.actorId,
+    actor_id: params.actorId ?? null,
     actor_role: params.actorRole,
     action: params.action,
     entity_type: params.entityType,

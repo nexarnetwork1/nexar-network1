@@ -11,10 +11,26 @@ export const platformSettingsSchema = z.object({
   supportEmail: z.string().email("Invalid support email"),
   nxrToken: z.string().optional(),
   usdtToken: z.string().optional(),
+  maintenanceMode: z.coerce.boolean().optional(),
+  platformStatus: z.enum(["operational", "degraded", "maintenance"]).optional(),
+  minPaymentUsd: z.coerce.number().positive().optional(),
+  maxPaymentUsd: z.coerce.number().positive().optional(),
+  emailNotificationsEnabled: z.coerce.boolean().optional(),
+  telegramNotificationsEnabled: z.coerce.boolean().optional(),
+  merchantPromotionDiscountPercent: z.coerce.number().min(0).max(1).optional(),
+  merchantPromotionDurationDays: z.coerce.number().int().min(1).max(365).optional(),
 });
 
 export const feeScheduleSchema = z.object({
-  paymentType: z.enum(["nxr", "crypto_other", "card"]),
+  paymentType: z.enum([
+    "nxr",
+    "crypto_other",
+    "card",
+    "visa",
+    "mastercard",
+    "apple_pay",
+    "google_pay",
+  ]),
   baseRate: z.coerce.number().min(0, "Rate must be positive").max(1, "Rate cannot exceed 100%"),
 });
 

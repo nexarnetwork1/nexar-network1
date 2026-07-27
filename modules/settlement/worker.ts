@@ -7,6 +7,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { bsc } from "viem/chains";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { env } from "@/config/env";
 import { getTokenAddress, type CryptoAsset } from "@/lib/blockchain/bsc-client";
 import { deriveSessionDepositAddress } from "@/lib/blockchain/deposit";
 import { getExchangeRate } from "./fee-calculator";
@@ -170,7 +171,7 @@ export async function getTreasuryWallet(): Promise<`0x${string}` | null> {
     .limit(1)
     .single();
 
-  const address = data?.treasury_wallet_address ?? process.env.TREASURY_WALLET_ADDRESS;
+  const address = data?.treasury_wallet_address ?? env.TREASURY_WALLET_ADDRESS ?? null;
   return address ? (address as `0x${string}`) : null;
 }
 

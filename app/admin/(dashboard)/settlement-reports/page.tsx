@@ -1,13 +1,9 @@
 import Link from "next/link";
-import { requireRole } from "@/modules/users/repository";
-import { getSettlementReports, generateSettlementReport } from "@/modules/settlement-reports/repository";
-import { Button } from "@/components/ui/Button";
+import { requireSuperAdmin } from "@/modules/users/repository";
+import { getSettlementReports } from "@/modules/settlement-reports/repository";
 
 export default async function AdminSettlementReportsPage() {
-  const profile = await requireRole(["admin"]);
-  await generateSettlementReport({ periodType: "daily", generatedBy: profile.id });
-  await generateSettlementReport({ periodType: "weekly", generatedBy: profile.id });
-  await generateSettlementReport({ periodType: "monthly", generatedBy: profile.id });
+  await requireSuperAdmin();
   const reports = await getSettlementReports({ limit: 30 });
 
   return (

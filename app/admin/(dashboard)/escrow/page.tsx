@@ -1,4 +1,4 @@
-import { requireRole } from "@/modules/users/repository";
+import { requireSuperAdmin } from "@/modules/users/repository";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { releaseEscrowAction } from "@/modules/escrow/actions";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import type { Escrow } from "@/types";
 
 export default async function AdminEscrowPage() {
-  await requireRole(["admin"]);
+  await requireSuperAdmin();
   const admin = createAdminClient();
   const { data } = await admin.from("escrows").select("*").order("created_at", { ascending: false }).limit(100);
   const escrows = (data ?? []) as Escrow[];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { toast } from "sonner";
@@ -13,13 +13,14 @@ import {
   Wallet,
   Circle,
 } from "lucide-react";
+import { SuperAdminVerifyButton } from "./SuperAdminVerifyButton";
 
 export function WalletMenu() {
-
-const { user, logout, connectWallet } = usePrivy();
-const { wallets } = useWallets();
-
-const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout, connectWallet } = usePrivy();
+  const { wallets } = useWallets();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isTreasuryWallet, setIsTreasuryWallet] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const address = user?.wallet?.address ?? "";
 
@@ -39,15 +40,39 @@ const [menuOpen, setMenuOpen] = useState(false);
 
   async function copyAddress() {
     if (!address) return;
-
-
-await navigator.clipboard.writeText(address);
-
-toast.success("Wallet address copied");
+    await navigator.clipboard.writeText(address);
+    toast.success("Wallet address copied");
   }
 
+  useEffect(() => {
+    if (!address) {
+      setIsTreasuryWallet(false);
+      setIsSuperAdmin(false);
+      return;
+    }
+
+    fetch(`/api/admin/wallet/status?wallet=${encodeURIComponent(address)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setIsTreasuryWallet(Boolean(data.isTreasuryWallet));
+        setIsSuperAdmin(Boolean(data.authenticated));
+      })
+      .catch(() => {
+        setIsTreasuryWallet(false);
+        setIsSuperAdmin(false);
+      });
+
+    fetch("/api/admin/wallet/connected", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ walletAddress: address }),
+    }).catch(() => undefined);
+  }, [address]);
+
   async function disconnectWallet() {
+    await fetch("/api/admin/wallet/logout", { method: "POST" }).catch(() => undefined);
     await logout();
+    setIsSuperAdmin(false);
   }
 
   return (
@@ -158,6 +183,15 @@ toast.success("Wallet address copied");
             View on BscScan
           </a>
         </MenuItem>
+
+        {isTreasuryWallet && !isSuperAdmin && address && (
+          <MenuItem>
+            <SuperAdminVerifyButton
+              walletAddress={address}
+              onVerified={() => setIsSuperAdmin(true)}
+            />
+          </MenuItem>
+        )}
 
         <MenuItem>
           <button
