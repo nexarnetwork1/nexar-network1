@@ -19,6 +19,9 @@ export function AppProviders({ children }: AppProvidersProps) {
   useEffect(() => {
     if (reducedMotion) return;
 
+    const html = document.documentElement;
+    html.classList.add("lenis", "lenis-smooth");
+
     const lenis = new Lenis({
       duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -28,19 +31,21 @@ export function AppProviders({ children }: AppProvidersProps) {
 
     lenis.on("scroll", ScrollTrigger.update);
 
-   const raf = (time: number) => {
-  lenis.raf(time);
-  requestAnimationFrame(raf);
-};
+    let rafId = 0;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
 
-requestAnimationFrame(raf);
     gsap.ticker.lagSmoothing(0);
-
     ScrollTrigger.refresh();
 
     return () => {
-      gsap.ticker.remove(raf);
+      cancelAnimationFrame(rafId);
       lenis.destroy();
+      html.classList.remove("lenis", "lenis-smooth");
+      ScrollTrigger.refresh();
     };
   }, [reducedMotion]);
 
