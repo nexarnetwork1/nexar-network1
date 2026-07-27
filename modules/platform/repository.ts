@@ -140,12 +140,16 @@ export async function getActiveSupportedCurrencies() {
   return data;
 }
 
+/** Checkout-supported methods — must match modules/payments/validators.ts */
+const CHECKOUT_PAYMENT_CODES = ["NXR", "BNB", "USDT", "card"] as const;
+
 export async function getPaymentMethods() {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("payment_methods")
     .select("*")
     .eq("is_active", true)
+    .in("code", [...CHECKOUT_PAYMENT_CODES])
     .order("code");
 
   if (error) return [];

@@ -379,28 +379,40 @@ export default function MarketPage() {
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {EXCHANGES.map((exchange) => (
-                <a
-                  key={exchange.name}
-                  href={exchange.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl transition-all hover:border-gold/30 hover:bg-card/60"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{exchange.icon}</span>
-                    <div className="flex-1">
-                      <p className="font-heading text-lg font-semibold">{exchange.name}</p>
-                      <p className={`text-xs ${exchange.status === "Available" ? "text-emerald-400" : "text-muted"}`}>
-                        {exchange.status}
-                      </p>
-                    </div>
-                    {exchange.status === "Available" && (
+              {EXCHANGES.map((exchange) =>
+                exchange.status === "Available" ? (
+                  <a
+                    key={exchange.name}
+                    href={exchange.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl transition-all hover:border-gold/30 hover:bg-card/60"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{exchange.icon}</span>
+                      <div className="flex-1">
+                        <p className="font-heading text-lg font-semibold">{exchange.name}</p>
+                        <p className="text-xs text-emerald-400">{exchange.status}</p>
+                      </div>
                       <ExternalLink className="h-4 w-4 text-muted" />
-                    )}
+                    </div>
+                  </a>
+                ) : (
+                  <div
+                    key={exchange.name}
+                    className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl"
+                    aria-label={`${exchange.name} — ${exchange.status}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{exchange.icon}</span>
+                      <div className="flex-1">
+                        <p className="font-heading text-lg font-semibold">{exchange.name}</p>
+                        <p className="text-xs text-muted">{exchange.status}</p>
+                      </div>
+                    </div>
                   </div>
-                </a>
-              ))}
+                )
+              )}
             </div>
           </div>
 
