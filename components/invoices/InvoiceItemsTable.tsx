@@ -1,5 +1,5 @@
 import type { InvoiceItem } from "@/types";
-import { formatCurrency } from "@/utils/format";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 type InvoiceItemsTableProps = {
   items: InvoiceItem[];
@@ -26,10 +26,10 @@ export function InvoiceItemsTable({ items, currency = "USD" }: InvoiceItemsTable
               <td className="px-4 py-3">{item.product_name}</td>
               <td className="px-4 py-3 text-right">{item.quantity}</td>
               <td className="px-4 py-3 text-right">
-                {formatCurrency(Number(item.unit_price), currency)}
+                <CurrencyAmount amount={Number(item.unit_price)} currency={currency} size={16} />
               </td>
               <td className="px-4 py-3 text-right">
-                {formatCurrency(Number(item.line_total), currency)}
+                <CurrencyAmount amount={Number(item.line_total)} currency={currency} size={16} />
               </td>
             </tr>
           ))}

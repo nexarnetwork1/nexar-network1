@@ -6,7 +6,7 @@ import { CartItemRow } from "@/components/cart/CartItemRow";
 import { CheckoutButton } from "@/components/orders/CheckoutButton";
 import { Button } from "@/components/ui/Button";
 import { groupCartItemsByStore } from "@/utils/cart";
-import { formatCurrency } from "@/utils";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function CartPage() {
   const profile = await getCurrentProfile();
@@ -49,7 +49,7 @@ export default async function CartPage() {
               >
                 <h2 className="font-heading text-lg font-semibold">{group.storeName}</h2>
                 <p className="mt-1 text-sm text-muted">
-                  Store subtotal: {formatCurrency(group.subtotal, currency)}
+                  Store subtotal: <CurrencyAmount amount={group.subtotal} currency={currency} size={16} />
                 </p>
                 <div className="mt-4">
                   {group.items.map((item) => (
@@ -65,7 +65,7 @@ export default async function CartPage() {
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>
-                <span className="font-medium">{formatCurrency(subtotal, currency)}</span>
+                <CurrencyAmount amount={subtotal} currency={currency} size={16} amountClassName="font-medium" />
               </div>
               <div className="flex justify-between text-muted">
                 <span>Platform fees</span>
@@ -85,7 +85,7 @@ export default async function CartPage() {
               </div>
               <div className="flex justify-between border-t border-border pt-3 text-base font-semibold">
                 <span>Grand total</span>
-                <span>{formatCurrency(subtotal, currency)}</span>
+                <CurrencyAmount amount={subtotal} currency={currency} size={16} amountClassName="font-semibold" />
               </div>
             </div>
             {storeCount > 1 && (

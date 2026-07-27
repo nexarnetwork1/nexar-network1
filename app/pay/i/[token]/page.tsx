@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { PayNowButton } from "@/components/payments/PayNowButton";
 import { getInvoicePaymentOptions } from "@/modules/payments/repository";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = { params: Promise<{ token: string }> };
 
@@ -58,7 +59,7 @@ export default async function PublicInvoicePayPage({ params }: Props) {
         <div className="flex justify-between">
           <dt className="text-muted">Amount</dt>
           <dd className="font-heading text-lg text-gold">
-            {invoice.currency} {Number(invoice.amount).toFixed(2)}
+            <CurrencyAmount amount={Number(invoice.amount)} currency={invoice.currency} size={20} />
           </dd>
         </div>
         <div className="flex justify-between">

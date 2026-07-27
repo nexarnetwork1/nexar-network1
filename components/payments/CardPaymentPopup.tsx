@@ -10,6 +10,8 @@ import {
 } from "@stripe/react-stripe-js";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { Button } from "@/components/ui/Button";
+import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 type CardPaymentPopupProps = {
   clientSecret: string;
@@ -65,7 +67,13 @@ function CardCheckoutForm({
       {error && <p className="text-sm text-red-400">{error}</p>}
       <div className="flex gap-3">
         <Button type="submit" className="flex-1" disabled={!stripe || processing}>
-          {processing ? "Processing…" : `Pay $${amountUsd.toFixed(2)}`}
+          {processing ? (
+            "Processing…"
+          ) : (
+            <span className="inline-flex items-center gap-2">
+              Pay <UsdAmount amount={amountUsd} size={16} />
+            </span>
+          )}
         </Button>
         <Button type="button" variant="secondary" onClick={onClose} disabled={processing}>
           Cancel
@@ -103,7 +111,9 @@ export function CardPaymentPopup({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
         <CloseButton onClick={onClose} className="absolute right-4 top-4" />
-        <h2 className="font-heading text-xl font-semibold text-gold">Pay with card</h2>
+        <h2 className="flex items-center gap-2 font-heading text-xl font-semibold text-gold">
+          Pay with <PaymentMethodLogo method="card" size={22} showLabel={false} />
+        </h2>
         <p className="mt-1 text-sm text-muted">{storeName}</p>
         <p className="mt-2 font-mono text-sm">{invoiceNumber}</p>
         <Elements stripe={stripePromise} options={{ clientSecret }}>

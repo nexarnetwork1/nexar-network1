@@ -4,7 +4,7 @@ import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantOrders } from "@/modules/orders/repository";
 import { getMerchantProfile } from "@/modules/wallet/repository";
 import { createClient } from "@/lib/supabase/server";
-import { formatCurrency } from "@/utils/format";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function MerchantRevenuePage() {
   const profile = await getCurrentProfile();
@@ -43,9 +43,9 @@ export default async function MerchantRevenuePage() {
       <p className="mt-2 text-muted">{store.name} — earnings overview</p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Stat label="Gross sales" value={formatCurrency(totalGross)} />
-        <Stat label="Platform fees" value={formatCurrency(totalFees)} />
-        <Stat label="Net received" value={formatCurrency(totalNet)} highlight />
+        <Stat label="Gross sales" value={<UsdAmount amount={totalGross} size={24} />} />
+        <Stat label="Platform fees" value={<UsdAmount amount={totalFees} size={24} />} />
+        <Stat label="Net received" value={<UsdAmount amount={totalNet} size={24} />} highlight />
       </div>
 
       <h2 className="mt-10 font-heading text-lg font-semibold">Payout wallet</h2>
@@ -59,7 +59,7 @@ export default async function MerchantRevenuePage() {
             className="flex justify-between rounded-xl border border-border bg-card/40 px-4 py-3 text-sm"
           >
             <span className="font-mono text-xs">{order.id.slice(0, 8)}…</span>
-            <span>${Number(order.subtotal).toFixed(2)}</span>
+            <UsdAmount amount={Number(order.subtotal)} size={16} />
           </li>
         ))}
         {paidOrders.length === 0 && (
@@ -76,7 +76,7 @@ function Stat({
   highlight,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   highlight?: boolean;
 }) {
   return (

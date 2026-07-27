@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getAllOrders } from "@/modules/orders/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminOrdersPage() {
   const profile = await getCurrentProfile();
@@ -37,7 +38,7 @@ export default async function AdminOrdersPage() {
                 </td>
                 <td className="px-4 py-3">{order.store.name}</td>
                 <td className="px-4 py-3">
-                  {order.currency} {Number(order.subtotal).toFixed(2)}
+                  <CurrencyAmount amount={Number(order.subtotal)} currency={order.currency} size={16} />
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={order.status} />

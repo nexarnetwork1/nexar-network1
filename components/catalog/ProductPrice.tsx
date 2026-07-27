@@ -1,4 +1,4 @@
-import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = {
   price: number;
@@ -6,13 +6,12 @@ type Props = {
   currency: string;
   size?: "sm" | "md" | "lg";
   showBadge?: boolean;
-  showCurrencyLogo?: boolean;
 };
 
-const sizeClasses = {
-  sm: { price: "text-base", compare: "text-xs" },
-  md: { price: "text-lg", compare: "text-sm" },
-  lg: { price: "text-3xl", compare: "text-lg" },
+const sizeMap = {
+  sm: { logo: 16, amount: "text-base", compare: "text-xs" },
+  md: { logo: 18, amount: "text-lg", compare: "text-sm" },
+  lg: { logo: 24, amount: "text-3xl", compare: "text-lg" },
 };
 
 export function ProductPrice({
@@ -21,29 +20,31 @@ export function ProductPrice({
   currency,
   size = "md",
   showBadge = false,
-  showCurrencyLogo = false,
 }: Props) {
   const salePrice = Number(price);
   const listPrice =
     compareAtPrice != null && Number(compareAtPrice) > salePrice
       ? Number(compareAtPrice)
       : null;
-  const classes = sizeClasses[size];
+  const styles = sizeMap[size];
   const onSale = listPrice != null;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex flex-wrap items-baseline gap-2">
-        {showCurrencyLogo && (
-          <CurrencyLogo code={currency} size={size === "lg" ? 24 : 18} />
-        )}
-        <span className={`font-heading text-gold ${classes.price}`}>
-          {currency} {salePrice.toFixed(2)}
-        </span>
+        <CurrencyAmount
+          amount={salePrice}
+          currency={currency}
+          size={styles.logo}
+          amountClassName={`font-heading text-gold ${styles.amount}`}
+        />
         {listPrice != null && (
-          <span className={`text-muted line-through ${classes.compare}`}>
-            {currency} {listPrice.toFixed(2)}
-          </span>
+          <CurrencyAmount
+            amount={listPrice}
+            currency={currency}
+            size={styles.logo - 2}
+            amountClassName={`text-muted line-through ${styles.compare}`}
+          />
         )}
       </div>
       {showBadge && onSale && (

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { updateStoreSettingsAction } from "@/modules/stores/actions";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 import type { StoreSettings } from "@/types";
 
 type StoreSettingsFormProps = {
@@ -43,19 +45,22 @@ export function StoreSettingsForm({ settings }: StoreSettingsFormProps) {
         label="Notification email"
         defaultValue={settings.notification_email ?? ""}
       />
-      <Input
-        name="minOrderAmountUsd"
-        type="number"
-        step="0.01"
-        min="0"
-        label="Minimum order amount (USD)"
-        defaultValue={String(settings.min_order_amount_usd)}
-      />
-      <Input
+      <div>
+        <label className="mb-1 flex items-center gap-2 text-sm text-muted">
+          Minimum order amount (<UsdAmount amount={1} size={14} />)
+        </label>
+        <Input
+          name="minOrderAmountUsd"
+          type="number"
+          step="0.01"
+          min="0"
+          defaultValue={String(settings.min_order_amount_usd)}
+        />
+      </div>
+      <CurrencySelectField
         name="defaultCurrency"
-        label="Default currency"
         defaultValue={settings.default_currency}
-        maxLength={3}
+        label="Default currency"
       />
       <label className="flex items-center gap-2 text-sm">
         <input

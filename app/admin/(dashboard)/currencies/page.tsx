@@ -1,5 +1,6 @@
 import { getSupportedCurrencies } from "@/modules/platform/repository";
 import { toggleCurrencyAction } from "@/modules/platform/actions";
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 
 async function toggleFormAction(formData: FormData) {
   "use server";
@@ -32,7 +33,11 @@ export default async function AdminCurrenciesPage() {
           <tbody>
             {currencies.map((currency) => (
               <tr key={currency.id} className="border-b border-white/5">
-                <td className="px-4 py-3 font-mono font-medium">{currency.code}</td>
+                <td className="px-4 py-3 font-mono font-medium">
+                  <span className="inline-flex items-center gap-2">
+                    <CurrencyLogo code={currency.code} size={18} showLabel />
+                  </span>
+                </td>
                 <td className="px-4 py-3">{currency.name}</td>
                 <td className="px-4 py-3 capitalize">{currency.kind}</td>
                 <td className="px-4 py-3">{currency.decimals}</td>

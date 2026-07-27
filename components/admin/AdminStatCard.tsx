@@ -1,6 +1,6 @@
 type AdminStatCardProps = {
   label: string;
-  value: string | number;
+  value: React.ReactNode;
   hint?: string;
   tone?: "default" | "success" | "warning" | "danger";
 };

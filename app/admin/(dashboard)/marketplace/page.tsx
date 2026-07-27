@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAllStores, getAllProducts } from "@/modules/platform/repository";
 import { getTopMerchants, getTopProducts } from "@/modules/analytics/repository";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminMarketplacePage() {
   const [stores, products, topMerchants, topProducts] = await Promise.all([
@@ -31,7 +32,10 @@ export default async function AdminMarketplacePage() {
             {topMerchants.map((m) => (
               <li key={m.store_id} className="flex justify-between">
                 <span>{m.store_name}</span>
-                <span className="text-zinc-400">${m.revenue.toFixed(2)} · {m.order_count} orders</span>
+                <span className="inline-flex items-center gap-1 text-zinc-400">
+                  <UsdAmount amount={m.revenue} size={16} amountClassName="text-zinc-400" />
+                  <span>· {m.order_count} orders</span>
+                </span>
               </li>
             ))}
           </ul>
@@ -43,7 +47,10 @@ export default async function AdminMarketplacePage() {
             {topProducts.map((p) => (
               <li key={p.product_id} className="flex justify-between">
                 <span>{p.product_name}</span>
-                <span className="text-zinc-400">{p.units_sold} sold · ${p.revenue.toFixed(2)}</span>
+                <span className="inline-flex items-center gap-1 text-zinc-400">
+                  <span>{p.units_sold} sold ·</span>
+                  <UsdAmount amount={p.revenue} size={16} amountClassName="text-zinc-400" />
+                </span>
               </li>
             ))}
           </ul>

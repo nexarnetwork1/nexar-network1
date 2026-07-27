@@ -7,6 +7,7 @@ import { getFeaturedStores } from "@/modules/marketplace/repository";
 import { productSearchSchema } from "@/modules/catalog/validators";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { StoreCard } from "@/components/marketplace/StoreCard";
+import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
 
 type Props = {
   searchParams: Promise<{
@@ -124,12 +125,13 @@ export default async function BrowsePage({ searchParams }: Props) {
           <option value="price_desc">Price: high to low</option>
           <option value="name">Name</option>
         </select>
-        <select name="currency" defaultValue={filters.currency ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm">
-          <option value="">All currencies</option>
-          {["USD", "NXR", "BNB", "USDT", "BTC", "ETH"].map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+        <CurrencySelectField
+          name="currency"
+          defaultValue={filters.currency ?? ""}
+          includeEmpty
+          showLogo={Boolean(filters.currency)}
+          className="rounded-xl border-border bg-surface/80 px-3 py-3 text-sm"
+        />
         <input name="minPrice" type="number" step="0.01" placeholder="Min price" defaultValue={filters.minPrice ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm" />
         <input name="maxPrice" type="number" step="0.01" placeholder="Max price" defaultValue={filters.maxPrice ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm" />
         <label className="flex items-center gap-2 text-sm">

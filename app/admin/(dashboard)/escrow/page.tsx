@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { releaseEscrowAction } from "@/modules/escrow/actions";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 import type { Escrow } from "@/types";
 
 export default async function AdminEscrowPage() {
@@ -30,7 +31,9 @@ export default async function AdminEscrowPage() {
             {escrows.map((e) => (
               <tr key={e.id} className="border-t border-border">
                 <td className="px-4 py-3 font-mono text-xs">{e.order_id.slice(0, 8)}…</td>
-                <td className="px-4 py-3">${Number(e.amount).toFixed(2)} {e.currency}</td>
+                <td className="px-4 py-3">
+                  <CurrencyAmount amount={Number(e.amount)} currency={e.currency} size={16} />
+                </td>
                 <td className="px-4 py-3"><StatusBadge status={e.status} /></td>
                 <td className="px-4 py-3 text-muted">{e.held_at ? new Date(e.held_at).toLocaleString() : "—"}</td>
                 <td className="px-4 py-3">

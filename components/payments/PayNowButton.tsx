@@ -7,11 +7,12 @@ import { initiatePaymentAction } from "@/modules/payments/actions";
 import {
   cryptoPaymentMethods,
   initiatePaymentSchema,
-  type CryptoPaymentMethod,
   type PaymentMethodCode,
 } from "@/modules/payments/validators";
 import { PaymentPopup } from "@/components/payments/PaymentPopup";
 import { CardPaymentPopup } from "@/components/payments/CardPaymentPopup";
+import { PaymentMethodPicker } from "@/components/payments/BrandedSelect";
+import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
 import type { PaymentSession } from "@/types";
@@ -42,8 +43,12 @@ export function PayNowButton({
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [showMethodPicker, setShowMethodPicker] = useState(false);
 
-  const availableCrypto = paymentOptions.acceptsCrypto ? cryptoPaymentMethods : [];
+  const availableCrypto = paymentOptions.acceptsCrypto ? [...cryptoPaymentMethods] : [];
   const showCard = paymentOptions.acceptsCard;
+  const pickerMethods = [
+    ...availableCrypto,
+    ...(showCard ? (["card"] as const) : []),
+  ];
 
   async function handlePay() {
     setLoading(true);
@@ -136,42 +141,22 @@ export function PayNowButton({
       ) : (
         <div className="rounded-xl border border-border bg-card/40 p-4">
           <p className="text-sm text-muted">Select payment method</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {availableCrypto.map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMethod(m)}
-                className={`rounded-lg border px-4 py-2 text-sm transition ${
-                  method === m
-                    ? "border-gold bg-gold/10 text-gold"
-                    : "border-border text-muted hover:text-white"
-                }`}
-              >
-                {m}
-              </button>
-            ))}
-            {showCard && (
-              <button
-                type="button"
-                onClick={() => setMethod("card")}
-                className={`rounded-lg border px-4 py-2 text-sm transition ${
-                  method === "card"
-                    ? "border-gold bg-gold/10 text-gold"
-                    : "border-border text-muted hover:text-white"
-                }`}
-              >
-                Card
-              </button>
-            )}
-          </div>
+          <PaymentMethodPicker
+            className="mt-3"
+            methods={pickerMethods}
+            selected={method}
+            onSelect={(m) => setMethod(m as PaymentMethodCode)}
+          />
           <div className="mt-4 flex gap-2">
             <Button type="button" disabled={loading} onClick={handlePay}>
-              {loading
-                ? "Starting…"
-                : method === "card"
-                  ? "Pay with card"
-                  : `Pay with ${method}`}
+              {loading ? (
+                "Starting…"
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  Pay with
+                  <PaymentMethodLogo method={method} size={18} showLabel={false} />
+                </span>
+              )}
             </Button>
             <Button
               type="button"

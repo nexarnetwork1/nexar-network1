@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireSuperAdmin } from "@/modules/users/repository";
 import { getSettlementReports } from "@/modules/settlement-reports/repository";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminSettlementReportsPage() {
   await requireSuperAdmin();
@@ -25,9 +26,9 @@ export default async function AdminSettlementReportsPage() {
             {reports.map((r) => (
               <tr key={r.id} className="border-t border-border">
                 <td className="px-4 py-3 capitalize">{r.period_type} · {r.period_start}</td>
-                <td className="px-4 py-3">${r.metrics.gross_revenue.toFixed(2)}</td>
-                <td className="px-4 py-3">${r.metrics.platform_fees.toFixed(2)}</td>
-                <td className="px-4 py-3">${r.metrics.net_revenue.toFixed(2)}</td>
+                <td className="px-4 py-3"><UsdAmount amount={r.metrics.gross_revenue} size={16} /></td>
+                <td className="px-4 py-3"><UsdAmount amount={r.metrics.platform_fees} size={16} /></td>
+                <td className="px-4 py-3"><UsdAmount amount={r.metrics.net_revenue} size={16} /></td>
                 <td className="px-4 py-3 space-x-2">
                   <Link href={`/api/admin/settlement-reports/${r.id}/csv`} className="text-gold hover:underline">CSV</Link>
                   <Link href={`/api/admin/settlement-reports/${r.id}/excel`} className="text-gold hover:underline">Excel</Link>

@@ -9,6 +9,7 @@ import {
   cancelPaymentSessionAction,
 } from "@/modules/payments/actions";
 import { PaymentQrCode } from "@/components/payments/PaymentQrCode";
+import { CurrencyAmount, UsdAmount } from "@/components/payments/CurrencyAmount";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { truncateAddress } from "@/utils";
@@ -186,15 +187,23 @@ export function PaymentPopup({
             <dt className="text-muted">Invoice</dt>
             <dd className="font-mono">{invoiceNumber}</dd>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <dt className="text-muted">Amount</dt>
-            <dd className="font-heading text-lg text-gold">
-              {Number(session.amount).toFixed(6)} {session.currency}
+            <dd>
+              <CurrencyAmount
+                amount={Number(session.amount)}
+                currency={session.currency}
+                decimals={6}
+                size={22}
+                amountClassName="font-heading text-lg text-gold"
+              />
             </dd>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <dt className="text-muted">≈ USD</dt>
-            <dd>${Number(session.amount_usd).toFixed(2)}</dd>
+            <dd>
+              <UsdAmount amount={Number(session.amount_usd)} size={18} />
+            </dd>
           </div>
           {merchantWallet && (
             <div className="flex justify-between gap-4">
@@ -222,7 +231,7 @@ export function PaymentPopup({
             </p>
             {session.qr_payload && (
               <div className="mt-4 flex justify-center">
-                <PaymentQrCode value={session.qr_payload} />
+                <PaymentQrCode value={session.qr_payload} currency={session.currency} />
               </div>
             )}
           </div>

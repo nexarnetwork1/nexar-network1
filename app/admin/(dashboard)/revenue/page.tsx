@@ -6,6 +6,7 @@ import {
 import { RevenueChart } from "@/components/admin/RevenueChart";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminRevenuePage() {
   const [overview, stats, monthlyRevenue] = await Promise.all([
@@ -25,10 +26,10 @@ export default async function AdminRevenuePage() {
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <AdminStatCard label="Total revenue" value={`$${stats.totalRevenue.toFixed(2)}`} />
-        <AdminStatCard label="Platform fees" value={`$${stats.totalPlatformFees.toFixed(2)}`} tone="warning" />
-        <AdminStatCard label="Today" value={`$${overview.todayRevenue.toFixed(2)}`} tone="success" />
-        <AdminStatCard label="This month" value={`$${overview.monthlyRevenue.toFixed(2)}`} />
+        <AdminStatCard label="Total revenue" value={<UsdAmount amount={stats.totalRevenue} size={20} />} />
+        <AdminStatCard label="Platform fees" value={<UsdAmount amount={stats.totalPlatformFees} size={20} />} tone="warning" />
+        <AdminStatCard label="Today" value={<UsdAmount amount={overview.todayRevenue} size={20} />} tone="success" />
+        <AdminStatCard label="This month" value={<UsdAmount amount={overview.monthlyRevenue} size={20} />} />
       </div>
 
       <section className="mt-10">

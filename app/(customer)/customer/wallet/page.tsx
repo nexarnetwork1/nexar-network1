@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerWalletSummary } from "@/modules/wallet/repository";
-import { formatCurrency, formatDateTime } from "@/utils/format";
+import { formatDateTime } from "@/utils/format";
+import { CurrencyAmount, UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function CustomerWalletPage() {
   const profile = await getCurrentProfile();
@@ -29,7 +30,7 @@ export default async function CustomerWalletPage() {
         <div>
           <dt className="text-xs uppercase tracking-wider text-muted">Total spent</dt>
           <dd className="mt-1 font-heading text-2xl text-gold">
-            {formatCurrency(totalSpent)}
+            <UsdAmount amount={totalSpent} size={24} amountClassName="font-heading text-2xl text-gold" />
           </dd>
         </div>
         <div>
@@ -51,7 +52,7 @@ export default async function CustomerWalletPage() {
             </div>
             <div className="text-right">
               <p className="font-mono">
-                {Number(tx.amount).toFixed(4)} {tx.currency}
+              <CurrencyAmount amount={Number(tx.amount)} currency={tx.currency} decimals={4} size={16} />
               </p>
               <p className="text-xs capitalize text-muted">{tx.status}</p>
             </div>

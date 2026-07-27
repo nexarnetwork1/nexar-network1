@@ -2,6 +2,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantWalletSummary } from "@/modules/wallet/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { formatDateTime } from "@/utils/format";
+import { CurrencyAmount, UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function MerchantWalletPage() {
   const profile = await getCurrentProfile();
@@ -20,7 +21,7 @@ export default async function MerchantWalletPage() {
       <p className="mt-2 text-muted">Payout address and transaction history</p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <StatCard label="Total revenue" value={`$${Number(summary.profile?.total_revenue_usd ?? 0).toFixed(2)}`} />
+        <StatCard label="Total revenue" value={<UsdAmount amount={Number(summary.profile?.total_revenue_usd ?? 0)} size={20} />} />
         <StatCard label="Total orders" value={String(summary.profile?.total_orders ?? 0)} />
         <StatCard label="Payout wallet" value={store?.wallet_address ? "Configured" : "Missing"} />
       </div>
@@ -49,7 +50,9 @@ export default async function MerchantWalletPage() {
               {summary.transactions.map((tx) => (
                 <tr key={tx.id} className="border-b border-border/50">
                   <td className="py-3 capitalize">{tx.tx_type.replace("_", " ")}</td>
-                  <td className="py-3">${Number(tx.amount).toFixed(2)} {tx.currency}</td>
+                  <td className="py-3">
+                    <CurrencyAmount amount={Number(tx.amount)} currency={tx.currency} size={16} />
+                  </td>
                   <td className="py-3 capitalize">{tx.status}</td>
                   <td className="py-3 text-muted">{formatDateTime(tx.created_at)}</td>
                 </tr>
@@ -69,7 +72,7 @@ export default async function MerchantWalletPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function StatCard({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-surface p-5">
       <p className="text-xs uppercase tracking-wider text-muted">{label}</p>

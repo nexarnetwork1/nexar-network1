@@ -10,6 +10,8 @@ import {
 import { updateExchangeRateAction } from "@/modules/platform/actions";
 import { objectToFormData } from "@/utils/form-data";
 import type { ZodSchema } from "zod";
+import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 type ExchangeRateFormProps = {
   currencies?: Array<{ code: string; kind: string }>;
@@ -35,6 +37,7 @@ export function ExchangeRateForm({ currencies = [] }: ExchangeRateFormProps) {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useZodForm<ExchangeRateInput>({
     schema: exchangeRateSchema as ZodSchema<ExchangeRateInput>,
@@ -63,24 +66,19 @@ export function ExchangeRateForm({ currencies = [] }: ExchangeRateFormProps) {
       className="flex flex-wrap items-end gap-4 rounded-2xl border border-white/10 bg-zinc-900 p-6"
       noValidate
     >
+      <CurrencySelectField
+        {...register("baseCurrency")}
+        selectedCode={watch("baseCurrency")}
+        label="Asset"
+        className="border-white/10 bg-zinc-950"
+      />
+      {errors.baseCurrency && (
+        <p className="text-xs text-red-400">{errors.baseCurrency.message}</p>
+      )}
       <div>
-        <label className="text-xs text-zinc-400">Asset</label>
-        <select
-          {...register("baseCurrency")}
-          className="mt-1 block rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
-        >
-          {cryptoCurrencies.map((currency) => (
-            <option key={currency.code} value={currency.code}>
-              {currency.code}
-            </option>
-          ))}
-        </select>
-        {errors.baseCurrency && (
-          <p className="mt-1 text-xs text-red-400">{errors.baseCurrency.message}</p>
-        )}
-      </div>
-      <div>
-        <label className="text-xs text-zinc-400">Rate (USD per 1 unit)</label>
+        <label className="flex items-center gap-2 text-xs text-zinc-400">
+          Rate (<UsdAmount amount={1} size={14} /> per 1 unit)
+        </label>
         <input
           {...register("rate", { valueAsNumber: true })}
           type="number"

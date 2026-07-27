@@ -7,6 +7,8 @@ import {
   updateFeeScheduleAction,
 } from "@/modules/platform/actions";
 import type { PlatformSettings } from "@/types";
+import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = {
   settings: PlatformSettings | null;
@@ -22,6 +24,8 @@ const FEE_LABELS: Record<string, string> = {
   apple_pay: "Apple Pay Fee",
   google_pay: "Google Pay Fee",
 };
+
+const FEE_METHOD_KEYS = Object.keys(FEE_LABELS);
 
 export function ComprehensivePlatformSettingsForm({ settings, latestFees }: Props) {
   const router = useRouter();
@@ -77,10 +81,9 @@ export function ComprehensivePlatformSettingsForm({ settings, latestFees }: Prop
 
         <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
           <h2 className="text-lg font-semibold text-yellow-400">Fees</h2>
-          {Object.entries(FEE_LABELS).map(([key, label]) => (
+          {FEE_METHOD_KEYS.map((key) => (
             <FeeField
               key={key}
-              label={label}
               paymentType={key}
               defaultValue={latestFees[key] ?? 0}
               onSave={updateFee}
@@ -128,18 +131,20 @@ export function ComprehensivePlatformSettingsForm({ settings, latestFees }: Prop
         <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
           <h2 className="text-lg font-semibold text-yellow-400">Payments</h2>
           <Field
-            label="Minimum Payment (USD)"
+            label="Minimum Payment"
             name="minPaymentUsd"
             type="number"
             step="0.01"
             defaultValue={String(settings.min_payment_usd ?? 1)}
+            suffix={<UsdAmount amount={1} size={14} />}
           />
           <Field
-            label="Maximum Payment (USD)"
+            label="Maximum Payment"
             name="maxPaymentUsd"
             type="number"
             step="0.01"
             defaultValue={String(settings.max_payment_usd ?? 100000)}
+            suffix={<UsdAmount amount={1} size={14} />}
           />
         </section>
 
@@ -166,8 +171,18 @@ export function ComprehensivePlatformSettingsForm({ settings, latestFees }: Prop
         <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
           <h2 className="text-lg font-semibold text-yellow-400">Tokens & Support</h2>
           <Field label="Support Email" name="supportEmail" defaultValue={settings.support_email} />
-          <Field label="NXR Token" name="nxrToken" defaultValue={settings.nxr_token_address ?? ""} />
-          <Field label="USDT Token" name="usdtToken" defaultValue={settings.usdt_token_address ?? ""} />
+          <Field
+            label="NXR Token"
+            name="nxrToken"
+            defaultValue={settings.nxr_token_address ?? ""}
+            prefix={<PaymentMethodLogo method="nxr" size={18} showLabel={false} />}
+          />
+          <Field
+            label="USDT Token"
+            name="usdtToken"
+            defaultValue={settings.usdt_token_address ?? ""}
+            prefix={<PaymentMethodLogo method="usdt" size={18} showLabel={false} />}
+          />
         </section>
 
         {error && <p className="text-sm text-red-400">{error}</p>}
@@ -191,16 +206,24 @@ function Field({
   defaultValue,
   type = "text",
   step,
+  prefix,
+  suffix,
 }: {
   label: string;
   name: string;
   defaultValue?: string;
   type?: string;
   step?: string;
+  prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="text-xs text-zinc-400">{label}</label>
+      <label className="flex items-center gap-2 text-xs text-zinc-400">
+        {prefix}
+        {label}
+        {suffix && <span className="inline-flex items-center">({suffix})</span>}
+      </label>
       <input
         name={name}
         type={type}
@@ -213,12 +236,10 @@ function Field({
 }
 
 function FeeField({
-  label,
   paymentType,
   defaultValue,
   onSave,
 }: {
-  label: string;
   paymentType: string;
   defaultValue: number;
   onSave: (paymentType: string, rate: number) => Promise<void>;
@@ -226,7 +247,10 @@ function FeeField({
   return (
     <div className="flex items-end gap-3">
       <div className="flex-1">
-        <label className="text-xs text-zinc-400">{label}</label>
+        <label className="flex items-center gap-2 text-xs text-zinc-400">
+          <PaymentMethodLogo method={paymentType} size={18} showLabel={false} />
+          {FEE_LABELS[paymentType] ?? paymentType}
+        </label>
         <input
           id={`fee-${paymentType}`}
           type="number"

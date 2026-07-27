@@ -5,6 +5,7 @@ import { getMerchantStore } from "@/modules/stores/repository";
 import { getOrderById } from "@/modules/orders/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CancelOrderButton } from "@/components/orders/CancelOrderButton";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -34,16 +35,20 @@ export default async function MerchantOrderDetailPage({ params }: Props) {
         <div className="rounded-xl border border-border bg-card/40 p-4">
           <dt className="text-xs text-muted">Subtotal</dt>
           <dd className="mt-1 font-medium">
-            {order.currency} {Number(order.subtotal).toFixed(2)}
+            <CurrencyAmount amount={Number(order.subtotal)} currency={order.currency} size={16} />
           </dd>
         </div>
         <div className="rounded-xl border border-border bg-card/40 p-4">
           <dt className="text-xs text-muted">Platform fee</dt>
-          <dd className="mt-1">{order.currency} {Number(order.platform_fee).toFixed(2)}</dd>
+          <dd className="mt-1">
+            <CurrencyAmount amount={Number(order.platform_fee)} currency={order.currency} size={16} />
+          </dd>
         </div>
         <div className="rounded-xl border border-border bg-card/40 p-4">
           <dt className="text-xs text-muted">Merchant amount</dt>
-          <dd className="mt-1">{order.currency} {Number(order.merchant_amount).toFixed(2)}</dd>
+          <dd className="mt-1">
+            <CurrencyAmount amount={Number(order.merchant_amount)} currency={order.currency} size={16} />
+          </dd>
         </div>
       </dl>
 
@@ -55,7 +60,7 @@ export default async function MerchantOrderDetailPage({ params }: Props) {
             className="flex justify-between rounded-xl border border-border bg-card/40 px-4 py-3 text-sm"
           >
             <span>{item.product_name} × {item.quantity}</span>
-            <span>{order.currency} {Number(item.line_total).toFixed(2)}</span>
+            <CurrencyAmount amount={Number(item.line_total)} currency={order.currency} size={16} />
           </li>
         ))}
       </ul>

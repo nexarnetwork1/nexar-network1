@@ -5,6 +5,7 @@ import {
 } from "@/modules/platform/repository";
 import { PlatformSettingsForm } from "@/components/admin/PlatformSettingsForm";
 import { FeeScheduleForm } from "@/components/admin/FeeScheduleForm";
+import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 
 export default async function AdminPlatformFeesPage() {
   const [settings, latestRates, schedules] = await Promise.all([
@@ -35,9 +36,9 @@ export default async function AdminPlatformFeesPage() {
       <section className="mt-8 rounded-2xl border border-white/10 bg-zinc-900 p-6">
         <h2 className="text-lg font-semibold">Current fee rates</h2>
         <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-          <Rate label="NXR" rate={latestRates.nxr} />
-          <Rate label="Other crypto" rate={latestRates.crypto_other} />
-          <Rate label="Cards" rate={latestRates.card} />
+          <Rate method="nxr" rate={latestRates.nxr} />
+          <Rate method="crypto_other" rate={latestRates.crypto_other} />
+          <Rate method="card" rate={latestRates.card} />
         </dl>
 
         <FeeScheduleForm />
@@ -57,7 +58,9 @@ export default async function AdminPlatformFeesPage() {
             <tbody>
               {schedules.slice(0, 20).map((s) => (
                 <tr key={s.id} className="border-b border-white/5">
-                  <td className="px-4 py-3">{s.payment_type}</td>
+                  <td className="px-4 py-3">
+                    <PaymentMethodLogo method={s.payment_type} size={18} />
+                  </td>
                   <td className="px-4 py-3">{(Number(s.base_rate) * 100).toFixed(2)}%</td>
                   <td className="px-4 py-3 text-zinc-400">
                     {new Date(s.effective_from).toLocaleString()}
@@ -72,10 +75,12 @@ export default async function AdminPlatformFeesPage() {
   );
 }
 
-function Rate({ label, rate }: { label: string; rate?: number }) {
+function Rate({ method, rate }: { method: string; rate?: number }) {
   return (
     <div className="rounded-xl border border-white/10 bg-zinc-950 p-4">
-      <dt className="text-xs text-zinc-500">{label}</dt>
+      <dt className="text-xs text-zinc-500">
+        <PaymentMethodLogo method={method} size={18} />
+      </dt>
       <dd className="mt-1 text-xl font-bold">
         {rate != null ? `${(rate * 100).toFixed(2)}%` : "—"}
       </dd>

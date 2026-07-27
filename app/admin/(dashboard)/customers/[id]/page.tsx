@@ -4,6 +4,9 @@ import { getCustomerById } from "@/modules/platform/repository";
 import { getCustomerWalletSummaryAdmin, getCustomerPurchaseHistoryAdmin } from "@/modules/wallet/repository";
 import { banUserAction, resetUserPasswordAction } from "@/modules/platform/actions";
 import { formatDateTime } from "@/utils/format";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -45,8 +48,8 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <Stat label="Total orders" value={String(cp?.total_orders ?? 0)} />
-        <Stat label="Total spent" value={`$${Number(cp?.total_spent_usd ?? 0).toFixed(2)}`} />
-        <Stat label="Preferred currency" value={cp?.preferred_currency ?? "USD"} />
+        <Stat label="Total spent" value={<UsdAmount amount={Number(cp?.total_spent_usd ?? 0)} />} />
+        <Stat label="Preferred currency" value={<CurrencyLogo code={cp?.preferred_currency ?? "USD"} size={18} showLabel />} />
       </div>
 
       <section className="mt-10 rounded-2xl border border-white/10 bg-zinc-900 p-6">
@@ -56,7 +59,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
           {wallet.transactions.slice(0, 10).map((tx) => (
             <li key={tx.id} className="flex justify-between border-b border-white/5 pb-2">
               <span className="capitalize">{tx.tx_type.replace("_", " ")}</span>
-              <span>${Number(tx.amount).toFixed(2)} {tx.currency}</span>
+              <CurrencyAmount amount={Number(tx.amount)} currency={tx.currency} size={16} />
             </li>
           ))}
         </ul>
@@ -66,9 +69,12 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
         <h2 className="text-lg font-semibold text-yellow-400">Purchase history</h2>
         <ul className="mt-4 space-y-2 text-sm">
           {purchases.map((p) => (
-            <li key={p.order_id} className="flex justify-between">
+            <li key={p.order_id} className="flex justify-between items-center gap-4">
               <span>{p.store_name}</span>
-              <span>${Number(p.total).toFixed(2)} · {formatDateTime(p.paid_at ?? p.created_at)}</span>
+              <span className="flex items-center gap-2">
+                <UsdAmount amount={Number(p.total)} size={16} />
+                <span className="text-zinc-500">· {formatDateTime(p.paid_at ?? p.created_at)}</span>
+              </span>
             </li>
           ))}
         </ul>
@@ -93,7 +99,7 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-900 p-5">
       <p className="text-xs uppercase tracking-wider text-zinc-500">{label}</p>

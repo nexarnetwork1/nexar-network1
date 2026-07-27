@@ -7,6 +7,8 @@ import {
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { RealtimeScope } from "@/components/realtime/RealtimeScope";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 import { requireSuperAdmin } from "@/modules/users/repository";
 
 export default async function AdminDashboardPage() {
@@ -29,9 +31,9 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <AdminStatCard label="Today's revenue" value={`$${overview.todayRevenue.toFixed(2)}`} tone="success" />
-        <AdminStatCard label="Monthly revenue" value={`$${overview.monthlyRevenue.toFixed(2)}`} />
-        <AdminStatCard label="Platform fee revenue" value={`$${overview.platformFeeRevenue.toFixed(2)}`} tone="warning" />
+        <AdminStatCard label="Today's revenue" value={<UsdAmount amount={overview.todayRevenue} />} tone="success" />
+        <AdminStatCard label="Monthly revenue" value={<UsdAmount amount={overview.monthlyRevenue} />} />
+        <AdminStatCard label="Platform fee revenue" value={<UsdAmount amount={overview.platformFeeRevenue} />} tone="warning" />
         <AdminStatCard label="Today's orders" value={overview.todayOrders} />
         <AdminStatCard label="Today's payments" value={overview.todayPayments} />
         <AdminStatCard label="Active merchants" value={overview.activeMerchants} />
@@ -56,7 +58,7 @@ export default async function AdminDashboardPage() {
                   <p className="text-xs text-zinc-500">{tx.reference ?? tx.id.slice(0, 8)}</p>
                 </div>
                 <div className="text-right">
-                  <p>${tx.amount.toFixed(2)} {tx.currency}</p>
+                  <CurrencyAmount amount={tx.amount} currency={tx.currency} size={16} />
                   <p className="text-xs capitalize text-zinc-500">{tx.status}</p>
                 </div>
               </li>

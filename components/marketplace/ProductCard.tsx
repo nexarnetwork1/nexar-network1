@@ -92,7 +92,6 @@ export function ProductCard({ product, showNewBadge }: ProductCardProps) {
           compareAtPrice={product.compare_at_price}
           currency={product.currency}
           showBadge
-          showCurrencyLogo
         />
 
         <div className="mt-4 flex items-center gap-2">

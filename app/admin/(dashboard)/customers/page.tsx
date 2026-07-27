@@ -3,6 +3,7 @@ import { getCustomers } from "@/modules/platform/repository";
 import { banUserAction, resetUserPasswordAction } from "@/modules/platform/actions";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { formatDateTime } from "@/utils/format";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 async function banFormAction(formData: FormData) {
   "use server";
@@ -58,7 +59,9 @@ export default async function AdminCustomersPage() {
                     <p className="text-xs text-zinc-500">{customer.email}</p>
                   </td>
                   <td className="px-4 py-3">{cp?.total_orders ?? 0}</td>
-                  <td className="px-4 py-3">${Number(cp?.total_spent_usd ?? 0).toFixed(2)}</td>
+                  <td className="px-4 py-3">
+                    <UsdAmount amount={Number(cp?.total_spent_usd ?? 0)} size={16} />
+                  </td>
                   <td className="max-w-[120px] truncate px-4 py-3 font-mono text-xs">
                     {customer.wallet_address ?? "—"}
                   </td>

@@ -1,6 +1,7 @@
 import { getAllProducts } from "@/modules/platform/repository";
 import { moderateProductAction } from "@/modules/platform/actions";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 async function moderateFormAction(formData: FormData) {
   "use server";
@@ -46,7 +47,9 @@ export default async function AdminProductsPage() {
                       <span className="ml-2 text-xs text-amber-400">({store?.status})</span>
                     )}
                   </td>
-                  <td className="px-4 py-3">${Number(product.price).toFixed(2)}</td>
+                  <td className="px-4 py-3">
+                    <CurrencyAmount amount={Number(product.price)} currency={product.currency} size={16} />
+                  </td>
                   <td className="px-4 py-3">{product.stock}</td>
                   <td className="px-4 py-3">
                     {product.is_active ? (

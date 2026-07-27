@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 import type { ProductWithDetails, ProductWithStore } from "@/types";
 
 type Props = {
@@ -36,9 +37,7 @@ export function ProductDetailClient({ product, related, children }: Props) {
                     <img src={p.image_url} alt="" className="mb-3 aspect-square w-full rounded-lg object-cover" />
                   )}
                   <p className="font-medium">{p.name}</p>
-                  <p className="text-sm text-gold">
-                    {p.currency} {Number(p.price).toFixed(2)}
-                  </p>
+                  <CurrencyAmount amount={Number(p.price)} currency={p.currency} size={16} amountClassName="text-sm text-gold" />
                 </Link>
               </li>
             ))}

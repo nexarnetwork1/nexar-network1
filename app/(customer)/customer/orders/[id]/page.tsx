@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PayNowButton } from "@/components/payments/PayNowButton";
 import { CancelOrderButton } from "@/components/orders/CancelOrderButton";
 import { Button } from "@/components/ui/Button";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -40,7 +41,7 @@ export default async function CustomerOrderDetailPage({ params }: Props) {
         <div className="rounded-xl border border-border bg-card/40 p-4">
           <dt className="text-xs text-muted">Subtotal</dt>
           <dd className="mt-1 font-medium">
-            {order.currency} {Number(order.subtotal).toFixed(2)}
+            <CurrencyAmount amount={Number(order.subtotal)} currency={order.currency} size={16} />
           </dd>
         </div>
         <div className="rounded-xl border border-border bg-card/40 p-4">
@@ -72,10 +73,10 @@ export default async function CustomerOrderDetailPage({ params }: Props) {
                 <td className="px-4 py-3">{item.product_name}</td>
                 <td className="px-4 py-3">{item.quantity}</td>
                 <td className="px-4 py-3">
-                  {order.currency} {Number(item.unit_price).toFixed(2)}
+                  <CurrencyAmount amount={Number(item.unit_price)} currency={order.currency} size={16} />
                 </td>
                 <td className="px-4 py-3">
-                  {order.currency} {Number(item.line_total).toFixed(2)}
+                  <CurrencyAmount amount={Number(item.line_total)} currency={order.currency} size={16} />
                 </td>
               </tr>
             ))}

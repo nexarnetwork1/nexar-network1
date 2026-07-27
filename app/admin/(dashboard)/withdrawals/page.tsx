@@ -3,6 +3,7 @@ import { getPendingWithdrawals } from "@/modules/withdrawals/repository";
 import { adminReviewWithdrawalAction } from "@/modules/withdrawals/actions";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminWithdrawalsPage() {
   await requireSuperAdmin();
@@ -16,7 +17,7 @@ export default async function AdminWithdrawalsPage() {
         {withdrawals.map((w) => (
           <div key={w.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border p-6">
             <div>
-              <p className="font-semibold text-white">${Number(w.amount).toFixed(2)} {w.currency}</p>
+              <CurrencyAmount amount={Number(w.amount)} currency={w.currency} size={18} />
               <p className="font-mono text-xs text-muted">{w.wallet_address}</p>
               <StatusBadge status={w.status} />
             </div>

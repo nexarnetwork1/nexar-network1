@@ -8,7 +8,6 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ProductImageGallery } from "@/components/catalog/ProductImageGallery";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { ProductDetailClient } from "@/components/marketplace/ProductDetailClient";
-import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -68,12 +67,9 @@ export default async function ProductDetailPage({ params }: Props) {
             compareAtPrice={product.compare_at_price}
             currency={product.currency}
             size="lg"
-            showCurrencyLogo
           />
 
           <p className="mt-2 flex items-center gap-2 text-sm text-muted">
-            <CurrencyLogo code={product.currency} size={18} showLabel />
-            <span>·</span>
             <span>{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</span>
           </p>
 

@@ -1,6 +1,8 @@
 import { getExchangeRates, getActiveSupportedCurrencies } from "@/modules/platform/repository";
 import { ExchangeRateForm } from "@/components/admin/ExchangeRateForm";
 import { formatDateTime } from "@/utils/format";
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminExchangeRatesPage() {
   const [rates, currencies] = await Promise.all([
@@ -24,9 +26,10 @@ export default async function AdminExchangeRatesPage() {
         {currencies.map((c) => (
           <span
             key={c.id}
-            className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300"
           >
-            {c.code} · {c.kind}
+            <CurrencyLogo code={c.code} size={14} showLabel />
+            <span>· {c.kind}</span>
           </span>
         ))}
       </div>
@@ -50,8 +53,12 @@ export default async function AdminExchangeRatesPage() {
           <tbody>
             {Object.values(latestByAsset).map((r) => (
               <tr key={r.id} className="border-b border-white/5">
-                <td className="px-4 py-3 font-medium">{r.base_currency}</td>
-                <td className="px-4 py-3">${Number(r.rate).toFixed(6)}</td>
+                <td className="px-4 py-3 font-medium">
+                  <CurrencyLogo code={r.base_currency} size={18} showLabel />
+                </td>
+                <td className="px-4 py-3">
+                  <UsdAmount amount={Number(r.rate)} size={16} />
+                </td>
                 <td className="px-4 py-3 text-zinc-400">{r.source}</td>
                 <td className="px-4 py-3 text-zinc-400">
                   {formatDateTime(r.fetched_at)}

@@ -3,6 +3,8 @@ import { getPlatformSettings } from "@/modules/platform/repository";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { formatDateTime } from "@/utils/format";
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminTreasuryPage() {
   const [summary, settings] = await Promise.all([
@@ -28,7 +30,7 @@ export default async function AdminTreasuryPage() {
           value={summary.address ? `${summary.address.slice(0, 10)}…${summary.address.slice(-8)}` : "Not configured"}
           hint={summary.address ?? undefined}
         />
-        <AdminStatCard label="Total platform fees" value={`$${summary.totalFees.toFixed(2)}`} tone="warning" />
+        <AdminStatCard label="Total platform fees" value={<UsdAmount amount={summary.totalFees} />} tone="warning" />
         <AdminStatCard label="Ledger entries" value={summary.transactions.length} />
       </div>
 
@@ -59,8 +61,12 @@ export default async function AdminTreasuryPage() {
             {summary.transactions.map((tx) => (
               <tr key={tx.id} className="border-b border-white/5">
                 <td className="px-4 py-3 capitalize">{tx.tx_type.replace("_", " ")}</td>
-                <td className="px-4 py-3">${Number(tx.amount).toFixed(2)}</td>
-                <td className="px-4 py-3">{tx.currency}</td>
+                <td className="px-4 py-3">
+                  <UsdAmount amount={Number(tx.amount)} size={16} />
+                </td>
+                <td className="px-4 py-3">
+                  <CurrencyLogo code={tx.currency} size={18} showLabel />
+                </td>
                 <td className="px-4 py-3 capitalize">{tx.status}</td>
                 <td className="max-w-[100px] truncate px-4 py-3 font-mono text-xs">
                   {tx.tx_hash ?? "—"}

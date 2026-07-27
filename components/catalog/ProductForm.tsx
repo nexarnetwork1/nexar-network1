@@ -12,6 +12,7 @@ import { productSchema, type ProductInput } from "@/modules/catalog/validators";
 import { objectToFormData } from "@/utils/form-data";
 import type { Product, ProductCategory } from "@/types";
 import type { ZodSchema } from "zod";
+import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
 
 type ProductFormProps = {
   action: (formData: FormData) => Promise<{ success: boolean; error?: string; redirectTo?: string }>;
@@ -33,6 +34,7 @@ export function ProductForm({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useZodForm<ProductInput>({
     schema: productSchema as ZodSchema<ProductInput>,
@@ -97,12 +99,14 @@ export function ProductForm({
           label="Compare-at price (optional)"
           error={errors.compareAtPrice?.message}
         />
-        <Input
+        <CurrencySelectField
           {...register("currency")}
+          selectedCode={watch("currency")}
           label="Currency"
-          maxLength={3}
-          error={errors.currency?.message}
         />
+        {errors.currency && (
+          <p className="text-xs text-red-400">{errors.currency.message}</p>
+        )}
       </div>
       <Input
         {...register("stock", { valueAsNumber: true })}

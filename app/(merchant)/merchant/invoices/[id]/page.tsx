@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { InvoiceItemsTable } from "@/components/invoices/InvoiceItemsTable";
 import { InvoiceShareLink } from "@/components/merchant/InvoiceShareLink";
 import { buildInvoicePayUrl } from "@/lib/qr/payload";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -45,7 +46,7 @@ export default async function MerchantInvoiceDetailPage({ params }: Props) {
         <div className="flex justify-between">
           <dt className="text-muted">Amount</dt>
           <dd className="font-heading text-xl text-gold">
-            {invoice.currency} {Number(invoice.amount).toFixed(2)}
+            <CurrencyAmount amount={Number(invoice.amount)} currency={invoice.currency} size={20} />
           </dd>
         </div>
         <div className="flex justify-between">

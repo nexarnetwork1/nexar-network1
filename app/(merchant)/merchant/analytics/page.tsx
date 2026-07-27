@@ -3,6 +3,8 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantOrders } from "@/modules/orders/repository";
 import { MerchantAnalyticsChart } from "@/components/merchant/MerchantAnalyticsChart";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 
 export default async function MerchantAnalyticsPage() {
   const profile = await getCurrentProfile();
@@ -54,7 +56,11 @@ export default async function MerchantAnalyticsPage() {
         <div className="rounded-2xl border border-border bg-card/40 p-5">
           <p className="text-xs uppercase text-muted">Gross revenue</p>
           <p className="mt-2 font-heading text-2xl text-gold">
-            ${paidOrders.reduce((s, o) => s + Number(o.subtotal), 0).toFixed(2)}
+            <UsdAmount
+              amount={paidOrders.reduce((s, o) => s + Number(o.subtotal), 0)}
+              size={24}
+              amountClassName="font-heading text-2xl text-gold"
+            />
           </p>
         </div>
       </div>
@@ -72,7 +78,7 @@ export default async function MerchantAnalyticsPage() {
               key={method}
               className="flex justify-between rounded-xl border border-border bg-card/40 px-4 py-3 text-sm"
             >
-              <span className="capitalize">{method}</span>
+              <PaymentMethodLogo method={method} size={18} />
               <span>{count} orders</span>
             </li>
           ))}

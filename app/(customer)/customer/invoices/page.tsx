@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerInvoices } from "@/modules/invoices/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function CustomerInvoicesPage() {
   const profile = await getCurrentProfile();
@@ -43,7 +44,7 @@ export default async function CustomerInvoicesPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    {invoice.currency} {Number(invoice.amount).toFixed(2)}
+                    <CurrencyAmount amount={Number(invoice.amount)} currency={invoice.currency} size={16} />
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={invoice.status} />

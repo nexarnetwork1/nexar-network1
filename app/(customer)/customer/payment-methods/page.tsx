@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getPaymentMethods } from "@/modules/platform/repository";
+import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 
 export default async function CustomerPaymentMethodsPage() {
   const profile = await getCurrentProfile();
@@ -21,7 +22,7 @@ export default async function CustomerPaymentMethodsPage() {
             key={method.id}
             className="rounded-2xl border border-border bg-card/40 p-5"
           >
-            <p className="font-medium">{method.name}</p>
+            <PaymentMethodLogo method={method.code} size={18} />
             <p className="mt-1 text-xs uppercase text-muted">{method.kind}</p>
             <p className="mt-2 text-sm text-muted">
               {method.is_active ? "Available" : "Coming soon"}

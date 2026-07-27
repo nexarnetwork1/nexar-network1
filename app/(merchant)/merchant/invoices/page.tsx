@@ -5,6 +5,7 @@ import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantInvoices } from "@/modules/invoices/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function MerchantInvoicesPage() {
   const profile = await getCurrentProfile();
@@ -54,7 +55,7 @@ export default async function MerchantInvoicesPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    {invoice.currency} {Number(invoice.amount).toFixed(2)}
+                    <CurrencyAmount amount={Number(invoice.amount)} currency={invoice.currency} size={16} />
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={invoice.status} />

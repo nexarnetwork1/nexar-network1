@@ -1,13 +1,21 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
-import type { PaymentMethodCode } from "@/lib/constants/payment-branding";
+import {
+  getPaymentMethodAsset,
+  getPaymentMethodLabel,
+  normalizePaymentMethodCode,
+  type PaymentMethodCode,
+} from "@/lib/constants/payment-branding";
 import { CurrencyLogo } from "./CurrencyLogo";
 
 type PaymentMethodLogoProps = {
-  method: PaymentMethodCode;
+  method: string;
   size?: number;
   showLabel?: boolean;
   className?: string;
 };
+
+const CRYPTO_METHODS = new Set(["nxr", "bnb", "usdt", "btc", "eth"]);
 
 export function PaymentMethodLogo({
   method,
@@ -15,18 +23,13 @@ export function PaymentMethodLogo({
   showLabel = true,
   className,
 }: PaymentMethodLogoProps) {
-  const cryptoMap: Partial<Record<PaymentMethodCode, string>> = {
-    nxr: "NXR",
-    bnb: "BNB",
-    usdt: "USDT",
-    btc: "BTC",
-    eth: "ETH",
-  };
+  const code = normalizePaymentMethodCode(method);
 
-  if (cryptoMap[method]) {
+  if (CRYPTO_METHODS.has(code)) {
+    const currencyCode = code.toUpperCase();
     return (
       <CurrencyLogo
-        code={cryptoMap[method]!}
+        code={currencyCode}
         size={size}
         showLabel={showLabel}
         className={className}
@@ -34,71 +37,45 @@ export function PaymentMethodLogo({
     );
   }
 
+  const src = getPaymentMethodAsset(method);
+  const label = getPaymentMethodLabel(method);
+  const isWide = ["visa", "mastercard", "apple_pay", "google_pay", "card"].includes(code);
+
   return (
     <span className={cn("inline-flex items-center gap-1.5", className)}>
-      <CardBrandSvg method={method} size={size} />
-      {showLabel && <span className="text-xs font-medium">{labelFor(method)}</span>}
+      <Image
+        src={src}
+        alt={label}
+        width={isWide ? Math.round(size * 1.6) : size}
+        height={size}
+        className="shrink-0 object-contain"
+        unoptimized
+      />
+      {showLabel && (
+        <span className="text-xs font-medium">{label}</span>
+      )}
     </span>
   );
 }
 
-function labelFor(method: PaymentMethodCode): string {
-  const labels: Record<PaymentMethodCode, string> = {
-    nxr: "NXR",
-    bnb: "BNB",
-    usdt: "USDT",
-    btc: "BTC",
-    eth: "ETH",
-    visa: "Visa",
-    mastercard: "Mastercard",
-    apple_pay: "Apple Pay",
-    google_pay: "Google Pay",
-    card: "Card",
-  };
-  return labels[method];
-}
-
-function CardBrandSvg({ method, size }: { method: PaymentMethodCode; size: number }) {
-  const w = size * 1.6;
-  const h = size;
-
-  if (method === "visa") {
-    return (
-      <svg width={w} height={h} viewBox="0 0 48 32" aria-hidden className="shrink-0">
-        <rect width="48" height="32" rx="4" fill="#1A1F71" />
-        <text x="24" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontStyle="italic" fontFamily="Arial,sans-serif">VISA</text>
-      </svg>
-    );
-  }
-  if (method === "mastercard") {
-    return (
-      <svg width={w} height={h} viewBox="0 0 48 32" aria-hidden className="shrink-0">
-        <rect width="48" height="32" rx="4" fill="#252525" />
-        <circle cx="19" cy="16" r="8" fill="#EB001B" />
-        <circle cx="29" cy="16" r="8" fill="#F79E1B" fillOpacity="0.9" />
-      </svg>
-    );
-  }
-  if (method === "apple_pay") {
-    return (
-      <svg width={w} height={h} viewBox="0 0 48 32" aria-hidden className="shrink-0">
-        <rect width="48" height="32" rx="4" fill="#000" />
-        <text x="24" y="20" textAnchor="middle" fill="white" fontSize="8" fontFamily="system-ui"> Apple Pay</text>
-      </svg>
-    );
-  }
-  if (method === "google_pay") {
-    return (
-      <svg width={w} height={h} viewBox="0 0 48 32" aria-hidden className="shrink-0">
-        <rect width="48" height="32" rx="4" fill="#fff" stroke="#ddd" />
-        <text x="24" y="20" textAnchor="middle" fill="#4285F4" fontSize="7" fontFamily="system-ui">Google Pay</text>
-      </svg>
-    );
-  }
+/** Type-safe variant for known store payment method codes */
+export function BrandedPaymentMethod({
+  method,
+  size = 20,
+  showLabel = true,
+  className,
+}: {
+  method: PaymentMethodCode;
+  size?: number;
+  showLabel?: boolean;
+  className?: string;
+}) {
   return (
-    <svg width={w} height={h} viewBox="0 0 48 32" aria-hidden className="shrink-0">
-      <rect width="48" height="32" rx="4" fill="#333" />
-      <text x="24" y="20" textAnchor="middle" fill="white" fontSize="9" fontFamily="system-ui">Card</text>
-    </svg>
+    <PaymentMethodLogo
+      method={method}
+      size={size}
+      showLabel={showLabel}
+      className={className}
+    />
   );
 }

@@ -10,6 +10,7 @@ import { RevenueChart } from "@/components/admin/RevenueChart";
 import { RetrySettlementsButton } from "@/components/admin/RetrySettlementsButton";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { ExportButton } from "@/components/admin/ExportButton";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function AdminAnalyticsPage() {
   const [stats, settlements, monthlyRevenue, topMerchants, topProducts, growth] =
@@ -41,8 +42,8 @@ export default async function AdminAnalyticsPage() {
       </section>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <AdminStatCard label="Total revenue (paid orders)" value={`$${stats.totalRevenue.toFixed(2)}`} />
-        <AdminStatCard label="Platform fees collected" value={`$${stats.totalPlatformFees.toFixed(2)}`} tone="warning" />
+        <AdminStatCard label="Total revenue (paid orders)" value={<UsdAmount amount={stats.totalRevenue} size={20} />} />
+        <AdminStatCard label="Platform fees collected" value={<UsdAmount amount={stats.totalPlatformFees} size={20} />} tone="warning" />
         <AdminStatCard label="Total orders" value={String(stats.totalOrders)} />
         <AdminStatCard label="Customers" value={String(stats.totalCustomers)} />
         <AdminStatCard label="Merchants" value={String(stats.totalMerchants)} />
@@ -66,7 +67,7 @@ export default async function AdminAnalyticsPage() {
             {topMerchants.map((m) => (
               <li key={m.store_id} className="flex justify-between">
                 <span>{m.store_name}</span>
-                <span className="text-zinc-400">${m.revenue.toFixed(2)}</span>
+                <UsdAmount amount={m.revenue} size={16} amountClassName="text-zinc-400" />
               </li>
             ))}
           </ul>

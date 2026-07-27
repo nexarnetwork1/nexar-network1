@@ -4,6 +4,8 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { RetrySettlementsButton } from "@/components/admin/RetrySettlementsButton";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { formatDateTime } from "@/utils/format";
+import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 
 export default async function AdminPaymentsPage() {
   const [sessions, settlements, statusHistory] = await Promise.all([
@@ -48,9 +50,11 @@ export default async function AdminPaymentsPage() {
                 <td className="px-4 py-3 font-mono text-xs">
                   {(s.invoice as { invoice_number?: string })?.invoice_number ?? "—"}
                 </td>
-                <td className="px-4 py-3">{s.method}</td>
                 <td className="px-4 py-3">
-                  {Number(s.amount).toFixed(6)} {s.currency}
+                  <PaymentMethodLogo method={s.method} size={18} />
+                </td>
+                <td className="px-4 py-3">
+                  <CurrencyAmount amount={Number(s.amount)} currency={s.currency} decimals={6} size={16} />
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={s.status} />
@@ -90,11 +94,15 @@ export default async function AdminPaymentsPage() {
                 key={s.id}
                 className={`border-b border-white/5 ${s.status === "failed" ? "bg-red-950/30" : ""}`}
               >
-                <td className="px-4 py-3">${Number(s.gross_amount).toFixed(2)}</td>
-                <td className="px-4 py-3 text-yellow-400">
-                  ${Number(s.platform_fee).toFixed(2)}
+                <td className="px-4 py-3">
+                  <UsdAmount amount={Number(s.gross_amount)} size={16} />
                 </td>
-                <td className="px-4 py-3">${Number(s.merchant_amount).toFixed(2)}</td>
+                <td className="px-4 py-3 text-yellow-400">
+                  <UsdAmount amount={Number(s.platform_fee)} size={16} />
+                </td>
+                <td className="px-4 py-3">
+                  <UsdAmount amount={Number(s.merchant_amount)} size={16} />
+                </td>
                 <td className="px-4 py-3">{(Number(s.fee_rate_applied) * 100).toFixed(2)}%</td>
                 <td className="px-4 py-3">
                   <StatusBadge status={s.status} />

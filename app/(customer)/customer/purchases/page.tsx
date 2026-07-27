@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerPurchaseHistory } from "@/modules/wallet/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { formatCurrency, formatDateTime } from "@/utils/format";
+import { formatDateTime } from "@/utils/format";
+import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function CustomerPurchaseHistoryPage() {
   const profile = await getCurrentProfile();
@@ -40,7 +41,9 @@ export default async function CustomerPurchaseHistoryPage() {
                     {row.store_name}
                   </Link>
                 </td>
-                <td className="px-4 py-3">{formatCurrency(Number(row.total))}</td>
+                <td className="px-4 py-3">
+                  <UsdAmount amount={Number(row.total)} size={16} />
+                </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={row.status} />
                 </td>
