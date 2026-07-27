@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantInvoices } from "@/modules/invoices/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Button } from "@/components/ui/Button";
 
 export default async function MerchantInvoicesPage() {
   const profile = await getCurrentProfile();
@@ -16,8 +17,15 @@ export default async function MerchantInvoicesPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold">Invoices</h1>
-      <p className="mt-2 text-muted">Invoices for {store.name}</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-3xl font-semibold">Invoices</h1>
+          <p className="mt-2 text-muted">Invoices for {store.name}</p>
+        </div>
+        <Link href="/merchant/invoices/new">
+          <Button>New payment request</Button>
+        </Link>
+      </div>
 
       {invoices.length === 0 ? (
         <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center text-muted">

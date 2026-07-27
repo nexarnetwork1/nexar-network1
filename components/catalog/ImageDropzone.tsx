@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone, type Accept } from "react-dropzone";
 import { cn } from "@/lib/utils/cn";
 
@@ -24,9 +24,16 @@ export function ImageDropzone({
   label = "Product image",
   error,
 }: ImageDropzoneProps) {
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+
   const onDrop = useCallback(
     (accepted: File[]) => {
-      onFileChange(accepted[0] ?? null);
+      const file = accepted[0] ?? null;
+      onFileChange(file);
+      setObjectUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return file ? URL.createObjectURL(file) : null;
+      });
     },
     [onFileChange]
   );
@@ -37,17 +44,6 @@ export function ImageDropzone({
     maxFiles: 1,
     multiple: false,
   });
-
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (acceptedFiles[0]) {
-      const url = URL.createObjectURL(acceptedFiles[0]);
-      setObjectUrl(url);
-      return () => URL.revokeObjectURL(url);
-    }
-    setObjectUrl(null);
-  }, [acceptedFiles]);
 
   const preview = objectUrl ?? currentImageUrl;
 
@@ -85,7 +81,13 @@ export function ImageDropzone({
       {acceptedFiles[0] && (
         <button
           type="button"
-          onClick={() => onFileChange(null)}
+          onClick={() => {
+            onFileChange(null);
+            setObjectUrl((prev) => {
+              if (prev) URL.revokeObjectURL(prev);
+              return null;
+            });
+          }}
           className="text-xs text-muted hover:text-white"
         >
           Remove selected image

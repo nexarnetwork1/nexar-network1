@@ -9,7 +9,16 @@ import {
   customerRegisterSchema,
   merchantRegisterSchema,
   completeProfileSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+  updateProfileSchema,
+  changeEmailSchema,
+  changeWalletSchema,
 } from "./validators";
+import { writeSecurityLog } from "@/modules/audit/security";
+import { writeAuditLog } from "@/modules/audit/repository";
+import { enforceSingleSession, trackUserSession } from "./session";
 import type { UserRole } from "@/types";
 
 export type ActionResult = {
@@ -30,10 +39,26 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
+  const rememberMe = formData.get("rememberMe") === "true";
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  });
 
   if (error) {
+    await writeSecurityLog({
+      eventType: "failed_login",
+      metadata: { email: parsed.data.email, message: error.message },
+    }).catch(() => undefined);
     return { success: false, error: error.message };
+  }
+
+  await enforceSingleSession(data.user.id);
+  await trackUserSession(data.user.id).catch(() => undefined);
+
+  if (!rememberMe) {
+    // Session still uses Supabase cookie; single-session revokes other devices when enabled
   }
 
   const { data: profile } = await supabase
@@ -107,6 +132,15 @@ export async function registerCustomerAction(
   if (profileError) {
     return { success: false, error: profileError.message };
   }
+
+  await writeAuditLog({
+    actorId: data.user.id,
+    actorRole: "customer",
+    action: "auth.register",
+    entityType: "profile",
+    entityId: data.user.id,
+    metadata: { method: "email", role: "customer" },
+  }).catch(() => undefined);
 
   return { success: true, redirectTo: "/customer" };
 }
@@ -213,6 +247,15 @@ export async function registerMerchantAction(
     return { success: false, error: storeError.message };
   }
 
+  await writeAuditLog({
+    actorId: data.user.id,
+    actorRole: "merchant",
+    action: "auth.register",
+    entityType: "profile",
+    entityId: data.user.id,
+    metadata: { method: "email", role: "merchant", store_name: parsed.data.storeName },
+  }).catch(() => undefined);
+
   return { success: true, redirectTo: "/merchant" };
 }
 
@@ -287,11 +330,289 @@ export async function completeProfileAction(
     }
   }
 
+  await writeAuditLog({
+    actorId: user.id,
+    actorRole: role,
+    action: "auth.profile_completed",
+    entityType: "profile",
+    entityId: user.id,
+    metadata: { role },
+  }).catch(() => undefined);
+
   return { success: true, redirectTo: getDashboardPath(role) };
 }
 
 export async function signOutAction(): Promise<void> {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    await writeAuditLog({
+      actorId: user.id,
+      actorRole: profile?.role ?? "customer",
+      action: "auth.logout",
+      entityType: "profile",
+      entityId: user.id,
+    }).catch(() => undefined);
+  }
+
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+export async function forgotPasswordAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get("email"),
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo,
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function resetPasswordAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = resetPasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { success: false, error: "Invalid or expired reset link. Request a new one." };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorRole: "customer",
+    action: "auth.password_reset",
+    entityType: "profile",
+    entityId: user.id,
+  }).catch(() => undefined);
+
+  return { success: true, redirectTo: "/login?message=password_reset" };
+}
+
+export async function changePasswordAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = changePasswordSchema.safeParse({
+    currentPassword: formData.get("currentPassword"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { success: false, error: "Not authenticated" };
+  }
+
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.currentPassword,
+  });
+
+  if (verifyError) {
+    return { success: false, error: "Current password is incorrect" };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorRole: "customer",
+    action: "auth.password_changed",
+    entityType: "profile",
+    entityId: user.id,
+  }).catch(() => undefined);
+
+  return { success: true };
+}
+
+export async function resendConfirmationAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const email = formData.get("email");
+  if (typeof email !== "string" || !email.includes("@")) {
+    return { success: false, error: "Valid email required" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function updateProfileAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = updateProfileSchema.safeParse({
+    fullName: formData.get("fullName"),
+    singleSession:
+      formData.get("singleSession") === "on" ||
+      formData.get("singleSession") === "true",
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: parsed.data.fullName,
+      single_session_enabled: parsed.data.singleSession ?? false,
+    })
+    .eq("id", user.id);
+
+  if (error) return { success: false, error: error.message };
+
+  return { success: true };
+}
+
+export async function changeEmailAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = changeEmailSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) return { success: false, error: "Not authenticated" };
+
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.password,
+  });
+
+  if (verifyError) {
+    return { success: false, error: "Password is incorrect" };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    email: parsed.data.email,
+  });
+
+  if (error) return { success: false, error: error.message };
+
+  return {
+    success: true,
+    redirectTo: "/login?message=confirm_email",
+  };
+}
+
+export async function changeWalletAction(
+  formData: FormData
+): Promise<ActionResult> {
+  const parsed = changeWalletSchema.safeParse({
+    walletAddress: formData.get("walletAddress"),
+    confirmWalletAddress: formData.get("confirmWalletAddress"),
+    password: formData.get("password"),
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) return { success: false, error: "Not authenticated" };
+
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.password,
+  });
+
+  if (verifyError) {
+    return { success: false, error: "Password is incorrect" };
+  }
+
+  const wallet = parsed.data.walletAddress.toLowerCase();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ wallet_address: wallet })
+    .eq("id", user.id);
+
+  if (error) return { success: false, error: error.message };
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorRole: "customer",
+    action: "profile.wallet_changed",
+    entityType: "profile",
+    entityId: user.id,
+  }).catch(() => undefined);
+
+  return { success: true };
 }

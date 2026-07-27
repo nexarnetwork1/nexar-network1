@@ -1,11 +1,16 @@
-import { getAllPaymentSessions, getAllSettlements } from "@/modules/platform/repository";
+import { getAllPaymentSessions, getAllSettlements, getRecentPaymentStatusHistory } from "@/modules/platform/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { RetrySettlementsButton } from "@/components/admin/RetrySettlementsButton";
+import { formatDateTime } from "@/utils/format";
 
 export default async function AdminPaymentsPage() {
-  const [sessions, settlements] = await Promise.all([
+  const [sessions, settlements, statusHistory] = await Promise.all([
     getAllPaymentSessions(),
     getAllSettlements(),
+    getRecentPaymentStatusHistory(20),
   ]);
+
+  const failedSettlements = settlements.filter((s) => s.status === "failed");
 
   return (
     <div>
@@ -46,7 +51,15 @@ export default async function AdminPaymentsPage() {
         </table>
       </div>
 
-      <h2 className="mt-10 text-lg font-semibold">Settlements</h2>
+      <h2 className="mt-10 flex flex-wrap items-center gap-4 text-lg font-semibold">
+        Settlements
+        {failedSettlements.length > 0 && (
+          <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-normal text-red-300">
+            {failedSettlements.length} failed
+          </span>
+        )}
+        <RetrySettlementsButton />
+      </h2>
       <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
         <table className="w-full text-sm">
           <thead>
@@ -60,7 +73,10 @@ export default async function AdminPaymentsPage() {
           </thead>
           <tbody>
             {settlements.map((s) => (
-              <tr key={s.id} className="border-b border-white/5">
+              <tr
+                key={s.id}
+                className={`border-b border-white/5 ${s.status === "failed" ? "bg-red-950/30" : ""}`}
+              >
                 <td className="px-4 py-3">${Number(s.gross_amount).toFixed(2)}</td>
                 <td className="px-4 py-3 text-yellow-400">
                   ${Number(s.platform_fee).toFixed(2)}
@@ -72,6 +88,37 @@ export default async function AdminPaymentsPage() {
                 </td>
               </tr>
             ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="mt-10 text-lg font-semibold">Status history</h2>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-white/10 bg-zinc-900 text-left text-zinc-400">
+              <th className="px-4 py-3">From</th>
+              <th className="px-4 py-3">To</th>
+              <th className="px-4 py-3">Reason</th>
+              <th className="px-4 py-3">When</th>
+            </tr>
+          </thead>
+          <tbody>
+            {statusHistory.map((h) => (
+              <tr key={h.id} className="border-b border-white/5">
+                <td className="px-4 py-3 capitalize">{h.from_status ?? "—"}</td>
+                <td className="px-4 py-3 capitalize">{h.to_status}</td>
+                <td className="px-4 py-3 text-zinc-400">{h.reason ?? "—"}</td>
+                <td className="px-4 py-3 text-zinc-400">{formatDateTime(h.created_at)}</td>
+              </tr>
+            ))}
+            {statusHistory.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-6 text-center text-zinc-500">
+                  No status transitions yet.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

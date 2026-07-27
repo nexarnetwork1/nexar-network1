@@ -14,6 +14,7 @@ export type PlatformStats = {
   totalPlatformFees: number;
   totalPayments: number;
   paidPayments: number;
+  newContactMessages: number;
 };
 
 export type MonthlyRevenue = {
@@ -26,12 +27,13 @@ export type MonthlyRevenue = {
 export async function getPlatformStats(): Promise<PlatformStats> {
   const admin = createAdminClient();
 
-  const [profiles, stores, orders, settlements, payments] = await Promise.all([
+  const [profiles, stores, orders, settlements, payments, contacts] = await Promise.all([
     admin.from("profiles").select("role", { count: "exact", head: false }),
     admin.from("stores").select("status"),
     admin.from("orders").select("status, subtotal, platform_fee"),
     admin.from("settlements").select("platform_fee, status"),
     admin.from("payment_sessions").select("status"),
+    admin.from("contact_messages").select("status"),
   ]);
 
   const profileData = profiles.data ?? [];
@@ -39,6 +41,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   const orderData = orders.data ?? [];
   const settlementData = settlements.data ?? [];
   const paymentData = payments.data ?? [];
+  const contactData = contacts.data ?? [];
 
   return {
     totalUsers: profileData.length,
@@ -58,6 +61,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
       .reduce((sum, s) => sum + Number(s.platform_fee), 0),
     totalPayments: paymentData.length,
     paidPayments: paymentData.filter((p) => p.status === "paid").length,
+    newContactMessages: contactData.filter((c) => c.status === "new").length,
   };
 }
 

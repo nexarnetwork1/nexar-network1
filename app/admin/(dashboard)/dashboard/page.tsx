@@ -45,6 +45,10 @@ export default async function AdminDashboardPage() {
               <span className="text-zinc-400">Payments completed</span>
               <span className="font-medium">{stats.paidPayments}</span>
             </li>
+            <li className="flex justify-between">
+              <span className="text-zinc-400">New contact messages</span>
+              <span className="font-medium">{stats.newContactMessages}</span>
+            </li>
           </ul>
         </section>
 
@@ -54,6 +58,7 @@ export default async function AdminDashboardPage() {
             <QuickLink href="/admin/merchants" label="Approve merchants" />
             <QuickLink href="/admin/platform-fees" label="Configure fees" />
             <QuickLink href="/admin/audit-logs" label="View audit logs" />
+            <QuickLink href="/admin/contact" label="Contact messages" />
             <QuickLink href="/admin/security" label="Security settings" />
           </div>
         </section>

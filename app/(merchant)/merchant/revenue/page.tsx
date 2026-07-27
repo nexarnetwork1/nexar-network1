@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantOrders } from "@/modules/orders/repository";
+import { getMerchantProfile } from "@/modules/wallet/repository";
 import { createClient } from "@/lib/supabase/server";
+import { formatCurrency } from "@/utils/format";
 
 export default async function MerchantRevenuePage() {
   const profile = await getCurrentProfile();
@@ -11,7 +13,10 @@ export default async function MerchantRevenuePage() {
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");
 
-  const orders = await getMerchantOrders(store.id);
+  const [orders, merchantProfile] = await Promise.all([
+    getMerchantOrders(store.id),
+    getMerchantProfile(profile.id),
+  ]);
   const paidOrders = orders.filter((o) => o.status === "paid");
 
   const supabase = await createClient();
@@ -28,10 +33,9 @@ export default async function MerchantRevenuePage() {
     (sum, s) => sum + Number(s.platform_fee),
     0
   );
-  const totalNet = (settlements ?? []).reduce(
-    (sum, s) => sum + Number(s.merchant_amount),
-    0
-  );
+  const totalNet =
+    merchantProfile?.total_revenue_usd ??
+    (settlements ?? []).reduce((sum, s) => sum + Number(s.merchant_amount), 0);
 
   return (
     <div>
@@ -39,9 +43,9 @@ export default async function MerchantRevenuePage() {
       <p className="mt-2 text-muted">{store.name} — earnings overview</p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Stat label="Gross sales" value={`$${totalGross.toFixed(2)}`} />
-        <Stat label="Platform fees" value={`$${totalFees.toFixed(2)}`} />
-        <Stat label="Net received" value={`$${totalNet.toFixed(2)}`} highlight />
+        <Stat label="Gross sales" value={formatCurrency(totalGross)} />
+        <Stat label="Platform fees" value={formatCurrency(totalFees)} />
+        <Stat label="Net received" value={formatCurrency(totalNet)} highlight />
       </div>
 
       <h2 className="mt-10 font-heading text-lg font-semibold">Payout wallet</h2>

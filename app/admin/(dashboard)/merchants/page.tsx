@@ -11,11 +11,17 @@ async function updateStoreFormAction(formData: FormData) {
 
 export default async function AdminMerchantsPage() {
   const stores = await getAllStores();
+  const pendingCount = stores.filter((s) => s.status === "pending").length;
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-yellow-400">Merchants</h1>
-      <p className="mt-2 text-zinc-400">{stores.length} stores</p>
+      <p className="mt-2 text-zinc-400">
+        {stores.length} stores
+        {pendingCount > 0 && (
+          <span className="ml-2 text-amber-400">· {pendingCount} awaiting approval</span>
+        )}
+      </p>
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">
         <table className="w-full text-sm">
@@ -39,7 +45,19 @@ export default async function AdminMerchantsPage() {
                     "—"}
                 </td>
                 <td className="px-4 py-3 capitalize">{store.mode.replace("_", " ")}</td>
-                <td className="px-4 py-3 capitalize">{store.status}</td>
+                <td className="px-4 py-3 capitalize">
+                  <span
+                    className={
+                      store.status === "pending"
+                        ? "text-amber-400"
+                        : store.status === "active"
+                          ? "text-emerald-400"
+                          : "text-red-400"
+                    }
+                  >
+                    {store.status}
+                  </span>
+                </td>
                 <td className="max-w-[120px] truncate px-4 py-3 font-mono text-xs">
                   {store.wallet_address}
                 </td>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import {
   useAccount,
   useReadContract,
@@ -39,6 +39,11 @@ export function BuyNxrModal({ open, onClose }: BuyNxrModalProps) {
 }
 
 function BuyNxrModalInner({ open, onClose }: BuyNxrModalProps) {
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
 const { login } = usePrivy();
@@ -89,6 +94,9 @@ const { login } = usePrivy();
 
     return () => cancelAnimationFrame(frameId);
   }, [isSuccess, refetch, refetchAllowance]);
+
+  if (!mounted) return null;
+  if (typeof document === "undefined") return null;
 
   const ensureWallet = (): boolean => {
     reset();
@@ -146,18 +154,7 @@ login();
     });
   };
 
-  if (!isWeb3Configured()) return null;
-
-const [mounted, setMounted] = useState(false);
-
-useEffect(() => {
-  setMounted(true);
-}, []);
-
-if (!mounted) return null;
-if (typeof document === "undefined") return null;
-
-return createPortal(
+  return createPortal(
   <AnimatePresence>
     {open && (
       <>

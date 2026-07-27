@@ -11,11 +11,46 @@ import {
   storeStatusSchema,
   userRoleSchema,
 } from "./validators";
+import { createNotification } from "@/modules/notifications/repository";
+import { buildQrPayload } from "@/lib/qr/payload";
 import type { ActionResult } from "@/modules/auth/actions";
 import type { StoreStatus } from "@/types";
 
 async function assertAdmin() {
   return requireRole(["admin"]);
+}
+
+async function ensureStoreQrCodes(
+  storeId: string,
+  slug: string
+): Promise<void> {
+  const admin = createAdminClient();
+  const { data: existing } = await admin
+    .from("qr_codes")
+    .select("qr_type")
+    .eq("store_id", storeId);
+
+  const types = new Set((existing ?? []).map((row) => row.qr_type));
+
+  if (!types.has("marketplace")) {
+    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    await admin.from("qr_codes").insert({
+      store_id: storeId,
+      qr_type: "marketplace",
+      secret_token: token,
+      payload: buildQrPayload(token),
+    });
+  }
+
+  if (!types.has("payment_only")) {
+    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    await admin.from("qr_codes").insert({
+      store_id: storeId,
+      qr_type: "payment_only",
+      secret_token: token,
+      payload: buildQrPayload(token),
+    });
+  }
 }
 
 export async function updatePlatformSettingsAction(
@@ -154,12 +189,44 @@ export async function updateStoreStatusAction(
   }
 
   const admin = createAdminClient();
+
+  const { data: store } = await admin
+    .from("stores")
+    .select("owner_id, name, slug")
+    .eq("id", parsed.data.storeId)
+    .single();
+
   const { error } = await admin
     .from("stores")
     .update({ status: parsed.data.status })
     .eq("id", parsed.data.storeId);
 
   if (error) return { success: false, error: error.message };
+
+  if (parsed.data.status === "active" && store?.slug) {
+    await ensureStoreQrCodes(parsed.data.storeId, store.slug).catch(() => undefined);
+  }
+
+  if (store?.owner_id) {
+    const titles: Record<StoreStatus, string> = {
+      pending: "Store status updated",
+      active: "Store approved",
+      suspended: "Store suspended",
+    };
+    const bodies: Record<StoreStatus, string> = {
+      pending: `${store.name} is pending review.`,
+      active: `${store.name} is now active on Nexar Network.`,
+      suspended: `${store.name} has been suspended.`,
+    };
+
+    await createNotification({
+      userId: store.owner_id,
+      type: "system",
+      title: titles[parsed.data.status],
+      body: bodies[parsed.data.status],
+      metadata: { store_id: parsed.data.storeId, status: parsed.data.status },
+    }).catch(() => undefined);
+  }
 
   auditLogger.log({
     action: "admin.store.status_updated",
@@ -239,4 +306,24 @@ export async function togglePromotionAction(
 
   revalidatePath("/admin/promotions");
   return { success: true };
+}
+
+export async function retryFailedSettlementsAction(): Promise<
+  ActionResult & { attempted?: number; succeeded?: number; failed?: number }
+> {
+  const profile = await assertAdmin();
+  const { retryFailedSettlements } = await import("@/modules/settlement/worker");
+
+  const result = await retryFailedSettlements(20);
+
+  auditLogger.log({
+    action: "admin.settlements.retry",
+    entityType: "settlement",
+    actorId: profile.id,
+    actorRole: profile.role,
+    metadata: result,
+  });
+
+  revalidatePath("/admin/analytics");
+  return { success: true, ...result };
 }

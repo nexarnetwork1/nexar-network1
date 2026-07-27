@@ -11,10 +11,25 @@ import { updateExchangeRateAction } from "@/modules/platform/actions";
 import { objectToFormData } from "@/utils/form-data";
 import type { ZodSchema } from "zod";
 
-export function ExchangeRateForm() {
+type ExchangeRateFormProps = {
+  currencies?: Array<{ code: string; kind: string }>;
+};
+
+export function ExchangeRateForm({ currencies = [] }: ExchangeRateFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const cryptoCurrencies =
+    currencies.length > 0
+      ? currencies.filter((c) => c.kind === "crypto")
+      : [
+          { code: "BNB", kind: "crypto" },
+          { code: "NXR", kind: "crypto" },
+          { code: "USDT", kind: "crypto" },
+          { code: "BTC", kind: "crypto" },
+          { code: "ETH", kind: "crypto" },
+        ];
 
   const {
     register,
@@ -54,11 +69,11 @@ export function ExchangeRateForm() {
           {...register("baseCurrency")}
           className="mt-1 block rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
         >
-          <option value="BNB">BNB</option>
-          <option value="NXR">NXR</option>
-          <option value="USDT">USDT</option>
-          <option value="BTC">BTC</option>
-          <option value="ETH">ETH</option>
+          {cryptoCurrencies.map((currency) => (
+            <option key={currency.code} value={currency.code}>
+              {currency.code}
+            </option>
+          ))}
         </select>
         {errors.baseCurrency && (
           <p className="mt-1 text-xs text-red-400">{errors.baseCurrency.message}</p>

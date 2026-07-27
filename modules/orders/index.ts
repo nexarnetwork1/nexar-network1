@@ -6,4 +6,4 @@ export {
   getOrderItems,
 } from "./repository";
 
-export { checkoutAction } from "./actions";
+export { checkoutAction, cancelOrderAction, merchantCancelOrderAction } from "./actions";

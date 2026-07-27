@@ -14,6 +14,11 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
+  if (authConfig.publicRoutes.some((route) => pathname.startsWith(route))) {
+    const { supabaseResponse } = await updateSession(request);
+    return supabaseResponse;
+  }
+
   const { user, supabaseResponse, supabase } = await updateSession(request);
 
   let profile = null;

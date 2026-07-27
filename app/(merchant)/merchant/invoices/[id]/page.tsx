@@ -4,6 +4,9 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getInvoiceById } from "@/modules/invoices/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { InvoiceItemsTable } from "@/components/invoices/InvoiceItemsTable";
+import { InvoiceShareLink } from "@/components/merchant/InvoiceShareLink";
+import { buildInvoicePayUrl } from "@/lib/qr/payload";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -17,6 +20,11 @@ export default async function MerchantInvoiceDetailPage({ params }: Props) {
 
   const invoice = await getInvoiceById(id);
   if (!invoice || invoice.store_id !== store.id) notFound();
+
+  const payUrl =
+    invoice.share_token && ["pending", "draft"].includes(invoice.status)
+      ? buildInvoicePayUrl(invoice.share_token)
+      : null;
 
   return (
     <div>
@@ -52,6 +60,10 @@ export default async function MerchantInvoiceDetailPage({ params }: Props) {
           </dd>
         </div>
       </dl>
+
+      <InvoiceItemsTable items={invoice.items ?? []} currency={invoice.currency} />
+
+      {payUrl && <InvoiceShareLink payUrl={payUrl} />}
 
       <a
         href={`/api/invoices/${invoice.id}/pdf`}

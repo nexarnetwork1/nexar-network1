@@ -6,12 +6,16 @@ Operational checklist for deploying Nexar Network to production.
 
 ```bash
 cp .env.production.example .env.local   # reference only — set vars in host dashboard
+supabase db push                         # apply all 12 migrations to production Supabase
 npm run prelaunch                        # typecheck + lint + build
 ```
+
+For local builds without full Supabase env, use `npm run build:local` (sets `SKIP_ENV_VALIDATION=true`).
 
 Verify locally:
 - `GET /api/health` returns `healthy` or documents `degraded` reasons
 - Login, checkout, and payment popup work against staging Supabase
+- Run `scripts/rls-audit.sql` — zero tables without RLS
 
 ## Deploy (Netlify)
 
@@ -31,6 +35,8 @@ Verify locally:
 | 5 | Create product → browse as customer | Product visible |
 | 6 | Checkout → Pay now (testnet) | Payment popup with QR, session created |
 | 7 | Check Sentry | No unhandled errors from smoke test |
+| 8 | Submit `/contact` form | Message appears in Admin → Contact |
+| 9 | Approve merchant store | Merchant receives notification + QR codes |
 
 ## Cron: expire payment sessions
 
@@ -44,6 +50,26 @@ Call every minute with secret header:
 curl -H "Authorization: Bearer $CRON_SECRET" \
   https://your-domain.com/api/cron/expire-sessions
 ```
+
+This endpoint also expires stale merchant promotions (`expire_merchant_promotions`).
+
+**Verify open crypto payments** (every 1–2 minutes):
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" \
+  https://your-domain.com/api/cron/verify-payments
+```
+
+**Stripe webhooks:** Configure Stripe dashboard → `POST /api/webhooks/stripe` with `STRIPE_WEBHOOK_SECRET`.
+
+**Retry failed crypto settlements** (every 15 minutes):
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" \
+  https://your-domain.com/api/cron/retry-settlements
+```
+
+**Transactional email:** Set `RESEND_API_KEY` and `EMAIL_FROM` for invoice and payment notifications.
 
 Use Netlify scheduled functions, GitHub Actions, or Supabase Edge Function scheduler.
 

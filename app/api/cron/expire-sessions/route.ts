@@ -30,11 +30,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    const { data: expiredPromotions, error: promoError } = await admin.rpc(
+      "expire_merchant_promotions"
+    );
+
+    if (promoError) {
+      logger.warn("Cron expire_merchant_promotions failed", { error: promoError.message });
+    }
+
     logger.info("Expired stale payment sessions", { count: data });
 
     return NextResponse.json({
       success: true,
       expired: data ?? 0,
+      expiredPromotions: expiredPromotions ?? 0,
       timestamp: new Date().toISOString(),
     });
   } catch (err) {

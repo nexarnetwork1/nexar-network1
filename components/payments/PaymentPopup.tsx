@@ -4,7 +4,10 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { verifyPaymentAction } from "@/modules/payments/actions";
+import {
+  verifyPaymentAction,
+  cancelPaymentSessionAction,
+} from "@/modules/payments/actions";
 import { PaymentQrCode } from "@/components/payments/PaymentQrCode";
 import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
@@ -15,8 +18,17 @@ type PaymentPopupProps = {
   session: PaymentSession;
   invoiceNumber: string;
   storeName: string;
+  merchantWallet?: string | null;
   onClose: () => void;
 };
+
+type DisplayStatus =
+  | "pending"
+  | "waiting"
+  | "confirmed"
+  | "completed"
+  | "expired"
+  | "cancelled";
 
 function formatCountdown(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -25,19 +37,52 @@ function formatCountdown(ms: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function mapDisplayStatus(
+  status: PaymentSession["status"],
+  verifying: boolean
+): DisplayStatus {
+  if (status === "paid" || status === "completed") return "completed";
+  if (status === "confirmed") return "confirmed";
+  if (status === "expired" || status === "failed") return "expired";
+  if (status === "cancelled") return "cancelled";
+  if (verifying) return "confirmed";
+  return status === "waiting" ? "waiting" : "pending";
+}
+
+const STATUS_LABELS: Record<DisplayStatus, string> = {
+  pending: "Pending",
+  waiting: "Waiting for payment",
+  confirmed: "Confirmed on-chain",
+  completed: "Completed",
+  expired: "Expired",
+  cancelled: "Cancelled",
+};
+
+const STATUS_COLORS: Record<DisplayStatus, string> = {
+  pending: "text-zinc-400",
+  waiting: "text-amber-400",
+  confirmed: "text-sky-400",
+  completed: "text-emerald-400",
+  expired: "text-red-400",
+  cancelled: "text-red-400",
+};
+
 export function PaymentPopup({
   session: initialSession,
   invoiceNumber,
   storeName,
+  merchantWallet,
   onClose,
 }: PaymentPopupProps) {
   const router = useRouter();
   const [session, setSession] = useState(initialSession);
   const [countdown, setCountdown] = useState("");
   const [verifying, setVerifying] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const expiresAt = new Date(session.expires_at).getTime();
+  const displayStatus = mapDisplayStatus(session.status, verifying);
 
   useEffect(() => {
     const tick = () => {
@@ -107,21 +152,19 @@ export function PaymentPopup({
     return () => clearInterval(id);
   }, [session.status, pollVerify]);
 
-  const statusLabel =
-    session.status === "waiting"
-      ? "Waiting for payment"
-      : session.status === "paid"
-        ? "Paid"
-        : session.status === "expired"
-          ? "Expired"
-          : "Failed";
-
-  const statusColor =
-    session.status === "paid"
-      ? "text-emerald-400"
-      : session.status === "waiting"
-        ? "text-amber-400"
-        : "text-red-400";
+  async function handleCancel() {
+    setCancelling(true);
+    setError(null);
+    const result = await cancelPaymentSessionAction(session.id);
+    if (!result.success) {
+      setError(result.error ?? "Could not cancel");
+      setCancelling(false);
+      return;
+    }
+    setSession((s) => ({ ...s, status: "expired" }));
+    setCancelling(false);
+    onClose();
+  }
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
@@ -153,9 +196,15 @@ export function PaymentPopup({
             <dt className="text-muted">≈ USD</dt>
             <dd>${Number(session.amount_usd).toFixed(2)}</dd>
           </div>
+          {merchantWallet && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted shrink-0">Merchant wallet</dt>
+              <dd className="truncate font-mono text-xs">{truncateAddress(merchantWallet, 6)}</dd>
+            </div>
+          )}
           <div className="flex justify-between">
             <dt className="text-muted">Status</dt>
-            <dd className={statusColor}>{statusLabel}</dd>
+            <dd className={STATUS_COLORS[displayStatus]}>{STATUS_LABELS[displayStatus]}</dd>
           </div>
           {session.status === "waiting" && (
             <div className="flex justify-between">
@@ -167,12 +216,9 @@ export function PaymentPopup({
 
         {session.deposit_address && session.status === "waiting" && (
           <div className="mt-6 rounded-xl border border-border bg-surface/80 p-4">
-            <p className="text-xs text-muted uppercase tracking-wider">Send to wallet</p>
+            <p className="text-xs text-muted uppercase tracking-wider">Send to deposit address</p>
             <p className="mt-2 break-all font-mono text-xs text-gold-secondary">
               {session.deposit_address}
-            </p>
-            <p className="mt-1 text-xs text-muted">
-              {truncateAddress(session.deposit_address, 6)}
             </p>
             {session.qr_payload && (
               <div className="mt-4 flex justify-center">
@@ -186,16 +232,26 @@ export function PaymentPopup({
 
         <div className="mt-6 flex gap-3">
           {session.status === "waiting" && (
-            <Button
-              type="button"
-              className="flex-1"
-              disabled={verifying}
-              onClick={pollVerify}
-            >
-              {verifying ? "Checking…" : "I have paid"}
-            </Button>
+            <>
+              <Button
+                type="button"
+                className="flex-1"
+                disabled={verifying}
+                onClick={pollVerify}
+              >
+                {verifying ? "Checking…" : "I have paid"}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={cancelling}
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+            </>
           )}
-          {session.status === "paid" && (
+          {(session.status === "paid" || displayStatus === "completed") && (
             <Button type="button" className="flex-1" onClick={onClose}>
               Done
             </Button>

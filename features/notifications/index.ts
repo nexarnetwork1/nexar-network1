@@ -1,2 +1,7 @@
-/** Notifications feature — email and in-app notifications. */
-export {};
+export {
+  getUserNotifications,
+  getUnreadNotificationCount,
+  markNotificationRead,
+  createNotification,
+  markNotificationReadAction,
+} from "@/modules/notifications";

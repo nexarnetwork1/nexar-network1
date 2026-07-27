@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useZodForm } from "@/hooks/useZodForm";
 import { loginSchema, type LoginInput } from "@/schemas";
-import { loginAction } from "@/modules/auth/actions";
+import { loginAction, resendConfirmationAction } from "@/modules/auth/actions";
 import { objectToFormData } from "@/utils/form-data";
 
 export default function LoginForm() {
@@ -19,6 +19,7 @@ export default function LoginForm() {
   const message = searchParams.get("message");
 
   const [serverError, setServerError] = useState<string | null>(null);
+  const [resendEmail, setResendEmail] = useState<string | null>(null);
 
   const {
     register,
@@ -34,11 +35,14 @@ export default function LoginForm() {
 
     const formData = objectToFormData(data);
     if (redirect) formData.set("redirect", redirect);
+    const rememberMe = (document.getElementById("rememberMe") as HTMLInputElement)?.checked;
+    formData.set("rememberMe", rememberMe ? "true" : "false");
 
     const result = await loginAction(formData);
 
     if (!result.success) {
       setServerError(result.error ?? "Login failed");
+      setResendEmail(data.email);
       return;
     }
 
@@ -46,11 +50,23 @@ export default function LoginForm() {
     router.refresh();
   }
 
+  async function handleResend() {
+    if (!resendEmail) return;
+    const fd = new FormData();
+    fd.set("email", resendEmail);
+    await resendConfirmationAction(fd);
+  }
+
   return (
     <AuthCard title="Sign in" subtitle="Access your Nexar Network account">
       {message === "confirm_email" && (
         <p className="mb-6 rounded-xl border border-gold/20 bg-gold/5 px-4 py-3 text-sm text-gold-secondary">
           Check your email to confirm your account, then sign in.
+        </p>
+      )}
+      {message === "password_reset" && (
+        <p className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-400">
+          Password updated. You can sign in with your new password.
         </p>
       )}
 
@@ -80,7 +96,30 @@ export default function LoginForm() {
           error={errors.password?.message}
         />
 
-        {serverError && <p className="text-sm text-red-400">{serverError}</p>}
+        <div className="flex items-center justify-between text-sm">
+          <label className="flex items-center gap-2 text-muted">
+            <input id="rememberMe" type="checkbox" className="rounded border-border" />
+            Remember me
+          </label>
+          <Link href="/forgot-password" className="text-gold hover:text-gold-secondary">
+            Forgot password?
+          </Link>
+        </div>
+
+        {serverError && (
+          <div>
+            <p className="text-sm text-red-400">{serverError}</p>
+            {resendEmail && message !== "confirm_email" && (
+              <button
+                type="button"
+                onClick={handleResend}
+                className="mt-2 text-xs text-gold hover:underline"
+              >
+                Resend confirmation email
+              </button>
+            )}
+          </div>
+        )}
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Signing in…" : "Sign in"}

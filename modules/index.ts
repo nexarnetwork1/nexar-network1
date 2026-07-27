@@ -18,3 +18,4 @@ export * as platform from "./platform";
 export * as audit from "./audit";
 export * as analytics from "./analytics";
 export * as notifications from "./notifications";
+export * as contact from "./contact";

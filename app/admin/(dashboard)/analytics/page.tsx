@@ -1,6 +1,7 @@
 import { getPlatformStats, getMonthlyRevenue } from "@/modules/analytics/repository";
 import { getAllSettlements } from "@/modules/platform/repository";
 import { RevenueChart } from "@/components/admin/RevenueChart";
+import { RetrySettlementsButton } from "@/components/admin/RetrySettlementsButton";
 
 export default async function AdminAnalyticsPage() {
   const [stats, settlements, monthlyRevenue] = await Promise.all([
@@ -31,6 +32,15 @@ export default async function AdminAnalyticsPage() {
         <StatCard label="Active stores" value={String(stats.activeStores)} />
         <StatCard label="Completed settlements" value={String(completedSettlements.length)} />
         <StatCard label="Failed settlements" value={String(failedSettlements.length)} />
+        <div className="rounded-2xl border border-white/10 bg-zinc-900 p-5 sm:col-span-2 lg:col-span-3">
+          <p className="text-xs uppercase tracking-wider text-zinc-500">Settlement recovery</p>
+          <p className="mt-2 text-sm text-zinc-400">
+            Re-attempt on-chain payouts for crypto settlements marked failed.
+          </p>
+          <div className="mt-4">
+            <RetrySettlementsButton />
+          </div>
+        </div>
         <StatCard
           label="Payment success rate"
           value={

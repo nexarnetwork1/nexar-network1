@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
 import { CartBadge } from "@/components/cart/CartBadge";
-import Link from "next/link";
+import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { Button } from "@/components/ui/Button";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function CustomerLayout({
   children,
@@ -16,11 +18,18 @@ export default async function CustomerLayout({
     redirect("/login");
   }
 
+  const supabase = await createClient();
+  const { count: pendingInvoices } = await supabase
+    .from("invoices")
+    .select("id", { count: "exact", head: true })
+    .eq("customer_id", profile.id)
+    .in("status", ["pending", "draft"]);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface/50">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex flex-wrap items-center gap-6 text-sm">
             <Link href="/customer" className="font-heading text-gold">
               Nexar
             </Link>
@@ -33,10 +42,20 @@ export default async function CustomerLayout({
             </Link>
             <Link href="/customer/invoices" className="text-muted hover:text-white">
               Invoices
+              {(pendingInvoices ?? 0) > 0 && (
+                <span className="ml-1 text-amber-400">({pendingInvoices})</span>
+              )}
             </Link>
             <Link href="/customer/wallet" className="text-muted hover:text-white">
               Wallet
             </Link>
+            <Link href="/customer/purchases" className="text-muted hover:text-white">
+              History
+            </Link>
+            <Link href="/customer/profile" className="text-muted hover:text-white">
+              Profile
+            </Link>
+            <NotificationBadge userId={profile.id} />
           </nav>
           <form action={signOutAction}>
             <Button type="submit" variant="ghost" size="sm">

@@ -116,3 +116,39 @@ export async function getAllSettlements() {
   if (error) return [];
   return data;
 }
+
+export async function getSupportedCurrencies() {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("supported_currencies")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order");
+
+  if (error) return [];
+  return data;
+}
+
+export async function getPaymentMethods() {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("payment_methods")
+    .select("*")
+    .eq("is_active", true)
+    .order("code");
+
+  if (error) return [];
+  return data;
+}
+
+export async function getRecentPaymentStatusHistory(limit = 50) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("payment_status_history")
+    .select("*, session:payment_sessions(id, method, amount_usd)")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) return [];
+  return data;
+}

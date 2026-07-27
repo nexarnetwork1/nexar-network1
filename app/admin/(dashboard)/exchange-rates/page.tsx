@@ -1,9 +1,12 @@
-import { getExchangeRates } from "@/modules/platform/repository";
+import { getExchangeRates, getSupportedCurrencies } from "@/modules/platform/repository";
 import { ExchangeRateForm } from "@/components/admin/ExchangeRateForm";
 import { formatDateTime } from "@/utils/format";
 
 export default async function AdminExchangeRatesPage() {
-  const rates = await getExchangeRates();
+  const [rates, currencies] = await Promise.all([
+    getExchangeRates(),
+    getSupportedCurrencies(),
+  ]);
 
   const latestByAsset: Record<string, typeof rates[0]> = {};
   for (const r of rates) {
@@ -17,8 +20,21 @@ export default async function AdminExchangeRatesPage() {
       <h1 className="text-3xl font-bold text-yellow-400">Exchange rates</h1>
       <p className="mt-2 text-zinc-400">Crypto to USD conversion rates for payments</p>
 
+      <div className="mt-6 flex flex-wrap gap-2">
+        {currencies.map((c) => (
+          <span
+            key={c.id}
+            className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300"
+          >
+            {c.code} · {c.kind}
+          </span>
+        ))}
+      </div>
+
       <div className="mt-8">
-        <ExchangeRateForm />
+        <ExchangeRateForm
+          currencies={currencies.map((c) => ({ code: c.code, kind: c.kind }))}
+        />
       </div>
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">

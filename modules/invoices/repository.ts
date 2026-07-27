@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Invoice, InvoiceWithDetails } from "@/types";
+import type { Invoice, InvoiceWithDetails, InvoiceItem } from "@/types";
 
 export async function getCustomerInvoices(customerId: string): Promise<Invoice[]> {
   const supabase = await createClient();
@@ -48,7 +48,27 @@ export async function getInvoiceById(invoiceId: string): Promise<InvoiceWithDeta
     .single();
 
   if (error) return null;
-  return data as InvoiceWithDetails;
+  const invoice = data as InvoiceWithDetails;
+
+  const { data: items } = await supabase
+    .from("invoice_items")
+    .select("*")
+    .eq("invoice_id", invoiceId)
+    .order("created_at");
+
+  return { ...invoice, items: (items ?? []) as InvoiceWithDetails["items"] };
+}
+
+export async function getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("invoice_items")
+    .select("*")
+    .eq("invoice_id", invoiceId)
+    .order("created_at");
+
+  if (error) return [];
+  return (data ?? []) as InvoiceItem[];
 }
 
 export async function getInvoiceByOrderId(orderId: string): Promise<Invoice | null> {

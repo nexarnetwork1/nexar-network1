@@ -7,8 +7,9 @@ export const authConfig = {
     admin: "/admin/dashboard",
   },
   profileCompletionRoute: "/auth/complete-profile",
-  authRoutes: ["/login", "/register", "/signup"],
-  publicAuthRoutes: ["/auth/callback", "/auth/complete-profile"],
+  authRoutes: ["/login", "/register", "/signup", "/forgot-password", "/reset-password"],
+  publicAuthRoutes: ["/auth/callback", "/auth/complete-profile", "/forgot-password", "/reset-password"],
+  publicRoutes: ["/store", "/pay", "/api/qr", "/api/pay", "/api/health", "/api/csrf"],
 } as const;
 
 export type AuthProvider = (typeof authConfig.providers)[number];

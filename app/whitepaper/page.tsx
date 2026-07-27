@@ -345,7 +345,7 @@ export default function WhitepaperPage() {
 
   <div className="space-y-5 text-muted leading-8">
     <p>
-      Our vision is to establish Nexar Network as one of the world's
+      Our vision is to establish Nexar Network as one of the world&apos;s
       leading blockchain ecosystems dedicated to digital payments.
     </p>
 

@@ -5,6 +5,13 @@ export {
   registerMerchantAction,
   completeProfileAction,
   signOutAction,
+  forgotPasswordAction,
+  resetPasswordAction,
+  changePasswordAction,
+  resendConfirmationAction,
+  updateProfileAction,
+  changeEmailAction,
+  changeWalletAction,
 } from "./actions";
 export type { ActionResult } from "./actions";
 export {
@@ -12,4 +19,10 @@ export {
   customerRegisterSchema,
   merchantRegisterSchema,
   completeProfileSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+  updateProfileSchema,
+  changeEmailSchema,
+  changeWalletSchema,
 } from "./validators";

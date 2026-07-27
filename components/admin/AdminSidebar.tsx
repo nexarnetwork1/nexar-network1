@@ -16,6 +16,7 @@ const platformLinks = [
   { name: "Exchange Rates", href: "/admin/exchange-rates" },
   { name: "Promotions", href: "/admin/promotions" },
   { name: "Audit Logs", href: "/admin/audit-logs" },
+  { name: "Contact", href: "/admin/contact" },
   { name: "Security", href: "/admin/security" },
 ];
 

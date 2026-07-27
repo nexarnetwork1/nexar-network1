@@ -1,14 +1,18 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
-import { getCustomerOrders } from "@/modules/orders/repository";
+import { getCustomerWalletSummary } from "@/modules/wallet/repository";
+import { formatCurrency, formatDateTime } from "@/utils/format";
 
 export default async function CustomerWalletPage() {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
 
-  const orders = await getCustomerOrders(profile.id);
-  const paidOrders = orders.filter((o) => o.status === "paid");
-  const totalSpent = paidOrders.reduce((sum, o) => sum + Number(o.subtotal), 0);
+  const { profile: customerProfile, wallets, transactions } =
+    await getCustomerWalletSummary(profile.id);
+
+  const totalSpent = Number(customerProfile?.total_spent_usd ?? 0);
+  const totalOrders = customerProfile?.total_orders ?? 0;
+  const primaryWallet = wallets.find((w) => w.is_primary) ?? wallets[0];
 
   return (
     <div>
@@ -19,20 +23,44 @@ export default async function CustomerWalletPage() {
         <div>
           <dt className="text-xs uppercase tracking-wider text-muted">Wallet address</dt>
           <dd className="mt-1 break-all font-mono text-sm text-gold-secondary">
-            {profile.wallet_address ?? "Not set"}
+            {profile.wallet_address ?? primaryWallet?.address ?? "Not set"}
           </dd>
         </div>
         <div>
           <dt className="text-xs uppercase tracking-wider text-muted">Total spent</dt>
           <dd className="mt-1 font-heading text-2xl text-gold">
-            ${totalSpent.toFixed(2)}
+            {formatCurrency(totalSpent)}
           </dd>
         </div>
         <div>
           <dt className="text-xs uppercase tracking-wider text-muted">Completed orders</dt>
-          <dd className="mt-1">{paidOrders.length}</dd>
+          <dd className="mt-1">{totalOrders}</dd>
         </div>
       </dl>
+
+      <h2 className="mt-10 font-heading text-lg font-semibold">Recent transactions</h2>
+      <ul className="mt-4 space-y-2">
+        {transactions.map((tx) => (
+          <li
+            key={tx.id}
+            className="flex items-center justify-between rounded-xl border border-border bg-card/40 px-4 py-3 text-sm"
+          >
+            <div>
+              <p className="font-medium capitalize">{tx.tx_type.replace(/_/g, " ")}</p>
+              <p className="text-xs text-muted">{formatDateTime(tx.created_at)}</p>
+            </div>
+            <div className="text-right">
+              <p className="font-mono">
+                {Number(tx.amount).toFixed(4)} {tx.currency}
+              </p>
+              <p className="text-xs capitalize text-muted">{tx.status}</p>
+            </div>
+          </li>
+        ))}
+        {transactions.length === 0 && (
+          <li className="text-muted">No wallet transactions yet.</li>
+        )}
+      </ul>
     </div>
   );
 }

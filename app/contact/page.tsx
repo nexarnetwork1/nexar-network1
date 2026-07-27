@@ -14,6 +14,7 @@ FaTiktok,
 
 import { SiBinance } from "react-icons/si";
 import { Container } from "@/components/ui/Container";
+import { ContactForm } from "@/components/contact/ContactForm";
 import { SITE, SOCIAL } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
@@ -113,6 +114,17 @@ export default function ContactPage() {
           <p className="mt-5 text-lg leading-8 text-muted">
             Connect with {SITE.name} through our official channels. Join our community, follow our updates, or reach out for partnerships.
           </p>
+
+          {/* Direct message */}
+          <div className="mt-12 luxury-border rounded-3xl bg-card/40 p-8 backdrop-blur-xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold/20 bg-gold/5">
+                <Send className="h-5 w-5 text-gold" />
+              </div>
+              <h2 className="font-heading text-xl font-semibold">Send a message</h2>
+            </div>
+            <ContactForm />
+          </div>
 
           {/* Social Channels Grid */}
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

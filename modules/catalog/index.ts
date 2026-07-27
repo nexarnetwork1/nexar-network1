@@ -1,8 +1,14 @@
 export {
   getMerchantProducts,
+  getMerchantProductsWithInventory,
   getProductById,
   searchMarketplaceProducts,
   getMarketplaceProduct,
+  getMarketplaceProductWithDetails,
+  getStoreCategories,
+  getMarketplaceCategories,
+  getProductImages,
+  getProductInventory,
 } from "./repository";
 
 export {
@@ -10,7 +16,10 @@ export {
   updateProductAction,
   deleteProductAction,
   toggleProductActiveAction,
+  createCategoryAction,
+  toggleProductFormAction,
+  deleteProductFormAction,
 } from "./actions";
 
-export { productSchema, productSearchSchema } from "./validators";
-export type { ProductInput, ProductSearchInput } from "./validators";
+export { productSchema, productSearchSchema, productCategorySchema } from "./validators";
+export type { ProductInput, ProductSearchInput, ProductCategoryInput } from "./validators";

@@ -3,24 +3,27 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { ImageDropzone } from "@/components/catalog/ImageDropzone";
 import { useZodForm } from "@/hooks/useZodForm";
 import { productSchema, type ProductInput } from "@/modules/catalog/validators";
 import { objectToFormData } from "@/utils/form-data";
-import type { Product } from "@/types";
+import type { Product, ProductCategory } from "@/types";
 import type { ZodSchema } from "zod";
 
 type ProductFormProps = {
   action: (formData: FormData) => Promise<{ success: boolean; error?: string; redirectTo?: string }>;
   product?: Product;
+  categories?: ProductCategory[];
   submitLabel?: string;
 };
 
 export function ProductForm({
   action,
   product,
+  categories = [],
   submitLabel = "Save product",
 }: ProductFormProps) {
   const router = useRouter();
@@ -40,6 +43,7 @@ export function ProductForm({
       currency: product?.currency ?? "USD",
       stock: product?.stock ?? 0,
       isActive: product?.is_active ?? true,
+      categoryId: product?.category_id ?? "",
     },
   });
 
@@ -98,6 +102,17 @@ export function ProductForm({
         label="Stock"
         error={errors.stock?.message}
       />
+      {categories.length > 0 && (
+        <Select
+          {...register("categoryId")}
+          label="Category"
+          options={[
+            { value: "", label: "No category" },
+            ...categories.map((c) => ({ value: c.id, label: c.name })),
+          ]}
+          error={errors.categoryId?.message}
+        />
+      )}
       <div className="flex items-center gap-3">
         <input
           id="isActive"

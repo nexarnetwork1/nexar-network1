@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMarketplaceProduct } from "@/modules/catalog/repository";
+import { getMarketplaceProductWithDetails } from "@/modules/catalog/repository";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { ProductImageGallery } from "@/components/catalog/ProductImageGallery";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -9,7 +10,7 @@ type Props = {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params;
-  const product = await getMarketplaceProduct(id);
+  const product = await getMarketplaceProductWithDetails(id);
 
   if (!product) notFound();
 
@@ -23,18 +24,11 @@ export default async function ProductDetailPage({ params }: Props) {
       </Link>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-2">
-        {product.image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="aspect-square w-full rounded-2xl object-cover"
-          />
-        ) : (
-          <div className="flex aspect-square items-center justify-center rounded-2xl border border-border bg-surface text-muted">
-            No image
-          </div>
-        )}
+        <ProductImageGallery
+          images={product.images}
+          fallbackUrl={product.image_url}
+          alt={product.name}
+        />
 
         <div>
           <p className="text-sm text-muted">{product.store.name}</p>

@@ -1,2 +1,8 @@
-/** Wallet feature — balance, deposits, and transaction history. */
-export {};
+export {
+  getCustomerProfile,
+  getMerchantProfile,
+  getUserWallets,
+  getWalletTransactions,
+  getCustomerWalletSummary,
+  getMerchantWalletSummary,
+} from "@/modules/wallet/repository";

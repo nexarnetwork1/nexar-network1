@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getOrderById } from "@/modules/orders/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { CancelOrderButton } from "@/components/orders/CancelOrderButton";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -58,6 +59,12 @@ export default async function MerchantOrderDetailPage({ params }: Props) {
           </li>
         ))}
       </ul>
+
+      {order.status === "pending_payment" && (
+        <div className="mt-8">
+          <CancelOrderButton orderId={order.id} scope="merchant" />
+        </div>
+      )}
 
       {order.invoice && (
         <div className="mt-8">

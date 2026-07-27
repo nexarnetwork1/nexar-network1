@@ -2,8 +2,10 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getInvoiceById } from "@/modules/invoices/repository";
+import { getInvoicePaymentOptions } from "@/modules/payments/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PayNowButton } from "@/components/payments/PayNowButton";
+import { InvoiceItemsTable } from "@/components/invoices/InvoiceItemsTable";
 import { Button } from "@/components/ui/Button";
 
 type Props = { params: Promise<{ id: string }> };
@@ -15,6 +17,8 @@ export default async function CustomerInvoiceDetailPage({ params }: Props) {
 
   const invoice = await getInvoiceById(id);
   if (!invoice || invoice.customer_id !== profile.id) notFound();
+
+  const paymentOptions = await getInvoicePaymentOptions(invoice.store_id);
 
   return (
     <div>
@@ -59,6 +63,8 @@ export default async function CustomerInvoiceDetailPage({ params }: Props) {
         </div>
       </dl>
 
+      <InvoiceItemsTable items={invoice.items ?? []} currency={invoice.currency} />
+
       <div className="mt-8 flex gap-3">
         <a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
           <Button variant="secondary">Download PDF</Button>
@@ -69,6 +75,7 @@ export default async function CustomerInvoiceDetailPage({ params }: Props) {
             invoiceNumber={invoice.invoice_number}
             storeName={invoice.store.name}
             amountUsd={Number(invoice.amount)}
+            paymentOptions={paymentOptions}
           />
         )}
       </div>

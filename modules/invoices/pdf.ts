@@ -1,7 +1,6 @@
 import PDFDocument from "pdfkit";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getInvoiceById } from "./repository";
-import { getOrderItems } from "@/modules/orders/repository";
+import { getInvoiceById, getInvoiceItems } from "./repository";
 
 export async function generateInvoicePdfBuffer(
   invoiceId: string
@@ -9,7 +8,10 @@ export async function generateInvoicePdfBuffer(
   const invoice = await getInvoiceById(invoiceId);
   if (!invoice) throw new Error("Invoice not found");
 
-  const items = await getOrderItems(invoice.order_id);
+  const items =
+    invoice.items && invoice.items.length > 0
+      ? invoice.items
+      : await getInvoiceItems(invoiceId);
 
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50 });

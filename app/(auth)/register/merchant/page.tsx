@@ -58,6 +58,11 @@ export default function MerchantRegisterPage() {
     router.refresh();
   }
 
+  async function onFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await handleSubmit(onSubmit)(event);
+  }
+
   return (
     <AuthCard
       title="Merchant registration"
@@ -72,7 +77,7 @@ export default function MerchantRegisterPage() {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      <form onSubmit={onFormSubmit} className="space-y-4" noValidate>
         <Input
           {...register("merchantName")}
           label="Merchant name"

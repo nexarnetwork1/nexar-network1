@@ -41,7 +41,7 @@ export default function NewsPage() {
             </h3>
 
             <p className="mt-3 text-zinc-400">
-              Click "Add News" to publish your first article.
+              Click &quot;Add News&quot; to publish your first article.
             </p>
 
           </div>

@@ -2,8 +2,10 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getOrderById } from "@/modules/orders/repository";
+import { getInvoicePaymentOptions } from "@/modules/payments/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PayNowButton } from "@/components/payments/PayNowButton";
+import { CancelOrderButton } from "@/components/orders/CancelOrderButton";
 import { Button } from "@/components/ui/Button";
 
 type Props = { params: Promise<{ id: string }> };
@@ -17,6 +19,7 @@ export default async function CustomerOrderDetailPage({ params }: Props) {
   if (!order || order.customer_id !== profile.id) notFound();
 
   const invoice = order.invoice;
+  const paymentOptions = await getInvoicePaymentOptions(order.store_id);
 
   return (
     <div>
@@ -86,12 +89,16 @@ export default async function CustomerOrderDetailPage({ params }: Props) {
             <Button variant="secondary">View invoice</Button>
           </Link>
           {order.status === "pending_payment" && invoice && (
-            <PayNowButton
-              invoiceId={invoice.id}
-              invoiceNumber={invoice.invoice_number}
-              storeName={order.store.name}
-              amountUsd={Number(invoice.amount)}
-            />
+            <>
+              <PayNowButton
+                invoiceId={invoice.id}
+                invoiceNumber={invoice.invoice_number}
+                storeName={order.store.name}
+                amountUsd={Number(invoice.amount)}
+                paymentOptions={paymentOptions}
+              />
+              <CancelOrderButton orderId={order.id} />
+            </>
           )}
           <a href={`/api/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
             <Button variant="outline">Download PDF</Button>

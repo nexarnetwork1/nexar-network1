@@ -2,21 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
-import { getMerchantProducts, toggleProductActiveAction, deleteProductAction } from "@/modules/catalog";
+import { getMerchantProductsWithInventory } from "@/modules/catalog/repository";
+import { toggleProductFormAction, deleteProductFormAction } from "@/modules/catalog/actions";
 import { Button } from "@/components/ui/Button";
-
-async function toggleProductFormAction(formData: FormData) {
-  "use server";
-  const productId = formData.get("productId") as string;
-  const isActive = formData.get("isActive") === "true";
-  await toggleProductActiveAction(productId, isActive);
-}
-
-async function deleteProductFormAction(formData: FormData) {
-  "use server";
-  const productId = formData.get("productId") as string;
-  await deleteProductAction(productId);
-}
 
 export default async function MerchantProductsPage() {
   const profile = await getCurrentProfile();
@@ -32,11 +20,21 @@ export default async function MerchantProductsPage() {
     );
   }
 
-  const products = await getMerchantProducts(store.id);
+  if (store.mode === "payments_only") {
+    redirect("/merchant/invoices/new");
+  }
+
+  const products = await getMerchantProductsWithInventory(store.id);
+  const lowStockCount = products.filter(
+    (p) =>
+      p.inventory &&
+      p.inventory.quantity_on_hand - p.inventory.reserved_quantity <=
+        p.inventory.low_stock_threshold
+  ).length;
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-3xl font-semibold">Products</h1>
           <p className="mt-2 text-muted">
@@ -44,11 +42,21 @@ export default async function MerchantProductsPage() {
             {store.status !== "active" && (
               <span className="ml-2 text-amber-400">(store pending approval)</span>
             )}
+            {lowStockCount > 0 && (
+              <span className="ml-2 text-amber-400">
+                ({lowStockCount} low stock)
+              </span>
+            )}
           </p>
         </div>
-        <Link href="/merchant/products/new">
-          <Button>Add product</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/merchant/products/new">
+            <Button>Add product</Button>
+          </Link>
+          <Link href="/merchant/categories">
+            <Button variant="secondary">Categories</Button>
+          </Link>
+        </div>
       </div>
 
       {products.length === 0 ? (
@@ -89,7 +97,20 @@ export default async function MerchantProductsPage() {
                   <td className="px-4 py-3">
                     {product.currency} {Number(product.price).toFixed(2)}
                   </td>
-                  <td className="px-4 py-3">{product.stock}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={
+                        product.inventory &&
+                        product.inventory.quantity_on_hand -
+                          product.inventory.reserved_quantity <=
+                          product.inventory.low_stock_threshold
+                          ? "text-amber-400"
+                          : ""
+                      }
+                    >
+                      {product.stock}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <span className={product.is_active ? "text-emerald-400" : "text-muted"}>
                       {product.is_active ? "Active" : "Inactive"}

@@ -1,2 +1,9 @@
-/** Merchant feature — store dashboard and product management. */
-export {};
+export {
+  getMerchantStore,
+  getStoreBySlug,
+  getStoreById,
+  getStoreSettings,
+  getStoreQrCodes,
+} from "@/modules/stores/repository";
+
+export { getActiveStorePromotion, getStorePromotions } from "@/modules/promotions/repository";

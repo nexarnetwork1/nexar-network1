@@ -39,6 +39,14 @@ export function applyRateLimit(request: NextRequest): Response | null {
     }
   }
 
+  if (pathname === "/contact" || pathname.startsWith("/contact/")) {
+    const { allowed } = rateLimit(`contact:${ip}`, "auth");
+    if (!allowed) {
+      securityLogger.rateLimitHit(ip, pathname);
+      return Response.json({ error: "Too many requests" }, { status: 429 });
+    }
+  }
+
   if (pathname.includes("/checkout") || pathname.startsWith("/api/")) {
     const { allowed } = rateLimit(`api:${ip}`, "api");
     if (!allowed && !pathname.startsWith("/api/health")) {

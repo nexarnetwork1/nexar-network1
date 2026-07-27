@@ -1,7 +1,12 @@
 import { getPlatformSettings } from "@/modules/platform/repository";
+import { getRecentSecurityLogs } from "@/modules/audit/security";
+import { formatDateTime } from "@/utils/format";
 
 export default async function AdminSecurityPage() {
-  const settings = await getPlatformSettings();
+  const [settings, securityLogs] = await Promise.all([
+    getPlatformSettings(),
+    getRecentSecurityLogs(10),
+  ]);
 
   const checks = [
     {
@@ -59,6 +64,29 @@ export default async function AdminSecurityPage() {
           </div>
         ))}
       </div>
+
+      <section className="mt-10 rounded-2xl border border-white/10 bg-zinc-900 p-6">
+        <h2 className="text-lg font-semibold text-yellow-400">Recent security events</h2>
+        <ul className="mt-4 space-y-2">
+          {securityLogs.map((log) => (
+            <li
+              key={log.id}
+              className="flex items-center justify-between rounded-xl border border-white/5 px-4 py-3 text-sm"
+            >
+              <div>
+                <p className="font-medium capitalize">{log.event_type.replace(/_/g, " ")}</p>
+                <p className="text-xs text-zinc-500">{formatDateTime(log.created_at)}</p>
+              </div>
+              {log.ip_address && (
+                <span className="font-mono text-xs text-zinc-400">{log.ip_address}</span>
+              )}
+            </li>
+          ))}
+          {securityLogs.length === 0 && (
+            <li className="text-sm text-zinc-500">No security events recorded yet.</li>
+          )}
+        </ul>
+      </section>
 
       <section className="mt-10 rounded-2xl border border-white/10 bg-zinc-900 p-6">
         <h2 className="text-lg font-semibold text-yellow-400">Security policies</h2>

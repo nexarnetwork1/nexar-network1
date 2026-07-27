@@ -1,4 +1,5 @@
--- Phase 6: Merchant settlement read access
+-- Phase 6: Merchant settlement read access (idempotent)
+DROP POLICY IF EXISTS "Merchants can read store settlements" ON public.settlements;
 CREATE POLICY "Merchants can read store settlements"
   ON public.settlements FOR SELECT
   USING (

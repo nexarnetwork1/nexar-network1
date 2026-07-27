@@ -8,6 +8,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { bsc } from "viem/chains";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getTokenAddress, type CryptoAsset } from "@/lib/blockchain/bsc-client";
+import { deriveSessionDepositAddress } from "@/lib/blockchain/deposit";
 import { getExchangeRate } from "./fee-calculator";
 
 const ERC20_TRANSFER = [
@@ -83,28 +84,47 @@ export async function executeSettlement(params: {
       });
     }
 
-    await admin.from("settlement_transfers").insert([
+    const transferUpdates = [
       {
-        settlement_id: params.settlementId,
-        transfer_type: "platform_fee",
+        transfer_type: "platform_fee" as const,
         to_address: params.treasuryWallet,
         amount: platformFeeCrypto,
         currency: params.asset,
         tx_hash: feeTxHash,
-        status: "submitted",
-        completed_at: new Date().toISOString(),
       },
       {
-        settlement_id: params.settlementId,
-        transfer_type: "merchant_payout",
+        transfer_type: "merchant_payout" as const,
         to_address: params.merchantWallet,
         amount: merchantAmountCrypto,
         currency: params.asset,
         tx_hash: merchantTxHash,
-        status: "submitted",
-        completed_at: new Date().toISOString(),
       },
-    ]);
+    ];
+
+    for (const transfer of transferUpdates) {
+      const { data: updated } = await admin
+        .from("settlement_transfers")
+        .update({
+          to_address: transfer.to_address,
+          amount: transfer.amount,
+          currency: transfer.currency,
+          tx_hash: transfer.tx_hash,
+          status: "submitted",
+          completed_at: new Date().toISOString(),
+        })
+        .eq("settlement_id", params.settlementId)
+        .eq("transfer_type", transfer.transfer_type)
+        .select("id");
+
+      if (!updated?.length) {
+        await admin.from("settlement_transfers").insert({
+          settlement_id: params.settlementId,
+          ...transfer,
+          status: "submitted",
+          completed_at: new Date().toISOString(),
+        });
+      }
+    }
 
     await admin
       .from("settlements")
@@ -137,4 +157,71 @@ export async function getTreasuryWallet(): Promise<`0x${string}` | null> {
 
   const address = data?.treasury_wallet_address ?? process.env.TREASURY_WALLET_ADDRESS;
   return address ? (address as `0x${string}`) : null;
+}
+
+export async function retryFailedSettlements(limit = 10): Promise<{
+  attempted: number;
+  succeeded: number;
+  failed: number;
+}> {
+  const admin = createAdminClient();
+  const treasury = await getTreasuryWallet();
+
+  if (!treasury) {
+    return { attempted: 0, succeeded: 0, failed: 0 };
+  }
+
+  const { data: settlements } = await admin
+    .from("settlements")
+    .select(
+      "id, payment_session_id, platform_fee, merchant_amount, order:orders(merchant_wallet_snapshot)"
+    )
+    .eq("status", "failed")
+    .limit(limit);
+
+  let attempted = 0;
+  let succeeded = 0;
+  let failed = 0;
+
+  for (const settlement of settlements ?? []) {
+    const { data: session } = await admin
+      .from("payment_sessions")
+      .select("id, method")
+      .eq("id", settlement.payment_session_id)
+      .single();
+
+    if (!session || session.method === "card") continue;
+
+    const order = settlement.order as { merchant_wallet_snapshot?: string } | null;
+    if (!order?.merchant_wallet_snapshot) {
+      failed += 1;
+      attempted += 1;
+      continue;
+    }
+
+    attempted += 1;
+
+    try {
+      const { privateKey } = deriveSessionDepositAddress(session.id);
+      await executeSettlement({
+        settlementId: settlement.id,
+        sessionId: session.id,
+        depositPrivateKey: privateKey,
+        merchantWallet: order.merchant_wallet_snapshot as `0x${string}`,
+        treasuryWallet: treasury,
+        platformFeeUsd: Number(settlement.platform_fee),
+        merchantAmountUsd: Number(settlement.merchant_amount),
+        asset: session.method as CryptoAsset,
+      });
+      succeeded += 1;
+    } catch {
+      failed += 1;
+    }
+  }
+
+  return {
+    attempted,
+    succeeded,
+    failed,
+  };
 }
