@@ -27,6 +27,7 @@ import {
   formatCountdown,
 } from "@/lib/web3/presale-math";
 import { PresaleCountdown } from "@/components/web3/PresaleCountdown";
+import { PresalePanelSkeleton } from "@/components/web3/PresalePanelSkeleton";
 import { cn } from "@/lib/utils/cn";
 import { notifyPresaleRefresh } from "@/lib/web3/presale-refresh";
 
@@ -191,13 +192,19 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
     sold_out: "Hard cap reached — no more purchases",
     ended: "Presale has ended — claim your tokens below",
     loading: "Reading contract data…",
-    error: "Unable to read presale contract",
+    error: presale.loadTimedOut
+      ? "Blockchain RPC timeout — check your connection and retry"
+      : "Unable to read presale contract",
   }[presale.status];
 
   const allClaimed =
     presale.purchasedAmount > 0 &&
     presale.claimableAmount <= 0 &&
     presale.claimedAmount >= presale.purchasedAmount;
+
+  if (presale.status === "loading") {
+    return <PresalePanelSkeleton />;
+  }
 
   return (
     <div className={cn("luxury-border rounded-3xl bg-card/40 p-6 backdrop-blur-md", className)}>
@@ -210,7 +217,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
             presale.status === "upcoming" && "bg-amber-500/15 text-amber-400",
             presale.status === "sold_out" && "bg-red-500/15 text-red-400",
             presale.status === "ended" && "bg-muted/20 text-muted",
-            (presale.status === "loading" || presale.status === "error") && "bg-muted/20 text-muted"
+            presale.status === "error" && "bg-muted/20 text-muted"
           )}
         >
           {statusLabel}
@@ -265,7 +272,18 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       {statusMessage && (
         <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden />
-          <p className="text-sm text-amber-200/90">{statusMessage}</p>
+          <div className="flex-1">
+            <p className="text-sm text-amber-200/90">{statusMessage}</p>
+            {presale.status === "error" && (
+              <button
+                type="button"
+                onClick={() => presale.refetch()}
+                className="mt-2 text-xs font-medium text-gold hover:underline"
+              >
+                Retry connection
+              </button>
+            )}
+          </div>
         </div>
       )}
 

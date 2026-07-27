@@ -54,7 +54,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="home"
-      className="relative flex min-h-[calc(100vh-var(--nxr-nav-height))] items-center overflow-hidden"
+      className="relative flex min-h-[calc(100vh-var(--nxr-header-offset)-2rem)] items-center overflow-hidden scroll-mt-[var(--nxr-header-offset)]"
     >
       <Container className="relative py-12 sm:py-16 lg:py-24">
         <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
@@ -114,7 +114,7 @@ export function HeroSection() {
             >
               <ConnectWalletButton size="lg" magnetic glow />
               <BuyNxrButton />
-              <Link href="#whitepaper">
+              <Link href="/#whitepaper">
                 <Button size="lg" variant="outline" magnetic>
                   Whitepaper
                   <ArrowUpRight className="h-4 w-4" />
@@ -145,8 +145,8 @@ export function HeroSection() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          transition={{ delay: 1.4 }}
+          className="mt-8 hidden sm:block lg:absolute lg:bottom-6 lg:left-1/2 lg:mt-0 lg:-translate-x-1/2"
         >
           <ScrollIndicator />
         </motion.div>

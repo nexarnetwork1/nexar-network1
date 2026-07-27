@@ -31,6 +31,8 @@
   --nxr-radius-full: 9999px;
 
   --nxr-nav-height: 5rem;
+  --nxr-ticker-height: 2.75rem;
+  --nxr-header-offset: calc(var(--nxr-nav-height) + var(--nxr-ticker-height));
   --nxr-section-gap: clamp(5rem, 10vw, 9rem);
 
   color-scheme: dark;
@@ -158,7 +160,7 @@
   }
 
   .nav-offset {
-    padding-top: var(--nxr-nav-height);
+    padding-top: var(--nxr-header-offset);
   }
 
   .mask-radial-fade {

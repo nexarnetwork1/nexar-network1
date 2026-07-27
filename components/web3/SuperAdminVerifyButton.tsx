@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSignMessage } from "wagmi";
 import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
@@ -14,6 +15,7 @@ export function SuperAdminVerifyButton({
   walletAddress,
   onVerified,
 }: SuperAdminVerifyButtonProps) {
+  const router = useRouter();
   const { signMessageAsync } = useSignMessage();
   const [loading, setLoading] = useState(false);
 
@@ -50,6 +52,8 @@ export function SuperAdminVerifyButton({
 
       toast.success("Super Admin access granted");
       onVerified?.();
+      router.push("/admin/dashboard");
+      router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Verification failed");
     } finally {

@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
 import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
+import { NavLink } from "@/components/layout/NavLink";
 import { Logo } from "@/components/ui/Logo";
 import { CloseButton } from "@/components/ui/CloseButton";
 
@@ -116,7 +116,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.04 }}
                 >
-                  <Link
+                  <NavLink
                     href={item.href}
                     onClick={onClose}
                     className={cn(
@@ -129,7 +129,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                     <span className="font-mono text-xs text-gold/40 transition-colors group-hover:text-gold" aria-hidden="true">
                       0{index + 1}
                     </span>
-                  </Link>
+                  </NavLink>
                 </motion.div>
               ))}
             </nav>

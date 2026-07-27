@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { PageAmbientBackground } from "@/components/ui/PageAmbientBackground";
 import { PresalePanel } from "@/components/web3/PresalePanel";
 import { PresalePortfolio } from "@/components/web3/PresalePortfolio";
 import { PresaleTransactionHistory } from "@/components/web3/PresaleTransactionHistory";
@@ -11,14 +12,14 @@ import { CONTRACTS } from "@/lib/constants/site";
 
 export default function PresalePage() {
   return (
-    <main className="nav-offset min-h-screen">
-      <Container className="py-12 lg:py-20">
+    <main className="nav-offset relative min-h-screen">
+      <PageAmbientBackground variant="presale" />
+      <Container className="relative py-12 lg:py-20">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs font-medium tracking-[0.24em] uppercase text-gold">Public Presale</p>
           <h1 className="mt-3 font-heading text-4xl font-semibold md:text-5xl">Buy NXR on BNB Smart Chain</h1>
           <p className="mt-4 max-w-2xl text-muted">
-            All presale data is read directly from the deployed NexarPresale smart contract.
-            No demo logic. No hardcoded dates.
+            All presale data is read directly from the deployed NexarPresale smart contract on BNB Smart Chain.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-4">
             <ConnectWalletButton size="md" />

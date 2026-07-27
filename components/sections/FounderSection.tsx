@@ -15,7 +15,7 @@ const SOCIAL_LINKS = [
 
 export function FounderSection() {
   return (
-    <section id="founder" className="section-padding relative overflow-hidden">
+    <section id="founder" className="section-padding relative scroll-mt-[var(--nxr-header-offset)] overflow-hidden">
       {/* Section divider */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
 

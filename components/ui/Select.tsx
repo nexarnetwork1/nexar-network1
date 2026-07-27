@@ -2,6 +2,7 @@
 
 import { forwardRef, type SelectHTMLAttributes } from "react";
 import { cn } from "@/lib/utils/cn";
+import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 
 export type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label?: string;
@@ -26,13 +27,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           id={selectId}
-          className={cn(
-            "w-full rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm text-white",
-            "outline-none transition-colors appearance-none",
-            "focus:border-gold/40 focus:ring-1 focus:ring-gold/20",
-            error && "border-red-500/50",
-            className
-          )}
+          className={cn(DROPDOWN_CLASS, error && "border-red-500/50", className)}
           {...props}
         >
           {options.map((opt) => (

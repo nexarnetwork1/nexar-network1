@@ -1,10 +1,9 @@
 import { cn } from "@/lib/utils/cn";
-import type { ReactNode } from "react";
 
 type AuthCardProps = {
   title: string;
   subtitle?: string;
-  children: ReactNode;
+  children: React.ReactNode;
   className?: string;
 };
 
@@ -12,7 +11,7 @@ export function AuthCard({ title, subtitle, children, className }: AuthCardProps
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-md rounded-2xl border border-border bg-card/60 p-8 backdrop-blur-xl",
+        "mx-auto w-full max-w-md rounded-2xl border border-border/80 bg-card/50 p-8 shadow-xl shadow-black/20 backdrop-blur-2xl",
         className
       )}
     >

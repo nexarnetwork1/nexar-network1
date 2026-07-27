@@ -113,11 +113,14 @@ export function WalletMenu() {
           border border-gold/20
           bg-[#0B0B0B]/95
           backdrop-blur-2xl
-          p-2
+          p-3
           shadow-[0_0_40px_rgba(212,175,55,0.12)]
           focus:outline-none
           z-50
           overflow-hidden
+          transition duration-200 ease-out
+          data-[closed]:scale-95 data-[closed]:opacity-0
+          data-[open]:scale-100 data-[open]:opacity-100
         "
       >
         <div className="border-b border-white/10 px-4 py-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useAccount, useBlock, useReadContracts } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { formatUnits, parseUnits } from "viem";
@@ -30,6 +30,7 @@ const baseContracts = [
 export function usePresaleData() {
   const { address, isConnected, chainId: walletChainId } = useAccount();
   const { data: block } = useBlock({ chainId, watch: true });
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
 
   const {
     data: baseData,
@@ -40,6 +41,15 @@ export function usePresaleData() {
     contracts: baseContracts,
     query: { refetchInterval: 15_000 },
   });
+
+  useEffect(() => {
+    if (!isBaseLoading && !isBaseError) {
+      setLoadTimedOut(false);
+      return;
+    }
+    const id = window.setTimeout(() => setLoadTimedOut(true), 20_000);
+    return () => window.clearTimeout(id);
+  }, [isBaseLoading, isBaseError]);
 
   const bnbPriceFeed = baseData?.[9]?.result as `0x${string}` | undefined;
   const usdtToken = baseData?.[6]?.result as `0x${string}` | undefined;
@@ -142,7 +152,7 @@ export function usePresaleData() {
   const blockTimestamp = block ? Number(block.timestamp) : null;
 
   let status: PresaleStatus = "loading";
-  if (isBaseError) {
+  if (isBaseError || loadTimedOut) {
     status = "error";
   } else if (
     blockTimestamp !== null &&
@@ -227,5 +237,6 @@ export function usePresaleData() {
     canBuy: status === "live",
     canClaim: status === "ended",
     blockTimestamp,
+    loadTimedOut,
   };
 }

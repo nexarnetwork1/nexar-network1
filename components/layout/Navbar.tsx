@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import Link from "next/link";
 import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useScrolled } from "@/hooks/useScrolled";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { SuperAdminNavLink } from "@/components/layout/SuperAdminNavLink";
+import { NavLink } from "@/components/layout/NavLink";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
 import { MobileMenu } from "./MobileMenu";
@@ -27,20 +27,16 @@ export function Navbar() {
         )}
       >
         <Container className="flex items-center justify-between gap-6">
-          <Link
-            href="#home"
-            aria-label="Nexar Network home"
-            className="relative z-10 shrink-0"
-          >
+          <NavLink href="/" aria-label="Nexar Network home" className="relative z-10 shrink-0">
             <Logo />
-          </Link>
+          </NavLink>
 
           <nav
             aria-label="Primary navigation"
             className="hidden items-center gap-1 lg:flex xl:gap-1"
           >
             {NAV_ITEMS.map((item) => (
-              <Link
+              <NavLink
                 key={item.href}
                 href={item.href}
                 className="group relative px-2 py-2 lg:px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-full"
@@ -50,7 +46,7 @@ export function Navbar() {
                 </span>
                 <span className="absolute inset-0 rounded-full bg-white/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <span className="absolute bottom-1 left-2 lg:left-3 h-px w-0 bg-gradient-to-r from-gold to-gold-secondary transition-all duration-300 group-hover:w-[calc(100%-1rem)] lg:group-hover:w-[calc(100%-1.5rem)]" />
-              </Link>
+              </NavLink>
             ))}
           </nav>
 
@@ -76,9 +72,9 @@ export function Navbar() {
             </button>
           </div>
         </Container>
-     </header>
+      </header>
 
-<MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
     </>
   );
 }

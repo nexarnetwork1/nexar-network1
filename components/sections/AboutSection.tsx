@@ -57,7 +57,7 @@ export function AboutSection() {
   }, [reducedMotion]);
 
   return (
-    <section id="about" className="section-padding relative">
+    <section id="about" className="section-padding relative scroll-mt-[var(--nxr-header-offset)]">
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
           <Reveal>

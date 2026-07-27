@@ -34,7 +34,7 @@ const WHITEPAPER_SECTIONS = [
 
 export function WhitepaperSection() {
   return (
-    <section id="whitepaper" className="section-padding relative">
+    <section id="whitepaper" className="section-padding relative scroll-mt-[var(--nxr-header-offset)]">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">

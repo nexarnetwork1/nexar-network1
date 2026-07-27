@@ -5,6 +5,9 @@ import {
 } from "@/modules/marketplace/repository";
 import { getMarketplaceCategories } from "@/modules/catalog/repository";
 import { StoreCard } from "@/components/marketplace/StoreCard";
+import { MarketplaceEmptyState } from "@/components/marketplace/MarketplaceEmptyState";
+import { PageAmbientBackground } from "@/components/ui/PageAmbientBackground";
+import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 
 type Props = {
   searchParams: Promise<{
@@ -50,8 +53,9 @@ export default async function MarketplaceStoresPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b border-border bg-surface/30">
+    <div className="relative min-h-screen bg-background">
+      <PageAmbientBackground variant="marketplace" />
+      <div className="relative border-b border-border bg-surface/30 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <h1 className="font-heading text-3xl font-semibold md:text-4xl">Marketplace Stores</h1>
           <p className="mt-2 max-w-2xl text-muted">
@@ -86,24 +90,16 @@ export default async function MarketplaceStoresPage({ searchParams }: Props) {
             type="search"
             defaultValue={params.q ?? ""}
             placeholder="Search stores…"
-            className="min-w-[200px] flex-1 rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm outline-none focus:border-gold/40"
+            className="min-w-[200px] flex-1 rounded-xl border border-border/80 bg-card/70 px-4 py-3.5 text-sm shadow-lg shadow-black/10 backdrop-blur-xl outline-none transition focus:border-gold/40 focus:ring-2 focus:ring-gold/15"
           />
-          <select
-            name="sort"
-            defaultValue={sort}
-            className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm"
-          >
+          <select name="sort" defaultValue={sort} className={DROPDOWN_CLASS}>
             <option value="featured">Featured</option>
             <option value="top_rated">Top Rated</option>
             <option value="best_selling">Best Selling</option>
             <option value="newest">Newest</option>
             <option value="name">Alphabetical</option>
           </select>
-          <select
-            name="category"
-            defaultValue={params.category ?? ""}
-            className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm"
-          >
+          <select name="category" defaultValue={params.category ?? ""} className={DROPDOWN_CLASS}>
             <option value="">All categories</option>
             {categories.map((c) => (
               <option key={c.id} value={c.slug}>
@@ -120,9 +116,7 @@ export default async function MarketplaceStoresPage({ searchParams }: Props) {
         </form>
 
         {stores.length === 0 ? (
-          <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center text-muted">
-            No stores found.
-          </div>
+          <MarketplaceEmptyState hasFilters={Boolean(params.q || params.category)} />
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {stores.map((store) => (
