@@ -4,7 +4,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { RetrySettlementsButton } from "@/components/admin/RetrySettlementsButton";
 import { ExportButton } from "@/components/admin/ExportButton";
 import { formatDateTime } from "@/utils/format";
-import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import { CurrencyAmount, UsdAmount } from "@/components/payments/CurrencyAmount";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 
 export default async function AdminPaymentsPage() {

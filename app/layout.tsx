@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
+import { NewsTicker } from "@/components/layout/NewsTicker";
 import { BackgroundEffect } from "@/components/background/BackgroundEffect";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
 import { Toaster } from "sonner";
-import AnnouncementBanner from "@/components/news/AnnouncementBanner";
+import { getActiveTickerAnnouncements } from "@/modules/ticker/repository";
 import {
   organizationSchema,
   websiteSchema,
@@ -44,11 +45,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const tickerAnnouncements = await getActiveTickerAnnouncements();
+
   return (
     <html
       lang="en"
@@ -90,7 +93,7 @@ export default function RootLayout({
 {/* <BackgroundEffect /> */}
          <Navbar />
 
-<AnnouncementBanner />
+<NewsTicker announcements={tickerAnnouncements} />
 
 <div
   id="main-content"

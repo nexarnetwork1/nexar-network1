@@ -45,7 +45,7 @@ const operationsLinks = [
   { name: "Settlement Reports", href: "/admin/settlement-reports" },
 ];
 
-const cmsLinks = [{ name: "News", href: "/admin/news" }];
+const cmsLinks = [{ name: "News Ticker", href: "/admin/news-ticker" }];
 
 function NavSection({ title, links }: { title: string; links: { name: string; href: string }[] }) {
   const pathname = usePathname();

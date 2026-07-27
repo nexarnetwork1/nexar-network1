@@ -713,3 +713,15 @@ export type NotificationPreference = {
   created_at: string;
   updated_at: string;
 };
+
+export type TickerAnnouncement = {
+  id: string;
+  message: string;
+  is_enabled: boolean;
+  sort_order: number;
+  priority: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
