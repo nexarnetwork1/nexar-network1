@@ -6,6 +6,7 @@ export function calculateCouponDiscount(
   coupon: Pick<Coupon, "coupon_type" | "value">,
   orderTotalUsd: number
 ): number {
+  if (coupon.coupon_type === "free_shipping") return 0;
   if (coupon.coupon_type === "percentage") {
     return Number((orderTotalUsd * (coupon.value / 100)).toFixed(2));
   }
@@ -16,7 +17,7 @@ export async function validateCoupon(
   code: string,
   storeId?: string,
   orderTotalUsd = 0
-): Promise<{ valid: boolean; coupon?: Coupon; discountUsd?: number; error?: string }> {
+): Promise<{ valid: boolean; coupon?: Coupon; discountUsd?: number; freeShipping?: boolean; error?: string }> {
   const supabase = await createClient();
   let query = supabase
     .from("coupons")
@@ -45,6 +46,7 @@ export async function validateCoupon(
     valid: true,
     coupon,
     discountUsd: calculateCouponDiscount(coupon, orderTotalUsd),
+    freeShipping: coupon.coupon_type === "free_shipping",
   };
 }
 

@@ -17,6 +17,8 @@ const managementLinks = [
   { name: "Invoices", href: "/admin/invoices" },
   { name: "Payments", href: "/admin/payments" },
   { name: "Products", href: "/admin/products" },
+  { name: "Reviews", href: "/admin/reviews" },
+  { name: "Reports", href: "/admin/reports" },
   { name: "Marketplace", href: "/admin/marketplace" },
 ];
 

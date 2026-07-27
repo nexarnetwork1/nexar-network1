@@ -15,7 +15,7 @@ export const SITE = {
 
 export const CONTRACTS = {
   token: "0x3c7c9eeA8826e5bcB4ed2b798123915Cd596c909",
-  presale: "0x9BB3674dfE84b908B88BAf7285c8744531d678c9c",
+  presale: "0x9B3674dfE84b908B88BAf7285c8744531d678c9c",
   treasury: "0xaCc4915C896Cd4E0d18C65fe5e10DcFBAe190f12",
   teamVesting: "0x55D0402D6E81F598cdAdC3132Fe4982912FdB787",
 } as const;

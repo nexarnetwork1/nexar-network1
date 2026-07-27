@@ -1,12 +1,60 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import Marquee from "react-fast-marquee";
 import type { TickerAnnouncement } from "@/types";
+import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 
 type NewsTickerProps = {
   announcements?: TickerAnnouncement[];
 };
+
+function PresaleTickerMessage() {
+  const { status, isLoading } = usePresaleData();
+
+  if (isLoading) {
+    return <span className="text-gold font-semibold">NXR Presale — loading on-chain status…</span>;
+  }
+
+  if (status === "upcoming") {
+    return (
+      <Link href="/presale" className="text-amber-400 font-semibold hover:underline">
+        NXR Presale opens soon — view countdown
+      </Link>
+    );
+  }
+
+  if (status === "live") {
+    return (
+      <Link href="/presale" className="text-gold font-semibold hover:underline">
+        🚀 NXR Public Presale is live — buy on BSC
+      </Link>
+    );
+  }
+
+  if (status === "sold_out") {
+    return (
+      <Link href="/presale" className="text-red-400 font-semibold hover:underline">
+        NXR Presale sold out
+      </Link>
+    );
+  }
+
+  if (status === "ended") {
+    return (
+      <Link href="/presale" className="font-semibold hover:underline">
+        NXR Presale ended — claim your tokens
+      </Link>
+    );
+  }
+
+  return (
+    <Link href="/presale" className="text-gold font-semibold hover:underline">
+      NXR Presale
+    </Link>
+  );
+}
 
 export function NewsTicker({ announcements = [] }: NewsTickerProps) {
   return (
@@ -44,9 +92,7 @@ export function NewsTicker({ announcements = [] }: NewsTickerProps) {
             <span>TokenPocket</span>
           </div>
 
-          <span className="text-gold font-semibold">
-            🚀 JOIN OUR PUBLIC PRESALE NOW
-          </span>
+          <PresaleTickerMessage />
 
           {announcements.map((item) => (
             <span

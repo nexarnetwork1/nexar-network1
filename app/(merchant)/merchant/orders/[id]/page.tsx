@@ -5,6 +5,8 @@ import { getMerchantStore } from "@/modules/stores/repository";
 import { getOrderById } from "@/modules/orders/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CancelOrderButton } from "@/components/orders/CancelOrderButton";
+import { FulfillmentActions } from "@/components/orders/FulfillmentActions";
+import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 type Props = { params: Promise<{ id: string }> };
@@ -64,6 +66,31 @@ export default async function MerchantOrderDetailPage({ params }: Props) {
           </li>
         ))}
       </ul>
+
+      {order.status === "paid" && (
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          <FulfillmentActions orderId={order.id} currentStatus={order.fulfillment_status} />
+          {order.fulfillment_status && (
+            <StatusBadge status={order.fulfillment_status} />
+          )}
+        </div>
+      )}
+
+      {order.status === "paid" && (
+        <aside className="mt-10 max-w-md rounded-2xl border border-border bg-card/40 p-6">
+          <h2 className="font-heading text-lg font-semibold">Fulfillment timeline</h2>
+          <div className="mt-4">
+            <OrderTimeline
+              status={order.status}
+              fulfillmentStatus={order.fulfillment_status}
+              createdAt={order.created_at}
+              paidAt={order.paid_at}
+              shippedAt={order.shipped_at}
+              deliveredAt={order.delivered_at}
+            />
+          </div>
+        </aside>
+      )}
 
       {order.status === "pending_payment" && (
         <div className="mt-8">

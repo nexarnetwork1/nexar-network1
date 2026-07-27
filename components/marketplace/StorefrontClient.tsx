@@ -4,8 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { BadgeCheck, Heart, Share2, Star, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
-import type { ProductWithStore, StoreMarketplaceProfile, StoreSettings } from "@/types";
+import type { ProductWithStore, StoreMarketplaceProfile, StoreReview, StoreSettings } from "@/types";
 import { ProductCard } from "@/components/marketplace/ProductCard";
+import { StoreTrustBadges } from "@/components/marketplace/StoreTrustBadges";
+import { StoreReviews } from "@/components/reviews/StoreReviews";
+import { ReportButton } from "@/components/security/ReportButton";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 import { getStorePaymentMethods } from "@/lib/constants/payment-branding";
 import type { PaymentMethodCode } from "@/lib/constants/payment-branding";
@@ -28,6 +31,16 @@ type StorefrontProps = {
   salesCount: number;
   rating: number;
   verificationStatus: string | null;
+  storeReviews?: StoreReview[];
+  reviewCount?: number;
+  trustMetrics?: {
+    years_active: number;
+    total_orders: number;
+    total_reviews: number;
+    avg_rating: number;
+    response_rate: number;
+    avg_response_hours: number | null;
+  } | null;
 };
 
 export function StorefrontClient({
@@ -39,6 +52,9 @@ export function StorefrontClient({
   salesCount,
   rating,
   verificationStatus,
+  storeReviews = [],
+  reviewCount = 0,
+  trustMetrics,
 }: StorefrontProps) {
   const [tab, setTab] = useState<"products" | "about" | "reviews" | "policies" | "contact">(
     "products"
@@ -104,6 +120,11 @@ export function StorefrontClient({
                   <TrendingUp className="h-3.5 w-3.5" /> Top Seller
                 </span>
               )}
+              {profile.featured && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-xs text-blue-400">
+                  Official Store
+                </span>
+              )}
             </div>
             <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted">
               {rating > 0 && (
@@ -135,10 +156,22 @@ export function StorefrontClient({
             type="button"
             onClick={shareStore}
             className="inline-flex items-center gap-1 rounded-xl border border-border px-4 py-2 text-sm text-muted hover:text-white"
+            aria-label="Share store"
           >
-            <Share2 className="h-4 w-4" /> Share
+            <Share2 className="h-4 w-4" aria-hidden /> Share
           </button>
+          <ReportButton targetType="store" targetId={store.id} label="Report store" />
         </div>
+      </div>
+
+      <div className="mt-8">
+        <StoreTrustBadges
+          verificationStatus={verificationStatus}
+          isTopSeller={salesCount >= 10}
+          isFeatured={profile.featured}
+          metrics={trustMetrics ?? null}
+          salesCount={salesCount}
+        />
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
@@ -192,11 +225,12 @@ export function StorefrontClient({
         )}
 
         {tab === "reviews" && (
-          <p className="text-muted">
-            {salesCount > 0
-              ? `Trusted by ${salesCount} completed orders. Full review system coming soon.`
-              : "No reviews yet — be the first to purchase!"}
-          </p>
+          <StoreReviews
+            reviews={storeReviews}
+            avgRating={rating}
+            count={reviewCount}
+            storeId={store.id}
+          />
         )}
 
         {tab === "policies" && (

@@ -27,3 +27,7 @@ export * as coupons from "./coupons";
 export * as webhooks from "./webhooks";
 export * as settlementReports from "./settlement-reports";
 export * as search from "./search";
+export * as reviews from "./reviews";
+export * as wishlist from "./wishlist";
+export * as reports from "./reports";
+export * as marketplace from "./marketplace";

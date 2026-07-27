@@ -10,6 +10,12 @@ export type OrderStatus =
   | "cancelled"
   | "refunded";
 
+export type FulfillmentStatus = "pending" | "processing" | "shipped" | "delivered";
+
+export type ReviewStatus = "pending" | "approved" | "rejected" | "flagged";
+
+export type ReportTarget = "product" | "store" | "product_review" | "store_review";
+
 export type InvoiceStatus =
   | "draft"
   | "pending"
@@ -276,15 +282,19 @@ export type Order = {
   customer_id: string;
   store_id: string;
   status: OrderStatus;
+  fulfillment_status?: FulfillmentStatus;
   subtotal: number;
   platform_fee: number;
   merchant_amount: number;
+  discount_amount?: number;
   currency: string;
   payment_method: PaymentMethod | null;
   merchant_wallet_snapshot: string | null;
   created_at: string;
   updated_at: string;
   paid_at: string | null;
+  shipped_at?: string | null;
+  delivered_at?: string | null;
 };
 
 export type OrderItem = {
@@ -622,7 +632,7 @@ export type WithdrawalRequest = {
   updated_at: string;
 };
 
-export type CouponType = "percentage" | "fixed";
+export type CouponType = "percentage" | "fixed" | "free_shipping";
 export type CouponScope = "merchant" | "platform";
 
 export type Coupon = {
@@ -727,4 +737,86 @@ export type TickerAnnouncement = {
   ends_at: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type ProductReview = {
+  id: string;
+  product_id: string;
+  store_id: string;
+  customer_id: string;
+  order_id: string | null;
+  rating: number;
+  title: string | null;
+  body: string;
+  images: string[];
+  status: ReviewStatus;
+  merchant_reply: string | null;
+  merchant_reply_at: string | null;
+  is_verified_purchase: boolean;
+  helpful_count: number;
+  created_at: string;
+  updated_at: string;
+  customer?: Pick<Profile, "id" | "full_name" | "avatar_url">;
+};
+
+export type StoreReview = {
+  id: string;
+  store_id: string;
+  customer_id: string;
+  order_id: string | null;
+  rating: number;
+  title: string | null;
+  body: string;
+  images: string[];
+  status: ReviewStatus;
+  merchant_reply: string | null;
+  merchant_reply_at: string | null;
+  is_verified_purchase: boolean;
+  created_at: string;
+  updated_at: string;
+  customer?: Pick<Profile, "id" | "full_name" | "avatar_url">;
+};
+
+export type WishlistItem = {
+  id: string;
+  customer_id: string;
+  product_id: string;
+  created_at: string;
+  product?: ProductWithStore;
+};
+
+export type StoreTrustMetrics = {
+  store_id: string;
+  years_active: number;
+  total_orders: number;
+  total_reviews: number;
+  avg_rating: number;
+  response_rate: number;
+  avg_response_hours: number | null;
+};
+
+export type ContentReport = {
+  id: string;
+  reporter_id: string;
+  target_type: ReportTarget;
+  target_id: string;
+  reason: string;
+  details: string | null;
+  status: "pending" | "reviewed" | "dismissed" | "actioned";
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+};
+
+export type MerchantAnalytics = {
+  revenue: number;
+  orders: number;
+  customers: number;
+  products: number;
+  conversionRate: number;
+  revenueByDay: { date: string; revenue: number }[];
+  ordersByCurrency: { currency: string; count: number; revenue: number }[];
+  topProducts: { id: string; name: string; units: number; revenue: number }[];
+  bestCustomers: { id: string; name: string; orders: number; spent: number }[];
+  latestOrders: OrderWithDetails[];
 };

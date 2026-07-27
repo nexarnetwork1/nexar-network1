@@ -1,19 +1,50 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getMarketplaceProductWithDetails,
-  searchMarketplaceProducts,
 } from "@/modules/catalog/repository";
+import {
+  getSimilarProducts,
+  getFrequentlyBoughtTogether,
+  getRecommendedProducts,
+} from "@/modules/marketplace/recommendations";
+import {
+  getProductReviews,
+  getProductRatingSummary,
+} from "@/modules/reviews/repository";
+import { getCurrentProfile } from "@/modules/users/repository";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { BuyNowButton } from "@/components/orders/BuyNowButton";
 import { ProductImageGallery } from "@/components/catalog/ProductImageGallery";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { ProductSpecificationsTable } from "@/components/catalog/ProductSpecificationsTable";
 import { ProductDetailClient } from "@/components/marketplace/ProductDetailClient";
+import { ProductReviews } from "@/components/reviews/ProductReviews";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { ProductRecommendations } from "@/components/marketplace/ProductRecommendations";
+import { ReportButton } from "@/components/security/ReportButton";
+import { buildProductMetadata, buildProductJsonLd } from "@/lib/seo/marketplace";
 
 type Props = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getMarketplaceProductWithDetails(id);
+  if (!product) return { title: "Product not found" };
+
+  return buildProductMetadata({
+    name: product.name,
+    description: product.description,
+    price: Number(product.price),
+    currency: product.currency,
+    imageUrl: product.image_url,
+    storeName: product.store.name,
+    productId: product.id,
+  });
+}
 
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params;
@@ -21,27 +52,34 @@ export default async function ProductDetailPage({ params }: Props) {
 
   if (!product) notFound();
 
-  const { products: relatedRaw } = await searchMarketplaceProducts({
-    page: 1,
-    limit: 8,
-    sort: "newest",
-    onSale: false,
-    inStock: false,
-  });
+  const profile = await getCurrentProfile();
 
-  const related = relatedRaw
-    .filter((p) => p.id !== product.id)
-    .filter(
-      (p) =>
-        p.category_id === product.category_id || p.store_id === product.store_id
-    )
-    .slice(0, 4)
-    .map((p) => ({ ...p, images: [] }));
+  const [similar, boughtTogether, recommended, reviews, ratingSummary] = await Promise.all([
+    getSimilarProducts(product.id, product.category_id, product.store_id),
+    getFrequentlyBoughtTogether(product.id),
+    getRecommendedProducts(profile?.id ?? null),
+    getProductReviews(product.id),
+    getProductRatingSummary(product.id),
+  ]);
 
   const specifications = (product.specifications ?? {}) as Record<string, string>;
+  const jsonLd = buildProductJsonLd({
+    name: product.name,
+    description: product.description,
+    price: Number(product.price),
+    currency: product.currency,
+    imageUrl: product.image_url,
+    storeName: product.store.name,
+    productId: product.id,
+  });
 
   return (
-    <ProductDetailClient product={product} related={related}>
+    <ProductDetailClient product={product}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <Link href="/customer/browse" className="text-sm text-muted hover:text-gold">
         ← Back to marketplace
       </Link>
@@ -60,11 +98,17 @@ export default async function ProductDetailPage({ params }: Props) {
           >
             {product.store.logo_url && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.store.logo_url} alt="" className="h-6 w-6 rounded-full object-cover" />
+              <img src={product.store.logo_url} alt="" className="h-6 w-6 rounded-full object-cover" loading="lazy" />
             )}
             {product.store.name}
           </Link>
           <h1 className="mt-2 font-heading text-4xl font-semibold">{product.name}</h1>
+
+          {ratingSummary.count > 0 && (
+            <p className="mt-2 text-sm text-amber-400">
+              ★ {ratingSummary.avg} · {ratingSummary.count} review{ratingSummary.count !== 1 ? "s" : ""}
+            </p>
+          )}
 
           <ProductPrice
             price={Number(product.price)}
@@ -80,13 +124,9 @@ export default async function ProductDetailPage({ params }: Props) {
             </span>
           </p>
 
-          <p className="mt-1 text-xs text-muted">SKU: {product.id.slice(0, 8).toUpperCase()}</p>
-
           {product.description && (
             <div className="mt-6">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
-                Description
-              </h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">Description</h2>
               <p className="mt-2 leading-7 text-muted">{product.description}</p>
             </div>
           )}
@@ -102,9 +142,28 @@ export default async function ProductDetailPage({ params }: Props) {
             >
               Visit Store
             </Link>
+            <ReportButton targetType="product" targetId={product.id} label="Report product" />
           </div>
         </div>
       </div>
+
+      <ProductReviews
+        reviews={reviews}
+        avgRating={ratingSummary.avg}
+        count={ratingSummary.count}
+        productId={product.id}
+        storeId={product.store_id}
+      />
+
+      {profile && (
+        <div className="mt-8">
+          <ReviewForm productId={product.id} storeId={product.store_id} />
+        </div>
+      )}
+
+      <ProductRecommendations title="Similar Products" products={similar} id="similar-heading" />
+      <ProductRecommendations title="Frequently Bought Together" products={boughtTogether} id="fbt-heading" />
+      <ProductRecommendations title="Recommended for You" products={recommended.filter((p) => p.id !== product.id).slice(0, 4)} id="rec-heading" />
     </ProductDetailClient>
   );
 }

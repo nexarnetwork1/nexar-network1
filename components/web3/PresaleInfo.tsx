@@ -5,6 +5,7 @@ import { Clock, Target, TrendingUp, Wallet } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { StatusDot } from "@/components/ui/StatusDot";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
+import { PresaleCountdown } from "@/components/web3/PresaleCountdown";
 import { cn } from "@/lib/utils/cn";
 
 function formatDate(timestamp: bigint | undefined): string {
@@ -18,9 +19,11 @@ function formatDate(timestamp: bigint | undefined): string {
 
 const STATUS_LABELS = {
   upcoming: { label: "Upcoming", color: "text-amber-400" },
-  active: { label: "Live", color: "text-emerald-400" },
+  live: { label: "Live", color: "text-emerald-400" },
+  sold_out: { label: "Sold Out", color: "text-red-400" },
   ended: { label: "Ended", color: "text-muted" },
-  unknown: { label: "Loading", color: "text-muted" },
+  loading: { label: "Loading", color: "text-muted" },
+  error: { label: "Error", color: "text-red-400" },
 } as const;
 
 type PresaleInfoProps = {
@@ -30,27 +33,20 @@ type PresaleInfoProps = {
 
 export function PresaleInfo({ className, compact = false }: PresaleInfoProps) {
   const {
-    web3Ready,
     status,
     progress,
     soldAmount,
     capAmount,
+    remainingAmount,
     presaleStart,
     presaleEnd,
     purchasedAmount,
     claimableAmount,
+    claimedAmount,
+    countdownSeconds,
+    nxrPerUsdt,
+    isLoading,
   } = usePresaleData();
-
-  if (!web3Ready) {
-    return (
-      <div className={cn("luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-md", className)}>
-        <p className="text-sm text-muted">
-          Connect Web3 to view live presale data. Set{" "}
-          <code className="text-gold">NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID</code>.
-        </p>
-      </div>
-    );
-  }
 
   const statusMeta = STATUS_LABELS[status];
 
@@ -63,75 +59,95 @@ export function PresaleInfo({ className, compact = false }: PresaleInfoProps) {
     >
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <StatusDot
-            color={status === "active" ? "green" : "gold"}
-            size="sm"
-          />
+          <StatusDot color={status === "live" ? "green" : "gold"} size="sm" />
           <span className="text-[11px] tracking-[0.18em] text-muted uppercase">Presale</span>
         </div>
         <span className={cn("text-xs font-medium", statusMeta.color)}>{statusMeta.label}</span>
       </div>
 
-      <div className="mb-2 flex items-baseline justify-between">
-        <p className="font-mono text-2xl font-semibold text-white">
-          <AnimatedCounter value={Math.round(soldAmount / 1_000_000)} suffix="M" decimals={0} />
-        </p>
-        <p className="font-mono text-xs text-muted">
-          / {capAmount > 0 ? `${Math.round(capAmount / 1_000_000)}M` : "—"} NXR
-        </p>
-      </div>
-
-      <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-border">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${progress}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="h-full rounded-full bg-gradient-to-r from-gold to-gold-secondary"
-        />
-      </div>
-
-      <div className={cn("grid gap-3", compact ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4")}>
-        <div className="flex items-start gap-2">
-          <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" />
-          <div>
-            <p className="text-[10px] text-muted uppercase">Start</p>
-            <p className="font-mono text-[11px] text-white">{formatDate(presaleStart)}</p>
+      {isLoading ? (
+        <p className="text-sm text-muted">Reading contract…</p>
+      ) : (
+        <>
+          <div className="mb-2 flex items-baseline justify-between">
+            <p className="font-mono text-2xl font-semibold text-white">
+              {soldAmount >= 1_000_000 ? (
+                <AnimatedCounter value={Math.round(soldAmount / 1_000_000)} suffix="M" decimals={0} />
+              ) : (
+                soldAmount.toLocaleString()
+              )}
+            </p>
+            <p className="font-mono text-xs text-muted">
+              / {capAmount > 0 ? capAmount.toLocaleString() : "—"} NXR
+            </p>
           </div>
-        </div>
-        <div className="flex items-start gap-2">
-          <Target className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" />
-          <div>
-            <p className="text-[10px] text-muted uppercase">End</p>
-            <p className="font-mono text-[11px] text-white">{formatDate(presaleEnd)}</p>
+
+          <div className="mb-5 h-1.5 overflow-hidden rounded-full bg-border">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full rounded-full bg-gradient-to-r from-gold to-gold-secondary"
+            />
           </div>
-        </div>
-        {!compact && (
-          <>
+
+          {(status === "upcoming" || status === "live") && countdownSeconds > 0 && (
+            <PresaleCountdown
+              seconds={countdownSeconds}
+              label={status === "upcoming" ? "Starts in" : "Ends in"}
+            />
+          )}
+
+          {nxrPerUsdt > 0 && (
+            <p className="mb-4 text-center font-mono text-xs text-gold">
+              {nxrPerUsdt.toLocaleString()} NXR per 1 USDT
+            </p>
+          )}
+
+          <div className={cn("grid gap-3", compact ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4")}>
             <div className="flex items-start gap-2">
-              <TrendingUp className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" />
+              <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" aria-hidden />
               <div>
-                <p className="text-[10px] text-muted uppercase">Progress</p>
-                <p className="font-mono text-[11px] text-white">{progress.toFixed(1)}%</p>
+                <p className="text-[10px] text-muted uppercase">Start</p>
+                <p className="font-mono text-[11px] text-white">{formatDate(presaleStart)}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <Wallet className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" />
+              <Target className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" aria-hidden />
               <div>
-                <p className="text-[10px] text-muted uppercase">Your NXR</p>
-                <p className="font-mono text-[11px] text-white">
-                  {purchasedAmount > 0 ? `${purchasedAmount.toLocaleString()} purchased` : "—"}
-                  {claimableAmount > 0 && (
-                    <span className="block text-emerald-400">
-                      {claimableAmount.toLocaleString()} claimable
-                    </span>
-                  )}
-                </p>
+                <p className="text-[10px] text-muted uppercase">End</p>
+                <p className="font-mono text-[11px] text-white">{formatDate(presaleEnd)}</p>
               </div>
             </div>
-          </>
-        )}
-      </div>
+            {!compact && (
+              <>
+                <div className="flex items-start gap-2">
+                  <TrendingUp className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" aria-hidden />
+                  <div>
+                    <p className="text-[10px] text-muted uppercase">Remaining</p>
+                    <p className="font-mono text-[11px] text-white">{remainingAmount.toLocaleString()}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Wallet className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold/60" aria-hidden />
+                  <div>
+                    <p className="text-[10px] text-muted uppercase">Your NXR</p>
+                    <p className="font-mono text-[11px] text-white">
+                      {purchasedAmount > 0 ? purchasedAmount.toLocaleString() : "—"}
+                      {claimableAmount > 0 && (
+                        <span className="block text-emerald-400">{claimableAmount.toLocaleString()} claimable</span>
+                      )}
+                      {claimedAmount > 0 && (
+                        <span className="block text-muted">{claimedAmount.toLocaleString()} claimed</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      )}
     </motion.div>
   );
 }

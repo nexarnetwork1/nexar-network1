@@ -9,6 +9,7 @@ import { generateAndStoreInvoicePdf } from "@/modules/invoices/pdf";
 import { createNotification } from "@/modules/notifications/repository";
 import { getStoreById } from "@/modules/stores/repository";
 import { getMarketplaceProduct } from "@/modules/catalog/repository";
+import { getOrderById } from "@/modules/orders/repository";
 import { auditLogger } from "@/lib/logging/audit-logger";
 import { sendInvoiceReadyEmail } from "@/lib/email/send";
 import type { ActionResult } from "@/modules/auth/actions";
@@ -174,6 +175,51 @@ export async function checkoutAction(): Promise<CheckoutResult> {
   }
 
   redirect("/customer/orders");
+}
+
+export async function updateOrderFulfillmentAction(
+  orderId: string,
+  fulfillmentStatus: "processing" | "shipped" | "delivered"
+): Promise<ActionResult> {
+  const profile = await requireRole(["merchant", "admin"]);
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("update_order_fulfillment", {
+    p_order_id: orderId,
+    p_fulfillment_status: fulfillmentStatus,
+  });
+
+  if (error) return { success: false, error: error.message };
+
+  const order = await getOrderById(orderId);
+  if (order?.customer_id) {
+    const eventMap = {
+      processing: "order_processing",
+      shipped: "order_shipped",
+      delivered: "order_delivered",
+    } as const;
+    const { dispatchNotification } = await import("@/modules/notifications/dispatch");
+    await dispatchNotification({
+      event: eventMap[fulfillmentStatus],
+      userId: order.customer_id,
+      type: "order",
+      title:
+        fulfillmentStatus === "shipped"
+          ? "Order shipped"
+          : fulfillmentStatus === "delivered"
+            ? "Order delivered"
+            : "Order processing",
+      body: `Your order from ${order.store.name} is now ${fulfillmentStatus}.`,
+      metadata: { order_id: orderId, event: eventMap[fulfillmentStatus] },
+    });
+  }
+
+  revalidatePath("/merchant/orders");
+  revalidatePath(`/merchant/orders/${orderId}`);
+  revalidatePath("/customer/orders");
+  revalidatePath(`/customer/orders/${orderId}`);
+
+  return { success: true };
 }
 
 export async function buyNowAction(
