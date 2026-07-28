@@ -4,6 +4,7 @@ import { useAccount } from "wagmi";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { usePresaleTransactions } from "@/lib/web3/hooks/usePresaleTransactions";
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 
 export function PresaleTransactionHistory() {
   const { address } = useAccount();
@@ -33,16 +34,29 @@ export function PresaleTransactionHistory() {
               className="flex items-center justify-between rounded-xl border border-border bg-background/50 px-3 py-2 text-xs"
             >
               <div>
-                <p className="font-medium capitalize">
-                  {tx.type === "buy_bnb"
-                    ? "Buy (BNB)"
-                    : tx.type === "buy_usdt"
-                      ? "Buy (USDT)"
-                      : "Claim"}
+                <p className="flex items-center gap-1.5 font-medium capitalize">
+                  {tx.type === "buy_bnb" ? (
+                    <>
+                      Buy (<CurrencyLogo code="BNB" size={12} /> BNB)
+                    </>
+                  ) : tx.type === "buy_usdt" ? (
+                    <>
+                      Buy (<CurrencyLogo code="USDT" size={12} /> USDT)
+                    </>
+                  ) : (
+                    "Claim"
+                  )}
                 </p>
-                <p className="text-muted">
+                <p className="flex items-center gap-1.5 text-muted">
+                  <CurrencyLogo code="NXR" size={12} />
                   {tx.nxrAmount.toLocaleString()} NXR
-                  {tx.paymentAmount != null && ` · ${tx.paymentAmount} ${tx.paymentCurrency}`}
+                  {tx.paymentAmount != null && tx.paymentCurrency && (
+                    <>
+                      {" · "}
+                      <CurrencyLogo code={tx.paymentCurrency} size={12} />
+                      {tx.paymentAmount} {tx.paymentCurrency}
+                    </>
+                  )}
                 </p>
               </div>
               <Link

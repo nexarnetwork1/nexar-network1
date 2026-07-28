@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { verifyMessage } from "viem";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { CONTRACTS } from "@/lib/constants/site";
+import { tryCreateAdminClient } from "@/lib/supabase/admin";
 import {
   SUPER_ADMIN_COOKIE,
   buildAdminSignMessage,
@@ -15,14 +16,25 @@ import type { RequestAuditContext } from "@/lib/security/request-context";
 export { getSuperAdminSessionFromRequest } from "@/lib/admin/session";
 
 export async function getTreasuryWalletAddress(): Promise<string | null> {
-  const admin = createAdminClient();
-  const { data } = await admin
-    .from("platform_settings")
-    .select("treasury_wallet_address")
-    .limit(1)
-    .maybeSingle();
+  const envTreasury =
+    process.env.TREASURY_WALLET_ADDRESS ??
+    process.env.NEXT_PUBLIC_TREASURY_WALLET_ADDRESS ??
+    CONTRACTS.treasury;
 
-  return data?.treasury_wallet_address ?? process.env.TREASURY_WALLET_ADDRESS ?? null;
+  const admin = tryCreateAdminClient();
+  if (!admin) return envTreasury;
+
+  try {
+    const { data } = await admin
+      .from("platform_settings")
+      .select("treasury_wallet_address")
+      .limit(1)
+      .maybeSingle();
+
+    return data?.treasury_wallet_address ?? envTreasury;
+  } catch {
+    return envTreasury;
+  }
 }
 
 export async function isTreasuryWallet(address: string): Promise<boolean> {
@@ -87,7 +99,11 @@ export async function createWalletChallenge(walletAddress: string): Promise<{
   const message = buildAdminSignMessage(nonce);
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) {
+    throw new Error("Admin database not configured");
+  }
+
   const { data, error } = await admin
     .from("admin_wallet_challenges")
     .insert({
@@ -112,7 +128,8 @@ export async function verifyWalletChallenge(params: {
   signature: `0x${string}`;
 }): Promise<{ verified: boolean; reason?: string }> {
   const normalized = normalizeWalletAddress(params.walletAddress);
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return { verified: false, reason: "Admin database not configured" };
 
   const { data: challenge } = await admin
     .from("admin_wallet_challenges")

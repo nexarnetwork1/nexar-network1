@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
@@ -21,13 +22,20 @@ const FOCUSABLE_SELECTORS =
 export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
+  const pathnameRef = useRef(pathname);
 
   useScrollLock(open);
 
-  // Move focus into dialog when it opens
+  useEffect(() => {
+    if (pathnameRef.current !== pathname) {
+      pathnameRef.current = pathname;
+      if (open) onClose();
+    }
+  }, [pathname, open, onClose]);
+
   useEffect(() => {
     if (open) {
-      // Small delay to allow the animation to start before stealing focus
       const id = setTimeout(() => {
         closeButtonRef.current?.focus();
       }, 60);
@@ -35,7 +43,6 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
     }
   }, [open]);
 
-  // Focus trap: keep Tab/Shift+Tab cycling inside the dialog
   useEffect(() => {
     if (!open) return;
 
@@ -95,13 +102,13 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
-            className="fixed top-0 right-0 z-[80] flex h-full w-full max-w-sm flex-col border-l border-border bg-surface/95 backdrop-blur-2xl"
+            className="fixed top-0 right-0 z-[80] flex h-[100dvh] w-full max-w-sm min-h-0 flex-col border-l border-border bg-surface/95 backdrop-blur-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 320, damping: 32 }}
           >
-            <div className="flex items-center justify-between border-b border-border px-6 py-5">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-6 py-5">
               <Logo />
               <CloseButton
                 ref={closeButtonRef}
@@ -112,7 +119,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             </div>
 
             <nav
-              className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-6"
+              className="mobile-menu-scroll flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain px-4 py-6"
               aria-label="Mobile navigation"
               data-scroll-lock-scrollable
             >
@@ -133,7 +140,10 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                     )}
                   >
                     <span>{item.label}</span>
-                    <span className="font-mono text-xs text-gold/40 transition-colors group-hover:text-gold" aria-hidden="true">
+                    <span
+                      className="font-mono text-xs text-gold/40 transition-colors group-hover:text-gold"
+                      aria-hidden="true"
+                    >
                       0{index + 1}
                     </span>
                   </NavLink>
@@ -141,7 +151,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
               ))}
             </nav>
 
-            <div className="border-t border-border p-6">
+            <div className="shrink-0 border-t border-border p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
               <ConnectWalletButton className="w-full" size="lg" magnetic glow />
             </div>
           </motion.div>

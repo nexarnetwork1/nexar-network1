@@ -30,6 +30,7 @@ const WHITEPAPER_SECTIONS = [
   "Founder",
   "Legal Disclaimer",
   "Conclusion",
+  "Nexar Marketplace",
 ];
 
 export function WhitepaperSection() {

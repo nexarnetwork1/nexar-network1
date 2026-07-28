@@ -18,7 +18,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="nav-offset flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center justify-center px-6 py-16">
+    <main className="flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center justify-center px-6 py-16">
       <div className="mx-auto w-full max-w-md rounded-2xl border border-border/80 bg-card/50 p-8 text-center shadow-xl shadow-black/20 backdrop-blur-2xl">
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10">
           <AlertTriangle className="h-7 w-7 text-red-400" aria-hidden />

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function DisclaimerPage() {
   return (
-    <main className="nav-offset min-h-screen">
+    <main className="min-h-screen">
       <Container className="py-16 lg:py-24">
         <Link
           href="/"

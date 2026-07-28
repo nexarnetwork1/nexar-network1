@@ -3,6 +3,7 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { WhyNexarSection } from "@/components/sections/WhyNexarSection";
 import { TokenomicsSection } from "@/components/sections/TokenomicsSection";
 import { EcosystemSection } from "@/components/sections/EcosystemSection";
+import { MarketplaceSection } from "@/components/sections/MarketplaceSection";
 import { RoadmapSection } from "@/components/sections/RoadmapSection";
 import { SecuritySection } from "@/components/sections/SecuritySection";
 import { FounderSection } from "@/components/sections/FounderSection";
@@ -11,12 +12,13 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function HomePage() {
   return (
-    <main className="nav-offset relative flex flex-1 flex-col">
+    <main className="relative flex flex-1 flex-col">
       <HeroSection />
       <AboutSection />
       <WhyNexarSection />
       <TokenomicsSection />
       <EcosystemSection />
+      <MarketplaceSection />
       <RoadmapSection />
       <SecuritySection />
       <FounderSection />

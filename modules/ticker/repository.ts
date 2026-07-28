@@ -1,6 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { tryCreateAdminClient } from "@/lib/supabase/admin";
 import type { TickerAnnouncement } from "@/types";
+
+const DEFAULT_TICKER: TickerAnnouncement[] = [];
 
 function parseAnnouncement(row: Record<string, unknown>): TickerAnnouncement {
   return {
@@ -18,25 +19,34 @@ function parseAnnouncement(row: Record<string, unknown>): TickerAnnouncement {
 
 /** Active announcements for the public ticker (respects schedule + enabled). */
 export async function getActiveTickerAnnouncements(): Promise<TickerAnnouncement[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("ticker_announcements")
-    .select("*")
-    .order("sort_order", { ascending: true })
-    .order("priority", { ascending: false })
-    .order("created_at", { ascending: true });
+  try {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("ticker_announcements")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("priority", { ascending: false })
+      .order("created_at", { ascending: true });
 
-  if (error) {
-    console.error("[ticker] getActiveTickerAnnouncements", error);
-    return [];
+    if (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[ticker] announcements unavailable:", error.message);
+      }
+      return DEFAULT_TICKER;
+    }
+
+    return (data ?? []).map(parseAnnouncement);
+  } catch {
+    return DEFAULT_TICKER;
   }
-
-  return (data ?? []).map(parseAnnouncement);
 }
 
 /** All announcements for admin management (includes disabled + scheduled). */
 export async function getAllTickerAnnouncementsAdmin(): Promise<TickerAnnouncement[]> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return [];
+
   const { data, error } = await admin
     .from("ticker_announcements")
     .select("*")
@@ -44,11 +54,7 @@ export async function getAllTickerAnnouncementsAdmin(): Promise<TickerAnnounceme
     .order("priority", { ascending: false })
     .order("created_at", { ascending: true });
 
-  if (error) {
-    console.error("[ticker] getAllTickerAnnouncementsAdmin", error);
-    return [];
-  }
-
+  if (error) return [];
   return (data ?? []).map(parseAnnouncement);
 }
 
@@ -59,7 +65,8 @@ export async function createTickerAnnouncement(input: {
   startsAt: string | null;
   endsAt: string | null;
 }): Promise<{ id?: string; error?: string }> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return { error: "Admin database not configured" };
 
   const { data: maxRow } = await admin
     .from("ticker_announcements")
@@ -97,7 +104,9 @@ export async function updateTickerAnnouncement(
     endsAt: string | null;
   }
 ): Promise<{ error?: string }> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return { error: "Admin database not configured" };
+
   const { error } = await admin
     .from("ticker_announcements")
     .update({
@@ -114,7 +123,9 @@ export async function updateTickerAnnouncement(
 }
 
 export async function deleteTickerAnnouncement(id: string): Promise<{ error?: string }> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return { error: "Admin database not configured" };
+
   const { error } = await admin.from("ticker_announcements").delete().eq("id", id);
   if (error) return { error: error.message };
   return {};
@@ -124,7 +135,9 @@ export async function setTickerAnnouncementEnabled(
   id: string,
   isEnabled: boolean
 ): Promise<{ error?: string }> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return { error: "Admin database not configured" };
+
   const { error } = await admin
     .from("ticker_announcements")
     .update({ is_enabled: isEnabled })
@@ -137,7 +150,8 @@ export async function setTickerAnnouncementEnabled(
 export async function reorderTickerAnnouncements(
   orderedIds: string[]
 ): Promise<{ error?: string }> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return { error: "Admin database not configured" };
 
   const updates = orderedIds.map((id, index) =>
     admin.from("ticker_announcements").update({ sort_order: index }).eq("id", id)

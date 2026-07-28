@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { tryCreateAdminClient } from "@/lib/supabase/admin";
 import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
 import {
   loginSchema,
@@ -37,7 +37,7 @@ function slugifyStoreName(name: string, userId: string): string {
 }
 
 async function resolveUniqueStoreSlug(
-  admin: ReturnType<typeof createAdminClient>,
+  admin: NonNullable<ReturnType<typeof tryCreateAdminClient>>,
   storeName: string,
   userId: string
 ): Promise<string> {
@@ -57,8 +57,15 @@ async function persistCustomerProfile(
   fullName: string,
   walletAddress: string
 ): Promise<ActionResult | null> {
+  const admin = tryCreateAdminClient();
+  if (!admin) {
+    return {
+      success: false,
+      error: "Registration saved but profile setup requires server configuration.",
+    };
+  }
+
   try {
-    const admin = createAdminClient();
     const { error } = await admin
       .from("profiles")
       .update({
@@ -90,9 +97,15 @@ async function persistMerchantRegistration(
     logoUrl?: string | null;
   }
 ): Promise<ActionResult | null> {
-  try {
-    const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) {
+    return {
+      success: false,
+      error: "Registration saved but merchant setup requires server configuration.",
+    };
+  }
 
+  try {
     const { error: profileError } = await admin
       .from("profiles")
       .update({
@@ -387,31 +400,38 @@ export async function registerMerchantAction(
   }
 
   try {
-    const admin = createAdminClient();
-    await admin.auth.admin.updateUserById(data.user.id, {
-      app_metadata: { role: "merchant" },
-    });
+    const admin = tryCreateAdminClient();
+    if (admin) {
+      await admin.auth.admin.updateUserById(data.user.id, {
+        app_metadata: { role: "merchant" },
+      });
+    }
   } catch {
     // Service role key not configured in dev — profile.role is source of truth
   }
 
+  const admin = tryCreateAdminClient();
   let slug: string;
-  try {
-    slug = await resolveUniqueStoreSlug(createAdminClient(), parsed.data.storeName, data.user.id);
-  } catch {
+  if (admin) {
+    slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, data.user.id);
+  } else {
     slug = slugifyStoreName(parsed.data.storeName, data.user.id);
   }
 
-  const { error: storeError } = await supabase.from("stores").insert({
+  const storePayload = {
     owner_id: data.user.id,
     name: parsed.data.storeName,
     slug,
     business_type: parsed.data.businessType,
     logo_url: logoUrl,
     mode: parsed.data.mode,
-    status: "pending",
+    status: "pending" as const,
     wallet_address: parsed.data.walletAddress.toLowerCase(),
-  });
+  };
+
+  const { error: storeError } = admin
+    ? await admin.from("stores").insert(storePayload)
+    : await supabase.from("stores").insert(storePayload);
 
   if (storeError) {
     return { success: false, error: storeError.message };
@@ -471,31 +491,34 @@ export async function completeProfileAction(
   }
 
   if (role === "merchant" && parsed.data.storeName && parsed.data.businessType && parsed.data.mode) {
-    try {
-      const admin = createAdminClient();
+    const admin = tryCreateAdminClient();
+    if (admin) {
       await admin.auth.admin.updateUserById(user.id, {
         app_metadata: { role: "merchant" },
-      });
-    } catch {
-      // Service role key not configured in dev
+      }).catch(() => undefined);
     }
 
     let slug: string;
-    try {
-      slug = await resolveUniqueStoreSlug(createAdminClient(), parsed.data.storeName, user.id);
-    } catch {
+    if (admin) {
+      slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, user.id);
+    } else {
       slug = slugifyStoreName(parsed.data.storeName, user.id);
     }
 
-    const { error: storeError } = await supabase.from("stores").insert({
+    const storePayload = {
       owner_id: user.id,
       name: parsed.data.storeName,
       slug,
       business_type: parsed.data.businessType,
+      logo_url: null,
       mode: parsed.data.mode,
-      status: "pending",
+      status: "pending" as const,
       wallet_address: parsed.data.walletAddress.toLowerCase(),
-    });
+    };
+
+    const { error: storeError } = admin
+      ? await admin.from("stores").insert(storePayload)
+      : await supabase.from("stores").insert(storePayload);
 
     if (storeError) {
       return { success: false, error: storeError.message };
@@ -825,8 +848,10 @@ export async function revokeOtherSessionsAction(): Promise<ActionResult> {
   if (error) return { success: false, error: error.message };
 
   try {
-    const admin = createAdminClient();
-    await admin.auth.admin.signOut(user.id, "others");
+    const admin = tryCreateAdminClient();
+    if (admin) {
+      await admin.auth.admin.signOut(user.id, "others");
+    }
   } catch {
     // Service role not configured in dev
   }

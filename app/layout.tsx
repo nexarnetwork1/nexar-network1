@@ -99,7 +99,7 @@ export default async function RootLayout({
 
 <div
   id="main-content"
-  className="relative z-10 flex min-h-screen flex-col"
+  className="relative z-10 flex min-h-screen flex-col nav-offset"
 >
   {children}
 </div>

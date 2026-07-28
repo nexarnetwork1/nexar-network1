@@ -7,7 +7,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative">
+    <div className="relative min-h-[calc(100vh-var(--nxr-header-offset))]">
       <MarketplaceArtwork />
       <Container className="relative flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center justify-center py-8 sm:py-10">
         {children}

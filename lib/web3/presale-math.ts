@@ -75,6 +75,34 @@ export function validatePurchase(params: {
   return { valid: true };
 }
 
+/** Reverse: USDT wei from NXR amount */
+export function usdtFromNxr(
+  nxrAmountWei: bigint,
+  priceNumerator: bigint,
+  priceDenominator: bigint
+): bigint {
+  if (priceDenominator === BigInt(0) || priceNumerator === BigInt(0)) return BigInt(0);
+  return (nxrAmountWei * priceNumerator) / priceDenominator;
+}
+
+/** Reverse: BNB wei from NXR amount using Chainlink BNB/USD (8 decimals) */
+export function bnbFromNxr(
+  nxrAmountWei: bigint,
+  bnbUsdPrice: bigint,
+  priceNumerator: bigint,
+  priceDenominator: bigint
+): bigint {
+  if (bnbUsdPrice === BigInt(0)) return BigInt(0);
+  const usdtValue = usdtFromNxr(nxrAmountWei, priceNumerator, priceDenominator);
+  return (usdtValue * BigInt(1e8)) / bnbUsdPrice;
+}
+
+export function parseNxrAmount(amount: string): bigint {
+  const trimmed = amount.trim();
+  if (!trimmed || isNaN(Number(trimmed)) || Number(trimmed) <= 0) return BigInt(0);
+  return parseUnits(trimmed, 18);
+}
+
 export function formatCountdown(seconds: number): string {
   if (seconds <= 0) return "00:00:00";
   const d = Math.floor(seconds / 86400);

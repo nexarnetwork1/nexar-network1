@@ -8,7 +8,9 @@ export default function LoginPage() {
       <Suspense fallback={null}>
         <AdminAccessPrompt />
       </Suspense>
-      <LoginForm />
+      <Suspense fallback={<div className="h-64 animate-pulse rounded-2xl bg-card/40" />}>
+        <LoginForm />
+      </Suspense>
     </>
   );
 }

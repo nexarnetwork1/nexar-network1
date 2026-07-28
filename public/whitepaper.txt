@@ -559,6 +559,118 @@ The future independent blockchain powering the
 entire Nexar ecosystem.
 
 ============================================================
+NEXAR MARKETPLACE
+============================================================
+
+Nexar Network includes a complete decentralized Marketplace
+designed to connect merchants and customers within the Nexar
+ecosystem. The Marketplace enables businesses to register,
+create branded stores, list products, and accept payments in
+NXR and supported cryptocurrencies while customers browse,
+purchase, and manage orders through dedicated dashboards.
+
+Merchant Registration
+
+Merchants can register on Nexar Network, complete profile
+verification, and configure store settings including business
+type, wallet address, accepted payment methods, and branding.
+
+Merchant Stores
+
+Each merchant receives a dedicated store with a unique slug,
+public storefront, product catalog, and configurable payment
+options. Stores support marketplace listings and payments-only
+modes for invoice and QR-based commerce.
+
+Product Listings
+
+Merchants publish products with descriptions, pricing,
+inventory, categories, and media. Listings are discoverable
+through the public marketplace browse experience.
+
+Shopping Cart
+
+Customers add products to a persistent shopping cart, review
+line items and totals, and proceed to checkout from any
+supported device.
+
+Checkout
+
+Checkout supports multi-currency payments including NXR, BNB,
+USDT, and other supported assets. Totals, fees, and settlement
+details are displayed before confirmation.
+
+Multi-currency Payments
+
+The Marketplace accepts multiple payment currencies to serve
+global merchants and customers. Supported assets include NXR,
+BNB, USDT, BTC, ETH, and additional cryptocurrencies as
+enabled by platform settings.
+
+NXR Payments
+
+NXR is the native ecosystem token and receives preferential
+transaction pricing to encourage adoption within the Nexar
+Network economy.
+
+BNB Payments
+
+BNB Smart Chain payments enable fast, low-cost settlement
+for BSC-native commerce.
+
+USDT Payments
+
+USDT payments provide stable-value checkout for merchants
+and customers who prefer dollar-pegged settlement.
+
+Official Marketplace Transaction Fees
+
+• Payments made using NXR are charged a platform transaction
+  fee of 0.35%.
+
+• Payments made using any other supported currency (BNB, USDT,
+  BTC, ETH, and other supported assets) are charged a platform
+  transaction fee of 0.50%.
+
+The reduced NXR fee is designed to encourage adoption of the
+Nexar ecosystem while keeping merchant costs low.
+
+Order Management
+
+Orders flow through creation, payment confirmation, fulfillment,
+and completion states. Merchants and customers can track status,
+history, and settlement from their respective dashboards.
+
+Customer Dashboard
+
+Customers manage purchases, orders, invoices, wishlists, payment
+methods, wallet connections, and account settings from a unified
+customer dashboard.
+
+Merchant Dashboard
+
+Merchants manage products, orders, revenue, invoices, coupons,
+customers, analytics, withdrawals, and store configuration from
+a dedicated merchant dashboard.
+
+Reviews & Ratings
+
+Customers can leave reviews and ratings on completed purchases
+to build trust and transparency across the Marketplace.
+
+Secure Payments
+
+Marketplace payments use verified smart contracts, platform
+settlement controls, audit logging, and role-based access to
+protect merchants and customers.
+
+Future Marketplace Expansion
+
+Future releases will expand cross-chain support, advanced merchant
+tools, loyalty programs, escrow enhancements, and deeper NXR
+utility integration across the Nexar ecosystem.
+
+============================================================
 16. ROADMAP
 ============================================================
 

@@ -12,7 +12,7 @@ import { CONTRACTS } from "@/lib/constants/site";
 
 export default function PresalePage() {
   return (
-    <main className="nav-offset relative min-h-screen overflow-hidden">
+    <main className="relative min-h-screen overflow-hidden">
       <PresaleArtwork />
       <Container className="relative py-12 lg:py-20">
         <div className="mx-auto max-w-6xl">

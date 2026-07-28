@@ -1,11 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { supabaseConfig } from "@/config/supabase";
 
 /**
  * Service-role client for server-side workers and Edge Functions only.
  * NEVER import this in client components or expose via NEXT_PUBLIC_ env vars.
  */
-export function createAdminClient() {
+export function createAdminClient(): SupabaseClient {
   const url = supabaseConfig.url;
   const key = supabaseConfig.serviceRoleKey;
 
@@ -19,4 +19,17 @@ export function createAdminClient() {
       persistSession: false,
     },
   });
+}
+
+/** Returns admin client or null when service role env is not configured. */
+export function tryCreateAdminClient(): SupabaseClient | null {
+  try {
+    return createAdminClient();
+  } catch {
+    return null;
+  }
+}
+
+export function isAdminClientConfigured(): boolean {
+  return Boolean(supabaseConfig.url && supabaseConfig.serviceRoleKey);
 }

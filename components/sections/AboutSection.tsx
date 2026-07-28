@@ -164,6 +164,13 @@ export function AboutSection() {
             </Reveal>
           ))}
         </div>
+
+        <p className="mt-12 max-w-3xl text-sm leading-7 text-muted">
+          Nexar Network also includes a decentralized Marketplace where merchants
+          can register, create branded stores, and list products for sale. Customers
+          can browse the marketplace and pay using NXR and supported cryptocurrencies
+          including BNB and USDT, connecting commerce directly to the Nexar ecosystem.
+        </p>
       </Container>
     </section>
   );

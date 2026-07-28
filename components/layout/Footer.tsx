@@ -18,6 +18,7 @@ import { SITE, SOCIAL, CONTRACTS } from "@/lib/constants/site";
 import { FOOTER_LINKS } from "@/lib/constants/navigation";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
+import { ContactForm } from "@/components/contact/ContactForm";
 
 const SOCIAL_ICONS = [
   { href: SOCIAL.x, icon: FaXTwitter, label: "X" },
@@ -110,6 +111,23 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+
+        <div className="mt-8 sm:mt-14 grid gap-10 border-t border-border pt-8 sm:pt-12 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+          <div>
+            <h4 className="font-heading text-xl font-semibold text-white">Contact us</h4>
+            <p className="mt-3 max-w-md text-sm leading-7 text-muted">
+              Questions about NXR, the marketplace, or partnerships? Send a message and our team
+              will respond at{" "}
+              <a href="mailto:admin@nexarnetwork.org" className="text-gold hover:underline">
+                admin@nexarnetwork.org
+              </a>
+              .
+            </p>
+          </div>
+          <div className="luxury-border rounded-3xl bg-card/40 p-6 backdrop-blur-md sm:p-8">
+            <ContactForm />
           </div>
         </div>
 

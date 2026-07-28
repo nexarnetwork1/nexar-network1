@@ -4,8 +4,11 @@ export type CurrencyCode =
   | "NXR"
   | "BNB"
   | "USDT"
+  | "USDC"
   | "BTC"
   | "ETH"
+  | "SOL"
+  | "XRP"
   | "USD"
   | "EUR"
   | "EGP";
@@ -31,8 +34,11 @@ export const CURRENCY_ASSETS: Record<string, string> = {
   NXR: "/logo.png",
   BNB: "/payments/bnb.svg",
   USDT: "/payments/usdt.svg",
+  USDC: "/payments/usdc.svg",
   BTC: "/payments/btc.svg",
   ETH: "/payments/eth.svg",
+  SOL: "/payments/sol.svg",
+  XRP: "/payments/xrp.svg",
   USD: "/payments/usd.svg",
   EUR: "/payments/eur.svg",
   EGP: "/payments/eur.svg",
@@ -60,8 +66,11 @@ export const CURRENCY_META: Record<
   NXR: { label: "Nexar", symbol: "NXR" },
   BNB: { label: "BNB", symbol: "BNB" },
   USDT: { label: "Tether", symbol: "USDT" },
+  USDC: { label: "USD Coin", symbol: "USDC" },
   BTC: { label: "Bitcoin", symbol: "BTC" },
   ETH: { label: "Ethereum", symbol: "ETH" },
+  SOL: { label: "Solana", symbol: "SOL" },
+  XRP: { label: "XRP", symbol: "XRP" },
   USD: { label: "US Dollar", symbol: "USD" },
   EUR: { label: "Euro", symbol: "EUR" },
   EGP: { label: "Egyptian Pound", symbol: "EGP" },
@@ -85,7 +94,18 @@ export const PAYMENT_METHOD_META: Record<
   crypto_other: { label: "Other crypto" },
 };
 
-export const BRANDED_CURRENCIES = ["NXR", "BNB", "USDT", "BTC", "ETH", "USD", "EUR"] as const;
+export const BRANDED_CURRENCIES = [
+  "NXR",
+  "BNB",
+  "USDT",
+  "USDC",
+  "BTC",
+  "ETH",
+  "SOL",
+  "XRP",
+  "USD",
+  "EUR",
+] as const;
 
 export const BRANDED_PAYMENT_METHODS: PaymentMethodCode[] = [
   "nxr",
@@ -172,7 +192,7 @@ export function getStorePaymentMethods(settings: {
 export function currencyDecimals(code: string, override?: number): number {
   if (override != null) return override;
   const upper = code.toUpperCase();
-  if (["NXR", "BNB", "USDT", "BTC", "ETH"].includes(upper)) {
+  if (["NXR", "BNB", "USDT", "USDC", "BTC", "ETH", "SOL", "XRP"].includes(upper)) {
     return upper === "BTC" || upper === "ETH" ? 6 : upper === "USDT" ? 2 : 4;
   }
   return 2;

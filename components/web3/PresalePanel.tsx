@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   useAccount,
   useReadContract,
@@ -22,12 +22,16 @@ import {
   validatePurchase,
   nxrFromBnb,
   nxrFromUsdt,
+  bnbFromNxr,
+  usdtFromNxr,
   parseBnbAmount,
   parseUsdtAmount,
+  parseNxrAmount,
   formatCountdown,
 } from "@/lib/web3/presale-math";
 import { PresaleCountdown } from "@/components/web3/PresaleCountdown";
 import { PresalePanelSkeleton } from "@/components/web3/PresalePanelSkeleton";
+import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 import { cn } from "@/lib/utils/cn";
 import { notifyPresaleRefresh } from "@/lib/web3/presale-refresh";
 
@@ -52,10 +56,80 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   );
 
   const [method, setMethod] = useState<"bnb" | "usdt">("bnb");
+  const [nxrInput, setNxrInput] = useState("");
   const [bnbAmount, setBnbAmount] = useState("");
   const [usdtAmount, setUsdtAmount] = useState("");
+  const editingField = useRef<"nxr" | "bnb" | "usdt" | null>(null);
   const [step, setStep] = useState<"idle" | "approve" | "buy" | "claim">("idle");
   const [, startRefresh] = useTransition();
+
+  const canCalculate =
+    Boolean(presale.priceNumerator && presale.priceDenominator && presale.priceDenominator > BigInt(0));
+
+  function syncFromNxr(value: string) {
+    setNxrInput(value);
+    const nxrWei = parseNxrAmount(value);
+    if (!canCalculate || nxrWei === BigInt(0)) {
+      if (editingField.current === "nxr") {
+        setBnbAmount("");
+        setUsdtAmount("");
+      }
+      return;
+    }
+    const usdtWei = usdtFromNxr(nxrWei, presale.priceNumerator!, presale.priceDenominator!);
+    setUsdtAmount(formatUnits(usdtWei, presale.usdtDecimals));
+    if (presale.bnbUsdPrice) {
+      const bnbWei = bnbFromNxr(
+        nxrWei,
+        presale.bnbUsdPrice,
+        presale.priceNumerator!,
+        presale.priceDenominator!
+      );
+      setBnbAmount(formatUnits(bnbWei, 18));
+    }
+  }
+
+  function syncFromBnb(value: string) {
+    setBnbAmount(value);
+    const bnbWei = parseBnbAmount(value);
+    if (!canCalculate || bnbWei === BigInt(0)) {
+      if (editingField.current === "bnb") {
+        setNxrInput("");
+        setUsdtAmount("");
+      }
+      return;
+    }
+    const nxrWei =
+      presale.bnbUsdPrice && presale.priceNumerator && presale.priceDenominator
+        ? nxrFromBnb(bnbWei, presale.bnbUsdPrice, presale.priceNumerator, presale.priceDenominator)
+        : BigInt(0);
+    setNxrInput(formatUnits(nxrWei, 18));
+    const usdtWei = usdtFromNxr(nxrWei, presale.priceNumerator!, presale.priceDenominator!);
+    setUsdtAmount(formatUnits(usdtWei, presale.usdtDecimals));
+  }
+
+  function syncFromUsdt(value: string) {
+    setUsdtAmount(value);
+    const usdtWei = parseUsdtAmount(value, presale.usdtDecimals);
+    if (!canCalculate || usdtWei === BigInt(0)) {
+      if (editingField.current === "usdt") {
+        setNxrInput("");
+        setBnbAmount("");
+      }
+      return;
+    }
+    const nxrWei = nxrFromUsdt(usdtWei, presale.priceNumerator!, presale.priceDenominator!);
+    setNxrInput(formatUnits(nxrWei, 18));
+    if (presale.bnbUsdPrice) {
+      const bnbWei = bnbFromNxr(
+        nxrWei,
+        presale.bnbUsdPrice,
+        presale.priceNumerator!,
+        presale.priceDenominator!
+      );
+      setBnbAmount(formatUnits(bnbWei, 18));
+    }
+  }
 
   useEffect(() => {
     if (presale.status !== "loading" && presale.status !== "error") return;
@@ -73,7 +147,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       ? nxrFromBnb(bnbAmountWei, presale.bnbUsdPrice, presale.priceNumerator, presale.priceDenominator)
       : presale.priceNumerator && presale.priceDenominator
         ? nxrFromUsdt(usdtAmountWei, presale.priceNumerator, presale.priceDenominator)
-        : BigInt(0);
+        : parseNxrAmount(nxrInput);
 
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: presale.usdtToken,
@@ -330,34 +404,97 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
                 )}
                 aria-pressed={method === m}
               >
-                {m === "bnb" ? "Buy With BNB" : "Buy With USDT"}
+                {m === "bnb" ? "Pay with BNB" : "Pay with USDT"}
               </button>
             ))}
           </div>
 
-          {method === "bnb" ? (
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs text-muted">
-                <span>BNB Balance</span>
-                <span className="font-mono">{isConnected ? `${bnbBalanceFormatted} BNB` : "—"}</span>
-              </div>
-              <label className="block">
-                <span className="sr-only">BNB amount</span>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={bnbAmount}
-                  onChange={(e) => setBnbAmount(e.target.value)}
-                  placeholder="0.0"
-                  className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono outline-none focus:border-gold/40"
-                  aria-label="BNB amount to spend"
-                />
-              </label>
-              {estimatedNxr > BigInt(0) && (
-                <p className="text-xs text-muted">
-                  Estimated: <span className="font-mono text-gold">{formatUnits(estimatedNxr, 18)} NXR</span>
-                </p>
-              )}
+          <div className="mb-4 space-y-3 rounded-2xl border border-border/80 bg-background/40 p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted">Live calculator</p>
+            <label className="block">
+              <span className="mb-1 flex items-center gap-1.5 text-xs text-muted">
+                <CurrencyLogo code="NXR" size={14} />
+                NXR amount
+              </span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={nxrInput}
+                onChange={(e) => {
+                  editingField.current = "nxr";
+                  syncFromNxr(e.target.value);
+                }}
+                placeholder="0.0"
+                className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono outline-none focus:border-gold/40"
+                aria-label="NXR amount to purchase"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 flex items-center gap-1.5 text-xs text-muted">
+                <CurrencyLogo code="BNB" size={14} />
+                BNB equivalent
+              </span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={bnbAmount}
+                onChange={(e) => {
+                  editingField.current = "bnb";
+                  syncFromBnb(e.target.value);
+                }}
+                placeholder="0.0"
+                className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono outline-none focus:border-gold/40"
+                aria-label="BNB amount"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 flex items-center gap-1.5 text-xs text-muted">
+                <CurrencyLogo code="USDT" size={14} />
+                USDT equivalent
+              </span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={usdtAmount}
+                onChange={(e) => {
+                  editingField.current = "usdt";
+                  syncFromUsdt(e.target.value);
+                }}
+                placeholder="0.0"
+                className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono outline-none focus:border-gold/40"
+                aria-label="USDT amount"
+              />
+            </label>
+            {presale.bnbPriceUsd > 0 && (
+              <p className="text-[11px] text-muted">
+                BNB/USD oracle: ${presale.bnbPriceUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex justify-between text-xs text-muted">
+              <span className="inline-flex items-center gap-1.5">
+                <CurrencyLogo code={method === "bnb" ? "BNB" : "USDT"} size={14} />
+                {method === "bnb" ? "BNB Balance" : "USDT Balance"}
+              </span>
+              <span className="font-mono">
+                {isConnected
+                  ? method === "bnb"
+                    ? `${bnbBalanceFormatted} BNB`
+                    : `${usdtBalanceFormatted} USDT`
+                  : "—"}
+              </span>
+            </div>
+
+            {estimatedNxr > BigInt(0) && (
+              <p className="text-xs text-muted">
+                You receive:{" "}
+                <span className="font-mono text-gold">{formatUnits(estimatedNxr, 18)} NXR</span>
+              </p>
+            )}
+
+            {method === "bnb" ? (
               <Button
                 className="w-full"
                 size="lg"
@@ -367,30 +504,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
               >
                 {isPending || isConfirming ? "Confirming…" : "Buy With BNB"}
               </Button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs text-muted">
-                <span>USDT Balance</span>
-                <span className="font-mono">{isConnected ? `${usdtBalanceFormatted} USDT` : "—"}</span>
-              </div>
-              <label className="block">
-                <span className="sr-only">USDT amount</span>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={usdtAmount}
-                  onChange={(e) => setUsdtAmount(e.target.value)}
-                  placeholder="0.0"
-                  className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono outline-none focus:border-gold/40"
-                  aria-label="USDT amount to spend"
-                />
-              </label>
-              {estimatedNxr > BigInt(0) && (
-                <p className="text-xs text-muted">
-                  Estimated: <span className="font-mono text-gold">{formatUnits(estimatedNxr, 18)} NXR</span>
-                </p>
-              )}
+            ) : (
               <Button
                 className="w-full"
                 size="lg"
@@ -406,8 +520,8 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
                     ? "Buy With USDT"
                     : "Approve & Buy USDT"}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
 
           {!validation.valid && validation.error && isConnected && (
             <p className="mt-2 text-center text-xs text-red-400">{validation.error}</p>

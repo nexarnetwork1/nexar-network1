@@ -26,6 +26,10 @@ export default function AboutPage() {
             This page will be expanded with company mission, team, and roadmap
             content in a future phase.
           </p>
+          <p>
+            Nexar Network includes a decentralized Marketplace where merchants can
+            create stores and customers can pay using NXR and supported cryptocurrencies.
+          </p>
         </div>
       </Container>
     </main>

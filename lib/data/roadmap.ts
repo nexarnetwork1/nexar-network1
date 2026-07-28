@@ -26,6 +26,8 @@ export const ROADMAP: RoadmapPhase[] = [
       "CoinGecko Listing",
       "CoinMarketCap Listing",
       "Marketing Campaign",
+      "Marketplace Beta",
+      "Merchant Registration",
     ],
   },
   {
@@ -37,6 +39,11 @@ export const ROADMAP: RoadmapPhase[] = [
       "Merchant Payments",
       "Staking",
       "Strategic Partnerships",
+      "Public Marketplace",
+      "Merchant Dashboard",
+      "Customer Dashboard",
+      "Product Listings",
+      "Order Management",
     ],
   },
   {
@@ -48,6 +55,7 @@ export const ROADMAP: RoadmapPhase[] = [
       "Explorer",
       "Developer SDK",
       "Mainnet Preparation",
+      "Marketplace Expansion",
     ],
   },
 ];

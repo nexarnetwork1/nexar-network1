@@ -28,6 +28,7 @@ const WHITEPAPER_SECTIONS = [
   { id: "founder", title: "Founder" },
   { id: "legal", title: "Legal Disclaimer" },
   { id: "conclusion", title: "Conclusion" },
+  { id: "marketplace", title: "Nexar Marketplace" },
 ];
 
 export default function WhitepaperPage() {
@@ -76,7 +77,7 @@ export default function WhitepaperPage() {
   };
 
   return (
-    <main className="nav-offset min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <Container className="py-16 lg:py-24">
         <Link
           href="/#whitepaper"
@@ -976,6 +977,114 @@ Through transparency, continuous development,
 community participation and responsible growth,
 Nexar Network aims to become one of the leading
 global blockchain payment ecosystems.
+</p>
+
+</div>
+
+</section>
+
+              {/* Nexar Marketplace — additive documentation */}
+              <section id="marketplace" className="scroll-mt-24 mb-16">
+
+<h2 className="font-heading text-2xl font-semibold text-white mb-6">
+Nexar Marketplace
+</h2>
+
+<div className="space-y-6 text-muted leading-8">
+
+<p>
+Nexar Network includes a complete decentralized Marketplace
+designed to connect merchants and customers within the Nexar
+ecosystem.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Merchant Registration</h3>
+<p>
+Merchants register on Nexar Network, complete verification, and
+configure store settings including business type, wallet address,
+and accepted payment methods.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Merchant Stores</h3>
+<p>
+Each merchant receives a dedicated store with a unique slug,
+public storefront, product catalog, and configurable payment options.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Product Listings</h3>
+<p>
+Merchants publish products with descriptions, pricing, inventory,
+categories, and media for public marketplace discovery.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Shopping Cart</h3>
+<p>
+Customers add products to a persistent cart, review line items,
+and proceed to checkout.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Checkout</h3>
+<p>
+Checkout supports multi-currency payments with transparent totals,
+fees, and settlement details before confirmation.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Multi-currency Payments</h3>
+<p>
+The Marketplace accepts NXR, BNB, USDT, BTC, ETH, and additional
+supported cryptocurrencies as enabled by platform settings.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">NXR, BNB &amp; USDT Payments</h3>
+<p>
+NXR is the native ecosystem token with preferential fee pricing.
+BNB enables fast BSC settlement. USDT provides stable-value checkout.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Official Marketplace Transaction Fees</h3>
+<ul className="list-disc pl-6 space-y-2">
+<li>Payments made using NXR are charged a platform transaction fee of 0.35%.</li>
+<li>Payments made using any other supported currency (BNB, USDT, BTC, ETH, etc.) are charged a platform transaction fee of 0.50%.</li>
+</ul>
+<p>
+The reduced NXR fee is designed to encourage adoption of the Nexar
+ecosystem while keeping merchant costs low.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Order Management</h3>
+<p>
+Orders progress through payment, fulfillment, and completion with
+full history for merchants and customers.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Customer Dashboard</h3>
+<p>
+Customers manage purchases, orders, invoices, wishlists, and payment
+methods from a unified dashboard.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Merchant Dashboard</h3>
+<p>
+Merchants manage products, orders, revenue, invoices, analytics,
+and store settings from a dedicated dashboard.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Reviews &amp; Ratings</h3>
+<p>
+Customers leave reviews and ratings on completed purchases to build
+marketplace trust and transparency.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Secure Payments</h3>
+<p>
+Marketplace payments use verified contracts, platform settlement
+controls, audit logging, and role-based access.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Future Marketplace Expansion</h3>
+<p>
+Future releases will expand cross-chain support, merchant tools,
+loyalty programs, escrow enhancements, and deeper NXR integration.
 </p>
 
 </div>

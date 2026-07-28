@@ -41,7 +41,9 @@ function OAuthProviderButton({
     if (redirectTo) params.set("redirect", redirectTo);
     if (intent) params.set("intent", intent);
 
-    const callbackUrl = `${window.location.origin}/auth/callback${params.toString() ? `?${params}` : ""}`;
+    const query = params.toString();
+    const suffix = query.length > 0 ? "?" + query : "";
+    const callbackUrl = window.location.origin + "/auth/callback" + suffix;
 
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
@@ -54,42 +56,31 @@ function OAuthProviderButton({
     }
   }
 
-  if (!enabled) {
-    return (
-      <Button type="button" variant="secondary" className="w-full" disabled>
-        {label}
-        <span className="ml-2 text-xs text-muted">(Provider not configured.)</span>
-      </Button>
-    );
-  }
-
   return (
     <div>
       <Button
         type="button"
         variant="secondary"
-        className="w-full"
-        disabled={loading}
+        className="w-full justify-between"
+        disabled={!enabled || loading}
         onClick={signIn}
       >
-        {loading ? "Redirecting…" : label}
+        <span>{loading ? "Redirecting..." : label}</span>
+        {!enabled && (
+          <span className="text-[10px] font-normal uppercase tracking-wide text-muted">
+            Coming Soon
+          </span>
+        )}
       </Button>
       {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
+      {!enabled && (
+        <p className="mt-1 text-[10px] text-muted">Provider not configured.</p>
+      )}
     </div>
   );
 }
 
 export function OAuthButtons({ redirectTo, intent }: OAuthButtonsProps) {
-  const anyEnabled = PROVIDERS.some((p) => isOAuthProviderEnabled(p.id));
-
-  if (!anyEnabled) {
-    return (
-      <p className="rounded-xl border border-border/60 bg-surface/40 px-3 py-2 text-center text-xs text-muted">
-        Social sign-in providers are not configured.
-      </p>
-    );
-  }
-
   return (
     <div className="space-y-2.5">
       {PROVIDERS.map((provider) => (
