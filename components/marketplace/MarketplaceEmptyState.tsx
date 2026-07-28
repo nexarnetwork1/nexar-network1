@@ -37,8 +37,11 @@ export function MarketplaceEmptyState({ hasFilters }: MarketplaceEmptyStateProps
         </p>
         <Link href="/register/merchant" className="mt-8 inline-block">
           <Button size="lg" glow>
-            Become a merchant
+            Become First Merchant
           </Button>
+        </Link>
+        <Link href="/register/merchant" className="mt-3 block text-sm text-gold hover:underline">
+          Register your store →
         </Link>
       </div>
     </div>

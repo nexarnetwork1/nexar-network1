@@ -7,6 +7,7 @@ import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { SITE } from "@/lib/constants/site";
 import { BuyNxrButton } from "@/components/web3/BuyNxrButton";
+import { HeroWalletLogos } from "@/components/hero/HeroWalletLogos";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { BlockchainVisualization } from "@/components/hero/BlockchainVisualization";
@@ -26,9 +27,9 @@ export function HeroSection() {
     offset: ["start start", "end start"],
   });
 
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const vizY = useTransform(scrollYProgress, [0, 1], [0, -60]);
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 48]);
+  const vizY = useTransform(scrollYProgress, [0, 1], [0, -32]);
+  const opacity = useTransform(scrollYProgress, [0, 0.88], [1, 0.35]);
 
   useEffect(() => {
     if (reducedMotion || !headlineRef.current) return;
@@ -53,7 +54,7 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       id="home"
-      className="relative flex min-h-[calc(100vh-var(--nxr-header-offset)-2rem)] items-center overflow-hidden scroll-mt-[var(--nxr-header-offset)]"
+      className="relative flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center overflow-hidden scroll-mt-[var(--nxr-header-offset)] pt-4"
     >
       <Container className="relative py-12 sm:py-16 lg:py-24">
         <div className="grid items-center gap-8 sm:gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
@@ -111,14 +112,16 @@ export function HeroSection() {
               transition={{ duration: 0.8, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
               className="mt-8 flex flex-wrap items-center gap-2 sm:gap-3"
             >
-              <BuyNxrButton />
+              <BuyNxrButton variant="primary" glow magnetic />
               <Link href="/#about">
-                <Button size="lg" variant="outline" magnetic>
+                <Button size="lg" variant="primary" magnetic glow>
                   Learn More
                   <ArrowUpRight className="h-4 w-4" />
                 </Button>
               </Link>
             </motion.div>
+
+            <HeroWalletLogos />
 
             <motion.div
               initial={{ opacity: 0, y: 24 }}

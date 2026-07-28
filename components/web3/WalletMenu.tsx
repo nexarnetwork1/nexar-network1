@@ -45,11 +45,7 @@ export function WalletMenu() {
   }
 
   useEffect(() => {
-    if (!address) {
-      setIsTreasuryWallet(false);
-      setIsSuperAdmin(false);
-      return;
-    }
+    if (!address) return;
 
     fetch(`/api/admin/wallet/status?wallet=${encodeURIComponent(address)}`)
       .then((res) => res.json())
@@ -73,6 +69,7 @@ export function WalletMenu() {
     await fetch("/api/admin/wallet/logout", { method: "POST" }).catch(() => undefined);
     await logout();
     setIsSuperAdmin(false);
+    window.dispatchEvent(new CustomEvent("nxr:super-admin-updated"));
   }
 
   return (
@@ -187,7 +184,7 @@ export function WalletMenu() {
           </a>
         </MenuItem>
 
-        {isTreasuryWallet && !isSuperAdmin && address && (
+        {address && isTreasuryWallet && !isSuperAdmin && (
           <MenuItem>
             <SuperAdminVerifyButton
               walletAddress={address}

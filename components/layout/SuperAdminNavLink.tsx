@@ -1,28 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Shield } from "lucide-react";
+
+async function fetchAdminStatus(): Promise<boolean> {
+  const res = await fetch("/api/admin/wallet/status");
+  const data = await res.json();
+  return Boolean(data.authenticated);
+}
 
 export function SuperAdminNavLink() {
   const [authenticated, setAuthenticated] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-
-    fetch("/api/admin/wallet/status")
-      .then((res) => res.json())
-      .then((data) => {
-        if (active) setAuthenticated(Boolean(data.authenticated));
-      })
-      .catch(() => {
-        if (active) setAuthenticated(false);
-      });
-
-    return () => {
-      active = false;
-    };
+  const refresh = useCallback(() => {
+    fetchAdminStatus()
+      .then(setAuthenticated)
+      .catch(() => setAuthenticated(false));
   }, []);
+
+  useEffect(() => {
+    refresh();
+    window.addEventListener("nxr:super-admin-updated", refresh);
+    return () => window.removeEventListener("nxr:super-admin-updated", refresh);
+  }, [refresh]);
 
   if (!authenticated) return null;
 

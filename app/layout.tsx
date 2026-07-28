@@ -3,6 +3,7 @@ import { Inter, Sora, Space_Grotesk } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { NewsTicker } from "@/components/layout/NewsTicker";
 import { GlobalBackground } from "@/components/ui/GlobalBackground";
+import { HashScrollHandler } from "@/components/layout/HashScrollHandler";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { CookieConsent } from "@/components/ui/CookieConsent";
 import { Toaster } from "sonner";
@@ -91,6 +92,7 @@ export default async function RootLayout({
             Skip to content
           </a>
           <GlobalBackground variant="default" />
+          <HashScrollHandler />
          <Navbar />
 
 <NewsTicker announcements={tickerAnnouncements} />

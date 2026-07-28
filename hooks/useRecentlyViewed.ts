@@ -1,21 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 const RECENT_KEY = "nxr_recently_viewed";
 const MAX = 12;
 
-export function useRecentlyViewed() {
-  const [ids, setIds] = useState<string[]>([]);
+function readRecentlyViewed(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(RECENT_KEY);
-      setIds(raw ? (JSON.parse(raw) as string[]) : []);
-    } catch {
-      setIds([]);
-    }
-  }, []);
+export function useRecentlyViewed() {
+  const [ids, setIds] = useState<string[]>(() =>
+    typeof window === "undefined" ? [] : readRecentlyViewed()
+  );
 
   const track = useCallback((productId: string) => {
     setIds((prev) => {

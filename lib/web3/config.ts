@@ -2,8 +2,7 @@ import { createConfig, http, fallback } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { cookieStorage, createStorage } from "wagmi";
 
-export const privyAppId =
-  process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
+export const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "";
 
 const bscRpcUrl =
   process.env.NEXT_PUBLIC_BSC_RPC_URL ?? "https://bsc-dataseed.binance.org";

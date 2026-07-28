@@ -35,6 +35,7 @@ export function usePresaleData() {
     query: { retry: 2, staleTime: 30_000 },
   });
   const [loadTimedOut, setLoadTimedOut] = useState(false);
+  const [fallbackNow] = useState(() => Math.floor(Date.now() / 1000));
 
   const {
     data: baseData,
@@ -47,10 +48,7 @@ export function usePresaleData() {
   });
 
   useEffect(() => {
-    if (!isBaseLoading && !isBaseError) {
-      setLoadTimedOut(false);
-      return;
-    }
+    if (!isBaseLoading && !isBaseError) return;
     const id = window.setTimeout(() => setLoadTimedOut(true), 10_000);
     return () => window.clearTimeout(id);
   }, [isBaseLoading, isBaseError]);
@@ -154,7 +152,7 @@ export function usePresaleData() {
   const usdtDecimals = (usdtDecimalsData?.[0]?.result as number | undefined) ?? 18;
 
   const blockTimestamp = block ? Number(block.timestamp) : null;
-  const nowTimestamp = blockTimestamp ?? Math.floor(Date.now() / 1000);
+  const nowTimestamp = blockTimestamp ?? fallbackNow;
 
   let status: PresaleStatus = "loading";
   const hasBaseData =
@@ -164,7 +162,9 @@ export function usePresaleData() {
     totalSold !== undefined &&
     hardCap !== undefined;
 
-  if (isBaseError || loadTimedOut) {
+  const timedOutWhileLoading = loadTimedOut && isBaseLoading;
+
+  if (isBaseError || timedOutWhileLoading) {
     status = "error";
   } else if (hasBaseData) {
     const now = nowTimestamp;
@@ -242,6 +242,6 @@ export function usePresaleData() {
     canBuy: status === "live",
     canClaim: status === "ended",
     blockTimestamp,
-    loadTimedOut,
+    loadTimedOut: timedOutWhileLoading,
   };
 }

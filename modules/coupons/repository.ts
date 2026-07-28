@@ -19,7 +19,7 @@ export async function validateCoupon(
   orderTotalUsd = 0
 ): Promise<{ valid: boolean; coupon?: Coupon; discountUsd?: number; freeShipping?: boolean; error?: string }> {
   const supabase = await createClient();
-  let query = supabase
+  const query = supabase
     .from("coupons")
     .select("*")
     .eq("is_active", true)

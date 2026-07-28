@@ -1,6 +1,12 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import type { NextRequest } from "next/server";
 import { getAddress, type Address } from "viem";
 import { env } from "@/config/env";
+import {
+  fromBase64Url,
+  hmacSha256Hex,
+  timingSafeEqualHex,
+  toBase64Url,
+} from "@/lib/admin/session-crypto";
 
 export const SUPER_ADMIN_COOKIE = "nxr_super_admin";
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
@@ -22,19 +28,21 @@ export function normalizeWalletAddress(address: string): Address {
   return getAddress(address);
 }
 
-export function createSuperAdminSessionToken(walletAddress: string): string {
+export async function createSuperAdminSessionToken(walletAddress: string): Promise<string> {
   const normalized = normalizeWalletAddress(walletAddress);
   const expiresAt = Date.now() + SESSION_TTL_MS;
   const payload = `${normalized}:${expiresAt}`;
-  const signature = createHmac("sha256", sessionSecret()).update(payload).digest("hex");
-  return Buffer.from(`${payload}:${signature}`).toString("base64url");
+  const signature = await hmacSha256Hex(sessionSecret(), payload);
+  return toBase64Url(`${payload}:${signature}`);
 }
 
-export function parseSuperAdminSessionToken(token: string | undefined | null): SuperAdminSession | null {
+export async function parseSuperAdminSessionToken(
+  token: string | undefined | null
+): Promise<SuperAdminSession | null> {
   if (!token) return null;
 
   try {
-    const decoded = Buffer.from(token, "base64url").toString("utf8");
+    const decoded = fromBase64Url(token);
     const lastColon = decoded.lastIndexOf(":");
     if (lastColon <= 0) return null;
 
@@ -47,16 +55,20 @@ export function parseSuperAdminSessionToken(token: string | undefined | null): S
     const expiresAt = Number(payload.slice(sep + 1));
     if (!Number.isFinite(expiresAt)) return null;
 
-    const expected = createHmac("sha256", sessionSecret()).update(payload).digest("hex");
-    const a = Buffer.from(signature, "hex");
-    const b = Buffer.from(expected, "hex");
-    if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+    const expected = await hmacSha256Hex(sessionSecret(), payload);
+    if (!timingSafeEqualHex(signature, expected)) return null;
     if (expiresAt < Date.now()) return null;
 
     return { walletAddress: normalizeWalletAddress(walletAddress), expiresAt };
   } catch {
     return null;
   }
+}
+
+export function getSuperAdminSessionFromRequest(
+  request: NextRequest
+): Promise<SuperAdminSession | null> {
+  return parseSuperAdminSessionToken(request.cookies.get(SUPER_ADMIN_COOKIE)?.value);
 }
 
 export function superAdminCookieOptions(expiresAt: number) {

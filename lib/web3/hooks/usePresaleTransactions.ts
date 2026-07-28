@@ -31,18 +31,15 @@ export function usePresaleTransactions(wallet?: `0x${string}`) {
   );
 
   useEffect(() => {
-    if (!wallet) {
-      setTransactions([]);
-      return;
-    }
+    if (!wallet) return;
 
     let cancelled = false;
-    setIsLoading(true);
 
     const client = createPublicClient({ chain: bsc, transport: http() });
     const presale = CONTRACTS.presale as `0x${string}`;
 
     async function load() {
+      setIsLoading(true);
       try {
         const currentBlock = await client.getBlockNumber();
         const fromBlock = currentBlock > BigInt(5_000_000) ? currentBlock - BigInt(5_000_000) : BigInt(0);
@@ -153,5 +150,5 @@ export function usePresaleTransactions(wallet?: `0x${string}`) {
     };
   }, [wallet, refreshNonce]);
 
-  return { transactions, isLoading };
+  return { transactions: wallet ? transactions : [], isLoading: Boolean(wallet) && isLoading };
 }

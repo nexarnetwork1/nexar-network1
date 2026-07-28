@@ -19,7 +19,10 @@ export function useRealtimeSubscription<T extends Record<string, unknown>>(
   options: RealtimeOptions<T>
 ): void {
   const callbacksRef = useRef(options);
-  callbacksRef.current = options;
+
+  useEffect(() => {
+    callbacksRef.current = options;
+  }, [options]);
 
   useEffect(() => {
     const supabase = createClient();

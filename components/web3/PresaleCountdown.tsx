@@ -8,16 +8,15 @@ type PresaleCountdownProps = {
   label: string;
 };
 
-export function PresaleCountdown({ seconds, label }: PresaleCountdownProps) {
+function PresaleCountdownInner({ seconds, label }: PresaleCountdownProps) {
   const [remaining, setRemaining] = useState(seconds);
 
   useEffect(() => {
-    setRemaining(seconds);
     const id = window.setInterval(() => {
-      setRemaining((s) => Math.max(0, s - 1));
+      setRemaining((current) => Math.max(0, current - 1));
     }, 1000);
     return () => window.clearInterval(id);
-  }, [seconds]);
+  }, []);
 
   return (
     <div className="mb-4 rounded-xl border border-gold/20 bg-gold/5 p-4 text-center" aria-live="polite">
@@ -25,4 +24,8 @@ export function PresaleCountdown({ seconds, label }: PresaleCountdownProps) {
       <p className="mt-2 font-mono text-2xl font-semibold text-gold">{formatCountdown(remaining)}</p>
     </div>
   );
+}
+
+export function PresaleCountdown({ seconds, label }: PresaleCountdownProps) {
+  return <PresaleCountdownInner key={seconds} seconds={seconds} label={label} />;
 }

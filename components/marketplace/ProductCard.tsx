@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Heart, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ProductWithStore } from "@/types";
@@ -16,9 +17,10 @@ type ProductCardProps = {
 
 export function ProductCard({ product, showNewBadge }: ProductCardProps) {
   const { toggle, has } = useWishlist();
+  const [now] = useState(() => Date.now());
   const isNew =
     showNewBadge ??
-    Date.now() - new Date(product.created_at).getTime() < 14 * 86400000;
+    now - new Date(product.created_at).getTime() < 14 * 86400000;
 
   async function shareProduct() {
     const url = `${window.location.origin}/customer/browse/${product.id}`;

@@ -1,20 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 const WISHLIST_KEY = "nxr_wishlist";
 
-export function useWishlist() {
-  const [ids, setIds] = useState<string[]>([]);
+function readWishlist(): string[] {
+  try {
+    const raw = localStorage.getItem(WISHLIST_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(WISHLIST_KEY);
-      setIds(raw ? (JSON.parse(raw) as string[]) : []);
-    } catch {
-      setIds([]);
-    }
-  }, []);
+export function useWishlist() {
+  const [ids, setIds] = useState<string[]>(() =>
+    typeof window === "undefined" ? [] : readWishlist()
+  );
 
   const persist = useCallback((next: string[]) => {
     setIds(next);

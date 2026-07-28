@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextResponse, type NextRequest } from "next/server";
 import {
   clearSuperAdminSessionCookie,
@@ -8,7 +10,7 @@ import { getRequestAuditContext } from "@/lib/security/request-context";
 
 export async function POST(request: NextRequest) {
   const context = getRequestAuditContext(request);
-  const session = getSuperAdminSessionFromRequest(request);
+  const session = await getSuperAdminSessionFromRequest(request);
 
   if (session) {
     await writeWalletAuditLog({

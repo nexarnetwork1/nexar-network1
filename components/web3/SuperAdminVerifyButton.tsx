@@ -52,6 +52,7 @@ export function SuperAdminVerifyButton({
 
       toast.success("Super Admin access granted");
       onVerified?.();
+      window.dispatchEvent(new CustomEvent("nxr:super-admin-updated"));
       router.push("/admin/dashboard");
       router.refresh();
     } catch (error) {

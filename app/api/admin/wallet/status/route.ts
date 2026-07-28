@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextResponse, type NextRequest } from "next/server";
 import {
   getSuperAdminSessionFromRequest,
@@ -7,7 +9,7 @@ import {
 import { normalizeWalletAddress } from "@/lib/admin/session";
 
 export async function GET(request: NextRequest) {
-  const session = getSuperAdminSessionFromRequest(request);
+  const session = await getSuperAdminSessionFromRequest(request);
   const walletParam = request.nextUrl.searchParams.get("wallet");
 
   let isTreasury = false;

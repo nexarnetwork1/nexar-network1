@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 
 type NavLinkProps = {
@@ -14,21 +14,30 @@ type NavLinkProps = {
 /** Resolves home sections from any route via `/#section` paths. */
 export function NavLink({ href, className, children, onClick }: NavLinkProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const isHashOnly = href.startsWith("#");
   const resolvedHref = isHashOnly ? `/${href}` : href;
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     onClick?.();
-    if (!href.includes("#")) return;
 
-    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "";
-    if (!hash || hash === "#") return;
+    const hashIndex = href.indexOf("#");
+    if (hashIndex === -1) return;
 
-    if (pathname === "/" && hash.startsWith("#")) {
+    const hash = href.slice(hashIndex);
+    const path = href.slice(0, hashIndex) || "/";
+
+    if (pathname !== path) {
       e.preventDefault();
-      const el = document.querySelector(hash);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      router.push(`${path}${hash}`);
+      return;
+    }
+
+    if (hash && hash !== "#") {
+      e.preventDefault();
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
         window.history.replaceState(null, "", hash);
       }
     }

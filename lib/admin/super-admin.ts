@@ -12,6 +12,7 @@ import {
   type SuperAdminSession,
 } from "@/lib/admin/session";
 import type { RequestAuditContext } from "@/lib/security/request-context";
+export { getSuperAdminSessionFromRequest } from "@/lib/admin/session";
 
 export async function getTreasuryWalletAddress(): Promise<string | null> {
   const admin = createAdminClient();
@@ -34,13 +35,9 @@ export async function isTreasuryWallet(address: string): Promise<boolean> {
   }
 }
 
-export function getSuperAdminSessionFromRequest(request: NextRequest): SuperAdminSession | null {
-  return parseSuperAdminSessionToken(request.cookies.get(SUPER_ADMIN_COOKIE)?.value);
-}
-
 export async function getSuperAdminSession(): Promise<SuperAdminSession | null> {
   const cookieStore = await cookies();
-  const session = parseSuperAdminSessionToken(cookieStore.get(SUPER_ADMIN_COOKIE)?.value);
+  const session = await parseSuperAdminSessionToken(cookieStore.get(SUPER_ADMIN_COOKIE)?.value);
   if (!session) return null;
 
   const treasury = await getTreasuryWalletAddress();
@@ -66,8 +63,8 @@ export async function requireSuperAdminSession(): Promise<SuperAdminSession> {
 }
 
 export async function setSuperAdminSessionCookie(walletAddress: string): Promise<SuperAdminSession> {
-  const token = createSuperAdminSessionToken(walletAddress);
-  const session = parseSuperAdminSessionToken(token);
+  const token = await createSuperAdminSessionToken(walletAddress);
+  const session = await parseSuperAdminSessionToken(token);
   if (!session) throw new Error("Failed to create session");
 
   const cookieStore = await cookies();

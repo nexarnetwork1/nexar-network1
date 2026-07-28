@@ -3,9 +3,11 @@ import { updateSession } from "@/lib/supabase/middleware";
 import { authConfig } from "@/config/auth";
 import { applyRateLimit, handleAuthRouting } from "@/lib/middleware";
 import { isSuperAdminRoute, isSuperAdminPublicRoute } from "@/lib/admin/routes";
-import { getSuperAdminSessionFromRequest } from "@/lib/admin/super-admin";
-import { parseSuperAdminSessionToken } from "@/lib/admin/session";
-import { SUPER_ADMIN_COOKIE } from "@/lib/admin/session";
+import {
+  getSuperAdminSessionFromRequest,
+  parseSuperAdminSessionToken,
+  SUPER_ADMIN_COOKIE,
+} from "@/lib/admin/session";
 
 async function handleSuperAdminRouting(
   request: NextRequest
@@ -16,7 +18,7 @@ async function handleSuperAdminRouting(
     return null;
   }
 
-  const session = getSuperAdminSessionFromRequest(request);
+  const session = await getSuperAdminSessionFromRequest(request);
   if (!session) {
     return new NextResponse("Forbidden — Super Admin wallet session required", {
       status: 403,
@@ -69,9 +71,8 @@ export async function middleware(request: NextRequest) {
 
   const response = authResponse ?? supabaseResponse;
 
-  // Clear stale super-admin cookie when wallet session expired
   const rawSession = request.cookies.get(SUPER_ADMIN_COOKIE)?.value;
-  if (rawSession && !parseSuperAdminSessionToken(rawSession)) {
+  if (rawSession && !(await parseSuperAdminSessionToken(rawSession))) {
     response.cookies.delete(SUPER_ADMIN_COOKIE);
   }
 

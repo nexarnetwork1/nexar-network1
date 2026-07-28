@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { GripVertical, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -65,10 +65,6 @@ export function TickerManagement({ initialAnnouncements }: Props) {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-
-  useEffect(() => {
-    setItems(initialAnnouncements);
-  }, [initialAnnouncements]);
 
   function resetForm() {
     setEditingId(null);

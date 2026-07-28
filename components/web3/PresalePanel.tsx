@@ -57,6 +57,14 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   const [step, setStep] = useState<"idle" | "approve" | "buy" | "claim">("idle");
   const [, startRefresh] = useTransition();
 
+  useEffect(() => {
+    if (presale.status !== "loading" && presale.status !== "error") return;
+    const id = window.setInterval(() => {
+      presale.refetch();
+    }, presale.status === "error" ? 8_000 : 5_000);
+    return () => window.clearInterval(id);
+  }, [presale.status, presale.refetch]);
+
   const usdtAmountWei = parseUsdtAmount(usdtAmount, presale.usdtDecimals);
   const bnbAmountWei = parseBnbAmount(bnbAmount);
 
