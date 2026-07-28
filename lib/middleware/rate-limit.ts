@@ -11,11 +11,39 @@ export function getClientIp(request: NextRequest): string {
   );
 }
 
+function matchesRoute(pathname: string, routes: readonly string[]): boolean {
+  return routes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+}
+
+/** OAuth completion routes must not consume the auth brute-force budget. */
+function isOAuthFlowRoute(pathname: string): boolean {
+  return matchesRoute(pathname, authConfig.publicAuthRoutes);
+}
+
+function isAuthRoute(pathname: string): boolean {
+  return matchesRoute(pathname, authConfig.authRoutes);
+}
+
+/** Next.js RSC/prefetch requests reuse the page URL and were tripping auth limits. */
+function isRscOrPrefetchRequest(request: NextRequest): boolean {
+  return (
+    request.headers.get("RSC") === "1" ||
+    request.headers.get("Next-Router-Prefetch") === "1" ||
+    request.headers.get("Next-Router-State-Tree") !== null
+  );
+}
+
 export function applyRateLimit(request: NextRequest): Response | null {
   const ip = getClientIp(request);
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/api/cron")) {
+    return null;
+  }
+
+  if (isOAuthFlowRoute(pathname)) {
     return null;
   }
 
@@ -27,11 +55,12 @@ export function applyRateLimit(request: NextRequest): Response | null {
     }
   }
 
-  if (
-    authConfig.authRoutes.some(
-      (route) => pathname === route || pathname.startsWith(`${route}/`)
-    )
-  ) {
+  if (isAuthRoute(pathname)) {
+    // Brute-force protection targets form submissions, not page navigations or RSC flights.
+    if (request.method !== "POST" || isRscOrPrefetchRequest(request)) {
+      return null;
+    }
+
     const { allowed } = rateLimit(`auth:${ip}`, "auth");
     if (!allowed) {
       securityLogger.rateLimitHit(ip, pathname);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Wallet } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { createClient } from "@/lib/supabase/client";
@@ -22,26 +22,37 @@ function GoogleAuthButton({
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const oauthStartedRef = useRef(false);
 
   async function signInWithGoogle() {
+    if (oauthStartedRef.current || loading) return;
+
+    oauthStartedRef.current = true;
     setLoading(true);
     setError(null);
 
-    const params = new URLSearchParams();
-    if (redirectTo) params.set("redirect", redirectTo);
-    if (intent) params.set("intent", intent);
+    try {
+      const params = new URLSearchParams();
+      if (redirectTo) params.set("redirect", redirectTo);
+      if (intent) params.set("intent", intent);
 
-    const query = params.toString();
-    const suffix = query.length > 0 ? "?" + query : "";
-    const callbackUrl = window.location.origin + "/auth/callback" + suffix;
+      const query = params.toString();
+      const suffix = query.length > 0 ? "?" + query : "";
+      const callbackUrl = window.location.origin + "/auth/callback" + suffix;
 
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: callbackUrl },
-    });
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: callbackUrl },
+      });
 
-    if (oauthError) {
-      setError(oauthError.message);
+      if (oauthError) {
+        setError(oauthError.message);
+        oauthStartedRef.current = false;
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Google sign-in failed");
+      oauthStartedRef.current = false;
       setLoading(false);
     }
   }

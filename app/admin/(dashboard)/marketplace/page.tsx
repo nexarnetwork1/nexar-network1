@@ -75,7 +75,7 @@ export default async function AdminMarketplacePage() {
         settings={settings}
         latestFees={latestFees}
         merchantCount={stores.filter((s) => s.status === "active").length}
-        marketplaceRevenue={stats.platformFeeRevenue ?? 0}
+        marketplaceRevenue={stats.totalPlatformFees ?? 0}
       />
     </div>
   );
