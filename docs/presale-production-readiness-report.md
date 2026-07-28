@@ -36,7 +36,7 @@ The Nexar Presale module is wired end-to-end to the deployed `NexarPresale` smar
 
 - **Start:** 2026-08-01 00:00 UTC  
 - **End:** 2026-10-01 00:00 UTC  
-- **Hard cap:** 50,000,000 NXR  
+- **Hard cap:** 100,000,000 NXR  
 - **Min / max per wallet:** 100 / 100,000 NXR  
 - **Price:** 100 NXR per 1 USDT  
 - **Current status:** Upcoming (`totalSold = 0`)

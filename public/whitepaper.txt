@@ -670,6 +670,19 @@ Future releases will expand cross-chain support, advanced merchant
 tools, loyalty programs, escrow enhancements, and deeper NXR
 utility integration across the Nexar ecosystem.
 
+Store Subscription
+
+Merchants subscribe to list stores on the Nexar Marketplace. A launch
+promotion offers 50% off for the first three months — $10 instead of
+$20 — paid in supported cryptocurrencies only.
+
+NXR Payment Benefits
+
+Marketplace payments made with NXR receive a reduced platform
+transaction fee of 0.35% compared to 0.50% for other supported
+cryptocurrencies, encouraging ecosystem adoption while keeping
+merchant costs low.
+
 ============================================================
 16. ROADMAP
 ============================================================

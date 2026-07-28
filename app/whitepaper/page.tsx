@@ -857,6 +857,8 @@ releasing team allocations according to the official vesting schedule.
 <li>Strategic Partnerships</li>
 <li>DEX Listings</li>
 <li>Ecosystem Development</li>
+<li>Marketplace Beta</li>
+<li>Merchant Registration</li>
 </ul>
 </div>
 
@@ -868,6 +870,11 @@ releasing team allocations according to the official vesting schedule.
 <li>Explorer</li>
 <li>Bridge</li>
 <li>Developer APIs</li>
+<li>Public Marketplace</li>
+<li>Merchant Dashboard</li>
+<li>Customer Dashboard</li>
+<li>Product Listings</li>
+<li>Order Management</li>
 </ul>
 </div>
 
@@ -878,6 +885,7 @@ releasing team allocations according to the official vesting schedule.
 <li>Testnet</li>
 <li>Mainnet</li>
 <li>Global Adoption</li>
+<li>Marketplace Expansion</li>
 </ul>
 </div>
 
@@ -1085,6 +1093,20 @@ controls, audit logging, and role-based access.
 <p>
 Future releases will expand cross-chain support, merchant tools,
 loyalty programs, escrow enhancements, and deeper NXR integration.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">Store Subscription</h3>
+<p>
+Merchants subscribe to list stores on the Nexar Marketplace. A launch
+promotion offers 50% off for the first three months — $10 instead of
+$20 — paid in supported cryptocurrencies only.
+</p>
+
+<h3 className="text-lg font-semibold text-gold pt-2">NXR Payment Benefits</h3>
+<p>
+Marketplace payments made with NXR receive a reduced platform transaction
+fee of 0.35% compared to 0.50% for other supported cryptocurrencies,
+encouraging ecosystem adoption while keeping merchant costs low.
 </p>
 
 </div>

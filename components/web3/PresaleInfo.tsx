@@ -5,6 +5,7 @@ import { Clock, Target, TrendingUp, Wallet } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { StatusDot } from "@/components/ui/StatusDot";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
+import { getPresaleDisplayMetrics, PRESALE_NXR_PER_USDT } from "@/lib/web3/presale-display";
 import { PresaleCountdown } from "@/components/web3/PresaleCountdown";
 import { cn } from "@/lib/utils/cn";
 
@@ -34,19 +35,17 @@ type PresaleInfoProps = {
 export function PresaleInfo({ className, compact = false }: PresaleInfoProps) {
   const {
     status,
-    progress,
     soldAmount,
-    capAmount,
-    remainingAmount,
     presaleStart,
     presaleEnd,
     purchasedAmount,
     claimableAmount,
     claimedAmount,
     countdownSeconds,
-    nxrPerUsdt,
     isLoading,
   } = usePresaleData();
+
+  const { capAmount, remainingAmount, progress } = getPresaleDisplayMetrics(soldAmount);
 
   const statusMeta = STATUS_LABELS[status];
 
@@ -98,9 +97,9 @@ export function PresaleInfo({ className, compact = false }: PresaleInfoProps) {
             />
           )}
 
-          {nxrPerUsdt > 0 && (
+          {PRESALE_NXR_PER_USDT > 0 && (
             <p className="mb-4 text-center font-mono text-xs text-gold">
-              {nxrPerUsdt.toLocaleString()} NXR per 1 USDT
+              {PRESALE_NXR_PER_USDT} NXR per 1 USDT
             </p>
           )}
 

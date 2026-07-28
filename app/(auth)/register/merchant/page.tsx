@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/AuthCard";
-import { OAuthButtons } from "@/components/auth/OAuthButtons";
+import { MarketplaceAuthButtons } from "@/components/auth/MarketplaceAuthButtons";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
@@ -68,7 +68,7 @@ export default function MerchantRegisterPage() {
       title="Merchant registration"
       subtitle="Accept payments and sell products on Nexar Network"
     >
-      <OAuthButtons intent="merchant" />
+      <MarketplaceAuthButtons intent="merchant" />
 
       <div className="my-6 flex items-center gap-4">
         <span className="h-px flex-1 bg-border" />

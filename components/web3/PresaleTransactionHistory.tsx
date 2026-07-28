@@ -35,14 +35,12 @@ export function PresaleTransactionHistory() {
             >
               <div>
                 <p className="flex items-center gap-1.5 font-medium capitalize">
-                  {tx.type === "buy_bnb" ? (
-                    <>
-                      Buy (<CurrencyLogo code="BNB" size={12} /> BNB)
-                    </>
-                  ) : tx.type === "buy_usdt" ? (
+                  {tx.type === "buy_usdt" ? (
                     <>
                       Buy (<CurrencyLogo code="USDT" size={12} /> USDT)
                     </>
+                  ) : tx.type === "buy_bnb" ? (
+                    "Buy"
                   ) : (
                     "Claim"
                   )}

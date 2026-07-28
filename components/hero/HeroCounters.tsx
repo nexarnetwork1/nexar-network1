@@ -5,6 +5,7 @@ import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { SITE } from "@/lib/constants/site";
 import { MAX_SUPPLY } from "@/lib/data/tokenomics";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
+import { getPresaleDisplayMetrics } from "@/lib/web3/presale-display";
 
 type StatItemProps = {
   label: string;
@@ -21,7 +22,8 @@ function StatItem({ label, children }: StatItemProps) {
 }
 
 export function HeroCounters() {
-  const { soldAmount, capAmount, progress, status, isLoading } = usePresaleData();
+  const { soldAmount, progress: chainProgress, status, isLoading } = usePresaleData();
+  const { capAmount, progress } = getPresaleDisplayMetrics(soldAmount);
 
   const presaleDisplay = (() => {
     if (isLoading) return <span className="opacity-40">…</span>;
@@ -36,7 +38,7 @@ export function HeroCounters() {
             suffix={soldAmount >= 1_000_000 ? "M" : ""}
             enabled
           />
-          <span className="ml-1 text-xs text-muted">({progress.toFixed(0)}%)</span>
+          <span className="ml-1 text-xs text-muted">({(capAmount > 0 ? progress : chainProgress).toFixed(0)}%)</span>
         </Link>
       );
     }
@@ -59,11 +61,7 @@ export function HeroCounters() {
         {presaleDisplay}
       </StatItem>
       <StatItem label="Hard Cap">
-        {capAmount > 0 ? (
-          <AnimatedCounter value={Math.round(capAmount / 1_000_000)} suffix="M" enabled />
-        ) : (
-          "—"
-        )}
+        <AnimatedCounter value={100} suffix="M" enabled />
       </StatItem>
     </div>
   );

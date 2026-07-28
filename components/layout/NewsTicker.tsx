@@ -94,6 +94,10 @@ export function NewsTicker({ announcements = [] }: NewsTickerProps) {
 
           <PresaleTickerMessage />
 
+          <span className="whitespace-nowrap font-semibold text-gold">
+            🎉 Launch Offer – Limited Time · 50% OFF for all new merchants during the first 3 months · Now $10 instead of $20 · Limited-time offer · Paid in supported cryptocurrencies only · Marketplace Coming Soon
+          </span>
+
           {announcements.map((item) => (
             <span
               key={item.id}

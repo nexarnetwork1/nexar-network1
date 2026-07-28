@@ -88,6 +88,7 @@ export default async function AdminDashboardPage() {
 
           <h3 className="mt-8 text-sm font-semibold text-zinc-300">Quick links</h3>
           <div className="mt-3 grid gap-2">
+            <QuickLink href="/admin/marketplace" label="Marketplace administration" />
             <QuickLink href="/admin/revenue" label="Revenue reports" />
             <QuickLink href="/admin/treasury" label="Treasury wallet" />
             <QuickLink href="/admin/customers" label="Customer management" />

@@ -1,14 +1,19 @@
 import Link from "next/link";
 import { getAllStores, getAllProducts } from "@/modules/platform/repository";
-import { getTopMerchants, getTopProducts } from "@/modules/analytics/repository";
+import { getTopMerchants, getTopProducts, getPlatformStats } from "@/modules/analytics/repository";
+import { getPlatformSettings, getLatestFeeRates } from "@/modules/platform/repository";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import { MarketplaceAdminSettings } from "@/components/admin/MarketplaceAdminSettings";
 
 export default async function AdminMarketplacePage() {
-  const [stores, products, topMerchants, topProducts] = await Promise.all([
+  const [stores, products, topMerchants, topProducts, stats, settings, latestFees] = await Promise.all([
     getAllStores(),
     getAllProducts(50),
     getTopMerchants(5),
     getTopProducts(5),
+    getPlatformStats(),
+    getPlatformSettings(),
+    getLatestFeeRates(),
   ]);
 
   const marketplaceStores = stores.filter((s) => s.mode === "marketplace");
@@ -65,6 +70,13 @@ export default async function AdminMarketplacePage() {
           Manage merchants →
         </Link>
       </div>
+
+      <MarketplaceAdminSettings
+        settings={settings}
+        latestFees={latestFees}
+        merchantCount={stores.filter((s) => s.status === "active").length}
+        marketplaceRevenue={stats.platformFeeRevenue ?? 0}
+      />
     </div>
   );
 }

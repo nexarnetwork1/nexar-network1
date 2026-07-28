@@ -18,17 +18,12 @@ import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI, ERC20_ABI } from "@/lib/web3/abi";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { usePresaleWalletBalances } from "@/lib/web3/hooks/usePresaleWalletBalances";
+import { validatePurchase, parseUsdtAmount, parseNxrAmount } from "@/lib/web3/presale-math";
 import {
-  validatePurchase,
-  nxrFromBnb,
-  nxrFromUsdt,
-  bnbFromNxr,
-  usdtFromNxr,
-  parseBnbAmount,
-  parseUsdtAmount,
-  parseNxrAmount,
-  formatCountdown,
-} from "@/lib/web3/presale-math";
+  getPresaleDisplayMetrics,
+  nxrFromUsdtDisplay,
+  usdtFromNxrDisplay,
+} from "@/lib/web3/presale-display";
 import { PresaleCountdown } from "@/components/web3/PresaleCountdown";
 import { PresalePanelSkeleton } from "@/components/web3/PresalePanelSkeleton";
 import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
@@ -42,6 +37,7 @@ type PresalePanelProps = {
 
 export function PresalePanel({ compact, className }: PresalePanelProps) {
   const presale = usePresaleData();
+  const display = getPresaleDisplayMetrics(presale.soldAmount);
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { login } = usePrivy();
@@ -49,86 +45,37 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
-  const { bnbBalanceFormatted, usdtBalanceFormatted, refetchBalances } = usePresaleWalletBalances(
+  const { usdtBalanceFormatted, refetchBalances } = usePresaleWalletBalances(
     address,
     presale.usdtBalance,
     presale.usdtDecimals
   );
 
-  const [method, setMethod] = useState<"bnb" | "usdt">("bnb");
   const [nxrInput, setNxrInput] = useState("");
-  const [bnbAmount, setBnbAmount] = useState("");
   const [usdtAmount, setUsdtAmount] = useState("");
-  const editingField = useRef<"nxr" | "bnb" | "usdt" | null>(null);
+  const editingField = useRef<"nxr" | "usdt" | null>(null);
   const [step, setStep] = useState<"idle" | "approve" | "buy" | "claim">("idle");
   const [, startRefresh] = useTransition();
 
-  const canCalculate =
-    Boolean(presale.priceNumerator && presale.priceDenominator && presale.priceDenominator > BigInt(0));
-
   function syncFromNxr(value: string) {
     setNxrInput(value);
-    const nxrWei = parseNxrAmount(value);
-    if (!canCalculate || nxrWei === BigInt(0)) {
-      if (editingField.current === "nxr") {
-        setBnbAmount("");
-        setUsdtAmount("");
-      }
+    const nxr = Number(value);
+    if (!value.trim() || Number.isNaN(nxr) || nxr <= 0) {
+      if (editingField.current === "nxr") setUsdtAmount("");
       return;
     }
-    const usdtWei = usdtFromNxr(nxrWei, presale.priceNumerator!, presale.priceDenominator!);
-    setUsdtAmount(formatUnits(usdtWei, presale.usdtDecimals));
-    if (presale.bnbUsdPrice) {
-      const bnbWei = bnbFromNxr(
-        nxrWei,
-        presale.bnbUsdPrice,
-        presale.priceNumerator!,
-        presale.priceDenominator!
-      );
-      setBnbAmount(formatUnits(bnbWei, 18));
-    }
-  }
-
-  function syncFromBnb(value: string) {
-    setBnbAmount(value);
-    const bnbWei = parseBnbAmount(value);
-    if (!canCalculate || bnbWei === BigInt(0)) {
-      if (editingField.current === "bnb") {
-        setNxrInput("");
-        setUsdtAmount("");
-      }
-      return;
-    }
-    const nxrWei =
-      presale.bnbUsdPrice && presale.priceNumerator && presale.priceDenominator
-        ? nxrFromBnb(bnbWei, presale.bnbUsdPrice, presale.priceNumerator, presale.priceDenominator)
-        : BigInt(0);
-    setNxrInput(formatUnits(nxrWei, 18));
-    const usdtWei = usdtFromNxr(nxrWei, presale.priceNumerator!, presale.priceDenominator!);
-    setUsdtAmount(formatUnits(usdtWei, presale.usdtDecimals));
+    const usdt = usdtFromNxrDisplay(nxr);
+    setUsdtAmount(usdt.toFixed(Math.min(presale.usdtDecimals, 6)));
   }
 
   function syncFromUsdt(value: string) {
     setUsdtAmount(value);
-    const usdtWei = parseUsdtAmount(value, presale.usdtDecimals);
-    if (!canCalculate || usdtWei === BigInt(0)) {
-      if (editingField.current === "usdt") {
-        setNxrInput("");
-        setBnbAmount("");
-      }
+    const usdt = Number(value);
+    if (!value.trim() || Number.isNaN(usdt) || usdt <= 0) {
+      if (editingField.current === "usdt") setNxrInput("");
       return;
     }
-    const nxrWei = nxrFromUsdt(usdtWei, presale.priceNumerator!, presale.priceDenominator!);
-    setNxrInput(formatUnits(nxrWei, 18));
-    if (presale.bnbUsdPrice) {
-      const bnbWei = bnbFromNxr(
-        nxrWei,
-        presale.bnbUsdPrice,
-        presale.priceNumerator!,
-        presale.priceDenominator!
-      );
-      setBnbAmount(formatUnits(bnbWei, 18));
-    }
+    setNxrInput(String(nxrFromUsdtDisplay(usdt)));
   }
 
   useEffect(() => {
@@ -140,14 +87,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   }, [presale.status, presale.refetch]);
 
   const usdtAmountWei = parseUsdtAmount(usdtAmount, presale.usdtDecimals);
-  const bnbAmountWei = parseBnbAmount(bnbAmount);
-
-  const estimatedNxr =
-    method === "bnb" && presale.bnbUsdPrice && presale.priceNumerator && presale.priceDenominator
-      ? nxrFromBnb(bnbAmountWei, presale.bnbUsdPrice, presale.priceNumerator, presale.priceDenominator)
-      : presale.priceNumerator && presale.priceDenominator
-        ? nxrFromUsdt(usdtAmountWei, presale.priceNumerator, presale.priceDenominator)
-        : parseNxrAmount(nxrInput);
+  const estimatedNxr = parseNxrAmount(nxrInput);
 
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: presale.usdtToken,
@@ -158,7 +98,8 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
     query: { enabled: Boolean(address && presale.usdtToken) },
   });
 
-  const hasAllowance = allowance !== undefined && usdtAmountWei > BigInt(0) && allowance >= usdtAmountWei;
+  const hasAllowance =
+    allowance !== undefined && usdtAmountWei > BigInt(0) && allowance >= usdtAmountWei;
 
   useEffect(() => {
     if (!isSuccess) return;
@@ -210,18 +151,6 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       return false;
     }
     return true;
-  }
-
-  function handleBuyBnb() {
-    if (!ensureWallet() || !validation.valid) return;
-    writeContract({
-      address: CONTRACTS.presale as `0x${string}`,
-      abi: PRESALE_ABI,
-      functionName: "buyWithBnb",
-      value: bnbAmountWei,
-      chainId: bsc.id,
-    });
-    setStep("buy");
   }
 
   function handleUsdtFlow() {
@@ -306,44 +235,38 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
         </span>
       </div>
 
-      {/* Progress */}
       <div className="mb-4">
         <div className="flex justify-between text-xs text-muted">
           <span>{presale.soldAmount.toLocaleString()} NXR sold</span>
-          <span>{presale.remainingAmount.toLocaleString()} remaining</span>
+          <span>{display.remainingAmount.toLocaleString()} remaining</span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-border">
           <div
             className="h-full rounded-full bg-gradient-to-r from-gold to-gold-secondary transition-all duration-700"
-            style={{ width: `${presale.progress}%` }}
+            style={{ width: `${display.progress}%` }}
             role="progressbar"
-            aria-valuenow={presale.progress}
+            aria-valuenow={display.progress}
             aria-valuemin={0}
             aria-valuemax={100}
           />
         </div>
         <p className="mt-1 text-center text-xs text-muted">
-          {presale.progress.toFixed(1)}% of {presale.capAmount.toLocaleString()} NXR hard cap
+          {display.progress.toFixed(1)}% of {display.capAmount.toLocaleString()} NXR hard cap
         </p>
       </div>
 
-      {/* Price from contract */}
-      {!compact && presale.nxrPerUsdt > 0 && (
-        <dl className="mb-4 grid grid-cols-2 gap-3 text-xs">
+      {!compact && (
+        <dl className="mb-4 grid grid-cols-1 gap-3 text-xs">
           <div className="rounded-xl border border-border bg-background/50 p-3">
-            <dt className="text-muted">USDT price</dt>
-            <dd className="mt-1 font-mono text-white">{presale.nxrPerUsdt.toLocaleString()} NXR / USDT</dd>
-          </div>
-          <div className="rounded-xl border border-border bg-background/50 p-3">
-            <dt className="text-muted">BNB price</dt>
-            <dd className="mt-1 font-mono text-white">
-              {presale.nxrPerBnb > 0 ? `${presale.nxrPerBnb.toLocaleString()} NXR / BNB` : "Oracle"}
-            </dd>
+            <dt className="flex items-center gap-1.5 text-muted">
+              <CurrencyLogo code="USDT" size={14} />
+              USDT price
+            </dt>
+            <dd className="mt-1 font-mono text-white">100 NXR = 1 USDT</dd>
           </div>
         </dl>
       )}
 
-      {/* Countdown */}
       {(presale.status === "upcoming" || presale.status === "live") && presale.countdownSeconds > 0 && (
         <PresaleCountdown
           seconds={presale.countdownSeconds}
@@ -369,7 +292,6 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
         </div>
       )}
 
-      {/* User holdings */}
       {isConnected && presale.purchasedAmount > 0 && (
         <dl className="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
           <div className="rounded-xl border border-border bg-background/50 p-3">
@@ -389,28 +311,10 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
         </dl>
       )}
 
-      {/* Buy section — only when live */}
       {presale.canBuy && (
         <>
-          <div className="mb-4 flex gap-2 rounded-full border border-border bg-card/50 p-1">
-            {(["bnb", "usdt"] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMethod(m)}
-                className={cn(
-                  "flex-1 rounded-full py-2 text-sm font-medium transition",
-                  method === m ? "bg-gold text-background" : "text-muted hover:text-white"
-                )}
-                aria-pressed={method === m}
-              >
-                {m === "bnb" ? "Pay with BNB" : "Pay with USDT"}
-              </button>
-            ))}
-          </div>
-
           <div className="mb-4 space-y-3 rounded-2xl border border-border/80 bg-background/40 p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">Live calculator</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted">USDT calculator</p>
             <label className="block">
               <span className="mb-1 flex items-center gap-1.5 text-xs text-muted">
                 <CurrencyLogo code="NXR" size={14} />
@@ -431,26 +335,8 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
             </label>
             <label className="block">
               <span className="mb-1 flex items-center gap-1.5 text-xs text-muted">
-                <CurrencyLogo code="BNB" size={14} />
-                BNB equivalent
-              </span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={bnbAmount}
-                onChange={(e) => {
-                  editingField.current = "bnb";
-                  syncFromBnb(e.target.value);
-                }}
-                placeholder="0.0"
-                className="w-full rounded-xl border border-border bg-background/80 px-4 py-3 font-mono outline-none focus:border-gold/40"
-                aria-label="BNB amount"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 flex items-center gap-1.5 text-xs text-muted">
                 <CurrencyLogo code="USDT" size={14} />
-                USDT equivalent
+                USDT to pay
               </span>
               <input
                 type="text"
@@ -465,26 +351,16 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
                 aria-label="USDT amount"
               />
             </label>
-            {presale.bnbPriceUsd > 0 && (
-              <p className="text-[11px] text-muted">
-                BNB/USD oracle: ${presale.bnbPriceUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-              </p>
-            )}
+            <p className="text-[11px] text-muted">Rate: 100 NXR = 1 USDT · Pay with USDT only</p>
           </div>
 
           <div className="space-y-3">
             <div className="flex justify-between text-xs text-muted">
               <span className="inline-flex items-center gap-1.5">
-                <CurrencyLogo code={method === "bnb" ? "BNB" : "USDT"} size={14} />
-                {method === "bnb" ? "BNB Balance" : "USDT Balance"}
+                <CurrencyLogo code="USDT" size={14} />
+                USDT Balance
               </span>
-              <span className="font-mono">
-                {isConnected
-                  ? method === "bnb"
-                    ? `${bnbBalanceFormatted} BNB`
-                    : `${usdtBalanceFormatted} USDT`
-                  : "—"}
-              </span>
+              <span className="font-mono">{isConnected ? `${usdtBalanceFormatted} USDT` : "—"}</span>
             </div>
 
             {estimatedNxr > BigInt(0) && (
@@ -494,33 +370,21 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
               </p>
             )}
 
-            {method === "bnb" ? (
-              <Button
-                className="w-full"
-                size="lg"
-                glow
-                onClick={handleBuyBnb}
-                disabled={isPending || isConfirming || !validation.valid}
-              >
-                {isPending || isConfirming ? "Confirming…" : "Buy With BNB"}
-              </Button>
-            ) : (
-              <Button
-                className="w-full"
-                size="lg"
-                glow
-                onClick={handleUsdtFlow}
-                disabled={isPending || isConfirming || !validation.valid}
-              >
-                {isPending || isConfirming
-                  ? step === "approve"
-                    ? "Approving…"
-                    : "Confirming…"
-                  : hasAllowance
-                    ? "Buy With USDT"
-                    : "Approve & Buy USDT"}
-              </Button>
-            )}
+            <Button
+              className="w-full"
+              size="lg"
+              glow
+              onClick={handleUsdtFlow}
+              disabled={isPending || isConfirming || !validation.valid}
+            >
+              {isPending || isConfirming
+                ? step === "approve"
+                  ? "Approving…"
+                  : "Confirming…"
+                : hasAllowance
+                  ? "Buy With USDT"
+                  : "Approve & Buy USDT"}
+            </Button>
           </div>
 
           {!validation.valid && validation.error && isConnected && (
@@ -535,7 +399,6 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
         </>
       )}
 
-      {/* Claim section — after end or sold out */}
       {presale.canClaim && isConnected && presale.purchasedAmount > 0 && (
         <div className="mt-4 border-t border-border pt-4">
           <h3 className="font-heading text-lg font-semibold">Claim Tokens</h3>
@@ -570,7 +433,6 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
         </div>
       )}
 
-      {/* Transaction feedback */}
       {isSuccess && (
         <div className="mt-4 flex items-center justify-center gap-2 text-sm text-emerald-400">
           <CheckCircle2 className="h-4 w-4" aria-hidden />
