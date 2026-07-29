@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { ProductWithStore } from "@/types";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { getProductRatingSummaries } from "@/modules/reviews/repository";
 
 type MarketplaceProductRailProps = {
   title: string;
@@ -13,7 +14,7 @@ type MarketplaceProductRailProps = {
   productBasePath?: string;
 };
 
-export function MarketplaceProductRail({
+export async function MarketplaceProductRail({
   title,
   description,
   products,
@@ -22,6 +23,10 @@ export function MarketplaceProductRail({
   productBasePath = "/marketplace/products",
 }: MarketplaceProductRailProps) {
   if (products.length === 0) return null;
+
+  const ratingSummaries = await getProductRatingSummaries(
+    products.map((product) => product.id)
+  );
 
   return (
     <section className="py-10 sm:py-12">
@@ -44,6 +49,7 @@ export function MarketplaceProductRail({
             product={product}
             showNewBadge={showNewBadge}
             productBasePath={productBasePath}
+            ratingSummary={ratingSummaries.get(product.id)}
           />
         ))}
       </div>

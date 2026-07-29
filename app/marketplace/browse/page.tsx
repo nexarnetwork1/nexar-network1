@@ -10,6 +10,7 @@ import { Container } from "@/components/ui/Container";
 import { Footer } from "@/components/layout/Footer";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
 import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
+import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
 import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 import { buildMarketplaceMetadata } from "@/lib/seo/marketplace";
 
@@ -137,6 +138,13 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
                 </option>
               ))}
             </select>
+            <CurrencySelectField
+              name="currency"
+              defaultValue={filters.currency ?? ""}
+              includeEmpty
+              showLogo={Boolean(filters.currency)}
+              className="rounded-xl border-border bg-surface/80 px-3 py-3 text-sm"
+            />
             <input
               name="minPrice"
               type="number"
