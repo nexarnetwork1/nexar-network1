@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAccount, useSignMessage } from "wagmi";
+import { getAddress } from "viem";
 import { toast } from "sonner";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { isWalletSessionActive } from "@/lib/web3/wallet-session";
@@ -17,10 +18,21 @@ export function TreasuryAdminAutoVerify() {
   const { user, authenticated, ready } = usePrivy();
   const { address: wagmiAddress, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const signMessageRef = useRef(signMessageAsync);
+  signMessageRef.current = signMessageAsync;
   const verifyingRef = useRef(false);
   const verifiedRef = useRef<string | null>(null);
 
-  const address = (wagmiAddress ?? user?.wallet?.address ?? "") as `0x${string}` | undefined;
+  const rawAddress = wagmiAddress ?? user?.wallet?.address;
+  const address = rawAddress
+    ? (() => {
+        try {
+          return getAddress(rawAddress);
+        } catch {
+          return undefined;
+        }
+      })()
+    : undefined;
 
   useEffect(() => {
     if (!ready || !authenticated || !isWeb3Configured() || !address) return;
@@ -33,6 +45,7 @@ export function TreasuryAdminAutoVerify() {
       const statusRes = await fetch(
         `/api/admin/wallet/status?wallet=${encodeURIComponent(address!)}`
       );
+      if (!statusRes.ok) return;
       const status = await statusRes.json();
       if (cancelled) return;
 
@@ -50,6 +63,8 @@ export function TreasuryAdminAutoVerify() {
       }
 
       verifyingRef.current = true;
+      const verifyingToast = toast.loading("Verifying Super Admin access…");
+
       try {
         const challengeRes = await fetch("/api/admin/wallet/challenge", {
           method: "POST",
@@ -61,7 +76,7 @@ export function TreasuryAdminAutoVerify() {
         }
 
         const challenge = await challengeRes.json();
-        const signature = await signMessageAsync({ message: challenge.message });
+        const signature = await signMessageRef.current({ message: challenge.message });
         const verifyRes = await fetch("/api/admin/wallet/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -78,13 +93,15 @@ export function TreasuryAdminAutoVerify() {
         }
 
         verifiedRef.current = address!;
-        toast.success("Super Admin access granted");
+        toast.success("Super Admin access granted", { id: verifyingToast });
         window.dispatchEvent(new CustomEvent("nxr:super-admin-updated"));
-        router.push("/admin/dashboard");
         router.refresh();
+        router.push("/admin/dashboard");
       } catch (error) {
         if (!cancelled) {
-          toast.error(error instanceof Error ? error.message : "Admin verification failed");
+          toast.error(error instanceof Error ? error.message : "Admin verification failed", {
+            id: verifyingToast,
+          });
         }
       } finally {
         verifyingRef.current = false;
@@ -95,7 +112,7 @@ export function TreasuryAdminAutoVerify() {
     return () => {
       cancelled = true;
     };
-  }, [ready, authenticated, address, isConnected, signMessageAsync, router]);
+  }, [ready, authenticated, address, isConnected, router]);
 
   return null;
 }

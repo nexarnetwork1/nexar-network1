@@ -15,7 +15,8 @@ import { objectToFormData } from "@/utils/form-data";
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") ?? undefined;
+  const redirect =
+    searchParams.get("redirect") ?? searchParams.get("next") ?? undefined;
   const message = searchParams.get("message");
 
   const [serverError, setServerError] = useState<string | null>(null);

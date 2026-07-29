@@ -21,7 +21,7 @@ type ProductCardProps = {
 export function ProductCard({
   product,
   showNewBadge,
-  productBasePath = "/customer/browse",
+  productBasePath = "/marketplace/products",
   showMoveToCart = false,
   ratingSummary,
 }: ProductCardProps) {

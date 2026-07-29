@@ -62,11 +62,8 @@ export default async function MarketplaceStoresPage({ searchParams }: Props) {
             Discover verified merchants, compare ratings, and shop with crypto or card.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/customer/browse" className="text-sm text-gold hover:underline">
+            <Link href="/marketplace/browse" className="text-sm text-gold hover:underline">
               Browse all products →
-            </Link>
-            <Link href="/marketplace/browse" className="text-sm text-muted hover:text-white">
-              Public product browse
             </Link>
             <Link href="/marketplace" className="text-sm text-muted hover:text-white">
               Marketplace home

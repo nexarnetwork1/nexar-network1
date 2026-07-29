@@ -32,7 +32,7 @@ export async function GET(request: Request) {
           return NextResponse.redirect(`${origin}/verify-email`);
         }
 
-        if (profile && !profile.profile_completed) {
+        if (!profile || !profile.profile_completed) {
           const params = new URLSearchParams();
           if (intent) params.set("intent", intent);
           const qs = params.toString();

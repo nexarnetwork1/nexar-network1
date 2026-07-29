@@ -64,7 +64,7 @@ export function MarketplaceWishlistClient() {
           Sign in to save your wishlist across devices and sync with your account.
         </p>
         <Link
-          href={`/login?next=${encodeURIComponent("/customer/wishlist")}`}
+          href={`/login?redirect=${encodeURIComponent("/customer/wishlist")}`}
           className="mt-4 inline-block"
         >
           <Button>Sign in</Button>

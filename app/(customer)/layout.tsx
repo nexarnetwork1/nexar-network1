@@ -34,7 +34,7 @@ export default async function CustomerLayout({
             <Link href="/customer" className="font-heading text-gold">
               Nexar
             </Link>
-            <Link href="/customer/browse" className="text-muted hover:text-white">
+            <Link href="/marketplace/browse" className="text-muted hover:text-white">
               Browse
             </Link>
             <CartBadgeClient href="/customer/cart" />

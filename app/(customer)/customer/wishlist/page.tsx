@@ -26,9 +26,6 @@ export default async function CustomerWishlistPage() {
             <Link href="/marketplace/browse" className="text-gold hover:underline">
               Browse marketplace →
             </Link>
-            <Link href="/customer/browse" className="text-gold hover:underline">
-              Browse products →
-            </Link>
           </div>
         </div>
       ) : (

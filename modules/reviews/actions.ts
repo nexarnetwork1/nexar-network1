@@ -75,6 +75,7 @@ export async function createProductReviewAction(formData: FormData): Promise<Act
   }
 
   revalidatePath(`/customer/browse/${parsed.data.productId}`);
+  revalidatePath(`/marketplace/products/${parsed.data.productId}`);
   return { success: true };
 }
 

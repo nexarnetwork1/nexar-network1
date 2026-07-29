@@ -58,7 +58,7 @@ export function BuyNowButton({
         return;
       }
 
-      window.location.href = `/login?next=${encodeURIComponent(loginNextPath)}`;
+      window.location.href = `/login?redirect=${encodeURIComponent(loginNextPath)}`;
       return;
     }
 

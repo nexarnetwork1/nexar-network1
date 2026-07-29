@@ -219,6 +219,7 @@ export async function updateStoreAppearanceAction(
 
   revalidatePath("/merchant/store");
   revalidatePath("/customer/browse");
+  revalidatePath("/marketplace/browse");
   revalidatePath(`/store/${store.slug}`);
   revalidatePath("/marketplace/stores");
   return { success: true };

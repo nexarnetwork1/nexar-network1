@@ -87,7 +87,7 @@ export function GuestCartOrderSummary({
         </p>
       )}
 
-      <Link href={`/login?next=${encodeURIComponent("/customer/cart")}`} className="mt-6 block">
+      <Link href={`/login?redirect=${encodeURIComponent("/customer/cart")}`} className="mt-6 block">
         <Button className="w-full">Sign in to checkout</Button>
       </Link>
       <Link href="/marketplace/browse" className="mt-3 block">

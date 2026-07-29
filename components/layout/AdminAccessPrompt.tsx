@@ -13,7 +13,8 @@ export function AdminAccessPrompt() {
     if (searchParams.get("admin") !== "wallet-required") return;
 
     toast.message("Super Admin access required", {
-      description: "Connect the treasury wallet, open the wallet menu, and verify your signature.",
+      description:
+        "Connect the treasury wallet — signature verification will start automatically.",
       duration: 8000,
     });
 

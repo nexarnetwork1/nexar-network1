@@ -16,7 +16,7 @@ export function buildProductMetadata(input: ProductSeoInput): Metadata {
   const description =
     input.description?.slice(0, 160) ??
     `Buy ${input.name} from ${input.storeName} on ${SITE.name} marketplace.`;
-  const url = `${SITE.url}/customer/browse/${input.productId}`;
+  const url = `${SITE.url}/marketplace/products/${input.productId}`;
   const image = input.imageUrl ?? `${SITE.url}/opengraph-image`;
 
   return {
@@ -50,7 +50,7 @@ export function buildProductJsonLd(input: ProductSeoInput) {
     brand: { "@type": "Brand", name: input.storeName },
     offers: {
       "@type": "Offer",
-      url: `${SITE.url}/customer/browse/${input.productId}`,
+      url: `${SITE.url}/marketplace/products/${input.productId}`,
       priceCurrency: input.currency,
       price: input.price,
       availability:

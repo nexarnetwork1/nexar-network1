@@ -227,13 +227,19 @@ export default function MarketPage() {
                         >
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <Image
-                                src={coin.image}
-                                alt={coin.name}
-                                width={32}
-                                height={32}
-                                className="h-8 w-8 rounded-full"
-                              />
+                              {coin.image?.startsWith("http") ? (
+                                <Image
+                                  src={coin.image}
+                                  alt={coin.name}
+                                  width={32}
+                                  height={32}
+                                  className="h-8 w-8 rounded-full"
+                                />
+                              ) : (
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-card text-xs font-medium uppercase text-muted">
+                                  {coin.symbol.slice(0, 2)}
+                                </div>
+                              )}
                               <div>
                                 <p className="font-medium text-white">{coin.name}</p>
                                 <p className="text-xs text-muted uppercase">

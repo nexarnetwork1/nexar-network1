@@ -85,7 +85,7 @@ export default async function CustomerDashboardPage() {
 
       <div className="mt-8">
         <Link
-          href="/customer/browse"
+          href="/marketplace/browse"
           className="inline-flex rounded-xl bg-gold px-6 py-2.5 text-sm font-semibold text-background hover:bg-gold-secondary"
         >
           Browse marketplace

@@ -32,9 +32,6 @@ export default async function CartPage() {
             <Link href="/marketplace/browse">
               <Button variant="secondary">Browse marketplace</Button>
             </Link>
-            <Link href="/customer/browse">
-              <Button variant="ghost">Browse products</Button>
-            </Link>
           </div>
         </div>
       ) : (
