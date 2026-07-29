@@ -10,9 +10,14 @@ import { Container } from "@/components/ui/Container";
 import { Footer } from "@/components/layout/Footer";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
 import { MarketplaceBrowseActiveFilters } from "@/components/marketplace/MarketplaceBrowseActiveFilters";
+import { MarketplaceBrowseEmptyState } from "@/components/marketplace/MarketplaceBrowseEmptyState";
 import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
 import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
-import { buildMarketplaceBrowseHref } from "@/modules/marketplace/browse-url";
+import {
+  buildMarketplaceBrowseHref,
+  getBrowseResultsRange,
+  hasActiveBrowseFilters,
+} from "@/modules/marketplace/browse-url";
 import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 import { buildMarketplaceMetadata } from "@/lib/seo/marketplace";
 
@@ -79,6 +84,8 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
   );
 
   const totalPages = Math.ceil(total / filters.limit);
+  const resultsRange = getBrowseResultsRange(filters, total);
+  const hasFilters = hasActiveBrowseFilters(filters);
 
   const browseHref = (overrides?: Partial<typeof filters>) =>
     buildMarketplaceBrowseHref("/marketplace/browse", filters, overrides);
@@ -201,10 +208,17 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
             ))}
           </div>
 
+          {resultsRange && (
+            <p className="mt-6 text-sm text-muted">
+              Showing {resultsRange.start}–{resultsRange.end} of {resultsRange.total} product
+              {resultsRange.total === 1 ? "" : "s"}
+              {resultsRange.totalPages > 1 &&
+                ` · Page ${resultsRange.page} of ${resultsRange.totalPages}`}
+            </p>
+          )}
+
           {products.length === 0 ? (
-            <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center text-muted">
-              No products found.
-            </div>
+            <MarketplaceBrowseEmptyState hasFilters={hasFilters} />
           ) : (
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => (

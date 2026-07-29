@@ -23,3 +23,37 @@ export function buildMarketplaceBrowseHref(
   const query = params.toString();
   return query ? `${basePath}?${query}` : basePath;
 }
+
+export function hasActiveBrowseFilters(filters: ProductSearchInput): boolean {
+  return Boolean(
+    filters.q?.trim() ||
+      filters.categorySlug ||
+      filters.sort !== "newest" ||
+      filters.onSale ||
+      filters.currency ||
+      filters.minPrice != null ||
+      filters.maxPrice != null ||
+      filters.inStock ||
+      filters.minRating != null ||
+      filters.merchantSlug
+  );
+}
+
+export function getBrowseResultsRange(
+  filters: ProductSearchInput,
+  total: number
+): { start: number; end: number; total: number; page: number; totalPages: number } | null {
+  if (total < 1) return null;
+
+  const totalPages = Math.ceil(total / filters.limit);
+  const start = (filters.page - 1) * filters.limit + 1;
+  const end = Math.min(filters.page * filters.limit, total);
+
+  return {
+    start,
+    end,
+    total,
+    page: filters.page,
+    totalPages,
+  };
+}
