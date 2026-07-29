@@ -9,6 +9,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { MarketplaceCategoryGrid } from "@/components/marketplace/MarketplaceCategoryGrid";
 import { MarketplaceProductRail } from "@/components/marketplace/MarketplaceProductRail";
+import { MarketplaceStoreRail } from "@/components/marketplace/MarketplaceStoreRail";
 import { RecentlyViewedProductRail } from "@/components/marketplace/RecentlyViewedProductRail";
 import { buildMarketplaceMetadata } from "@/lib/seo/marketplace";
 
@@ -21,7 +22,7 @@ export const metadata = buildMarketplaceMetadata({
 
 export default async function MarketplaceHomePage() {
   const profile = await getCurrentProfile();
-  const [{ categories, featured, trending, newest, bestSellers }, recentlyViewed] =
+  const [{ categories, featured, trending, newest, bestSellers, flashDeals, featuredMerchants }, recentlyViewed] =
     await Promise.all([
       getMarketplaceHomeData(),
       profile?.role === "customer"
@@ -73,6 +74,20 @@ export default async function MarketplaceHomePage() {
             description="Top-performing products by order volume."
             products={bestSellers}
             viewAllHref="/marketplace/browse?sort=best_selling"
+          />
+
+          <MarketplaceProductRail
+            title="Flash Deals"
+            description="Limited-time discounts from verified merchants."
+            products={flashDeals}
+            viewAllHref="/marketplace/browse?sale=true"
+          />
+
+          <MarketplaceStoreRail
+            title="Featured Merchants"
+            description="Verified stores hand-picked across the Nexar marketplace."
+            stores={featuredMerchants}
+            viewAllHref="/marketplace/stores?sort=featured"
           />
 
           <div className="mt-12 rounded-3xl border border-gold/20 bg-gold/5 px-6 py-8 text-center sm:px-10">

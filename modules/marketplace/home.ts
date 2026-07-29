@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { tryCreateAdminClient } from "@/lib/supabase/admin";
-import type { ProductWithStore } from "@/types";
+import { searchMarketplaceProducts } from "@/modules/catalog/repository";
+import { getFeaturedStores } from "@/modules/marketplace/repository";
+import type { ProductWithStore, StoreDirectoryEntry } from "@/types";
 
 export type MarketplaceCategory = {
   id: string;
@@ -213,14 +215,37 @@ export async function getCustomerRecentlyViewedMarketplaceProducts(
   return getMarketplaceProductsByIds(data.map((row) => row.product_id));
 }
 
-export async function getMarketplaceHomeData() {
-  const [categories, featured, trending, newest, bestSellers] = await Promise.all([
-    getPlatformMarketplaceCategories(),
-    getFeaturedMarketplaceProducts(8),
-    getTrendingMarketplaceProducts(8),
-    getNewMarketplaceProducts(8),
-    getBestSellingMarketplaceProducts(8),
-  ]);
+export async function getFlashDealMarketplaceProducts(
+  limit = 8
+): Promise<ProductWithStore[]> {
+  const { products } = await searchMarketplaceProducts({
+    onSale: true,
+    page: 1,
+    limit,
+    sort: "featured",
+    inStock: true,
+  });
 
-  return { categories, featured, trending, newest, bestSellers };
+  return products;
+}
+
+export async function getFeaturedMarketplaceMerchants(
+  limit = 4
+): Promise<StoreDirectoryEntry[]> {
+  return getFeaturedStores(limit);
+}
+
+export async function getMarketplaceHomeData() {
+  const [categories, featured, trending, newest, bestSellers, flashDeals, featuredMerchants] =
+    await Promise.all([
+      getPlatformMarketplaceCategories(),
+      getFeaturedMarketplaceProducts(8),
+      getTrendingMarketplaceProducts(8),
+      getNewMarketplaceProducts(8),
+      getBestSellingMarketplaceProducts(8),
+      getFlashDealMarketplaceProducts(8),
+      getFeaturedMarketplaceMerchants(4),
+    ]);
+
+  return { categories, featured, trending, newest, bestSellers, flashDeals, featuredMerchants };
 }
