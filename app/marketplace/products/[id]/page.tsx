@@ -22,6 +22,8 @@ import { ProductReviews } from "@/components/reviews/ProductReviews";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { ProductRecommendations } from "@/components/marketplace/ProductRecommendations";
 import { ReportButton } from "@/components/security/ReportButton";
+import { WishlistButton } from "@/components/marketplace/WishlistButton";
+import { ShareProductButton } from "@/components/marketplace/ShareProductButton";
 import { Container } from "@/components/ui/Container";
 import { Footer } from "@/components/layout/Footer";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
@@ -149,6 +151,16 @@ export default async function PublicMarketplaceProductPage({ params }: Props) {
                 <div className="mt-8 flex flex-wrap items-end gap-3">
                   <AddToCartButton productId={product.id} stock={product.stock} showQuantity />
                   <BuyNowButton productId={product.id} stock={product.stock} />
+                  <WishlistButton
+                    productId={product.id}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted transition hover:text-white"
+                  />
+                  <ShareProductButton
+                    productId={product.id}
+                    productName={product.name}
+                    productBasePath="/marketplace/products"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted transition hover:text-white"
+                  />
                   <Link
                     href={`/store/${product.store.slug}`}
                     className="inline-flex items-center rounded-xl border border-border px-5 py-2.5 text-sm hover:border-gold/30"

@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Share2 } from "lucide-react";
-import { toast } from "sonner";
 import type { ProductWithStore } from "@/types";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { Button } from "@/components/ui/Button";
 import { WishlistButton } from "@/components/marketplace/WishlistButton";
+import { ShareProductButton } from "@/components/marketplace/ShareProductButton";
 
 type ProductCardProps = {
   product: ProductWithStore;
@@ -25,16 +24,6 @@ export function ProductCard({
   const isNew =
     showNewBadge ??
     now - new Date(product.created_at).getTime() < 14 * 86400000;
-
-  async function shareProduct() {
-    const url = `${window.location.origin}${productBasePath}/${product.id}`;
-    if (navigator.share) {
-      await navigator.share({ title: product.name, url }).catch(() => undefined);
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success("Link copied");
-    }
-  }
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card/40 transition hover:border-gold/25 hover:shadow-lg hover:shadow-black/20">
@@ -114,14 +103,12 @@ export function ProductCard({
 
         <div className="mt-3 flex items-center justify-end gap-2">
           <WishlistButton productId={product.id} />
-          <button
-            type="button"
-            onClick={shareProduct}
+          <ShareProductButton
+            productId={product.id}
+            productName={product.name}
+            productBasePath={productBasePath}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted hover:text-white"
-            aria-label="Share"
-          >
-            <Share2 className="h-4 w-4" />
-          </button>
+          />
         </div>
       </div>
     </article>
