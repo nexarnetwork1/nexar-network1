@@ -37,6 +37,7 @@ type WishlistContextValue = {
   isAuthenticated: boolean;
   has: (productId: string) => boolean;
   toggle: (productId: string) => Promise<void>;
+  remove: (productId: string) => void;
 };
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
@@ -111,9 +112,19 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     [isAuthenticated]
   );
 
+  const remove = useCallback((productId: string) => {
+    setIds((current) => {
+      const next = current.filter((id) => id !== productId);
+      if (!isAuthenticated) {
+        writeGuestWishlist(next);
+      }
+      return next;
+    });
+  }, [isAuthenticated]);
+
   const value = useMemo(
-    () => ({ ids, ready, isAuthenticated, has, toggle }),
-    [ids, ready, isAuthenticated, has, toggle]
+    () => ({ ids, ready, isAuthenticated, has, toggle, remove }),
+    [ids, ready, isAuthenticated, has, toggle, remove]
   );
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

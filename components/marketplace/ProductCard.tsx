@@ -8,17 +8,20 @@ import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { Button } from "@/components/ui/Button";
 import { WishlistButton } from "@/components/marketplace/WishlistButton";
 import { ShareProductButton } from "@/components/marketplace/ShareProductButton";
+import { MoveToCartButton } from "@/components/marketplace/MoveToCartButton";
 
 type ProductCardProps = {
   product: ProductWithStore;
   showNewBadge?: boolean;
   productBasePath?: string;
+  showMoveToCart?: boolean;
 };
 
 export function ProductCard({
   product,
   showNewBadge,
   productBasePath = "/customer/browse",
+  showMoveToCart = false,
 }: ProductCardProps) {
   const [now] = useState(() => Date.now());
   const isNew =
@@ -92,7 +95,11 @@ export function ProductCard({
 
         <div className="mt-4 grid grid-cols-2 gap-2">
           <div className="col-span-1">
-            <AddToCartButton productId={product.id} stock={product.stock} />
+            {showMoveToCart ? (
+              <MoveToCartButton productId={product.id} stock={product.stock} />
+            ) : (
+              <AddToCartButton productId={product.id} stock={product.stock} />
+            )}
           </div>
           <Link href={`${productBasePath}/${product.id}`} className="col-span-1">
             <Button type="button" variant="secondary" className="w-full">

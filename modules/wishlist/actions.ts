@@ -3,12 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, requireRole } from "@/modules/users/repository";
+import { addProductToCustomerCart } from "@/modules/cart/actions";
 import { getWishlistProductIds, trackRecentlyViewed } from "./repository";
 import type { ActionResult } from "@/modules/auth/actions";
 
 const WISHLIST_PATHS = [
   "/customer/wishlist",
   "/customer/browse",
+  "/customer/cart",
   "/marketplace",
   "/marketplace/browse",
 ];
@@ -84,6 +86,29 @@ export async function toggleWishlistAction(productId: string): Promise<ActionRes
 
   revalidateWishlistPaths();
   return { success: true, saved: true };
+}
+
+export async function moveWishlistToCartAction(productId: string): Promise<ActionResult> {
+  const profile = await requireRole(["customer"]);
+  const addResult = await addProductToCustomerCart(profile.id, productId, 1);
+
+  if (!addResult.success) {
+    return addResult;
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("wishlist_items")
+    .delete()
+    .eq("customer_id", profile.id)
+    .eq("product_id", productId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidateWishlistPaths();
+  return { success: true };
 }
 
 export async function trackProductViewAction(productId: string): Promise<void> {

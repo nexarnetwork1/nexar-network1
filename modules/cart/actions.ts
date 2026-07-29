@@ -77,6 +77,16 @@ async function mergeProductIntoCart(
   return { success: true };
 }
 
+export async function addProductToCustomerCart(
+  customerId: string,
+  productId: string,
+  quantity = 1
+): Promise<ActionResult> {
+  const result = await mergeProductIntoCart(customerId, productId, quantity);
+  if (result.success) revalidateCartPaths();
+  return result;
+}
+
 export async function getCartStateAction(): Promise<{
   authenticated: boolean;
   items: CartLine[];

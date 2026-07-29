@@ -55,6 +55,7 @@ type CartContextValue = {
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   removeItem: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
+  refresh: () => Promise<void>;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -178,6 +179,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     sessionStorage.removeItem(CART_SESSION_KEY);
   }, [isAuthenticated]);
 
+  const refresh = useCallback(async () => {
+    const state = await getCartStateAction();
+    if (state.authenticated) {
+      setItems(state.items);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       items,
@@ -188,8 +197,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateQuantity,
       removeItem,
       clearCart,
+      refresh,
     }),
-    [items, itemCount, ready, isAuthenticated, addItem, updateQuantity, removeItem, clearCart]
+    [items, itemCount, ready, isAuthenticated, addItem, updateQuantity, removeItem, clearCart, refresh]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

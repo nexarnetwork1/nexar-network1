@@ -32,7 +32,7 @@ export default async function CustomerWishlistPage() {
           {items.map((item) =>
             item.product ? (
               <li key={item.id}>
-                <ProductCard product={item.product} />
+                <ProductCard product={item.product} showMoveToCart productBasePath="/marketplace/products" />
               </li>
             ) : null
           )}
