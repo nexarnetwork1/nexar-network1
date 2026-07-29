@@ -74,18 +74,29 @@ export async function searchMarketplaceProducts(
   }
 
   if (input.categorySlug) {
-    const { data: category } = await supabase
-      .from("product_categories")
+    const { data: platformCategory } = await supabase
+      .from("marketplace_categories")
       .select("id")
       .eq("slug", input.categorySlug)
       .eq("is_active", true)
       .maybeSingle();
 
-    if (!category) {
-      return { products: [], total: 0 };
-    }
+    if (platformCategory) {
+      query = query.eq("marketplace_category_id", platformCategory.id);
+    } else {
+      const { data: category } = await supabase
+        .from("product_categories")
+        .select("id")
+        .eq("slug", input.categorySlug)
+        .eq("is_active", true)
+        .maybeSingle();
 
-    query = query.eq("category_id", category.id);
+      if (!category) {
+        return { products: [], total: 0 };
+      }
+
+      query = query.eq("category_id", category.id);
+    }
   }
 
   if (input.onSale) {

@@ -5,9 +5,15 @@ type ProductRecommendationsProps = {
   title: string;
   products: ProductWithStore[];
   id?: string;
+  productBasePath?: string;
 };
 
-export function ProductRecommendations({ title, products, id }: ProductRecommendationsProps) {
+export function ProductRecommendations({
+  title,
+  products,
+  id,
+  productBasePath,
+}: ProductRecommendationsProps) {
   if (!products.length) return null;
 
   return (
@@ -18,7 +24,7 @@ export function ProductRecommendations({ title, products, id }: ProductRecommend
       <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {products.map((product) => (
           <li key={product.id}>
-            <ProductCard product={product} />
+            <ProductCard product={product} productBasePath={productBasePath} />
           </li>
         ))}
       </ul>

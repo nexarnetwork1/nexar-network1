@@ -65,6 +65,9 @@ export default async function MarketplaceStoresPage({ searchParams }: Props) {
             <Link href="/customer/browse" className="text-sm text-gold hover:underline">
               Browse all products →
             </Link>
+            <Link href="/marketplace/browse" className="text-sm text-muted hover:text-white">
+              Public product browse
+            </Link>
             <Link href="/marketplace" className="text-sm text-muted hover:text-white">
               Marketplace home
             </Link>

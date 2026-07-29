@@ -13,9 +13,14 @@ import { useWishlist } from "@/hooks/useWishlist";
 type ProductCardProps = {
   product: ProductWithStore;
   showNewBadge?: boolean;
+  productBasePath?: string;
 };
 
-export function ProductCard({ product, showNewBadge }: ProductCardProps) {
+export function ProductCard({
+  product,
+  showNewBadge,
+  productBasePath = "/customer/browse",
+}: ProductCardProps) {
   const { toggle, has } = useWishlist();
   const [now] = useState(() => Date.now());
   const isNew =
@@ -23,7 +28,7 @@ export function ProductCard({ product, showNewBadge }: ProductCardProps) {
     now - new Date(product.created_at).getTime() < 14 * 86400000;
 
   async function shareProduct() {
-    const url = `${window.location.origin}/customer/browse/${product.id}`;
+    const url = `${window.location.origin}${productBasePath}/${product.id}`;
     if (navigator.share) {
       await navigator.share({ title: product.name, url }).catch(() => undefined);
     } else {
@@ -34,7 +39,7 @@ export function ProductCard({ product, showNewBadge }: ProductCardProps) {
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card/40 transition hover:border-gold/25 hover:shadow-lg hover:shadow-black/20">
-      <Link href={`/customer/browse/${product.id}`} className="relative block">
+      <Link href={`${productBasePath}/${product.id}`} className="relative block">
         {product.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -78,7 +83,7 @@ export function ProductCard({ product, showNewBadge }: ProductCardProps) {
           {product.store.name}
         </Link>
 
-        <Link href={`/customer/browse/${product.id}`}>
+        <Link href={`${productBasePath}/${product.id}`}>
           <h2 className="mt-1 font-medium leading-snug hover:text-gold">{product.name}</h2>
         </Link>
 
@@ -101,7 +106,7 @@ export function ProductCard({ product, showNewBadge }: ProductCardProps) {
           <div className="col-span-1">
             <AddToCartButton productId={product.id} stock={product.stock} />
           </div>
-          <Link href={`/customer/browse/${product.id}`} className="col-span-1">
+          <Link href={`${productBasePath}/${product.id}`} className="col-span-1">
             <Button type="button" variant="secondary" className="w-full">
               View Details
             </Button>
