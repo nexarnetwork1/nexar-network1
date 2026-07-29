@@ -12,3 +12,10 @@ export const updateCartItemSchema = z.object({
 
 export type AddToCartInput = z.infer<typeof addToCartSchema>;
 export type UpdateCartItemInput = z.infer<typeof updateCartItemSchema>;
+
+export const cartLineSchema = z.object({
+  productId: z.string().uuid(),
+  quantity: z.coerce.number().int().min(1).max(99),
+});
+
+export type CartLine = z.infer<typeof cartLineSchema>;

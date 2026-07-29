@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useZodForm } from "@/hooks/useZodForm";
 import { addToCartSchema } from "@/modules/cart/validators";
-import { addToCartAction } from "@/modules/cart/actions";
-import { objectToFormData } from "@/utils/form-data";
+import { useCart } from "@/components/marketplace/CartProvider";
 import type { ZodSchema } from "zod";
 import { z } from "zod";
 
@@ -28,29 +28,45 @@ export function AddToCartButton({
   showQuantity = false,
 }: AddToCartButtonProps) {
   const router = useRouter();
+  const { addItem, ready, isAuthenticated } = useCart();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useZodForm<AddToCartFormInput>({
     schema: addToCartFormSchema as ZodSchema<AddToCartFormInput>,
     defaultValues: { productId, quantity: 1 },
   });
 
   async function onSubmit(data: AddToCartFormInput) {
-    if (stock < 1) return;
+    if (stock < 1 || !ready) return;
     setServerError(null);
+    setIsSubmitting(true);
 
-    const result = await addToCartAction(objectToFormData(data));
+    const success = await addItem(data.productId, data.quantity);
 
-    if (!result.success) {
-      setServerError(result.error ?? "Failed to add to cart");
+    setIsSubmitting(false);
+
+    if (!success) {
+      setServerError("Failed to add to cart");
       return;
     }
 
-    router.refresh();
+    if (isAuthenticated) {
+      router.refresh();
+    } else {
+      toast.success("Added to cart", {
+        action: {
+          label: "View cart",
+          onClick: () => {
+            window.location.href = "/marketplace/cart";
+          },
+        },
+      });
+    }
   }
 
   if (stock < 1) {
@@ -71,7 +87,7 @@ export function AddToCartButton({
         <Button
           type="button"
           onClick={handleQuickAdd}
-          disabled={disabled || isSubmitting}
+          disabled={disabled || isSubmitting || !ready}
         >
           {isSubmitting ? "Adding…" : "Add to cart"}
         </Button>
@@ -92,7 +108,7 @@ export function AddToCartButton({
         className="w-20"
         error={errors.quantity?.message}
       />
-      <Button type="submit" disabled={disabled || isSubmitting}>
+      <Button type="submit" disabled={disabled || isSubmitting || !ready}>
         {isSubmitting ? "Adding…" : "Add to cart"}
       </Button>
       {serverError && <p className="text-sm text-red-400">{serverError}</p>}

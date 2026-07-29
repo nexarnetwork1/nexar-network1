@@ -28,9 +28,14 @@ export default async function CartPage() {
       {items.length === 0 ? (
         <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center">
           <p className="text-muted">Browse products to add items to your cart.</p>
-          <Link href="/customer/browse" className="mt-4 inline-block">
-            <Button variant="secondary">Browse products</Button>
-          </Link>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/marketplace/browse">
+              <Button variant="secondary">Browse marketplace</Button>
+            </Link>
+            <Link href="/customer/browse">
+              <Button variant="ghost">Browse products</Button>
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="mt-8 grid gap-10 lg:grid-cols-3">

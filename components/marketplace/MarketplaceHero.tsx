@@ -6,6 +6,7 @@ import { Search, ShoppingBag, Store } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
+import { CartBadgeClient } from "@/components/cart/CartBadgeClient";
 
 type MarketplaceHeroProps = {
   categories: Array<{ slug: string; name: string }>;
@@ -83,6 +84,10 @@ export function MarketplaceHero({ categories }: MarketplaceHeroProps) {
                 Browse Stores
               </Button>
             </Link>
+            <CartBadgeClient
+              showIcon
+              className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/40 px-4 py-2.5 text-sm text-muted transition hover:border-gold/30 hover:text-gold"
+            />
           </motion.div>
 
           {categories.length > 0 && (

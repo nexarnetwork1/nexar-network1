@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
-import { CartBadge } from "@/components/cart/CartBadge";
+import { CartBadgeClient } from "@/components/cart/CartBadgeClient";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
 import { Button } from "@/components/ui/Button";
@@ -37,7 +37,7 @@ export default async function CustomerLayout({
             <Link href="/customer/browse" className="text-muted hover:text-white">
               Browse
             </Link>
-            <CartBadge />
+            <CartBadgeClient href="/customer/cart" />
             <Link href="/customer/orders" className="text-muted hover:text-white">
               Orders
             </Link>

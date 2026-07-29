@@ -2,35 +2,43 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireRole } from "@/modules/users/repository";
+import { getCurrentProfile, requireRole } from "@/modules/users/repository";
 import { getMarketplaceProduct } from "@/modules/catalog/repository";
 import { getOrCreateCart, getCartWithItems } from "./repository";
-import { addToCartSchema, updateCartItemSchema } from "./validators";
+import { addToCartSchema, updateCartItemSchema, type CartLine } from "./validators";
 import { validateCoupon } from "@/modules/coupons/repository";
 import type { ActionResult } from "@/modules/auth/actions";
+import type { ProductWithStore } from "@/types";
 
-export async function addToCartAction(formData: FormData): Promise<ActionResult> {
-  const profile = await requireRole(["customer"]);
+const CART_PATHS = [
+  "/customer/cart",
+  "/customer/browse",
+  "/marketplace",
+  "/marketplace/browse",
+  "/marketplace/cart",
+];
 
-  const parsed = addToCartSchema.safeParse({
-    productId: formData.get("productId"),
-    quantity: formData.get("quantity") ?? 1,
-  });
-
-  if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+function revalidateCartPaths() {
+  for (const path of CART_PATHS) {
+    revalidatePath(path);
   }
+}
 
-  const product = await getMarketplaceProduct(parsed.data.productId);
+async function mergeProductIntoCart(
+  customerId: string,
+  productId: string,
+  quantity: number
+): Promise<ActionResult> {
+  const product = await getMarketplaceProduct(productId);
   if (!product) {
     return { success: false, error: "Product not available" };
   }
 
-  if (product.stock < parsed.data.quantity) {
+  if (product.stock < quantity) {
     return { success: false, error: "Insufficient stock" };
   }
 
-  const cart = await getOrCreateCart(profile.id);
+  const cart = await getOrCreateCart(customerId);
   if (!cart) {
     return { success: false, error: "Could not create cart" };
   }
@@ -41,11 +49,11 @@ export async function addToCartAction(formData: FormData): Promise<ActionResult>
     .from("cart_items")
     .select("id, quantity")
     .eq("cart_id", cart.id)
-    .eq("product_id", parsed.data.productId)
-    .single();
+    .eq("product_id", productId)
+    .maybeSingle();
 
   if (existing) {
-    const newQty = existing.quantity + parsed.data.quantity;
+    const newQty = existing.quantity + quantity;
     if (newQty > product.stock) {
       return { success: false, error: "Insufficient stock" };
     }
@@ -59,15 +67,111 @@ export async function addToCartAction(formData: FormData): Promise<ActionResult>
   } else {
     const { error } = await supabase.from("cart_items").insert({
       cart_id: cart.id,
-      product_id: parsed.data.productId,
-      quantity: parsed.data.quantity,
+      product_id: productId,
+      quantity,
     });
 
     if (error) return { success: false, error: error.message };
   }
 
-  revalidatePath("/customer/cart");
-  revalidatePath("/customer/browse");
+  return { success: true };
+}
+
+export async function getCartStateAction(): Promise<{
+  authenticated: boolean;
+  items: CartLine[];
+}> {
+  const profile = await getCurrentProfile();
+  if (!profile || profile.role !== "customer") {
+    return { authenticated: false, items: [] };
+  }
+
+  const { items } = await getCartWithItems(profile.id);
+  return {
+    authenticated: true,
+    items: items.map((item) => ({
+      productId: item.product_id,
+      quantity: item.quantity,
+    })),
+  };
+}
+
+export async function syncGuestCartAction(guestItems: CartLine[]): Promise<CartLine[]> {
+  const profile = await getCurrentProfile();
+  if (!profile || profile.role !== "customer" || guestItems.length === 0) {
+    return profile && profile.role === "customer"
+      ? (await getCartStateAction()).items
+      : [];
+  }
+
+  for (const line of guestItems) {
+    await mergeProductIntoCart(profile.id, line.productId, line.quantity);
+  }
+
+  revalidateCartPaths();
+  return (await getCartStateAction()).items;
+}
+
+export async function resolveCartProductsAction(
+  lines: CartLine[]
+): Promise<Array<CartLine & { product: ProductWithStore }>> {
+  if (lines.length === 0) return [];
+
+  const supabase = await createClient();
+  const productIds = lines.map((line) => line.productId);
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      "*, store:stores!inner(id, name, slug, logo_url, status, mode), images:product_images(url, is_primary, sort_order)"
+    )
+    .in("id", productIds)
+    .eq("is_active", true)
+    .eq("store.status", "active")
+    .eq("store.mode", "marketplace");
+
+  if (error || !data?.length) return [];
+
+  const products = data.map((row) => {
+    const { images, ...product } = row as ProductWithStore & {
+      images?: { url: string; is_primary: boolean; sort_order: number }[];
+    };
+    const primary = images?.find((image) => image.is_primary);
+    const image_url = primary?.url ?? images?.[0]?.url ?? product.image_url;
+    return { ...product, image_url } as ProductWithStore;
+  });
+
+  const byId = new Map(products.map((product) => [product.id, product]));
+
+  return lines
+    .map((line) => {
+      const product = byId.get(line.productId);
+      return product ? { ...line, product } : null;
+    })
+    .filter(Boolean) as Array<CartLine & { product: ProductWithStore }>;
+}
+
+export async function addToCartAction(formData: FormData): Promise<ActionResult> {
+  const profile = await requireRole(["customer"]);
+
+  const parsed = addToCartSchema.safeParse({
+    productId: formData.get("productId"),
+    quantity: formData.get("quantity") ?? 1,
+  });
+
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const result = await mergeProductIntoCart(
+    profile.id,
+    parsed.data.productId,
+    parsed.data.quantity
+  );
+
+  if (!result.success) return result;
+
+  revalidateCartPaths();
   return { success: true };
 }
 
@@ -103,7 +207,7 @@ export async function updateCartItemAction(formData: FormData): Promise<ActionRe
 
   if (error) return { success: false, error: error.message };
 
-  revalidatePath("/customer/cart");
+  revalidateCartPaths();
   return { success: true };
 }
 
@@ -121,7 +225,7 @@ export async function removeCartItemAction(itemId: string): Promise<ActionResult
 
   if (error) return { success: false, error: error.message };
 
-  revalidatePath("/customer/cart");
+  revalidateCartPaths();
   return { success: true };
 }
 
@@ -139,7 +243,7 @@ export async function clearCartAction(): Promise<ActionResult> {
 
   if (error) return { success: false, error: error.message };
 
-  revalidatePath("/customer/cart");
+  revalidateCartPaths();
   return { success: true };
 }
 
