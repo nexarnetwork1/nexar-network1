@@ -148,17 +148,38 @@ export type StoreMarketplaceProfile = {
   description?: string | null;
   primary_color?: string | null;
   secondary_color?: string | null;
+  accent_color?: string | null;
+  favicon_url?: string | null;
+  typography?: string | null;
+  button_style?: string | null;
+  border_radius?: string | null;
   website?: string | null;
   facebook?: string | null;
   instagram?: string | null;
   twitter?: string | null;
   tiktok?: string | null;
+  linkedin?: string | null;
+  youtube?: string | null;
+  telegram?: string | null;
+  discord?: string | null;
   business_phone?: string | null;
   business_email?: string | null;
   business_address?: string | null;
   business_hours?: Record<string, string> | null;
+  country?: string | null;
+  language?: string | null;
+  timezone?: string | null;
   featured?: boolean;
   policies?: string | null;
+  privacy_policy?: string | null;
+  refund_policy?: string | null;
+  shipping_policy?: string | null;
+  terms?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  seo_keywords?: string | null;
+  og_image?: string | null;
+  canonical_url?: string | null;
 };
 
 export type StoreSettings = {
@@ -246,6 +267,8 @@ export type Product = {
   is_active: boolean;
   is_on_sale?: boolean;
   specifications?: ProductSpecifications;
+  slug?: string | null;
+  brand_id?: string | null;
   created_at: string;
   updated_at: string;
 };

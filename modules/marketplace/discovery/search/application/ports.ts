@@ -1,4 +1,4 @@
-import type { CatalogListParams, CatalogListResult } from "../../shared/types";
+import type { CatalogListParams, CatalogListResult } from "../../../shared/types";
 
 export interface SearchRepository {
   searchProducts(params: CatalogListParams): Promise<CatalogListResult>;

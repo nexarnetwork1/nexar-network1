@@ -53,6 +53,11 @@ export default async function MerchantLayout({
             <Link href="/merchant/store" className="text-muted hover:text-white">
               {isPaymentsOnly ? "QR & Settings" : "Store"}
             </Link>
+            {!isPaymentsOnly && (
+              <Link href="/merchant/store/builder" className="text-muted hover:text-white">
+                Store Builder
+              </Link>
+            )}
             <Link href="/merchant/revenue" className="text-muted hover:text-white">
               Revenue
             </Link>

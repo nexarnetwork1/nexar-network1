@@ -54,10 +54,20 @@ export default async function MerchantStorePage() {
 
       {settings && store.mode === "marketplace" && (
         <>
-          <h2 className="mt-10 font-heading text-lg font-semibold">Store Appearance</h2>
-          <p className="mt-1 text-sm text-muted">
-            Customize how your store looks on the marketplace and public storefront.
-          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="font-heading text-lg font-semibold">Store Appearance</h2>
+              <p className="mt-1 text-sm text-muted">
+                Quick branding updates for your public storefront.
+              </p>
+            </div>
+            <a
+              href="/merchant/store/builder"
+              className="rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-sm font-medium text-gold hover:bg-gold/15"
+            >
+              Open Store Builder
+            </a>
+          </div>
           <StoreAppearanceForm store={store} settings={settings} />
         </>
       )}

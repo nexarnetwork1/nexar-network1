@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
   Product,
-  ProductWithDetails,
   ProductCategory,
   ProductImage,
   Inventory,
@@ -95,7 +94,7 @@ export async function getProductInventory(productId: string): Promise<Inventory 
 
 export async function getProductWithDetails(
   productId: string
-): Promise<ProductWithDetails | null> {
+): Promise<(Product & { images: ProductImage[] }) | null> {
   const product = await getProductById(productId);
   if (!product) return null;
 

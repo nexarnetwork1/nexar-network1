@@ -19,7 +19,9 @@ export function TreasuryAdminAutoVerify() {
   const { address: wagmiAddress, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const signMessageRef = useRef(signMessageAsync);
-  signMessageRef.current = signMessageAsync;
+  useEffect(() => {
+    signMessageRef.current = signMessageAsync;
+  }, [signMessageAsync]);
   const verifyingRef = useRef(false);
   const verifiedRef = useRef<string | null>(null);
 
