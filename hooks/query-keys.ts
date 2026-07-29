@@ -13,9 +13,8 @@ export const queryKeys = {
     search: (params: Record<string, unknown>) =>
       ["catalog", "search", params] as const,
   },
-  cart: {
-    all: (customerId: string) => ["cart", customerId] as const,
-    count: (customerId: string) => ["cart", "count", customerId] as const,
+  marketplace: {
+    cart: (customerId: string) => ["marketplace", "cart", customerId] as const,
   },
   orders: {
     all: (role: string, userId: string) => ["orders", role, userId] as const,

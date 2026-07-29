@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Flag } from "lucide-react";
 import { toast } from "sonner";
-import { reportContentAction } from "@/modules/reports/actions";
+import { reportContentAction } from "@/modules/marketplace/moderation";
 import type { ReportTarget } from "@/types";
 import { Button } from "@/components/ui/Button";
 

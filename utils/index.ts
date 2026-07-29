@@ -1,7 +1,6 @@
 export { cn } from "@/lib/utils/cn";
 export { objectToFormData } from "./form-data";
 export { formatDate, formatDateTime, formatRelative } from "./format";
-export { groupCartItemsByStore, type CartStoreGroup } from "./cart";
 export { toCsv, csvResponse } from "./export/csv";
 
 export function formatCurrency(

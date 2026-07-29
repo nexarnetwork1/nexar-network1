@@ -3,7 +3,6 @@ import { redirect, notFound } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getProductById, getStoreCategories } from "@/modules/catalog/repository";
-import { getPlatformMarketplaceCategories } from "@/modules/marketplace/home";
 import { updateProductAction } from "@/modules/catalog/actions";
 import { ProductForm } from "@/components/catalog/ProductForm";
 
@@ -23,8 +22,6 @@ export default async function EditProductPage({ params }: Props) {
   if (!product || product.store_id !== store.id) notFound();
 
   const categories = await getStoreCategories(store.id);
-  const platformCategories =
-    store.mode === "marketplace" ? await getPlatformMarketplaceCategories() : [];
   const boundUpdate = updateProductAction.bind(null, id);
 
   return (
@@ -41,7 +38,6 @@ export default async function EditProductPage({ params }: Props) {
           action={boundUpdate}
           product={product}
           categories={categories}
-          platformCategories={platformCategories}
           submitLabel="Update product"
         />
       </div>

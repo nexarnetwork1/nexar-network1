@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/modules/users/repository";
-import { getOrCreateCart, getCartWithItems } from "@/modules/cart/repository";
-import { generateAndStoreInvoicePdf } from "@/modules/invoices/pdf";
-import { createNotification } from "@/modules/notifications/repository";
-import { getStoreById } from "@/modules/stores/repository";
-import { getMarketplaceProduct } from "@/modules/catalog/repository";
+import {
+  getOrCreateMarketplaceCart,
+  getMarketplaceCartWithItems,
+} from "@/modules/marketplace/cart";
+import { getCatalogProductById } from "@/modules/marketplace/catalog";
 import { getOrderById } from "@/modules/orders/repository";
 import { auditLogger } from "@/lib/logging/audit-logger";
 import { sendInvoiceReadyEmail } from "@/lib/email/send";
@@ -74,13 +74,13 @@ export async function merchantCancelOrderAction(orderId: string): Promise<Action
 
 export async function checkoutAction(): Promise<CheckoutResult> {
   const profile = await requireRole(["customer"]);
-  const cart = await getOrCreateCart(profile.id);
+  const cart = await getOrCreateMarketplaceCart(profile.id);
 
   if (!cart) {
     return { success: false, error: "Cart not found" };
   }
 
-  const { items } = await getCartWithItems(profile.id);
+  const { items } = await getMarketplaceCartWithItems(profile.id);
 
   if (items.length === 0) {
     return { success: false, error: "Cart is empty" };
@@ -164,7 +164,7 @@ export async function checkoutAction(): Promise<CheckoutResult> {
     }
   }
 
-  revalidatePath("/customer/cart");
+  revalidatePath("/marketplace/cart");
   revalidatePath("/customer/orders");
   revalidatePath("/customer/invoices");
   revalidatePath("/merchant/orders");
@@ -227,7 +227,7 @@ export async function buyNowAction(
   quantity: number
 ): Promise<CheckoutResult> {
   const profile = await requireRole(["customer"]);
-  const product = await getMarketplaceProduct(productId);
+  const product = await getCatalogProductById(productId);
 
   if (!product) {
     return { success: false, error: "Product not available" };
@@ -237,7 +237,7 @@ export async function buyNowAction(
     return { success: false, error: "Insufficient stock" };
   }
 
-  const cart = await getOrCreateCart(profile.id);
+  const cart = await getOrCreateMarketplaceCart(profile.id);
   if (!cart) {
     return { success: false, error: "Could not create cart" };
   }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/AuthCard";
-import { MarketplaceAuthButtons } from "@/components/auth/MarketplaceAuthButtons";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useZodForm } from "@/hooks/useZodForm";
@@ -71,7 +71,7 @@ export default function LoginForm() {
         </p>
       )}
 
-      <MarketplaceAuthButtons redirectTo={redirect} />
+      <SocialAuthButtons redirectTo={redirect} />
 
       <div className="my-5 flex items-center gap-3">
         <span className="h-px flex-1 bg-border" />

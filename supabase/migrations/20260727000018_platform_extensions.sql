@@ -3,32 +3,60 @@
 
 -- ─── Enums ───────────────────────────────────────────────────────────────────
 
-CREATE TYPE public.escrow_status AS ENUM (
-  'pending', 'held', 'released', 'refunded', 'cancelled'
-);
+DO $$ BEGIN
+  CREATE TYPE public.escrow_status AS ENUM (
+    'pending', 'held', 'released', 'refunded', 'cancelled'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE public.dispute_status AS ENUM (
-  'open', 'under_review', 'awaiting_info', 'approved', 'rejected', 'resolved', 'closed'
-);
+DO $$ BEGIN
+  CREATE TYPE public.dispute_status AS ENUM (
+    'open', 'under_review', 'awaiting_info', 'approved', 'rejected', 'resolved', 'closed'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE public.withdrawal_status AS ENUM (
-  'pending', 'approved', 'rejected', 'processing', 'completed', 'cancelled'
-);
+DO $$ BEGIN
+  CREATE TYPE public.withdrawal_status AS ENUM (
+    'pending', 'approved', 'rejected', 'processing', 'completed', 'cancelled'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE public.coupon_type AS ENUM ('percentage', 'fixed');
-CREATE TYPE public.coupon_scope AS ENUM ('merchant', 'platform');
+DO $$ BEGIN
+  CREATE TYPE public.coupon_type AS ENUM ('percentage', 'fixed');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE public.webhook_event AS ENUM (
-  'payment.success', 'payment.failure', 'refund', 'order.created', 'invoice.paid'
-);
+DO $$ BEGIN
+  CREATE TYPE public.coupon_scope AS ENUM ('merchant', 'platform');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE public.webhook_delivery_status AS ENUM (
-  'pending', 'delivered', 'failed', 'retrying'
-);
+DO $$ BEGIN
+  CREATE TYPE public.webhook_event AS ENUM (
+    'payment.success', 'payment.failure', 'refund', 'order.created', 'invoice.paid'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE public.merchant_verification_level AS ENUM ('basic', 'business', 'enterprise');
+DO $$ BEGIN
+  CREATE TYPE public.webhook_delivery_status AS ENUM (
+    'pending', 'delivered', 'failed', 'retrying'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE public.settlement_report_period AS ENUM ('daily', 'weekly', 'monthly');
+DO $$ BEGIN
+  CREATE TYPE public.merchant_verification_level AS ENUM ('basic', 'business', 'enterprise');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE public.settlement_report_period AS ENUM ('daily', 'weekly', 'monthly');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Extend merchant verification statuses
 ALTER TABLE public.merchant_profiles
@@ -57,7 +85,7 @@ ALTER TYPE public.notification_type ADD VALUE IF NOT EXISTS 'refund';
 
 -- ─── Escrow ──────────────────────────────────────────────────────────────────
 
-CREATE TABLE public.escrows (
+CREATE TABLE IF NOT EXISTS public.escrows (
   id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id            UUID NOT NULL REFERENCES public.orders(id) ON DELETE RESTRICT,
   payment_session_id  UUID REFERENCES public.payment_sessions(id) ON DELETE SET NULL,
@@ -78,11 +106,11 @@ CREATE TABLE public.escrows (
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_escrows_order ON public.escrows(order_id);
-CREATE INDEX idx_escrows_store_status ON public.escrows(store_id, status);
-CREATE INDEX idx_escrows_customer ON public.escrows(customer_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_escrows_order ON public.escrows(order_id);
+CREATE INDEX IF NOT EXISTS idx_escrows_store_status ON public.escrows(store_id, status);
+CREATE INDEX IF NOT EXISTS idx_escrows_customer ON public.escrows(customer_id, created_at DESC);
 
-CREATE TABLE public.escrow_events (
+CREATE TABLE IF NOT EXISTS public.escrow_events (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   escrow_id   UUID NOT NULL REFERENCES public.escrows(id) ON DELETE CASCADE,
   actor_id    UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -94,11 +122,11 @@ CREATE TABLE public.escrow_events (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_escrow_events_escrow ON public.escrow_events(escrow_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_escrow_events_escrow ON public.escrow_events(escrow_id, created_at DESC);
 
 -- ─── Disputes ─────────────────────────────────────────────────────────────────
 
-CREATE TABLE public.disputes (
+CREATE TABLE IF NOT EXISTS public.disputes (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id      UUID NOT NULL REFERENCES public.orders(id) ON DELETE RESTRICT,
   escrow_id     UUID REFERENCES public.escrows(id) ON DELETE SET NULL,
@@ -115,11 +143,11 @@ CREATE TABLE public.disputes (
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_disputes_order ON public.disputes(order_id);
-CREATE INDEX idx_disputes_store ON public.disputes(store_id, status);
-CREATE INDEX idx_disputes_customer ON public.disputes(customer_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_disputes_order ON public.disputes(order_id);
+CREATE INDEX IF NOT EXISTS idx_disputes_store ON public.disputes(store_id, status);
+CREATE INDEX IF NOT EXISTS idx_disputes_customer ON public.disputes(customer_id, created_at DESC);
 
-CREATE TABLE public.dispute_messages (
+CREATE TABLE IF NOT EXISTS public.dispute_messages (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dispute_id  UUID NOT NULL REFERENCES public.disputes(id) ON DELETE CASCADE,
   sender_id   UUID NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
@@ -128,9 +156,9 @@ CREATE TABLE public.dispute_messages (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_dispute_messages_dispute ON public.dispute_messages(dispute_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_dispute_messages_dispute ON public.dispute_messages(dispute_id, created_at);
 
-CREATE TABLE public.dispute_evidence (
+CREATE TABLE IF NOT EXISTS public.dispute_evidence (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   dispute_id   UUID NOT NULL REFERENCES public.disputes(id) ON DELETE CASCADE,
   uploaded_by  UUID NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
@@ -140,11 +168,11 @@ CREATE TABLE public.dispute_evidence (
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_dispute_evidence_dispute ON public.dispute_evidence(dispute_id);
+CREATE INDEX IF NOT EXISTS idx_dispute_evidence_dispute ON public.dispute_evidence(dispute_id);
 
 -- ─── Withdrawals ─────────────────────────────────────────────────────────────
 
-CREATE TABLE public.withdrawal_requests (
+CREATE TABLE IF NOT EXISTS public.withdrawal_requests (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   merchant_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
   store_id        UUID NOT NULL REFERENCES public.stores(id) ON DELETE RESTRICT,
@@ -162,12 +190,12 @@ CREATE TABLE public.withdrawal_requests (
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_withdrawals_merchant ON public.withdrawal_requests(merchant_id, status);
-CREATE INDEX idx_withdrawals_store ON public.withdrawal_requests(store_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_withdrawals_merchant ON public.withdrawal_requests(merchant_id, status);
+CREATE INDEX IF NOT EXISTS idx_withdrawals_store ON public.withdrawal_requests(store_id, created_at DESC);
 
 -- ─── Coupons ─────────────────────────────────────────────────────────────────
 
-CREATE TABLE public.coupons (
+CREATE TABLE IF NOT EXISTS public.coupons (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code          TEXT NOT NULL,
   coupon_type   public.coupon_type NOT NULL,
@@ -187,10 +215,10 @@ CREATE TABLE public.coupons (
   CONSTRAINT coupons_code_scope_unique UNIQUE (code, coupon_scope, store_id)
 );
 
-CREATE INDEX idx_coupons_code ON public.coupons(UPPER(code));
-CREATE INDEX idx_coupons_store ON public.coupons(store_id) WHERE store_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_coupons_code ON public.coupons(UPPER(code));
+CREATE INDEX IF NOT EXISTS idx_coupons_store ON public.coupons(store_id) WHERE store_id IS NOT NULL;
 
-CREATE TABLE public.coupon_redemptions (
+CREATE TABLE IF NOT EXISTS public.coupon_redemptions (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   coupon_id   UUID NOT NULL REFERENCES public.coupons(id) ON DELETE RESTRICT,
   order_id    UUID NOT NULL REFERENCES public.orders(id) ON DELETE RESTRICT,
@@ -202,7 +230,7 @@ CREATE TABLE public.coupon_redemptions (
 
 -- ─── Webhooks ────────────────────────────────────────────────────────────────
 
-CREATE TABLE public.merchant_webhooks (
+CREATE TABLE IF NOT EXISTS public.merchant_webhooks (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id    UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   url         TEXT NOT NULL,
@@ -215,9 +243,9 @@ CREATE TABLE public.merchant_webhooks (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_merchant_webhooks_store ON public.merchant_webhooks(store_id);
+CREATE INDEX IF NOT EXISTS idx_merchant_webhooks_store ON public.merchant_webhooks(store_id);
 
-CREATE TABLE public.webhook_deliveries (
+CREATE TABLE IF NOT EXISTS public.webhook_deliveries (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   webhook_id   UUID NOT NULL REFERENCES public.merchant_webhooks(id) ON DELETE CASCADE,
   event        public.webhook_event NOT NULL,
@@ -232,12 +260,12 @@ CREATE TABLE public.webhook_deliveries (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_webhook_deliveries_pending ON public.webhook_deliveries(status, next_retry_at)
+CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_pending ON public.webhook_deliveries(status, next_retry_at)
   WHERE status IN ('pending', 'retrying', 'failed');
 
 -- ─── Settlement reports ──────────────────────────────────────────────────────
 
-CREATE TABLE public.settlement_reports (
+CREATE TABLE IF NOT EXISTS public.settlement_reports (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id      UUID REFERENCES public.stores(id) ON DELETE SET NULL,
   period_type   public.settlement_report_period NOT NULL,
@@ -249,11 +277,11 @@ CREATE TABLE public.settlement_reports (
   UNIQUE (store_id, period_type, period_start, period_end)
 );
 
-CREATE INDEX idx_settlement_reports_period ON public.settlement_reports(period_type, period_start DESC);
+CREATE INDEX IF NOT EXISTS idx_settlement_reports_period ON public.settlement_reports(period_type, period_start DESC);
 
 -- ─── Notification preferences ────────────────────────────────────────────────
 
-CREATE TABLE public.notification_preferences (
+CREATE TABLE IF NOT EXISTS public.notification_preferences (
   id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id   UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   channel   TEXT NOT NULL CHECK (channel IN ('in_app', 'email', 'sms', 'push', 'telegram')),
@@ -266,7 +294,7 @@ CREATE TABLE public.notification_preferences (
 
 -- ─── Loyalty (future activation) ─────────────────────────────────────────────
 
-CREATE TABLE public.loyalty_programs (
+CREATE TABLE IF NOT EXISTS public.loyalty_programs (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name        TEXT NOT NULL,
   is_active   BOOLEAN NOT NULL DEFAULT FALSE,
@@ -275,7 +303,7 @@ CREATE TABLE public.loyalty_programs (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE public.loyalty_accounts (
+CREATE TABLE IF NOT EXISTS public.loyalty_accounts (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   program_id  UUID NOT NULL REFERENCES public.loyalty_programs(id) ON DELETE RESTRICT,
@@ -287,7 +315,7 @@ CREATE TABLE public.loyalty_accounts (
   UNIQUE (user_id, program_id)
 );
 
-CREATE TABLE public.loyalty_transactions (
+CREATE TABLE IF NOT EXISTS public.loyalty_transactions (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   account_id  UUID NOT NULL REFERENCES public.loyalty_accounts(id) ON DELETE CASCADE,
   tx_type     TEXT NOT NULL,
@@ -300,7 +328,7 @@ CREATE TABLE public.loyalty_transactions (
 
 -- ─── POS (future activation) ─────────────────────────────────────────────────
 
-CREATE TABLE public.pos_devices (
+CREATE TABLE IF NOT EXISTS public.pos_devices (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id    UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
   device_name TEXT NOT NULL,
@@ -312,7 +340,7 @@ CREATE TABLE public.pos_devices (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE public.pos_sessions (
+CREATE TABLE IF NOT EXISTS public.pos_sessions (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   device_id   UUID NOT NULL REFERENCES public.pos_devices(id) ON DELETE CASCADE,
   operator_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE RESTRICT,
@@ -323,7 +351,7 @@ CREATE TABLE public.pos_sessions (
 
 -- ─── Multi-chain ─────────────────────────────────────────────────────────────
 
-CREATE TABLE public.supported_chains (
+CREATE TABLE IF NOT EXISTS public.supported_chains (
   chain_id      INTEGER PRIMARY KEY,
   name          TEXT NOT NULL,
   symbol        TEXT NOT NULL,
@@ -533,79 +561,26 @@ BEGIN
 END;
 $$;
 
--- ─── Global search RPC ───────────────────────────────────────────────────────
-
-CREATE OR REPLACE FUNCTION public.global_search(
-  p_query TEXT,
-  p_limit INTEGER DEFAULT 20
-) RETURNS JSONB
-LANGUAGE plpgsql SECURITY DEFINER STABLE SET search_path = public AS $$
-DECLARE
-  v_q TEXT := trim(p_query);
-  v_result JSONB := '[]'::JSONB;
-  v_role public.user_role;
-BEGIN
-  IF length(v_q) < 2 THEN
-    RETURN jsonb_build_object('results', '[]'::JSONB);
-  END IF;
-
-  v_role := private.current_user_role();
-
-  IF v_role = 'admin' THEN
-    SELECT jsonb_build_object('results', COALESCE(jsonb_agg(row_to_json(t)), '[]'::JSONB))
-    INTO v_result
-    FROM (
-      SELECT 'product' AS type, id, name AS title, store_id::TEXT AS ref FROM public.products
-        WHERE name ILIKE '%' || v_q || '%' LIMIT p_limit
-      UNION ALL
-      SELECT 'order', id, 'Order ' || LEFT(id::TEXT, 8), store_id::TEXT FROM public.orders
-        WHERE id::TEXT ILIKE '%' || v_q || '%' LIMIT p_limit
-      UNION ALL
-      SELECT 'invoice', id, invoice_number, store_id::TEXT FROM public.invoices
-        WHERE invoice_number ILIKE '%' || v_q || '%' LIMIT p_limit
-      UNION ALL
-      SELECT 'merchant', p.id, COALESCE(mp.business_name, p.full_name, p.email), p.id::TEXT
-      FROM public.profiles p
-      LEFT JOIN public.merchant_profiles mp ON mp.profile_id = p.id
-      WHERE p.role = 'merchant' AND (p.email ILIKE '%' || v_q || '%' OR mp.business_name ILIKE '%' || v_q || '%')
-      LIMIT p_limit
-    ) t;
-  ELSIF v_role = 'merchant' THEN
-    SELECT jsonb_build_object('results', COALESCE(jsonb_agg(row_to_json(t)), '[]'::JSONB))
-    INTO v_result
-    FROM (
-      SELECT 'product' AS type, pr.id, pr.name AS title, pr.store_id::TEXT AS ref
-      FROM public.products pr
-      JOIN public.stores s ON s.id = pr.store_id AND s.owner_id = auth.uid()
-      WHERE pr.name ILIKE '%' || v_q || '%' LIMIT p_limit
-      UNION ALL
-      SELECT 'order', o.id, 'Order ' || LEFT(o.id::TEXT, 8), o.store_id::TEXT
-      FROM public.orders o
-      JOIN public.stores s ON s.id = o.store_id AND s.owner_id = auth.uid()
-      WHERE o.id::TEXT ILIKE '%' || v_q || '%' LIMIT p_limit
-    ) t;
-  ELSE
-    SELECT jsonb_build_object('results', COALESCE(jsonb_agg(row_to_json(t)), '[]'::JSONB))
-    INTO v_result
-    FROM (
-      SELECT 'product' AS type, id, name AS title, store_id::TEXT AS ref FROM public.products
-        WHERE is_active AND name ILIKE '%' || v_q || '%' LIMIT p_limit
-    ) t;
-  END IF;
-
-  RETURN v_result;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.global_search(TEXT, INTEGER) TO authenticated;
+-- Global search RPC is defined in 20260727000020_realtime_search_completion.sql
 
 -- ─── Realtime publication ────────────────────────────────────────────────────
 
-ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.invoices;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.escrows;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.disputes;
+DO $$
+DECLARE
+  t TEXT;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+    RETURN;
+  END IF;
+  FOREACH t IN ARRAY ARRAY['orders', 'notifications', 'invoices', 'escrows', 'disputes'] LOOP
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_publication_tables
+      WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = t
+    ) THEN
+      EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I', t);
+    END IF;
+  END LOOP;
+END $$;
 
 -- ─── RLS ─────────────────────────────────────────────────────────────────────
 
@@ -629,23 +604,31 @@ ALTER TABLE public.pos_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.supported_chains ENABLE ROW LEVEL SECURITY;
 
 -- Escrows
+DROP POLICY IF EXISTS "Customers read own escrows" ON public.escrows;
 CREATE POLICY "Customers read own escrows" ON public.escrows FOR SELECT
   USING (customer_id = auth.uid());
+DROP POLICY IF EXISTS "Merchants read store escrows" ON public.escrows;
 CREATE POLICY "Merchants read store escrows" ON public.escrows FOR SELECT
   USING (EXISTS (SELECT 1 FROM public.stores s WHERE s.id = escrows.store_id AND s.owner_id = auth.uid()));
+DROP POLICY IF EXISTS "Admins manage escrows" ON public.escrows;
 CREATE POLICY "Admins manage escrows" ON public.escrows FOR ALL
   USING (private.current_user_role() = 'admin');
 
 -- Disputes
+DROP POLICY IF EXISTS "Customers manage own disputes" ON public.disputes;
 CREATE POLICY "Customers manage own disputes" ON public.disputes FOR ALL
   USING (customer_id = auth.uid());
+DROP POLICY IF EXISTS "Merchants read store disputes" ON public.disputes;
 CREATE POLICY "Merchants read store disputes" ON public.disputes FOR SELECT
   USING (EXISTS (SELECT 1 FROM public.stores s WHERE s.id = disputes.store_id AND s.owner_id = auth.uid()));
+DROP POLICY IF EXISTS "Merchants update store disputes" ON public.disputes;
 CREATE POLICY "Merchants update store disputes" ON public.disputes FOR UPDATE
   USING (EXISTS (SELECT 1 FROM public.stores s WHERE s.id = disputes.store_id AND s.owner_id = auth.uid()));
+DROP POLICY IF EXISTS "Admins manage disputes" ON public.disputes;
 CREATE POLICY "Admins manage disputes" ON public.disputes FOR ALL
   USING (private.current_user_role() = 'admin');
 
+DROP POLICY IF EXISTS "Dispute participants read messages" ON public.dispute_messages;
 CREATE POLICY "Dispute participants read messages" ON public.dispute_messages FOR SELECT
   USING (EXISTS (
     SELECT 1 FROM public.disputes d WHERE d.id = dispute_messages.dispute_id
@@ -653,9 +636,11 @@ CREATE POLICY "Dispute participants read messages" ON public.dispute_messages FO
       SELECT 1 FROM public.stores s WHERE s.id = d.store_id AND s.owner_id = auth.uid()
     ) OR private.current_user_role() = 'admin')
   ));
+DROP POLICY IF EXISTS "Dispute participants insert messages" ON public.dispute_messages;
 CREATE POLICY "Dispute participants insert messages" ON public.dispute_messages FOR INSERT
   WITH CHECK (sender_id = auth.uid());
 
+DROP POLICY IF EXISTS "Dispute participants read evidence" ON public.dispute_evidence;
 CREATE POLICY "Dispute participants read evidence" ON public.dispute_evidence FOR SELECT
   USING (EXISTS (
     SELECT 1 FROM public.disputes d WHERE d.id = dispute_evidence.dispute_id
@@ -663,34 +648,44 @@ CREATE POLICY "Dispute participants read evidence" ON public.dispute_evidence FO
       SELECT 1 FROM public.stores s WHERE s.id = d.store_id AND s.owner_id = auth.uid()
     ) OR private.current_user_role() = 'admin')
   ));
+DROP POLICY IF EXISTS "Dispute participants upload evidence" ON public.dispute_evidence;
 CREATE POLICY "Dispute participants upload evidence" ON public.dispute_evidence FOR INSERT
   WITH CHECK (uploaded_by = auth.uid());
 
 -- Withdrawals
+DROP POLICY IF EXISTS "Merchants manage own withdrawals" ON public.withdrawal_requests;
 CREATE POLICY "Merchants manage own withdrawals" ON public.withdrawal_requests FOR ALL
   USING (merchant_id = auth.uid());
+DROP POLICY IF EXISTS "Admins manage withdrawals" ON public.withdrawal_requests;
 CREATE POLICY "Admins manage withdrawals" ON public.withdrawal_requests FOR ALL
   USING (private.current_user_role() = 'admin');
 
 -- Coupons
+DROP POLICY IF EXISTS "Public read active coupons" ON public.coupons;
 CREATE POLICY "Public read active coupons" ON public.coupons FOR SELECT
   USING (is_active AND (expires_at IS NULL OR expires_at > NOW()));
+DROP POLICY IF EXISTS "Merchants manage store coupons" ON public.coupons;
 CREATE POLICY "Merchants manage store coupons" ON public.coupons FOR ALL
   USING (store_id IS NOT NULL AND EXISTS (
     SELECT 1 FROM public.stores s WHERE s.id = coupons.store_id AND s.owner_id = auth.uid()
   ));
+DROP POLICY IF EXISTS "Admins manage platform coupons" ON public.coupons;
 CREATE POLICY "Admins manage platform coupons" ON public.coupons FOR ALL
   USING (private.current_user_role() = 'admin');
 
+DROP POLICY IF EXISTS "Users read own redemptions" ON public.coupon_redemptions;
 CREATE POLICY "Users read own redemptions" ON public.coupon_redemptions FOR SELECT
   USING (customer_id = auth.uid());
 
 -- Webhooks
+DROP POLICY IF EXISTS "Merchants manage store webhooks" ON public.merchant_webhooks;
 CREATE POLICY "Merchants manage store webhooks" ON public.merchant_webhooks FOR ALL
   USING (EXISTS (SELECT 1 FROM public.stores s WHERE s.id = merchant_webhooks.store_id AND s.owner_id = auth.uid()));
+DROP POLICY IF EXISTS "Admins read webhooks" ON public.merchant_webhooks;
 CREATE POLICY "Admins read webhooks" ON public.merchant_webhooks FOR SELECT
   USING (private.current_user_role() = 'admin');
 
+DROP POLICY IF EXISTS "Merchants read webhook deliveries" ON public.webhook_deliveries;
 CREATE POLICY "Merchants read webhook deliveries" ON public.webhook_deliveries FOR SELECT
   USING (EXISTS (
     SELECT 1 FROM public.merchant_webhooks w
@@ -699,24 +694,32 @@ CREATE POLICY "Merchants read webhook deliveries" ON public.webhook_deliveries F
   ));
 
 -- Settlement reports
+DROP POLICY IF EXISTS "Merchants read own reports" ON public.settlement_reports;
 CREATE POLICY "Merchants read own reports" ON public.settlement_reports FOR SELECT
   USING (store_id IS NULL OR EXISTS (
     SELECT 1 FROM public.stores s WHERE s.id = settlement_reports.store_id AND s.owner_id = auth.uid()
   ));
+DROP POLICY IF EXISTS "Admins manage reports" ON public.settlement_reports;
 CREATE POLICY "Admins manage reports" ON public.settlement_reports FOR ALL
   USING (private.current_user_role() = 'admin');
 
 -- Notification preferences
+DROP POLICY IF EXISTS "Users manage own preferences" ON public.notification_preferences;
 CREATE POLICY "Users manage own preferences" ON public.notification_preferences FOR ALL
   USING (user_id = auth.uid());
 
 -- Future modules (admin only until activated)
+DROP POLICY IF EXISTS "Admins manage loyalty" ON public.loyalty_programs;
 CREATE POLICY "Admins manage loyalty" ON public.loyalty_programs FOR ALL USING (private.current_user_role() = 'admin');
+DROP POLICY IF EXISTS "Users read own loyalty" ON public.loyalty_accounts;
 CREATE POLICY "Users read own loyalty" ON public.loyalty_accounts FOR SELECT USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "Admins manage pos" ON public.pos_devices;
 CREATE POLICY "Admins manage pos" ON public.pos_devices FOR ALL
   USING (EXISTS (SELECT 1 FROM public.stores s WHERE s.id = pos_devices.store_id AND (s.owner_id = auth.uid() OR private.current_user_role() = 'admin')));
 
+DROP POLICY IF EXISTS "Public read active chains" ON public.supported_chains;
 CREATE POLICY "Public read active chains" ON public.supported_chains FOR SELECT USING (is_active OR private.current_user_role() = 'admin');
+DROP POLICY IF EXISTS "Admins manage chains" ON public.supported_chains;
 CREATE POLICY "Admins manage chains" ON public.supported_chains FOR ALL USING (private.current_user_role() = 'admin');
 
 GRANT EXECUTE ON FUNCTION public.create_escrow_hold(UUID, UUID, UUID, NUMERIC, TEXT) TO service_role;

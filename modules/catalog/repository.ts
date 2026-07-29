@@ -1,34 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { getMarketplaceProductRatingMap } from "@/modules/reviews/repository";
 import type {
   Product,
-  ProductWithStore,
   ProductWithDetails,
   ProductCategory,
   ProductImage,
   Inventory,
 } from "@/types";
-import type { ProductSearchInput } from "./validators";
-
-type ProductRowWithImages = ProductWithStore & {
-  images?: Pick<ProductImage, "url" | "is_primary" | "sort_order">[];
-};
-
-function resolveProductImageUrl(
-  product: Product,
-  images?: Pick<ProductImage, "url" | "is_primary" | "sort_order">[]
-): string | null {
-  if (!images?.length) return product.image_url;
-  const primary = images.find((image) => image.is_primary);
-  return primary?.url ?? images[0]?.url ?? product.image_url;
-}
-
-function mapMarketplaceProducts(rows: ProductRowWithImages[]): ProductWithStore[] {
-  return rows.map(({ images, ...product }) => ({
-    ...product,
-    image_url: resolveProductImageUrl(product, images),
-  }));
-}
 
 export async function getMerchantProducts(storeId: string): Promise<Product[]> {
   const supabase = await createClient();
@@ -52,176 +29,6 @@ export async function getProductById(productId: string): Promise<Product | null>
 
   if (error) return null;
   return data as Product;
-}
-
-export async function searchMarketplaceProducts(
-  input: ProductSearchInput
-): Promise<{ products: ProductWithStore[]; total: number }> {
-  const supabase = await createClient();
-  const offset = (input.page - 1) * input.limit;
-
-  let query = supabase
-    .from("products")
-    .select(
-      "*, store:stores!inner(id, name, slug, logo_url, status, mode), images:product_images(url, is_primary, sort_order)",
-      { count: "exact" }
-    )
-    .eq("is_active", true)
-    .eq("store.status", "active")
-    .eq("store.mode", "marketplace");
-
-  if (input.storeSlug) {
-    query = query.eq("store.slug", input.storeSlug);
-  }
-
-  if (input.categorySlug) {
-    const { data: platformCategory } = await supabase
-      .from("marketplace_categories")
-      .select("id")
-      .eq("slug", input.categorySlug)
-      .eq("is_active", true)
-      .maybeSingle();
-
-    if (platformCategory) {
-      query = query.eq("marketplace_category_id", platformCategory.id);
-    } else {
-      const { data: category } = await supabase
-        .from("product_categories")
-        .select("id")
-        .eq("slug", input.categorySlug)
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (!category) {
-        return { products: [], total: 0 };
-      }
-
-      query = query.eq("category_id", category.id);
-    }
-  }
-
-  if (input.onSale) {
-    query = query.eq("is_on_sale", true);
-  }
-
-  if (input.currency) {
-    query = query.eq("currency", input.currency.toUpperCase());
-  }
-
-  if (input.minPrice != null) {
-    query = query.gte("price", input.minPrice);
-  }
-
-  if (input.maxPrice != null) {
-    query = query.lte("price", input.maxPrice);
-  }
-
-  if (input.inStock) {
-    query = query.gt("stock", 0);
-  }
-
-  if (input.merchantSlug) {
-    query = query.eq("store.slug", input.merchantSlug);
-  }
-
-  if (input.q?.trim()) {
-    query = query.textSearch("search_vector", input.q.trim(), {
-      type: "websearch",
-      config: "english",
-    });
-  }
-
-  const needsRating = input.sort === "highest_rated" || input.minRating != null;
-  const ratingMap = needsRating ? await getMarketplaceProductRatingMap() : null;
-
-  if (input.minRating != null && ratingMap) {
-    const qualifyingIds = [...ratingMap.entries()]
-      .filter(([, summary]) => summary.avg >= input.minRating!)
-      .map(([productId]) => productId);
-
-    if (qualifyingIds.length === 0) {
-      return { products: [], total: 0 };
-    }
-
-    query = query.in("id", qualifyingIds);
-  }
-
-  if (input.sort === "highest_rated") {
-    const { data, error, count } = await query.order("created_at", { ascending: false }).range(
-      0,
-      999
-    );
-
-    if (error) return { products: [], total: 0 };
-
-    const products = mapMarketplaceProducts((data ?? []) as ProductRowWithImages[]);
-    products.sort((a, b) => {
-      const left = ratingMap?.get(a.id)?.avg ?? 0;
-      const right = ratingMap?.get(b.id)?.avg ?? 0;
-      return right - left || b.created_at.localeCompare(a.created_at);
-    });
-
-    const total = count ?? products.length;
-    return {
-      products: products.slice(offset, offset + input.limit),
-      total,
-    };
-  }
-
-  switch (input.sort) {
-    case "price_asc":
-      query = query.order("price", { ascending: true });
-      break;
-    case "price_desc":
-      query = query.order("price", { ascending: false });
-      break;
-    case "name":
-      query = query.order("name", { ascending: true });
-      break;
-    case "featured":
-    case "best_selling":
-      query = query.order("created_at", { ascending: false });
-      break;
-    default:
-      query = query.order("created_at", { ascending: false });
-  }
-
-  const { data, error, count } = await query
-    .range(offset, offset + input.limit - 1);
-
-  if (error) return { products: [], total: 0 };
-
-  return {
-    products: mapMarketplaceProducts((data ?? []) as ProductRowWithImages[]),
-    total: count ?? 0,
-  };
-}
-
-export async function getMarketplaceProduct(
-  productId: string
-): Promise<ProductWithStore | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*, store:stores!inner(id, name, slug, logo_url, status, mode)")
-    .eq("id", productId)
-    .eq("is_active", true)
-    .eq("store.status", "active")
-    .eq("store.mode", "marketplace")
-    .single();
-
-  if (error) return null;
-  return data as ProductWithStore;
-}
-
-export async function getMarketplaceProductWithDetails(
-  productId: string
-): Promise<ProductWithDetails | null> {
-  const product = await getMarketplaceProduct(productId);
-  if (!product) return null;
-
-  const images = await getProductImages(productId);
-  return { ...product, images };
 }
 
 export async function getMerchantProductsWithInventory(
@@ -262,37 +69,6 @@ export async function getStoreCategories(storeId: string): Promise<ProductCatego
   return (data ?? []) as ProductCategory[];
 }
 
-export async function getMarketplaceCategories(): Promise<ProductCategory[]> {
-  const supabase = await createClient();
-  const { data: products, error: productsError } = await supabase
-    .from("products")
-    .select("category_id, store:stores!inner(status, mode)")
-    .eq("is_active", true)
-    .eq("store.status", "active")
-    .eq("store.mode", "marketplace")
-    .not("category_id", "is", null);
-
-  if (productsError || !products?.length) return [];
-
-  const categoryIds = [
-    ...new Set(
-      products
-        .map((p) => p.category_id as string | null)
-        .filter((id): id is string => Boolean(id))
-    ),
-  ];
-
-  const { data, error } = await supabase
-    .from("product_categories")
-    .select("*")
-    .in("id", categoryIds)
-    .eq("is_active", true)
-    .order("name");
-
-  if (error) return [];
-  return (data ?? []) as ProductCategory[];
-}
-
 export async function getProductImages(productId: string): Promise<ProductImage[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -315,4 +91,14 @@ export async function getProductInventory(productId: string): Promise<Inventory 
 
   if (error) return null;
   return data as Inventory | null;
+}
+
+export async function getProductWithDetails(
+  productId: string
+): Promise<ProductWithDetails | null> {
+  const product = await getProductById(productId);
+  if (!product) return null;
+
+  const images = await getProductImages(productId);
+  return { ...product, images };
 }

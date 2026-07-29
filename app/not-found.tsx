@@ -19,10 +19,10 @@ export default function NotFound() {
               Return home
             </Button>
           </Link>
-          <Link href="/marketplace/stores">
+          <Link href="/marketplace">
             <Button variant="outline" className="w-full gap-2 sm:w-auto">
               <Search className="h-4 w-4" aria-hidden />
-              Browse marketplace
+              Marketplace
             </Button>
           </Link>
         </div>

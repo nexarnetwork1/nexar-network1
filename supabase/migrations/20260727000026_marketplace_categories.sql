@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS public.marketplace_categories (
 CREATE INDEX IF NOT EXISTS idx_marketplace_categories_sort
   ON public.marketplace_categories (sort_order ASC, name ASC);
 
+DROP TRIGGER IF EXISTS marketplace_categories_updated_at ON public.marketplace_categories;
 CREATE TRIGGER marketplace_categories_updated_at
   BEFORE UPDATE ON public.marketplace_categories
   FOR EACH ROW EXECUTE FUNCTION private.set_updated_at();
@@ -42,10 +43,12 @@ ON CONFLICT (slug) DO NOTHING;
 
 ALTER TABLE public.marketplace_categories ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS marketplace_categories_public_read ON public.marketplace_categories;
 CREATE POLICY marketplace_categories_public_read
   ON public.marketplace_categories FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS marketplace_categories_admin_manage ON public.marketplace_categories;
 CREATE POLICY marketplace_categories_admin_manage
   ON public.marketplace_categories FOR ALL
   USING (private.current_user_role() = 'admin')

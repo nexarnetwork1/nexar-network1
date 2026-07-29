@@ -6,8 +6,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { Web3Provider } from "@/components/providers/Web3Provider";
-import { WishlistProvider } from "@/components/marketplace/WishlistProvider";
-import { CartProvider } from "@/components/marketplace/CartProvider";
 import { QueryProvider } from "@/providers/query-provider";
 import { AdminAccessPrompt } from "@/components/layout/AdminAccessPrompt";
 
@@ -59,9 +57,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         <Suspense fallback={null}>
           <AdminAccessPrompt />
         </Suspense>
-        <WishlistProvider>
-          <CartProvider>{children}</CartProvider>
-        </WishlistProvider>
+        {children}
       </Web3Provider>
     </QueryProvider>
   );

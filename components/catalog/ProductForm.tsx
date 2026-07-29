@@ -18,7 +18,6 @@ type ProductFormProps = {
   action: (formData: FormData) => Promise<{ success: boolean; error?: string; redirectTo?: string }>;
   product?: Product;
   categories?: ProductCategory[];
-  platformCategories?: Array<{ id: string; name: string }>;
   submitLabel?: string;
 };
 
@@ -26,7 +25,6 @@ export function ProductForm({
   action,
   product,
   categories = [],
-  platformCategories = [],
   submitLabel = "Save product",
 }: ProductFormProps) {
   const router = useRouter();
@@ -49,7 +47,6 @@ export function ProductForm({
       stock: product?.stock ?? 0,
       isActive: product?.is_active ?? true,
       categoryId: product?.category_id ?? "",
-      marketplaceCategoryId: product?.marketplace_category_id ?? "",
     },
   });
 
@@ -127,20 +124,6 @@ export function ProductForm({
             ...categories.map((c) => ({ value: c.id, label: c.name })),
           ]}
           error={errors.categoryId?.message}
-        />
-      )}
-      {platformCategories.length > 0 && (
-        <Select
-          {...register("marketplaceCategoryId")}
-          label="Marketplace category"
-          options={[
-            { value: "", label: "No marketplace category" },
-            ...platformCategories.map((category) => ({
-              value: category.id,
-              label: category.name,
-            })),
-          ]}
-          error={errors.marketplaceCategoryId?.message}
         />
       )}
       <div className="flex items-center gap-3">

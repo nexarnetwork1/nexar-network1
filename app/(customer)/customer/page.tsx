@@ -2,13 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { createClient } from "@/lib/supabase/server";
-import { getWishlistItems } from "@/modules/wishlist/repository";
 import { getUnreadNotificationCount } from "@/modules/notifications/repository";
 
 const ACCOUNT_LINKS = [
   { href: "/customer/orders", label: "Orders", description: "Track purchases and delivery" },
   { href: "/customer/invoices", label: "Invoices", description: "View and pay invoices" },
-  { href: "/customer/wishlist", label: "Wishlist", description: "Saved products" },
   { href: "/customer/addresses", label: "Addresses", description: "Shipping and billing addresses" },
   { href: "/customer/payment-methods", label: "Saved Payment Methods", description: "Crypto and card options" },
   { href: "/customer/wallet", label: "Wallets", description: "Balance and transactions" },
@@ -27,7 +25,6 @@ export default async function CustomerDashboardPage() {
     { count: pendingOrders },
     { count: pendingInvoices },
     { data: wallet },
-    wishlist,
     unreadNotifications,
   ] = await Promise.all([
     supabase
@@ -45,7 +42,6 @@ export default async function CustomerDashboardPage() {
       .select("total_spent_usd, total_orders")
       .eq("profile_id", profile.id)
       .maybeSingle(),
-    getWishlistItems(profile.id),
     getUnreadNotificationCount(profile.id),
   ]);
 
@@ -54,12 +50,11 @@ export default async function CustomerDashboardPage() {
       <h1 className="font-heading text-3xl font-semibold">
         Welcome, {profile.full_name ?? "Customer"}
       </h1>
-      <p className="mt-2 text-muted">Your marketplace account at a glance</p>
+      <p className="mt-2 text-muted">Your account at a glance</p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Pending orders" value={pendingOrders ?? 0} accent="gold" />
         <StatCard label="Unpaid invoices" value={pendingInvoices ?? 0} accent="amber" />
-        <StatCard label="Wishlist items" value={wishlist.length} />
         <StatCard label="Unread notifications" value={unreadNotifications} />
         <StatCard label="Total orders" value={wallet?.total_orders ?? 0} />
         <StatCard
@@ -82,15 +77,6 @@ export default async function CustomerDashboardPage() {
           </li>
         ))}
       </ul>
-
-      <div className="mt-8">
-        <Link
-          href="/marketplace/browse"
-          className="inline-flex rounded-xl bg-gold px-6 py-2.5 text-sm font-semibold text-background hover:bg-gold-secondary"
-        >
-          Browse marketplace
-        </Link>
-      </div>
     </div>
   );
 }

@@ -454,4 +454,13 @@ $$;
 GRANT EXECUTE ON FUNCTION public.calculate_platform_fee(NUMERIC, TEXT, UUID) TO authenticated, service_role;
 
 -- Realtime for payment status updates in popup
-ALTER PUBLICATION supabase_realtime ADD TABLE public.payment_sessions;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
+     AND NOT EXISTS (
+       SELECT 1 FROM pg_publication_tables
+       WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'payment_sessions'
+     ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.payment_sessions;
+  END IF;
+END $$;

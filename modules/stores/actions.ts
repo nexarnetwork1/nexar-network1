@@ -150,7 +150,7 @@ export async function updateStoreMarketplaceProfileAction(
   if (error) return { success: false, error: error.message };
 
   revalidatePath("/merchant/store");
-  revalidatePath(`/store/${store.slug}`);
+  revalidatePath("/marketplace");
   return { success: true };
 }
 
@@ -218,9 +218,6 @@ export async function updateStoreAppearanceAction(
   if (error) return { success: false, error: error.message };
 
   revalidatePath("/merchant/store");
-  revalidatePath("/customer/browse");
-  revalidatePath("/marketplace/browse");
-  revalidatePath(`/store/${store.slug}`);
-  revalidatePath("/marketplace/stores");
+  revalidatePath("/marketplace");
   return { success: true };
 }

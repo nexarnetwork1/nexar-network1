@@ -6,7 +6,6 @@
 export { BaseService } from "./base.service";
 export { AuthService } from "./auth.service";
 export { CatalogService } from "./catalog.service";
-export { CartService } from "./cart.service";
 export { OrderService } from "./order.service";
 export { InvoiceService } from "./invoice.service";
 export { PaymentService } from "./payment.service";

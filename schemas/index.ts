@@ -21,17 +21,8 @@ export {
 
 export {
   productSchema,
-  productSearchSchema,
   type ProductInput,
-  type ProductSearchInput,
 } from "@/modules/catalog/validators";
-
-export {
-  addToCartSchema,
-  updateCartItemSchema,
-  type AddToCartInput,
-  type UpdateCartItemInput,
-} from "@/modules/cart/validators";
 
 export {
   initiatePaymentSchema,

@@ -295,7 +295,6 @@ export async function createProductAction(
 
   revalidatePath("/merchant/products");
   revalidatePath("/marketplace");
-  revalidatePath("/marketplace/browse");
   return { success: true, productId: data.id, redirectTo: "/merchant/products" };
 }
 
@@ -377,7 +376,7 @@ export async function updateProductAction(
   revalidatePath("/merchant/products");
   revalidatePath(`/merchant/products/${productId}/edit`);
   revalidatePath("/marketplace");
-  revalidatePath("/marketplace/browse");
+  revalidatePath("/marketplace");
   return { success: true, redirectTo: "/merchant/products" };
 }
 

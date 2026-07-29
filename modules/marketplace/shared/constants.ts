@@ -1,0 +1,21 @@
+/** Route prefixes for the storefront (App Router). */
+export const MARKETPLACE_ROUTES = {
+  root: "/marketplace",
+  shop: "/marketplace/shop",
+  collections: "/marketplace/collections",
+  collection: (slug: string) => `/marketplace/collections/${slug}`,
+  product: (handle: string) => `/marketplace/products/${handle}`,
+  store: (slug: string) => `/marketplace/stores/${slug}`,
+  cart: "/marketplace/cart",
+  wishlist: "/marketplace/wishlist",
+  checkout: "/marketplace/checkout",
+} as const;
+
+/** Versioned HTTP API base path. */
+export const MARKETPLACE_API_V1 = "/api/marketplace/v1" as const;
+
+export const MARKETPLACE_REALTIME = {
+  catalog: "marketplace:catalog",
+  cart: (customerId: string) => `marketplace:cart:${customerId}`,
+  inventory: (productId: string) => `marketplace:inventory:${productId}`,
+} as const;

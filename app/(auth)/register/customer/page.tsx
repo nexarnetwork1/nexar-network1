@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/AuthCard";
-import { MarketplaceAuthButtons } from "@/components/auth/MarketplaceAuthButtons";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useZodForm } from "@/hooks/useZodForm";
@@ -54,7 +54,7 @@ export default function CustomerRegisterPage() {
       title="Customer registration"
       subtitle="Browse, buy, and pay with crypto or card"
     >
-      <MarketplaceAuthButtons intent="customer" />
+      <SocialAuthButtons intent="customer" />
 
       <div className="my-6 flex items-center gap-4">
         <span className="h-px flex-1 bg-border" />
