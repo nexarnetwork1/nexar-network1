@@ -18,9 +18,14 @@ export default async function CustomerWishlistPage() {
       {items.length === 0 ? (
         <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center text-muted">
           <p>Your wishlist is empty.</p>
-          <Link href="/customer/browse" className="mt-4 inline-block text-gold hover:underline">
-            Browse products →
-          </Link>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <Link href="/marketplace/browse" className="text-gold hover:underline">
+              Browse marketplace →
+            </Link>
+            <Link href="/customer/browse" className="text-gold hover:underline">
+              Browse products →
+            </Link>
+          </div>
         </div>
       ) : (
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -23,8 +23,10 @@ function mapProducts(rows: ProductRowWithImages[]): ProductWithStore[] {
   });
 }
 
-async function baseProductQuery(limit: number) {
-  const supabase = await createClient();
+function buildBaseProductQuery(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  limit: number
+) {
   return supabase
     .from("products")
     .select(
@@ -64,7 +66,7 @@ export async function getFeaturedMarketplaceProducts(limit = 8): Promise<Product
     })
     .map((row) => row.store_id as string);
 
-  let query = await baseProductQuery(limit);
+  let query = buildBaseProductQuery(supabase, limit);
 
   if (featuredStoreIds.length > 0) {
     query = query.in("store_id", featuredStoreIds);
@@ -78,7 +80,8 @@ export async function getFeaturedMarketplaceProducts(limit = 8): Promise<Product
 }
 
 export async function getNewMarketplaceProducts(limit = 8): Promise<ProductWithStore[]> {
-  const { data, error } = await (await baseProductQuery(limit)).order("created_at", {
+  const supabase = await createClient();
+  const { data, error } = await buildBaseProductQuery(supabase, limit).order("created_at", {
     ascending: false,
   });
   if (error) return [];

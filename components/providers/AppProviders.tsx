@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { Web3Provider } from "@/components/providers/Web3Provider";
+import { WishlistProvider } from "@/components/marketplace/WishlistProvider";
 import { QueryProvider } from "@/providers/query-provider";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -52,7 +53,9 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   return (
     <QueryProvider>
-      <Web3Provider>{children}</Web3Provider>
+      <Web3Provider>
+        <WishlistProvider>{children}</WishlistProvider>
+      </Web3Provider>
     </QueryProvider>
   );
 }

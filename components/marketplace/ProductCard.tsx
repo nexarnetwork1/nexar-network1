@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Heart, Share2 } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ProductWithStore } from "@/types";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { Button } from "@/components/ui/Button";
-import { useWishlist } from "@/hooks/useWishlist";
+import { WishlistButton } from "@/components/marketplace/WishlistButton";
 
 type ProductCardProps = {
   product: ProductWithStore;
@@ -21,7 +21,6 @@ export function ProductCard({
   showNewBadge,
   productBasePath = "/customer/browse",
 }: ProductCardProps) {
-  const { toggle, has } = useWishlist();
   const [now] = useState(() => Date.now());
   const isNew =
     showNewBadge ??
@@ -114,16 +113,7 @@ export function ProductCard({
         </div>
 
         <div className="mt-3 flex items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => toggle(product.id)}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg border border-border transition ${
-              has(product.id) ? "border-red-400/50 text-red-400" : "text-muted hover:text-white"
-            }`}
-            aria-label="Wishlist"
-          >
-            <Heart className={`h-4 w-4 ${has(product.id) ? "fill-current" : ""}`} />
-          </button>
+          <WishlistButton productId={product.id} />
           <button
             type="button"
             onClick={shareProduct}
