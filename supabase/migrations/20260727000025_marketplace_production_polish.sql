@@ -158,6 +158,17 @@ LEFT JOIN (
 ) replied ON replied.store_id = s.id;
 
 -- ─── RLS ─────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION private.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT private.current_user_role() = 'admin';
+$$;
+
 ALTER TABLE public.product_reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.store_reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.wishlist_items ENABLE ROW LEVEL SECURITY;

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
 import {
   getCurrencyAsset,
@@ -24,20 +23,24 @@ export function CurrencyLogo({
   const isNxr = upper === "NXR";
 
   return (
-    <span className={cn("inline-flex items-center gap-1.5", className)}>
-      <Image
+    <span className={cn("inline-flex min-w-0 items-center gap-1.5", className)}>
+      {/* Native img avoids Android MIME/extension mismatches with nosniff + next/image SVG handling */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={src}
         alt={meta.label}
         width={size}
         height={size}
+        loading="lazy"
+        decoding="async"
         className={cn(
-          "shrink-0 object-contain",
+          "h-auto w-auto max-h-full max-w-full shrink-0 object-contain",
           isNxr ? "rounded-full" : "rounded-sm"
         )}
-        unoptimized={!isNxr}
+        style={{ width: size, height: size }}
       />
       {showLabel && (
-        <span className="text-sm font-medium">{meta.symbol}</span>
+        <span className="truncate text-sm font-medium">{meta.symbol}</span>
       )}
     </span>
   );

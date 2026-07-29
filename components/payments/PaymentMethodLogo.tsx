@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
 import {
   getPaymentMethodAsset,
@@ -40,19 +39,23 @@ export function PaymentMethodLogo({
   const src = getPaymentMethodAsset(method);
   const label = getPaymentMethodLabel(method);
   const isWide = ["visa", "mastercard", "apple_pay", "google_pay", "card"].includes(code);
+  const width = isWide ? Math.round(size * 1.6) : size;
 
   return (
-    <span className={cn("inline-flex items-center gap-1.5", className)}>
-      <Image
+    <span className={cn("inline-flex min-w-0 items-center gap-1.5", className)}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={src}
         alt={label}
-        width={isWide ? Math.round(size * 1.6) : size}
+        width={width}
         height={size}
-        className="shrink-0 object-contain"
-        unoptimized
+        loading="lazy"
+        decoding="async"
+        className="h-auto w-auto max-h-full max-w-full shrink-0 object-contain"
+        style={{ width, height: size }}
       />
       {showLabel && (
-        <span className="text-xs font-medium">{label}</span>
+        <span className="truncate text-xs font-medium">{label}</span>
       )}
     </span>
   );

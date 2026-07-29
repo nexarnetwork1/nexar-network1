@@ -32,16 +32,16 @@ export type CheckoutPaymentMethod = "NXR" | "BNB" | "USDT" | "BTC" | "ETH" | "ca
 
 export const CURRENCY_ASSETS: Record<string, string> = {
   NXR: "/logo.png",
-  BNB: "/payments/bnb.svg",
-  USDT: "/payments/usdt.svg",
-  USDC: "/payments/usdc.svg",
+  BNB: "/payments/bnb.png",
+  USDT: "/payments/usdt.png",
+  USDC: "/payments/usdc.png",
   BTC: "/payments/btc.svg",
   ETH: "/payments/eth.svg",
-  SOL: "/payments/sol.svg",
-  XRP: "/payments/xrp.svg",
-  USD: "/payments/usd.svg",
-  EUR: "/payments/eur.svg",
-  EGP: "/payments/eur.svg",
+  SOL: "/payments/sol.png",
+  XRP: "/payments/xrp.png",
+  USD: "/payments/usd.png",
+  EUR: "/payments/eur.png",
+  EGP: "/payments/eur.png",
 };
 
 export const PAYMENT_METHOD_ASSETS: Record<PaymentMethodCode, string | null> = {
@@ -53,7 +53,7 @@ export const PAYMENT_METHOD_ASSETS: Record<PaymentMethodCode, string | null> = {
   visa: "/payments/visa.svg",
   mastercard: "/payments/mastercard.svg",
   apple_pay: "/payments/apple-pay.svg",
-  google_pay: "/payments/google-pay.svg",
+  google_pay: "/payments/google-pay.jpg",
   card: "/payments/visa.svg",
   crypto: CURRENCY_ASSETS.BNB,
   crypto_other: CURRENCY_ASSETS.BTC,

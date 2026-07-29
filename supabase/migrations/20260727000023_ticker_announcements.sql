@@ -35,3 +35,9 @@ CREATE POLICY "Public read active ticker announcements"
     AND (starts_at IS NULL OR starts_at <= NOW())
     AND (ends_at IS NULL OR ends_at >= NOW())
   );
+
+CREATE POLICY "Admins manage ticker announcements"
+  ON public.ticker_announcements
+  FOR ALL
+  USING (private.current_user_role() = 'admin')
+  WITH CHECK (private.current_user_role() = 'admin');

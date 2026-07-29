@@ -322,13 +322,13 @@ BEGIN
     WHERE id = v_settlement.id;
 
     PERFORM private.record_wallet_transaction(
-      v_treasury_id, 'refund', -v_settlement.platform_fee, v_order.currency,
+      v_treasury_id, 'refund', ABS(v_settlement.platform_fee), v_order.currency,
       'settlement', v_settlement.id, NULL,
       jsonb_build_object('order_id', p_order_id, 'reason', p_reason, 'direction', 'fee_reversal')
     );
 
     PERFORM private.record_wallet_transaction(
-      v_merchant_wallet, 'refund', -v_settlement.merchant_amount, v_order.currency,
+      v_merchant_wallet, 'refund', ABS(v_settlement.merchant_amount), v_order.currency,
       'settlement', v_settlement.id, NULL,
       jsonb_build_object('order_id', p_order_id, 'reason', p_reason, 'direction', 'payout_reversal')
     );

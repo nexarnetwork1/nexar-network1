@@ -1,0 +1,70 @@
+NotFound: FileSystem.readFile (/home/mahmoud/.supabase/profile)
+Using access token for profile: supabase
+Supabase CLI 2.110.0
+Using profile: supabase (supabase.co)
+Using access token for profile: supabase
+Initialising login role...
+2026/07/29 01:34:03 HTTP POST: https://api.supabase.com/v1/projects/zwzigpxricdlhqqiiqfr/cli/login-role
+Connecting to remote database...
+[?25l[90m│[39m
+[36m◆[39m  Do you want to push these migrations to the remote database?
+[90m│[39m   • [1m20260727000007_database_architecture.sql[22m
+[90m│[39m   • [1m20260727000008_store_settings_trigger.sql[22m
+[90m│[39m   • [1m20260727000009_auth_payments_extension.sql[22m
+[90m│[39m   • [1m20260727000010_qr_payload_backfill.sql[22m
+[90m│[39m   • [1m20260727000011_cancel_pending_order.sql[22m
+[90m│[39m   • [1m20260727000012_merchant_cancel_pending_order.sql[22m
+[90m│[39m   • [1m20260727000013_product_compare_at_price.sql[22m
+[90m│[39m   • [1m20260727000014_auth_sessions_policy.sql[22m
+[90m│[39m   • [1m20260727000015_cancel_session_status.sql[22m
+[90m│[39m   • [1m20260727000016_database_completion.sql[22m
+[90m│[39m   • [1m20260727000017_production_performance.sql[22m
+[90m│[39m   • [1m20260727000018_platform_extensions.sql[22m
+[90m│[39m   • [1m20260727000019_escrow_payment_integration.sql[22m
+[90m│[39m   • [1m20260727000020_realtime_search_completion.sql[22m
+[90m│[39m   • [1m20260727000021_production_platform_settings.sql[22m
+[90m│[39m   • [1m20260727000022_marketplace_profile.sql[22m
+[90m│[39m   • [1m20260727000023_ticker_announcements.sql[22m
+[90m│[39m   • [1m20260727000024_product_specifications.sql[22m
+[90m│[39m   • [1m20260727000025_marketplace_production_polish.sql[22m
+[90m│[39m  
+[36m│[39m  [32m●[39m Yes [2m/[22m [2m○[22m [2mNo[22m
+[36m└[39m
+[999D[24A[J[90m│[39m   • [1m20260727000008_store_settings_trigger.sql[22m
+[90m│[39m   • [1m20260727000009_auth_payments_extension.sql[22m
+[90m│[39m   • [1m20260727000010_qr_payload_backfill.sql[22m
+[90m│[39m   • [1m20260727000011_cancel_pending_order.sql[22m
+[90m│[39m   • [1m20260727000012_merchant_cancel_pending_order.sql[22m
+[90m│[39m   • [1m20260727000013_product_compare_at_price.sql[22m
+[90m│[39m   • [1m20260727000014_auth_sessions_policy.sql[22m
+[90m│[39m   • [1m20260727000015_cancel_session_status.sql[22m
+[90m│[39m   • [1m20260727000016_database_completion.sql[22m
+[90m│[39m   • [1m20260727000017_production_performance.sql[22m
+[90m│[39m   • [1m20260727000018_platform_extensions.sql[22m
+[90m│[39m   • [1m20260727000019_escrow_payment_integration.sql[22m
+[90m│[39m   • [1m20260727000020_realtime_search_completion.sql[22m
+[90m│[39m   • [1m20260727000021_production_platform_settings.sql[22m
+[90m│[39m   • [1m20260727000022_marketplace_profile.sql[22m
+[90m│[39m   • [1m20260727000023_ticker_announcements.sql[22m
+[90m│[39m   • [1m20260727000024_product_specifications.sql[22m
+[90m│[39m   • [1m20260727000025_marketplace_production_polish.sql[22m
+[90m│[39m  
+[90m│[39m  [2mYes[22m
+[?25hApplying migration 20260727000007_database_architecture.sql...
+[31meffect/sql/SqlError: Failed to execute statement
+At statement: 98
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- QR CODES
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+CREATE TABLE public.qr_codes (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id      UUID NOT NULL REFERENCES public.stores(id) ON DELETE CASCADE,
+  qr_type       public.qr_code_type NOT NULL DEFAULT 'marketplace',
+  secret_token  TEXT NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(32), 'hex'),
+  payload       TEXT NOT NULL,
+  is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+  expires_at    TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)[39m

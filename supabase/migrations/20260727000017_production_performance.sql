@@ -1,11 +1,11 @@
 -- Production performance indexes for high-traffic payment and audit queries
 
-CREATE INDEX IF NOT EXISTS idx_payment_sessions_status_expires
+CREATE INDEX IF NOT EXISTS idx_payment_sessions_status_expires_active
   ON public.payment_sessions (status, expires_at DESC)
-  WHERE status IN ('waiting', 'processing');
+  WHERE status IN ('waiting', 'waiting_confirmation', 'pending');
 
-CREATE INDEX IF NOT EXISTS idx_payment_sessions_tx_hash
-  ON public.payment_sessions (tx_hash)
+CREATE INDEX IF NOT EXISTS idx_payment_attempts_tx_hash
+  ON public.payment_attempts (tx_hash)
   WHERE tx_hash IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_settlements_status_created

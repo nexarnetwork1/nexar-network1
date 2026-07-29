@@ -144,9 +144,14 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   function ensureWallet(): boolean {
     reset();
     if (!isConnected) {
-      void login()
-        .then(() => markWalletSessionActive())
-        .catch(() => undefined);
+      void (async () => {
+        try {
+          await login();
+          markWalletSessionActive();
+        } catch {
+          // Privy surfaces wallet errors in its modal
+        }
+      })();
       return false;
     }
     if (chainId !== bsc.id) {
