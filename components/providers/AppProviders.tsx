@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -56,7 +56,9 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryProvider>
       <Web3Provider>
-        <AdminAccessPrompt />
+        <Suspense fallback={null}>
+          <AdminAccessPrompt />
+        </Suspense>
         <WishlistProvider>
           <CartProvider>{children}</CartProvider>
         </WishlistProvider>
