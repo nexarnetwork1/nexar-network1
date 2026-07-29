@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
 import { CartBadgeClient } from "@/components/cart/CartBadgeClient";
+import { WishlistBadgeClient } from "@/components/marketplace/WishlistBadgeClient";
 import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
 
 type MarketplaceHeroProps = {
@@ -71,6 +72,10 @@ export function MarketplaceHero({ categories }: MarketplaceHeroProps) {
               </Button>
             </Link>
             <CartBadgeClient
+              showIcon
+              className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/40 px-4 py-2.5 text-sm text-muted transition hover:border-gold/30 hover:text-gold"
+            />
+            <WishlistBadgeClient
               showIcon
               className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/40 px-4 py-2.5 text-sm text-muted transition hover:border-gold/30 hover:text-gold"
             />

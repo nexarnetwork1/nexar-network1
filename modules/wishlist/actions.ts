@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, requireRole } from "@/modules/users/repository";
-import { addProductToCustomerCart } from "@/modules/cart/actions";
+import { addProductToCustomerCart, resolveCartProductsAction } from "@/modules/cart/actions";
 import { getWishlistProductIds, trackRecentlyViewed } from "./repository";
 import type { ActionResult } from "@/modules/auth/actions";
 
@@ -13,6 +13,7 @@ const WISHLIST_PATHS = [
   "/customer/cart",
   "/marketplace",
   "/marketplace/browse",
+  "/marketplace/wishlist",
 ];
 
 function revalidateWishlistPaths() {
@@ -109,6 +110,12 @@ export async function moveWishlistToCartAction(productId: string): Promise<Actio
 
   revalidateWishlistPaths();
   return { success: true };
+}
+
+export async function resolveWishlistProductsAction(productIds: string[]) {
+  return resolveCartProductsAction(
+    productIds.map((productId) => ({ productId, quantity: 1 }))
+  );
 }
 
 export async function trackProductViewAction(productId: string): Promise<void> {
