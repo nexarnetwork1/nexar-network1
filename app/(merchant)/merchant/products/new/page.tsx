@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getStoreCategories } from "@/modules/catalog/repository";
+import { getPlatformMarketplaceCategories } from "@/modules/marketplace/home";
 import { createProductAction } from "@/modules/catalog/actions";
 import { ProductForm } from "@/components/catalog/ProductForm";
 
@@ -14,6 +15,8 @@ export default async function NewProductPage() {
   if (!store) redirect("/merchant/products");
 
   const categories = await getStoreCategories(store.id);
+  const platformCategories =
+    store.mode === "marketplace" ? await getPlatformMarketplaceCategories() : [];
 
   return (
     <div>
@@ -28,6 +31,7 @@ export default async function NewProductPage() {
         <ProductForm
           action={createProductAction}
           categories={categories}
+          platformCategories={platformCategories}
           submitLabel="Create product"
         />
       </div>

@@ -252,6 +252,7 @@ export async function createProductAction(
     stock: formData.get("stock"),
     isActive: formData.get("isActive") !== "false",
     categoryId: formData.get("categoryId") || undefined,
+    marketplaceCategoryId: formData.get("marketplaceCategoryId") || undefined,
   });
 
   if (!parsed.success) {
@@ -280,6 +281,7 @@ export async function createProductAction(
       is_active: parsed.data.isActive,
       image_url: imageUrl,
       category_id: parsed.data.categoryId || null,
+      marketplace_category_id: parsed.data.marketplaceCategoryId || null,
       specifications,
     })
     .select("id")
@@ -292,6 +294,8 @@ export async function createProductAction(
   await syncProductCatalogData(supabase, data.id, parsed.data.stock, imageUrl);
 
   revalidatePath("/merchant/products");
+  revalidatePath("/marketplace");
+  revalidatePath("/marketplace/browse");
   return { success: true, productId: data.id, redirectTo: "/merchant/products" };
 }
 
@@ -315,6 +319,7 @@ export async function updateProductAction(
     stock: formData.get("stock"),
     isActive: formData.get("isActive") !== "false",
     categoryId: formData.get("categoryId") || undefined,
+    marketplaceCategoryId: formData.get("marketplaceCategoryId") || undefined,
   });
 
   if (!parsed.success) {
@@ -348,6 +353,8 @@ export async function updateProductAction(
     updatePayload.category_id = null;
   }
 
+  updatePayload.marketplace_category_id = parsed.data.marketplaceCategoryId || null;
+
   if (imageUrl) updatePayload.image_url = imageUrl;
 
   const { error } = await supabase
@@ -369,6 +376,8 @@ export async function updateProductAction(
 
   revalidatePath("/merchant/products");
   revalidatePath(`/merchant/products/${productId}/edit`);
+  revalidatePath("/marketplace");
+  revalidatePath("/marketplace/browse");
   return { success: true, redirectTo: "/merchant/products" };
 }
 

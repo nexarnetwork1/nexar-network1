@@ -242,6 +242,7 @@ export type Product = {
   image_url: string | null;
   stock: number;
   category_id: string | null;
+  marketplace_category_id?: string | null;
   is_active: boolean;
   is_on_sale?: boolean;
   specifications?: ProductSpecifications;

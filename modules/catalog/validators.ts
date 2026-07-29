@@ -13,6 +13,10 @@ export const productSchema = z
     stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
     isActive: z.coerce.boolean().default(true),
     categoryId: z.string().optional(),
+    marketplaceCategoryId: z.preprocess(
+      (val) => (val === "" || val === null || val === undefined ? undefined : val),
+      z.string().uuid().optional()
+    ),
     specifications: z.string().max(5000).optional(),
   })
   .refine((data) => !data.compareAtPrice || data.compareAtPrice > data.price, {
