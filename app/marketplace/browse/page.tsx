@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/marketplace/ProductCard";
 import { Container } from "@/components/ui/Container";
 import { Footer } from "@/components/layout/Footer";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
+import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
 import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 import { buildMarketplaceMetadata } from "@/lib/seo/marketplace";
 
@@ -104,12 +105,12 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
           </div>
 
           <form className="mt-8 grid gap-3 rounded-2xl border border-border bg-card/20 p-4 md:grid-cols-2 lg:grid-cols-4">
-            <input
-              name="q"
-              type="search"
+            <MarketplaceSearch
+              asField
               defaultValue={filters.q ?? ""}
               placeholder="Search products…"
-              className="rounded-xl border border-border bg-surface/80 px-4 py-3 text-sm outline-none focus:border-gold/40 lg:col-span-2"
+              variant="compact"
+              className="lg:col-span-2"
             />
             <select name="sort" defaultValue={filters.sort} className={DROPDOWN_CLASS}>
               <option value="newest">Newest</option>

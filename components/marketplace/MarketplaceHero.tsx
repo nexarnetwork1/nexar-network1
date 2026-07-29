@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Search, ShoppingBag, Store } from "lucide-react";
+import { ShoppingBag, Store } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
 import { CartBadgeClient } from "@/components/cart/CartBadgeClient";
+import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
 
 type MarketplaceHeroProps = {
   categories: Array<{ slug: string; name: string }>;
@@ -43,28 +44,13 @@ export function MarketplaceHero({ categories }: MarketplaceHeroProps) {
             all within the Nexar Network ecosystem.
           </motion.p>
 
-          <motion.form
+          <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            action="/marketplace/browse"
-            method="get"
-            className="mx-auto mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row"
           >
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-              <input
-                name="q"
-                type="search"
-                placeholder="Search products, brands, categories…"
-                className="w-full rounded-2xl border border-border/80 bg-card/70 py-4 pl-11 pr-4 text-sm shadow-lg shadow-black/10 backdrop-blur-xl outline-none transition focus:border-gold/40 focus:ring-2 focus:ring-gold/15"
-                aria-label="Search marketplace products"
-              />
-            </div>
-            <Button type="submit" size="lg" className="shrink-0 px-8">
-              Search
-            </Button>
-          </motion.form>
+            <MarketplaceSearch />
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
