@@ -4,6 +4,7 @@ import {
   getMarketplaceCategories,
 } from "@/modules/catalog/repository";
 import { getFeaturedStores } from "@/modules/marketplace/repository";
+import { getProductRatingSummaries } from "@/modules/reviews/repository";
 import { productSearchSchema } from "@/modules/catalog/validators";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { StoreCard } from "@/components/marketplace/StoreCard";
@@ -21,6 +22,7 @@ type Props = {
     maxPrice?: string;
     stock?: string;
     merchant?: string;
+    rating?: string;
   }>;
 };
 
@@ -37,6 +39,7 @@ export default async function BrowsePage({ searchParams }: Props) {
     maxPrice: rawParams.maxPrice,
     inStock: rawParams.stock,
     merchantSlug: rawParams.merchant,
+    minRating: rawParams.rating,
     limit: 20,
   });
 
@@ -54,6 +57,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         maxPrice: undefined,
         inStock: false,
         merchantSlug: undefined,
+        minRating: undefined,
       };
 
   const [{ products, total }, categories, featuredStores] = await Promise.all([
@@ -61,6 +65,9 @@ export default async function BrowsePage({ searchParams }: Props) {
     getMarketplaceCategories(),
     getFeaturedStores(3),
   ]);
+  const ratingSummaries = await getProductRatingSummaries(
+    products.map((product) => product.id)
+  );
 
   const totalPages = Math.ceil(total / filters.limit);
 
@@ -76,6 +83,7 @@ export default async function BrowsePage({ searchParams }: Props) {
     if (merged.minPrice) params.set("minPrice", String(merged.minPrice));
     if (merged.maxPrice) params.set("maxPrice", String(merged.maxPrice));
     if (merged.inStock) params.set("stock", "true");
+    if (merged.minRating) params.set("rating", String(merged.minRating));
     if (merged.merchantSlug) params.set("merchant", String(merged.merchantSlug));
     const query = params.toString();
     return query ? `/customer/browse?${query}` : "/customer/browse";
@@ -121,6 +129,7 @@ export default async function BrowsePage({ searchParams }: Props) {
           <option value="newest">Newest</option>
           <option value="featured">Featured</option>
           <option value="best_selling">Best Selling</option>
+          <option value="highest_rated">Highest Rated</option>
           <option value="price_asc">Price: low to high</option>
           <option value="price_desc">Price: high to low</option>
           <option value="name">Name</option>
@@ -134,6 +143,12 @@ export default async function BrowsePage({ searchParams }: Props) {
         />
         <input name="minPrice" type="number" step="0.01" placeholder="Min price" defaultValue={filters.minPrice ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm" />
         <input name="maxPrice" type="number" step="0.01" placeholder="Max price" defaultValue={filters.maxPrice ?? ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm" />
+        <select name="rating" defaultValue={filters.minRating ? String(filters.minRating) : ""} className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm">
+          <option value="">Any rating</option>
+          <option value="4">4+ stars</option>
+          <option value="3">3+ stars</option>
+          <option value="2">2+ stars</option>
+        </select>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="stock" defaultChecked={filters.inStock} /> In stock only
         </label>
@@ -167,7 +182,11 @@ export default async function BrowsePage({ searchParams }: Props) {
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              ratingSummary={ratingSummaries.get(product.id)}
+            />
           ))}
         </div>
       )}

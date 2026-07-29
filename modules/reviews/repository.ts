@@ -103,3 +103,53 @@ function normalizeReviewImages<T extends { images: unknown }>(review: T): T {
     images: Array.isArray(review.images) ? (review.images as string[]) : [],
   };
 }
+
+export type ProductRatingSummary = { avg: number; count: number };
+
+function buildProductRatingMap(
+  rows: Array<{ product_id: string; rating: number }>
+): Map<string, ProductRatingSummary> {
+  const buckets = new Map<string, { sum: number; count: number }>();
+
+  for (const row of rows) {
+    const current = buckets.get(row.product_id) ?? { sum: 0, count: 0 };
+    buckets.set(row.product_id, {
+      sum: current.sum + row.rating,
+      count: current.count + 1,
+    });
+  }
+
+  return new Map(
+    [...buckets.entries()].map(([productId, { sum, count }]) => [
+      productId,
+      { avg: Number((sum / count).toFixed(1)), count },
+    ])
+  );
+}
+
+export async function getMarketplaceProductRatingMap(): Promise<
+  Map<string, ProductRatingSummary>
+> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("product_reviews")
+    .select("product_id, rating")
+    .eq("status", "approved");
+
+  return buildProductRatingMap((data ?? []) as Array<{ product_id: string; rating: number }>);
+}
+
+export async function getProductRatingSummaries(
+  productIds: string[]
+): Promise<Map<string, ProductRatingSummary>> {
+  if (productIds.length === 0) return new Map();
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("product_reviews")
+    .select("product_id, rating")
+    .in("product_id", productIds)
+    .eq("status", "approved");
+
+  return buildProductRatingMap((data ?? []) as Array<{ product_id: string; rating: number }>);
+}

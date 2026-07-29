@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getMarketplaceProductRatingMap } from "@/modules/reviews/repository";
 import type {
   Product,
   ProductWithStore,
@@ -128,6 +129,43 @@ export async function searchMarketplaceProducts(
       type: "websearch",
       config: "english",
     });
+  }
+
+  const needsRating = input.sort === "highest_rated" || input.minRating != null;
+  const ratingMap = needsRating ? await getMarketplaceProductRatingMap() : null;
+
+  if (input.minRating != null && ratingMap) {
+    const qualifyingIds = [...ratingMap.entries()]
+      .filter(([, summary]) => summary.avg >= input.minRating!)
+      .map(([productId]) => productId);
+
+    if (qualifyingIds.length === 0) {
+      return { products: [], total: 0 };
+    }
+
+    query = query.in("id", qualifyingIds);
+  }
+
+  if (input.sort === "highest_rated") {
+    const { data, error, count } = await query.order("created_at", { ascending: false }).range(
+      0,
+      999
+    );
+
+    if (error) return { products: [], total: 0 };
+
+    const products = mapMarketplaceProducts((data ?? []) as ProductRowWithImages[]);
+    products.sort((a, b) => {
+      const left = ratingMap?.get(a.id)?.avg ?? 0;
+      const right = ratingMap?.get(b.id)?.avg ?? 0;
+      return right - left || b.created_at.localeCompare(a.created_at);
+    });
+
+    const total = count ?? products.length;
+    return {
+      products: products.slice(offset, offset + input.limit),
+      total,
+    };
   }
 
   switch (input.sort) {

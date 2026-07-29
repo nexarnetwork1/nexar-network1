@@ -15,6 +15,7 @@ type ProductCardProps = {
   showNewBadge?: boolean;
   productBasePath?: string;
   showMoveToCart?: boolean;
+  ratingSummary?: { avg: number; count: number };
 };
 
 export function ProductCard({
@@ -22,6 +23,7 @@ export function ProductCard({
   showNewBadge,
   productBasePath = "/customer/browse",
   showMoveToCart = false,
+  ratingSummary,
 }: ProductCardProps) {
   const [now] = useState(() => Date.now());
   const isNew =
@@ -79,7 +81,14 @@ export function ProductCard({
         </Link>
 
         <div className="mt-2 flex items-center gap-2 text-xs text-amber-400">
-          <span>★ 4.5</span>
+          {ratingSummary && ratingSummary.count > 0 ? (
+            <>
+              <span>★ {ratingSummary.avg}</span>
+              <span className="text-muted">({ratingSummary.count})</span>
+            </>
+          ) : (
+            <span className="text-muted">No reviews yet</span>
+          )}
           <span className="text-muted">·</span>
           <span className="text-muted capitalize">
             {product.stock > 0 ? "In stock" : "Out of stock"}

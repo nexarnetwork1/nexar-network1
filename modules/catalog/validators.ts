@@ -38,8 +38,17 @@ export const productSearchSchema = z.object({
   storeSlug: z.string().max(100).optional(),
   categorySlug: z.string().max(100).optional(),
   sort: z
-    .enum(["newest", "price_asc", "price_desc", "name", "best_selling", "featured"])
+    .enum([
+      "newest",
+      "price_asc",
+      "price_desc",
+      "name",
+      "best_selling",
+      "featured",
+      "highest_rated",
+    ])
     .default("newest"),
+  minRating: z.coerce.number().min(1).max(5).optional(),
   onSale: z.preprocess(
     (val) => val === "true" || val === true,
     z.boolean().default(false)

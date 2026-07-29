@@ -3,6 +3,7 @@ import {
   searchMarketplaceProducts,
 } from "@/modules/catalog/repository";
 import { getPlatformMarketplaceCategories } from "@/modules/marketplace/home";
+import { getProductRatingSummaries } from "@/modules/reviews/repository";
 import { productSearchSchema } from "@/modules/catalog/validators";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { Container } from "@/components/ui/Container";
@@ -29,6 +30,7 @@ type Props = {
     minPrice?: string;
     maxPrice?: string;
     stock?: string;
+    rating?: string;
   }>;
 };
 
@@ -44,6 +46,7 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
     minPrice: rawParams.minPrice,
     maxPrice: rawParams.maxPrice,
     inStock: rawParams.stock,
+    minRating: rawParams.rating,
     limit: 20,
   });
 
@@ -61,12 +64,16 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
         maxPrice: undefined,
         inStock: false,
         merchantSlug: undefined,
+        minRating: undefined,
       };
 
   const [{ products, total }, categories] = await Promise.all([
     searchMarketplaceProducts(filters),
     getPlatformMarketplaceCategories(),
   ]);
+  const ratingSummaries = await getProductRatingSummaries(
+    products.map((product) => product.id)
+  );
 
   const totalPages = Math.ceil(total / filters.limit);
 
@@ -82,6 +89,7 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
     if (merged.minPrice) params.set("minPrice", String(merged.minPrice));
     if (merged.maxPrice) params.set("maxPrice", String(merged.maxPrice));
     if (merged.inStock) params.set("stock", "true");
+    if (merged.minRating) params.set("rating", String(merged.minRating));
     const query = params.toString();
     return query ? `/marketplace/browse?${query}` : "/marketplace/browse";
   }
@@ -116,6 +124,7 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
               <option value="newest">Newest</option>
               <option value="featured">Featured</option>
               <option value="best_selling">Popularity</option>
+              <option value="highest_rated">Highest rated</option>
               <option value="price_asc">Price: low to high</option>
               <option value="price_desc">Price: high to low</option>
               <option value="name">Name</option>
@@ -144,6 +153,16 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
               defaultValue={filters.maxPrice ?? ""}
               className="rounded-xl border border-border bg-surface/80 px-3 py-3 text-sm"
             />
+            <select
+              name="rating"
+              defaultValue={filters.minRating ? String(filters.minRating) : ""}
+              className={DROPDOWN_CLASS}
+            >
+              <option value="">Any rating</option>
+              <option value="4">4+ stars</option>
+              <option value="3">3+ stars</option>
+              <option value="2">2+ stars</option>
+            </select>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" name="stock" defaultChecked={filters.inStock} /> In stock only
             </label>
@@ -195,6 +214,7 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
                   key={product.id}
                   product={product}
                   productBasePath="/marketplace/products"
+                  ratingSummary={ratingSummaries.get(product.id)}
                 />
               ))}
             </div>
