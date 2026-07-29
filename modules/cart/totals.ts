@@ -1,4 +1,9 @@
-import type { CartItemWithProduct } from "@/types";
+import type { ProductWithStore } from "@/types";
+
+export type CartTotalsLine = {
+  quantity: number;
+  product: Pick<ProductWithStore, "price" | "currency">;
+};
 
 export type CartAdjustmentType = "coupon" | "shipping" | "tax";
 
@@ -30,7 +35,7 @@ export type CartTotals = {
 };
 
 export function calculateCartTotals(
-  items: CartItemWithProduct[],
+  items: CartTotalsLine[],
   options: CartTotalsInput = {}
 ): CartTotals {
   const currency = items[0]?.product.currency ?? "USD";

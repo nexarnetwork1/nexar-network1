@@ -1,4 +1,5 @@
-import type { CartItemWithProduct } from "@/types";
+import type { CartItemWithProduct, ProductWithStore } from "@/types";
+import type { CartLine } from "@/modules/cart/validators";
 
 export type CartStoreGroup = {
   storeId: string;
@@ -7,10 +8,19 @@ export type CartStoreGroup = {
   subtotal: number;
 };
 
-export function groupCartItemsByStore(
-  items: CartItemWithProduct[]
-): CartStoreGroup[] {
-  const map = new Map<string, CartStoreGroup>();
+export type GuestCartLine = CartLine & { product: ProductWithStore };
+
+export type GuestCartStoreGroup = {
+  storeId: string;
+  storeName: string;
+  items: GuestCartLine[];
+  subtotal: number;
+};
+
+function buildStoreGroups<T extends { quantity: number; product: ProductWithStore }>(
+  items: T[]
+): Array<{ storeId: string; storeName: string; items: T[]; subtotal: number }> {
+  const map = new Map<string, { storeId: string; storeName: string; items: T[]; subtotal: number }>();
 
   for (const item of items) {
     const storeId = item.product.store_id;
@@ -30,4 +40,12 @@ export function groupCartItemsByStore(
   }
 
   return Array.from(map.values());
+}
+
+export function groupCartItemsByStore(items: CartItemWithProduct[]): CartStoreGroup[] {
+  return buildStoreGroups(items);
+}
+
+export function groupGuestCartLinesByStore(lines: GuestCartLine[]): GuestCartStoreGroup[] {
+  return buildStoreGroups(lines);
 }

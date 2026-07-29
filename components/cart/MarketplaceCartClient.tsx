@@ -3,18 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { resolveCartProductsAction } from "@/modules/cart/actions";
+import { calculateCartTotals } from "@/modules/cart/totals";
 import { useCart } from "@/components/marketplace/CartProvider";
 import { GuestCartItemRow } from "@/components/cart/GuestCartItemRow";
+import { GuestCartOrderSummary } from "@/components/cart/GuestCartOrderSummary";
 import { Button } from "@/components/ui/Button";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
-import type { ProductWithStore } from "@/types";
-import type { CartLine } from "@/modules/cart/validators";
-
-type ResolvedLine = CartLine & { product: ProductWithStore };
+import { groupGuestCartLinesByStore, type GuestCartLine } from "@/utils/cart";
 
 export function MarketplaceCartClient() {
   const { items, ready, updateQuantity, removeItem, clearCart } = useCart();
-  const [resolved, setResolved] = useState<ResolvedLine[]>([]);
+  const [resolved, setResolved] = useState<GuestCartLine[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,16 +36,8 @@ export function MarketplaceCartClient() {
     };
   }, [items, ready]);
 
-  const subtotal = useMemo(
-    () =>
-      resolved.reduce(
-        (total, line) => total + Number(line.product.price) * line.quantity,
-        0
-      ),
-    [resolved]
-  );
-
-  const currency = resolved[0]?.product.currency ?? "USD";
+  const storeGroups = useMemo(() => groupGuestCartLinesByStore(resolved), [resolved]);
+  const totals = useMemo(() => calculateCartTotals(resolved), [resolved]);
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
 
   if (!ready || loading) {
@@ -66,43 +57,39 @@ export function MarketplaceCartClient() {
 
   return (
     <div className="mt-8 grid gap-10 lg:grid-cols-3">
-      <div className="space-y-4 lg:col-span-2">
-        <section className="rounded-2xl border border-border bg-card/20 p-6">
-          {resolved.map((line) => (
-            <GuestCartItemRow
-              key={line.productId}
-              line={line}
-              onQuantityChange={(productId, quantity) => void updateQuantity(productId, quantity)}
-              onRemove={(productId) => void removeItem(productId)}
-            />
-          ))}
-        </section>
+      <div className="space-y-8 lg:col-span-2">
+        {storeGroups.map((group) => (
+          <section
+            key={group.storeId}
+            className="rounded-2xl border border-border bg-card/20 p-6"
+          >
+            <h2 className="font-heading text-lg font-semibold">{group.storeName}</h2>
+            <p className="mt-1 text-sm text-muted">
+              Store subtotal:{" "}
+              <CurrencyAmount amount={group.subtotal} currency={totals.currency} size={16} />
+            </p>
+            <div className="mt-4">
+              {group.items.map((line) => (
+                <GuestCartItemRow
+                  key={line.productId}
+                  line={line}
+                  onQuantityChange={(productId, quantity) => void updateQuantity(productId, quantity)}
+                  onRemove={(productId) => void removeItem(productId)}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
         <Button type="button" variant="ghost" onClick={() => void clearCart()}>
           Clear cart
         </Button>
       </div>
 
-      <aside className="rounded-2xl border border-border bg-card/30 p-6">
-        <h2 className="font-heading text-lg font-semibold">Order summary</h2>
-        <p className="mt-2 text-sm text-muted">
-          {itemCount} item{itemCount === 1 ? "" : "s"}
-        </p>
-        <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4">
-          <span className="text-muted">Subtotal</span>
-          <CurrencyAmount amount={subtotal} currency={currency} size={18} />
-        </div>
-        <p className="mt-4 text-xs text-muted">
-          Sign in to checkout. Shipping, fees, and discounts are calculated at checkout.
-        </p>
-        <Link href={`/login?next=${encodeURIComponent("/customer/cart")}`} className="mt-6 block">
-          <Button className="w-full">Sign in to checkout</Button>
-        </Link>
-        <Link href="/marketplace/browse" className="mt-3 block">
-          <Button variant="secondary" className="w-full">
-            Continue shopping
-          </Button>
-        </Link>
-      </aside>
+      <GuestCartOrderSummary
+        totals={totals}
+        itemCount={itemCount}
+        storeCount={storeGroups.length}
+      />
     </div>
   );
 }
