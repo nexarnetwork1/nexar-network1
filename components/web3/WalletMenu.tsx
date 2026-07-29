@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { usePrivy } from "@privy-io/react-auth";
-import { useAccount, useBalance, useChainId, useReadContracts } from "wagmi";
+import { useAccount, useBalance, useChainId, useDisconnect, useReadContracts } from "wagmi";
 import { bsc } from "wagmi/chains";
 import { formatUnits } from "viem";
 import { motion } from "framer-motion";
@@ -22,6 +22,8 @@ import { ERC20_ABI, PRESALE_ABI } from "@/lib/web3/abi";
 import { cn } from "@/lib/utils/cn";
 import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 import { SuperAdminVerifyButton } from "./SuperAdminVerifyButton";
+import { AddNxrToWalletButton } from "./AddNxrToWalletButton";
+import { clearWalletSession } from "@/lib/web3/wallet-session";
 
 const WALLET_META: Record<string, { label: string; icon: string }> = {
   metamask: { label: "MetaMask", icon: "🦊" },
@@ -41,6 +43,7 @@ function trimBalance(value: string, maxDecimals = 4): string {
 
 export function WalletMenu() {
   const { user, logout } = usePrivy();
+  const { disconnect } = useDisconnect();
   const { address: wagmiAddress, isConnected } = useAccount();
   const chainId = useChainId();
   const [isTreasuryWallet, setIsTreasuryWallet] = useState(false);
@@ -143,7 +146,9 @@ export function WalletMenu() {
   }, [address]);
 
   async function disconnectWallet() {
+    clearWalletSession();
     await fetch("/api/admin/wallet/logout", { method: "POST" }).catch(() => undefined);
+    disconnect();
     await logout();
     setIsSuperAdmin(false);
     window.dispatchEvent(new CustomEvent("nxr:super-admin-updated"));
@@ -238,6 +243,16 @@ export function WalletMenu() {
         </div>
 
         <div className="space-y-0.5 px-2 pb-3">
+          <MenuItem>
+            <div className="px-2 py-1">
+              <AddNxrToWalletButton
+                size="sm"
+                variant="secondary"
+                className="w-full justify-center"
+              />
+            </div>
+          </MenuItem>
+
           <MenuItem>
             <button
               type="button"

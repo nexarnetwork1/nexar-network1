@@ -8,6 +8,7 @@ import { bsc } from "wagmi/chains";
 
 import { config, privyAppId } from "@/lib/web3/config";
 import { TreasuryAdminAutoVerify } from "@/components/web3/TreasuryAdminAutoVerify";
+import { WalletSessionManager } from "@/components/web3/WalletSessionManager";
 
 export function Web3Provider({
   children,
@@ -41,7 +42,8 @@ export function Web3Provider({
           supportedChains: [bsc],
         }}
       >
-        <WagmiProvider config={config}>
+        <WagmiProvider config={config} reconnectOnMount={false}>
+          <WalletSessionManager />
           <TreasuryAdminAutoVerify />
           {children}
         </WagmiProvider>

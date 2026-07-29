@@ -1,6 +1,7 @@
 import { createConfig, http, fallback } from "wagmi";
 import { bsc } from "wagmi/chains";
-import { cookieStorage, createStorage } from "wagmi";
+import { createStorage } from "wagmi";
+import { createSessionStorageAdapter } from "@/lib/web3/session-storage";
 
 export const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "";
 
@@ -11,7 +12,7 @@ export const config = createConfig({
   chains: [bsc],
   ssr: false,
   storage: createStorage({
-    storage: cookieStorage,
+    storage: createSessionStorageAdapter(),
   }),
   transports: {
     [bsc.id]: fallback([

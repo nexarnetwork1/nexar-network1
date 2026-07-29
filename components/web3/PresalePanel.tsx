@@ -29,6 +29,7 @@ import { PresalePanelSkeleton } from "@/components/web3/PresalePanelSkeleton";
 import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 import { cn } from "@/lib/utils/cn";
 import { notifyPresaleRefresh } from "@/lib/web3/presale-refresh";
+import { markWalletSessionActive } from "@/lib/web3/wallet-session";
 
 type PresalePanelProps = {
   compact?: boolean;
@@ -143,7 +144,9 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   function ensureWallet(): boolean {
     reset();
     if (!isConnected) {
-      login();
+      void login()
+        .then(() => markWalletSessionActive())
+        .catch(() => undefined);
       return false;
     }
     if (chainId !== bsc.id) {

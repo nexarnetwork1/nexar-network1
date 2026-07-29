@@ -5,6 +5,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { Button, type ButtonProps } from "@/components/ui/Button";
 import { WalletMenu } from "./WalletMenu";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
+import { markWalletSessionActive } from "@/lib/web3/wallet-session";
 
 type ConnectWalletButtonProps = ButtonProps;
 
@@ -44,6 +45,7 @@ export function ConnectWalletButton({
         setConnecting(true);
         try {
           await login();
+          markWalletSessionActive();
         } catch {
           // Privy surfaces wallet errors in its modal
         } finally {

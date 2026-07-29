@@ -6,6 +6,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
+import { markWalletSessionActive } from "@/lib/web3/wallet-session";
 
 type MarketplaceAuthButtonsProps = {
   redirectTo?: string;
@@ -89,6 +90,7 @@ function WalletAuthButton() {
     setError(null);
     try {
       await login();
+      markWalletSessionActive();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Wallet connection failed");
     } finally {

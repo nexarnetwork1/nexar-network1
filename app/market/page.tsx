@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowLeft, ExternalLink, RefreshCw, Copy, Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SITE, CONTRACTS } from "@/lib/constants/site";
+import { AddNxrToWalletButton } from "@/components/web3/AddNxrToWalletButton";
 
 type CryptoData = {
   id: string;
@@ -286,6 +287,7 @@ export default function MarketPage() {
                     {CONTRACTS.token}
                   </code>
                   <CopyButton text={CONTRACTS.token} label="Copy token address" />
+                  <AddNxrToWalletButton size="sm" variant="outline" className="shrink-0" />
                   <a
                     href={`https://bscscan.com/token/${CONTRACTS.token}`}
                     target="_blank"

@@ -1,0 +1,32 @@
+{
+  "name": "Nexar Network Token List",
+  "logoURI": "https://www.nexarnetwork.org/logo.png",
+  "keywords": ["nexar", "nxr", "bsc", "bep20", "defi", "payments"],
+  "timestamp": "2026-07-28T00:00:00.000Z",
+  "tags": {
+    "stablecoin": {
+      "name": "Stablecoin",
+      "description": "Tokens pegged to a fiat value"
+    },
+    "defi": {
+      "name": "DeFi",
+      "description": "Decentralized finance tokens"
+    }
+  },
+  "tokens": [
+    {
+      "chainId": 56,
+      "address": "0xc37c9eeAB826e5bcB4ed2b798123915Cd596c909",
+      "name": "Nexar Network",
+      "symbol": "NXR",
+      "decimals": 18,
+      "logoURI": "https://www.nexarnetwork.org/logo.png",
+      "tags": ["defi"]
+    }
+  ],
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  }
+}
