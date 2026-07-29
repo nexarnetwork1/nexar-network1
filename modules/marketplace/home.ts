@@ -168,6 +168,47 @@ export async function getTrendingMarketplaceProducts(limit = 8): Promise<Product
   return topIds.map((id) => byId.get(id)).filter(Boolean) as ProductWithStore[];
 }
 
+export async function getMarketplaceProductsByIds(
+  ids: string[]
+): Promise<ProductWithStore[]> {
+  if (ids.length === 0) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      "*, store:stores!inner(id, name, slug, logo_url, status, mode), images:product_images(url, is_primary, sort_order)"
+    )
+    .eq("is_active", true)
+    .eq("store.status", "active")
+    .eq("store.mode", "marketplace")
+    .in("id", ids);
+
+  if (error || !data?.length) return [];
+
+  const byId = new Map(
+    mapProducts(data as ProductRowWithImages[]).map((product) => [product.id, product])
+  );
+  return ids.map((id) => byId.get(id)).filter(Boolean) as ProductWithStore[];
+}
+
+export async function getCustomerRecentlyViewedMarketplaceProducts(
+  customerId: string,
+  limit = 8
+): Promise<ProductWithStore[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("recently_viewed_products")
+    .select("product_id")
+    .eq("customer_id", customerId)
+    .order("viewed_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !data?.length) return [];
+
+  return getMarketplaceProductsByIds(data.map((row) => row.product_id));
+}
+
 export async function getMarketplaceHomeData() {
   const [categories, featured, trending, newest, bestSellers] = await Promise.all([
     getPlatformMarketplaceCategories(),

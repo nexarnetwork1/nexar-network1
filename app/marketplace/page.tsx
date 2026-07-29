@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Footer } from "@/components/layout/Footer";
-import { getMarketplaceHomeData } from "@/modules/marketplace/home";
+import {
+  getCustomerRecentlyViewedMarketplaceProducts,
+  getMarketplaceHomeData,
+} from "@/modules/marketplace/home";
+import { getCurrentProfile } from "@/modules/users/repository";
 import { MarketplaceHero } from "@/components/marketplace/MarketplaceHero";
 import { MarketplaceCategoryGrid } from "@/components/marketplace/MarketplaceCategoryGrid";
 import { MarketplaceProductRail } from "@/components/marketplace/MarketplaceProductRail";
+import { RecentlyViewedProductRail } from "@/components/marketplace/RecentlyViewedProductRail";
 import { buildMarketplaceMetadata } from "@/lib/seo/marketplace";
 
 export const metadata = buildMarketplaceMetadata({
@@ -15,8 +20,14 @@ export const metadata = buildMarketplaceMetadata({
 });
 
 export default async function MarketplaceHomePage() {
-  const { categories, featured, trending, newest, bestSellers } =
-    await getMarketplaceHomeData();
+  const profile = await getCurrentProfile();
+  const [{ categories, featured, trending, newest, bestSellers }, recentlyViewed] =
+    await Promise.all([
+      getMarketplaceHomeData(),
+      profile?.role === "customer"
+        ? getCustomerRecentlyViewedMarketplaceProducts(profile.id, 8)
+        : Promise.resolve([]),
+    ]);
 
   return (
     <>
@@ -24,6 +35,16 @@ export default async function MarketplaceHomePage() {
         <MarketplaceHero categories={categories} />
         <Container as="div" className="pb-16">
           <MarketplaceCategoryGrid categories={categories} />
+
+          {recentlyViewed.length > 0 ? (
+            <MarketplaceProductRail
+              title="Recently Viewed"
+              description="Pick up where you left off with products you opened recently."
+              products={recentlyViewed}
+            />
+          ) : (
+            <RecentlyViewedProductRail />
+          )}
 
           <MarketplaceProductRail
             title="Featured Products"
