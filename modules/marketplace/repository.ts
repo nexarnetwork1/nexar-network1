@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { tryCreateAdminClient } from "@/lib/supabase/admin";
 import type { StoreDirectoryEntry, StoreMarketplaceProfile, StoreSettings } from "@/types";
 
 export type StoreSearchInput = {
@@ -22,6 +22,62 @@ function deriveRating(salesCount: number): number {
   if (salesCount >= 5) return 4.2;
   if (salesCount >= 1) return 4.0;
   return 0;
+}
+
+async function loadStoreDirectoryMetrics(
+  storeIds: string[],
+  ownerIds: string[],
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<{
+  productCounts: Map<string, number>;
+  salesCounts: Map<string, number>;
+  verificationByOwner: Map<string, string>;
+}> {
+  const admin = tryCreateAdminClient();
+
+  if (admin) {
+    const [{ data: products }, { data: orders }, { data: merchants }] = await Promise.all([
+      admin.from("products").select("store_id").eq("is_active", true).in("store_id", storeIds),
+      admin.from("orders").select("store_id").eq("status", "paid").in("store_id", storeIds),
+      admin
+        .from("merchant_profiles")
+        .select("profile_id, verification_status")
+        .in("profile_id", ownerIds),
+    ]);
+
+    const productCounts = new Map<string, number>();
+    for (const product of products ?? []) {
+      productCounts.set(product.store_id, (productCounts.get(product.store_id) ?? 0) + 1);
+    }
+
+    const salesCounts = new Map<string, number>();
+    for (const order of orders ?? []) {
+      salesCounts.set(order.store_id, (salesCounts.get(order.store_id) ?? 0) + 1);
+    }
+
+    const verificationByOwner = new Map(
+      (merchants ?? []).map((merchant) => [merchant.profile_id, merchant.verification_status as string])
+    );
+
+    return { productCounts, salesCounts, verificationByOwner };
+  }
+
+  const [{ data: products }, { data: trustRows }] = await Promise.all([
+    supabase.from("products").select("store_id").eq("is_active", true).in("store_id", storeIds),
+    supabase.from("store_trust_metrics").select("store_id, total_orders").in("store_id", storeIds),
+  ]);
+
+  const productCounts = new Map<string, number>();
+  for (const product of products ?? []) {
+    productCounts.set(product.store_id, (productCounts.get(product.store_id) ?? 0) + 1);
+  }
+
+  const salesCounts = new Map<string, number>();
+  for (const row of trustRows ?? []) {
+    salesCounts.set(row.store_id, Number(row.total_orders ?? 0));
+  }
+
+  return { productCounts, salesCounts, verificationByOwner: new Map() };
 }
 
 export async function searchMarketplaceStores(
@@ -51,26 +107,10 @@ export async function searchMarketplaceStores(
   const storeIds = stores.map((s) => s.id);
   const ownerIds = stores.map((s) => s.owner_id);
 
-  const admin = createAdminClient();
-
-  const [{ data: products }, { data: orders }, { data: merchants }] = await Promise.all([
-    admin.from("products").select("store_id").eq("is_active", true).in("store_id", storeIds),
-    admin.from("orders").select("store_id").eq("status", "paid").in("store_id", storeIds),
-    admin.from("merchant_profiles").select("profile_id, verification_status").in("profile_id", ownerIds),
-  ]);
-
-  const productCounts = new Map<string, number>();
-  for (const p of products ?? []) {
-    productCounts.set(p.store_id, (productCounts.get(p.store_id) ?? 0) + 1);
-  }
-
-  const salesCounts = new Map<string, number>();
-  for (const o of orders ?? []) {
-    salesCounts.set(o.store_id, (salesCounts.get(o.store_id) ?? 0) + 1);
-  }
-
-  const verificationByOwner = new Map(
-    (merchants ?? []).map((m) => [m.profile_id, m.verification_status as string])
+  const { productCounts, salesCounts, verificationByOwner } = await loadStoreDirectoryMetrics(
+    storeIds,
+    ownerIds,
+    supabase
   );
 
   const maxSales = Math.max(...Array.from(salesCounts.values()), 0);
@@ -157,25 +197,53 @@ export async function getStorePublicProfile(slug: string) {
 
   if (!store) return null;
 
-  const admin = createAdminClient();
-  const [{ count: productCount }, { count: salesCount }, { data: merchant }] =
-    await Promise.all([
-      admin
+  const admin = tryCreateAdminClient();
+  let productCount = 0;
+  let salesCount = 0;
+  let verificationStatus: string | null = null;
+  let verificationLevel: string | null = null;
+
+  if (admin) {
+    const [{ count: activeProducts }, { count: paidOrders }, { data: merchant }] =
+      await Promise.all([
+        admin
+          .from("products")
+          .select("id", { count: "exact", head: true })
+          .eq("store_id", store.id)
+          .eq("is_active", true),
+        admin
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("store_id", store.id)
+          .eq("status", "paid"),
+        admin
+          .from("merchant_profiles")
+          .select("verification_status, verification_level")
+          .eq("profile_id", store.owner_id)
+          .maybeSingle(),
+      ]);
+
+    productCount = activeProducts ?? 0;
+    salesCount = paidOrders ?? 0;
+    verificationStatus = merchant?.verification_status ?? null;
+    verificationLevel = merchant?.verification_level ?? null;
+  } else {
+    const [{ count: activeProducts }, { data: trust }] = await Promise.all([
+      supabase
         .from("products")
         .select("id", { count: "exact", head: true })
         .eq("store_id", store.id)
         .eq("is_active", true),
-      admin
-        .from("orders")
-        .select("id", { count: "exact", head: true })
+      supabase
+        .from("store_trust_metrics")
+        .select("total_orders")
         .eq("store_id", store.id)
-        .eq("status", "paid"),
-      admin
-        .from("merchant_profiles")
-        .select("verification_status, verification_level")
-        .eq("profile_id", store.owner_id)
         .maybeSingle(),
     ]);
+
+    productCount = activeProducts ?? 0;
+    salesCount = Number(trust?.total_orders ?? 0);
+  }
 
   const settings = Array.isArray(store.settings) ? store.settings[0] : store.settings;
   const profile = parseProfile(settings?.marketplace_profile);
@@ -184,11 +252,11 @@ export async function getStorePublicProfile(slug: string) {
     store,
     settings: settings as StoreSettings | null,
     profile,
-    productCount: productCount ?? 0,
-    salesCount: salesCount ?? 0,
-    rating: deriveRating(salesCount ?? 0),
-    verificationStatus: merchant?.verification_status ?? null,
-    verificationLevel: merchant?.verification_level ?? null,
+    productCount,
+    salesCount,
+    rating: deriveRating(salesCount),
+    verificationStatus,
+    verificationLevel,
   };
 }
 

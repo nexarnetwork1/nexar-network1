@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSignMessage } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
 
@@ -16,10 +16,16 @@ export function SuperAdminVerifyButton({
   onVerified,
 }: SuperAdminVerifyButtonProps) {
   const router = useRouter();
+  const { isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const [loading, setLoading] = useState(false);
 
   async function verifyAdminAccess() {
+    if (!isConnected) {
+      toast.error("Wallet is still connecting. Try again in a moment.");
+      return;
+    }
+
     setLoading(true);
     try {
       const challengeRes = await fetch("/api/admin/wallet/challenge", {
@@ -66,11 +72,11 @@ export function SuperAdminVerifyButton({
     <button
       type="button"
       onClick={verifyAdminAccess}
-      disabled={loading}
+      disabled={loading || !isConnected}
       className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm text-gold transition hover:bg-gold/10 disabled:opacity-50"
     >
       <ShieldCheck size={18} />
-      {loading ? "Verifying…" : "Verify Super Admin Access"}
+      {loading ? "Verifying…" : isConnected ? "Verify Super Admin Access" : "Connecting wallet…"}
     </button>
   );
 }

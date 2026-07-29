@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { tryCreateAdminClient } from "@/lib/supabase/admin";
 import type { ProductWithStore } from "@/types";
 
 export async function getSimilarProducts(
@@ -64,7 +64,18 @@ export async function getRecommendedProducts(
     }
   }
 
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) {
+    const { data } = await supabase
+      .from("products")
+      .select("*, store:stores(id, name, slug, logo_url)")
+      .eq("is_active", true)
+      .gt("stock", 0)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    return (data ?? []) as ProductWithStore[];
+  }
+
   const { data: topOrderItems } = await admin
     .from("order_items")
     .select("product_id")
@@ -106,7 +117,9 @@ export async function getFrequentlyBoughtTogether(
   productId: string,
   limit = 4
 ): Promise<ProductWithStore[]> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) return [];
+
   const { data: orderItems } = await admin
     .from("order_items")
     .select("order_id")

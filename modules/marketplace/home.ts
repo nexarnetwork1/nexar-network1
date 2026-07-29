@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { tryCreateAdminClient } from "@/lib/supabase/admin";
 import type { ProductWithStore } from "@/types";
 
 export type MarketplaceCategory = {
@@ -89,7 +89,11 @@ export async function getNewMarketplaceProducts(limit = 8): Promise<ProductWithS
 }
 
 export async function getBestSellingMarketplaceProducts(limit = 8): Promise<ProductWithStore[]> {
-  const admin = createAdminClient();
+  const admin = tryCreateAdminClient();
+  if (!admin) {
+    return getNewMarketplaceProducts(limit);
+  }
+
   const { data: orderItems } = await admin
     .from("order_items")
     .select("product_id")

@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
       authenticated: false,
       isTreasuryWallet: isTreasury,
       treasuryConfigured,
+      walletRecognized: walletParam ? isTreasury : undefined,
     });
   }
 

@@ -42,7 +42,7 @@ export function Web3Provider({
           supportedChains: [bsc],
         }}
       >
-        <WagmiProvider config={config} reconnectOnMount={false}>
+        <WagmiProvider config={config} reconnectOnMount>
           <WalletSessionManager />
           <TreasuryAdminAutoVerify />
           {children}

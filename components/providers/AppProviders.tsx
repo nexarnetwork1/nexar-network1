@@ -9,6 +9,7 @@ import { Web3Provider } from "@/components/providers/Web3Provider";
 import { WishlistProvider } from "@/components/marketplace/WishlistProvider";
 import { CartProvider } from "@/components/marketplace/CartProvider";
 import { QueryProvider } from "@/providers/query-provider";
+import { AdminAccessPrompt } from "@/components/layout/AdminAccessPrompt";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -55,6 +56,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryProvider>
       <Web3Provider>
+        <AdminAccessPrompt />
         <WishlistProvider>
           <CartProvider>{children}</CartProvider>
         </WishlistProvider>

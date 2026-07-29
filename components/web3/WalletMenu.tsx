@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAccount, useBalance, useChainId, useDisconnect, useReadContracts } from "wagmi";
@@ -48,6 +48,7 @@ export function WalletMenu() {
   const chainId = useChainId();
   const [isTreasuryWallet, setIsTreasuryWallet] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const treasuryPromptRef = useRef<string | null>(null);
 
   const address = (wagmiAddress ?? user?.wallet?.address ?? "") as `0x${string}` | "";
   const walletType = user?.wallet?.walletClientType ?? "wallet";
@@ -130,8 +131,18 @@ export function WalletMenu() {
     fetch(`/api/admin/wallet/status?wallet=${encodeURIComponent(address)}`)
       .then((res) => res.json())
       .then((data) => {
-        setIsTreasuryWallet(Boolean(data.isTreasuryWallet));
-        setIsSuperAdmin(Boolean(data.authenticated));
+        const treasury = Boolean(data.isTreasuryWallet);
+        const admin = Boolean(data.authenticated);
+        setIsTreasuryWallet(treasury);
+        setIsSuperAdmin(admin);
+
+        if (treasury && !admin && treasuryPromptRef.current !== address) {
+          treasuryPromptRef.current = address;
+          toast.message("Treasury wallet connected", {
+            description: "Open this menu and verify your signature for Super Admin access.",
+            duration: 7000,
+          });
+        }
       })
       .catch(() => {
         setIsTreasuryWallet(false);
@@ -143,6 +154,22 @@ export function WalletMenu() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ walletAddress: address }),
     }).catch(() => undefined);
+  }, [address]);
+
+  useEffect(() => {
+    function handleSuperAdminUpdated() {
+      if (!address) return;
+      fetch(`/api/admin/wallet/status?wallet=${encodeURIComponent(address)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setIsTreasuryWallet(Boolean(data.isTreasuryWallet));
+          setIsSuperAdmin(Boolean(data.authenticated));
+        })
+        .catch(() => undefined);
+    }
+
+    window.addEventListener("nxr:super-admin-updated", handleSuperAdminUpdated);
+    return () => window.removeEventListener("nxr:super-admin-updated", handleSuperAdminUpdated);
   }, [address]);
 
   async function disconnectWallet() {

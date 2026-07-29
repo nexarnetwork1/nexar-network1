@@ -44,8 +44,8 @@ export function ConnectWalletButton({
         if (connecting) return;
         setConnecting(true);
         try {
-          await login();
           markWalletSessionActive();
+          await login();
         } catch {
           // Privy surfaces wallet errors in its modal
         } finally {
