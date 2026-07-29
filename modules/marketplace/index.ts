@@ -15,5 +15,8 @@ export * as wishlist from "./wishlist";
 export * as reviews from "./reviews";
 export * as discovery from "./discovery";
 export * as storefront from "./storefront";
+export * as statistics from "./statistics";
+export * as analytics from "./analytics";
+export * as brands from "./brands";
 export * as moderation from "./moderation";
 export * as realtime from "./realtime";
