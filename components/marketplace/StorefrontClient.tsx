@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BadgeCheck, Heart, Share2, Star, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import type { ProductWithStore, StoreMarketplaceProfile, StoreReview, StoreSettings } from "@/types";
+import type { ProductRatingSummary } from "@/modules/reviews/repository";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { StoreTrustBadges } from "@/components/marketplace/StoreTrustBadges";
 import { StoreReviews } from "@/components/reviews/StoreReviews";
@@ -27,6 +28,7 @@ type StorefrontProps = {
   profile: StoreMarketplaceProfile;
   settings: StoreSettings | null;
   products: ProductWithStore[];
+  productRatings?: Record<string, ProductRatingSummary>;
   productCount: number;
   salesCount: number;
   rating: number;
@@ -48,6 +50,7 @@ export function StorefrontClient({
   profile,
   settings,
   products,
+  productRatings = {},
   productCount,
   salesCount,
   rating,
@@ -202,7 +205,12 @@ export function StorefrontClient({
         {tab === "products" && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                productBasePath="/marketplace/products"
+                ratingSummary={productRatings[product.id]}
+              />
             ))}
             {products.length === 0 && (
               <p className="col-span-full text-center text-muted">No products listed yet.</p>

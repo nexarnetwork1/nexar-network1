@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getWishlistItems } from "@/modules/wishlist/repository";
+import { getProductRatingSummaries } from "@/modules/reviews/repository";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 
 export default async function CustomerWishlistPage() {
@@ -9,6 +10,9 @@ export default async function CustomerWishlistPage() {
   if (!profile) redirect("/login");
 
   const items = await getWishlistItems(profile.id);
+  const ratingSummaries = await getProductRatingSummaries(
+    items.flatMap((item) => (item.product ? [item.product.id] : []))
+  );
 
   return (
     <div>
@@ -32,7 +36,12 @@ export default async function CustomerWishlistPage() {
           {items.map((item) =>
             item.product ? (
               <li key={item.id}>
-                <ProductCard product={item.product} showMoveToCart productBasePath="/marketplace/products" />
+                <ProductCard
+                  product={item.product}
+                  showMoveToCart
+                  productBasePath="/marketplace/products"
+                  ratingSummary={ratingSummaries.get(item.product.id)}
+                />
               </li>
             ) : null
           )}

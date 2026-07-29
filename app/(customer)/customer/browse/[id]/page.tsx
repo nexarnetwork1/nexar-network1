@@ -173,9 +173,9 @@ export default async function ProductDetailPage({ params }: Props) {
         </div>
       )}
 
-      <ProductRecommendations title="Similar Products" products={similar} id="similar-heading" />
-      <ProductRecommendations title="Frequently Bought Together" products={boughtTogether} id="fbt-heading" />
-      <ProductRecommendations title="Recommended for You" products={recommended.filter((p) => p.id !== product.id).slice(0, 4)} id="rec-heading" />
+      <ProductRecommendations title="Similar Products" products={similar} id="similar-heading" productBasePath="/customer/browse" />
+      <ProductRecommendations title="Frequently Bought Together" products={boughtTogether} id="fbt-heading" productBasePath="/customer/browse" />
+      <ProductRecommendations title="Recommended for You" products={recommended.filter((p) => p.id !== product.id).slice(0, 4)} id="rec-heading" productBasePath="/customer/browse" />
     </ProductDetailClient>
   );
 }

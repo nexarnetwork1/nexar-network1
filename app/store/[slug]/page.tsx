@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getStorePublicProfile } from "@/modules/marketplace/repository";
 import { getStoreTrustMetrics } from "@/modules/marketplace/recommendations";
 import { searchMarketplaceProducts } from "@/modules/catalog/repository";
-import { getStoreReviews, getStoreRatingSummary } from "@/modules/reviews/repository";
+import { getStoreReviews, getStoreRatingSummary, getProductRatingSummaries } from "@/modules/reviews/repository";
 import { StorefrontClient } from "@/components/marketplace/StorefrontClient";
 import { buildStoreMetadata, buildStoreJsonLd } from "@/lib/seo/marketplace";
 
@@ -42,6 +42,11 @@ export default async function PublicStorePage({ params }: Props) {
     getStoreTrustMetrics(data.store.id),
   ]);
 
+  const ratingSummaries = await getProductRatingSummaries(
+    products.map((product) => product.id)
+  );
+  const productRatings = Object.fromEntries(ratingSummaries);
+
   const jsonLd = buildStoreJsonLd({
     name: data.store.name,
     description: data.profile.description ?? null,
@@ -60,6 +65,7 @@ export default async function PublicStorePage({ params }: Props) {
         profile={data.profile}
         settings={data.settings}
         products={products}
+        productRatings={productRatings}
         productCount={data.productCount}
         salesCount={data.salesCount}
         rating={ratingSummary.avg || data.rating}
