@@ -9,8 +9,10 @@ import { ProductCard } from "@/components/marketplace/ProductCard";
 import { Container } from "@/components/ui/Container";
 import { Footer } from "@/components/layout/Footer";
 import { MarketplaceArtwork } from "@/components/marketplace/MarketplaceArtwork";
+import { MarketplaceBrowseActiveFilters } from "@/components/marketplace/MarketplaceBrowseActiveFilters";
 import { MarketplaceSearch } from "@/components/marketplace/MarketplaceSearch";
 import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
+import { buildMarketplaceBrowseHref } from "@/modules/marketplace/browse-url";
 import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 import { buildMarketplaceMetadata } from "@/lib/seo/marketplace";
 
@@ -78,22 +80,8 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
 
   const totalPages = Math.ceil(total / filters.limit);
 
-  function browseHref(options?: Record<string, string | number | boolean | undefined>) {
-    const params = new URLSearchParams();
-    const merged = { ...filters, ...options };
-    if (merged.q) params.set("q", String(merged.q));
-    if (merged.page && merged.page > 1) params.set("page", String(merged.page));
-    if (merged.categorySlug) params.set("category", String(merged.categorySlug));
-    if (merged.sort && merged.sort !== "newest") params.set("sort", String(merged.sort));
-    if (merged.onSale) params.set("sale", "true");
-    if (merged.currency) params.set("currency", String(merged.currency));
-    if (merged.minPrice) params.set("minPrice", String(merged.minPrice));
-    if (merged.maxPrice) params.set("maxPrice", String(merged.maxPrice));
-    if (merged.inStock) params.set("stock", "true");
-    if (merged.minRating) params.set("rating", String(merged.minRating));
-    const query = params.toString();
-    return query ? `/marketplace/browse?${query}` : "/marketplace/browse";
-  }
+  const browseHref = (overrides?: Partial<typeof filters>) =>
+    buildMarketplaceBrowseHref("/marketplace/browse", filters, overrides);
 
   return (
     <>
@@ -184,6 +172,8 @@ export default async function MarketplaceBrowsePage({ searchParams }: Props) {
               Apply filters
             </button>
           </form>
+
+          <MarketplaceBrowseActiveFilters filters={filters} categories={categories} />
 
           <div className="mt-6 flex flex-wrap gap-2">
             <Link
