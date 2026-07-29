@@ -4,9 +4,13 @@ import { Button } from "@/components/ui/Button";
 
 type MarketplaceBrowseEmptyStateProps = {
   hasFilters: boolean;
+  basePath?: string;
 };
 
-export function MarketplaceBrowseEmptyState({ hasFilters }: MarketplaceBrowseEmptyStateProps) {
+export function MarketplaceBrowseEmptyState({
+  hasFilters,
+  basePath = "/marketplace/browse",
+}: MarketplaceBrowseEmptyStateProps) {
   if (hasFilters) {
     return (
       <div className="relative mt-12 overflow-hidden rounded-3xl border border-border bg-card/40 p-12 text-center backdrop-blur-md">
@@ -18,7 +22,7 @@ export function MarketplaceBrowseEmptyState({ hasFilters }: MarketplaceBrowseEmp
           Try different keywords, adjust price or rating filters, or clear everything to browse all
           products.
         </p>
-        <Link href="/marketplace/browse" className="mt-6 inline-block">
+        <Link href={basePath} className="mt-6 inline-block">
           <Button variant="secondary">Clear all filters</Button>
         </Link>
       </div>

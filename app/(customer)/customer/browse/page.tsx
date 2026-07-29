@@ -8,7 +8,14 @@ import { getProductRatingSummaries } from "@/modules/reviews/repository";
 import { productSearchSchema } from "@/modules/catalog/validators";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { StoreCard } from "@/components/marketplace/StoreCard";
+import { MarketplaceBrowseActiveFilters } from "@/components/marketplace/MarketplaceBrowseActiveFilters";
+import { MarketplaceBrowseEmptyState } from "@/components/marketplace/MarketplaceBrowseEmptyState";
 import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
+import {
+  buildMarketplaceBrowseHref,
+  getBrowseResultsRange,
+  hasActiveBrowseFilters,
+} from "@/modules/marketplace/browse-url";
 
 type Props = {
   searchParams: Promise<{
@@ -70,24 +77,12 @@ export default async function BrowsePage({ searchParams }: Props) {
   );
 
   const totalPages = Math.ceil(total / filters.limit);
+  const resultsRange = getBrowseResultsRange(filters, total);
+  const hasFilters = hasActiveBrowseFilters(filters);
+  const browseBasePath = "/customer/browse";
 
-  function browseHref(options?: Record<string, string | number | boolean | undefined>) {
-    const params = new URLSearchParams();
-    const merged = { ...filters, ...options };
-    if (merged.q) params.set("q", String(merged.q));
-    if (merged.page && merged.page > 1) params.set("page", String(merged.page));
-    if (merged.categorySlug) params.set("category", String(merged.categorySlug));
-    if (merged.sort && merged.sort !== "newest") params.set("sort", String(merged.sort));
-    if (merged.onSale) params.set("sale", "true");
-    if (merged.currency) params.set("currency", String(merged.currency));
-    if (merged.minPrice) params.set("minPrice", String(merged.minPrice));
-    if (merged.maxPrice) params.set("maxPrice", String(merged.maxPrice));
-    if (merged.inStock) params.set("stock", "true");
-    if (merged.minRating) params.set("rating", String(merged.minRating));
-    if (merged.merchantSlug) params.set("merchant", String(merged.merchantSlug));
-    const query = params.toString();
-    return query ? `/customer/browse?${query}` : "/customer/browse";
-  }
+  const browseHref = (overrides?: Partial<typeof filters>) =>
+    buildMarketplaceBrowseHref(browseBasePath, filters, overrides);
 
   return (
     <div>
@@ -160,6 +155,12 @@ export default async function BrowsePage({ searchParams }: Props) {
         </button>
       </form>
 
+      <MarketplaceBrowseActiveFilters
+        filters={filters}
+        categories={categories}
+        basePath={browseBasePath}
+      />
+
       <div className="mt-6 flex flex-wrap gap-2">
         <Link href={browseHref({ categorySlug: undefined, onSale: false, page: 1 })} className={`rounded-full px-3 py-1 text-xs ${!filters.categorySlug && !filters.onSale ? "bg-gold text-background" : "border border-border text-muted"}`}>
           All
@@ -175,10 +176,17 @@ export default async function BrowsePage({ searchParams }: Props) {
         ))}
       </div>
 
+      {resultsRange && (
+        <p className="mt-6 text-sm text-muted">
+          Showing {resultsRange.start}–{resultsRange.end} of {resultsRange.total} product
+          {resultsRange.total === 1 ? "" : "s"}
+          {resultsRange.totalPages > 1 &&
+            ` · Page ${resultsRange.page} of ${resultsRange.totalPages}`}
+        </p>
+      )}
+
       {products.length === 0 ? (
-        <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center text-muted">
-          No products found.
-        </div>
+        <MarketplaceBrowseEmptyState hasFilters={hasFilters} basePath={browseBasePath} />
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => (

@@ -114,6 +114,14 @@ function getActiveFilters(
     });
   }
 
+  if (filters.merchantSlug) {
+    chips.push({
+      id: "merchant",
+      label: `Store: ${filters.merchantSlug}`,
+      clear: { merchantSlug: undefined },
+    });
+  }
+
   return chips;
 }
 
