@@ -9,6 +9,7 @@ const ACCOUNT_LINKS = [
   { href: "/customer/orders", label: "Orders", description: "Track purchases and delivery" },
   { href: "/customer/invoices", label: "Invoices", description: "View and pay invoices" },
   { href: "/customer/wishlist", label: "Wishlist", description: "Saved products" },
+  { href: "/customer/addresses", label: "Addresses", description: "Shipping and billing addresses" },
   { href: "/customer/payment-methods", label: "Saved Payment Methods", description: "Crypto and card options" },
   { href: "/customer/wallet", label: "Wallets", description: "Balance and transactions" },
   { href: "/customer/purchases", label: "Downloads", description: "Purchase history" },
