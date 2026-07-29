@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Notification, NotificationType } from "@/types";
+import type { Notification, NotificationPreference, NotificationType } from "@/types";
+
+export { resolveNotificationPreference } from "./preferences";
 
 export async function getUserNotifications(
   userId: string,
@@ -61,4 +63,17 @@ export async function createNotification(params: {
     body: params.body,
     metadata: params.metadata ?? {},
   });
+}
+
+export async function getUserNotificationPreferences(
+  userId: string
+): Promise<NotificationPreference[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("notification_preferences")
+    .select("*")
+    .eq("user_id", userId);
+
+  if (error) return [];
+  return (data ?? []) as NotificationPreference[];
 }
