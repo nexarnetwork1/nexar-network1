@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Sora, Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import { Navbar } from "@/components/layout/Navbar";
 import { NewsTicker } from "@/components/layout/NewsTicker";
 import { GlobalBackground } from "@/components/ui/GlobalBackground";
@@ -16,22 +16,25 @@ import {
 } from "@/lib/constants/seo";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+const inter = localFont({
+  src: "./fonts/inter-latin.woff2",
   variable: "--font-inter",
   display: "swap",
+  weight: "100 900",
 });
 
-const sora = Sora({
-  subsets: ["latin"],
+const sora = localFont({
+  src: "./fonts/sora-latin.woff2",
   variable: "--font-sora",
   display: "swap",
+  weight: "100 800",
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
+const spaceGrotesk = localFont({
+  src: "./fonts/space-grotesk-latin.woff2",
   variable: "--font-space-grotesk",
   display: "swap",
+  weight: "300 700",
 });
 
 export const metadata: Metadata = {
