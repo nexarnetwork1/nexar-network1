@@ -143,6 +143,3 @@ export function CommerceAuthTrigger({
     </button>
   );
 }
-
-/** @deprecated Use NexarCommerceAuthProvider */
-export const CommerceAuthProvider = NexarCommerceAuthProvider;

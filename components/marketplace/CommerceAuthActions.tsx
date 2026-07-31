@@ -25,6 +25,3 @@ export function CommerceAuthActions({ isSignedIn }: CommerceAuthActionsProps) {
     </div>
   );
 }
-
-/** @deprecated Use CommerceAuthActions */
-export const MarketplaceAuthActions = CommerceAuthActions;

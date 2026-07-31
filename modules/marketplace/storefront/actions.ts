@@ -76,26 +76,6 @@ export async function submitProductReviewAction(formData: FormData): Promise<Act
   return { success: true };
 }
 
-export async function markReviewHelpfulAction(reviewId: string): Promise<ActionResult> {
-  await requireRole(["customer", "merchant"]);
-  const supabase = await createClient();
-  const { data: review } = await supabase
-    .from("product_reviews")
-    .select("helpful_count")
-    .eq("id", reviewId)
-    .maybeSingle();
-
-  if (!review) return { success: false, error: "Review not found" };
-
-  const { error } = await supabase
-    .from("product_reviews")
-    .update({ helpful_count: (review.helpful_count as number) + 1 })
-    .eq("id", reviewId);
-
-  if (error) return { success: false, error: error.message };
-  return { success: true };
-}
-
 export async function recordProductViewAction(productId: string): Promise<void> {
   const profile = await getCurrentProfile();
   if (!profile) return;

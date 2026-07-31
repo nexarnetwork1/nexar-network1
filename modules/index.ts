@@ -3,9 +3,7 @@
  * Each module owns: types, validators, repository, service, actions.
  */
 
-export * as auth from "./auth";
 export * as users from "./users";
-export * as stores from "./stores";
 export * as catalog from "./catalog";
 export * as orders from "./orders";
 export * as invoices from "./invoices";
@@ -26,4 +24,3 @@ export * as coupons from "./coupons";
 export * as webhooks from "./webhooks";
 export * as settlementReports from "./settlement-reports";
 export * as search from "./search";
-export * as marketplace from "./marketplace";
