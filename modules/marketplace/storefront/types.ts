@@ -2,11 +2,6 @@ import type {
   ProductImage,
   ProductReview,
   ProductWithStore,
-  Store,
-  StoreMarketplaceProfile,
-  StoreReview,
-  StoreSettings,
-  StoreTrustMetrics,
 } from "@/types";
 
 export type StoreBranding = {
@@ -20,16 +15,6 @@ export type StoreBranding = {
   policies: string | null;
   featured: boolean;
   updated_at: string;
-};
-
-export type StorefrontStore = Store & {
-  settings: StoreSettings | null;
-  branding: StoreBranding | null;
-  trust: StoreTrustMetrics | null;
-  is_verified: boolean;
-  follower_count: number;
-  product_count: number;
-  is_following: boolean;
 };
 
 export type ProductVariant = {
@@ -64,15 +49,6 @@ export type StorefrontProductDetail = StorefrontProduct & {
   in_wishlist: boolean;
 };
 
-export type StoreCollection = {
-  id: string;
-  slug: string;
-  name: string;
-  description?: string | null;
-  products: StorefrontProduct[];
-  kind: "category" | "new_arrivals" | "best_sellers" | "flash_deals" | "trending";
-};
-
 export type ShopFilters = {
   query?: string;
   storeSlug?: string;
@@ -96,12 +72,4 @@ export type ShopSearchResult = {
     categories: { id: string; name: string; slug: string; count: number }[];
     brands: { id: string; name: string; slug: string; count: number }[];
   };
-};
-
-export type StorefrontPageData = {
-  store: StorefrontStore;
-  collections: StoreCollection[];
-  featured_products: StorefrontProduct[];
-  store_reviews: StoreReview[];
-  profile: StoreMarketplaceProfile;
 };

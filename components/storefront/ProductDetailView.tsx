@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { Heart, ShieldCheck, Star } from "lucide-react";
-import { useAuthModal } from "@/components/auth/AuthModalProvider";
+import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import { ProductImageGallery } from "@/components/catalog/ProductImageGallery";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
@@ -27,7 +27,7 @@ type Props = {
 };
 
 export function ProductDetailView({ product, isCustomer = false, shareUrl }: Props) {
-  const { openAuthModal } = useAuthModal();
+  const { openCommerceAuth } = useCommerceAuth();
   const productPath = MARKETPLACE_ROUTES.product(product.slug || product.id);
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]?.id ?? null);
   const [inWishlist, setInWishlist] = useState(product.in_wishlist);
@@ -179,7 +179,7 @@ export function ProductDetailView({ product, isCustomer = false, shareUrl }: Pro
               <Button
                 size="lg"
                 onClick={() =>
-                  openAuthModal({ mode: "signin", redirect: productPath })
+                  openCommerceAuth({ mode: "signin", redirect: productPath })
                 }
               >
                 Sign in to purchase
@@ -195,7 +195,7 @@ export function ProductDetailView({ product, isCustomer = false, shareUrl }: Pro
               disabled={pending}
               onClick={() => {
                 if (!isCustomer) {
-                  openAuthModal({ mode: "signin", redirect: productPath });
+                  openCommerceAuth({ mode: "signin", redirect: productPath });
                   return;
                 }
                 startTransition(async () => {

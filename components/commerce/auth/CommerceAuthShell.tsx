@@ -1,26 +1,28 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { parseAuthModalParams } from "@/lib/auth/auth-modal-url";
-import { useAuthModal } from "@/components/auth/AuthModalProvider";
+import { parseCommerceAuthParams } from "@/lib/commerce/commerce-auth-url";
+import {
+  NexarCommerceAuthProvider,
+  useCommerceAuth,
+} from "@/components/commerce/auth/NexarCommerceAuthProvider";
 
-/** Opens the auth modal when ?auth=signin|register is present in the URL. */
-export function AuthModalOpener() {
+function CommerceAuthOpener() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { openAuthModal } = useAuthModal();
+  const { openCommerceAuth } = useCommerceAuth();
   const handledRef = useRef<string | null>(null);
 
   useEffect(() => {
     const key = searchParams.toString();
     if (handledRef.current === key) return;
 
-    const parsed = parseAuthModalParams(searchParams);
+    const parsed = parseCommerceAuthParams(searchParams);
     if (!parsed.open || !parsed.mode) return;
 
     handledRef.current = key;
-    openAuthModal({
+    openCommerceAuth({
       mode: parsed.mode,
       role: parsed.role ?? undefined,
       redirect: parsed.redirect ?? undefined,
@@ -32,7 +34,18 @@ export function AuthModalOpener() {
     url.searchParams.delete("role");
     url.searchParams.delete("message");
     router.replace(url.pathname + url.search + url.hash, { scroll: false });
-  }, [searchParams, openAuthModal, router]);
+  }, [searchParams, openCommerceAuth, router]);
 
   return null;
+}
+
+export function CommerceAuthShell({ children }: { children: React.ReactNode }) {
+  return (
+    <NexarCommerceAuthProvider>
+      <Suspense fallback={null}>
+        <CommerceAuthOpener />
+      </Suspense>
+      {children}
+    </NexarCommerceAuthProvider>
+  );
 }

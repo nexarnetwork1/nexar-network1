@@ -1,9 +1,7 @@
-/** Route prefixes for the storefront (App Router). */
+/** Nexar Commerce unified marketplace routes. */
 export const MARKETPLACE_ROUTES = {
   root: "/marketplace",
   shop: "/marketplace/shop",
-  collections: "/marketplace/collections",
-  collection: (slug: string) => `/marketplace/collections/${slug}`,
   product: (handle: string) => `/marketplace/products/${handle}`,
   store: (slug: string) => `/marketplace/shop?store=${encodeURIComponent(slug)}`,
   cart: "/marketplace/cart",

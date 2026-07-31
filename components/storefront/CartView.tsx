@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
-import { useAuthModal } from "@/components/auth/AuthModalProvider";
+import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import {
   removeCartItemAction,
@@ -19,7 +19,7 @@ type CartViewProps = {
 };
 
 export function CartView({ items: initialItems, isAuthenticated }: CartViewProps) {
-  const { openAuthModal } = useAuthModal();
+  const { openCommerceAuth } = useCommerceAuth();
   const [items, setItems] = useState(initialItems);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -69,7 +69,7 @@ export function CartView({ items: initialItems, isAuthenticated }: CartViewProps
         <p className="mt-2 text-sm text-muted">Your saved items and checkout are available after login.</p>
         <Button
           className="mt-6"
-          onClick={() => openAuthModal({ mode: "signin", redirect: MARKETPLACE_ROUTES.cart })}
+          onClick={() => openCommerceAuth({ mode: "signin", redirect: MARKETPLACE_ROUTES.cart })}
         >
           Sign in
         </Button>

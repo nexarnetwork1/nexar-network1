@@ -8,13 +8,12 @@ type ActionDef = AssistantAction & {
 
 /** Contextual navigation and prompt actions catalog. */
 export const NAVIGATION_ACTIONS: ActionDef[] = [
-  { label: "Open Marketplace", href: MARKETPLACE_ROUTES.root, keywords: ["marketplace", "shop"] },
-  { label: "Open Shop", href: MARKETPLACE_ROUTES.shop, keywords: ["shop", "products"] },
+  { label: "Open Marketplace", href: MARKETPLACE_ROUTES.root, keywords: ["marketplace", "shop", "products"] },
   { label: "Go to Cart", href: MARKETPLACE_ROUTES.cart, roles: ["customer"], keywords: ["cart"] },
   { label: "Open Wishlist", href: MARKETPLACE_ROUTES.wishlist, roles: ["customer"], keywords: ["wishlist"] },
   { label: "Open Checkout", href: MARKETPLACE_ROUTES.checkout, roles: ["customer"], keywords: ["checkout"] },
   { label: "Open Orders", href: "/customer/orders", roles: ["customer"], keywords: ["orders"] },
-  { label: "Customer Dashboard", href: "/customer", roles: ["customer"], keywords: ["customer"] },
+  { label: "My Account", href: "/customer/profile", roles: ["customer"], keywords: ["customer", "account", "profile"] },
   { label: "Open Wallet", href: "/customer/wallet", roles: ["customer"], keywords: ["wallet"] },
   {
     label: "Become a Merchant",
@@ -91,8 +90,8 @@ export function pickActionsForPage(
   role: AssistantUserRole,
 ): AssistantAction[] {
   const byPage: Record<string, string[]> = {
-    product: ["Open Shop", "Go to Cart", "Open Marketplace"],
-    cart: ["Open Checkout", "Open Shop", "Open Marketplace"],
+    product: ["Go to Cart", "Open Marketplace", "Open Wishlist"],
+    cart: ["Open Checkout", "Open Marketplace", "Open Orders"],
     checkout: ["Open Cart", "Open Orders", "Open Marketplace"],
     merchant: ["Add Product", "Merchant Orders", "Store Settings"],
     customer: ["Open Orders", "Open Marketplace", "Open Wallet"],

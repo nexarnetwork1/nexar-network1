@@ -1,7 +1,32 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { enforceSingleSession, trackUserSession } from "@/modules/auth/session";
+
+function commerceAuthFailureRedirect(
+  origin: string,
+  options: {
+    redirect?: string | null;
+    intent?: string | null;
+    message?: string;
+  },
+): NextResponse {
+  const role =
+    options.intent === "merchant" || options.intent === "customer"
+      ? options.intent
+      : undefined;
+
+  return NextResponse.redirect(
+    `${origin}${commerceAuthHref({
+      auth: "signin",
+      redirect:
+        options.redirect && isValidRedirect(options.redirect) ? options.redirect : undefined,
+      role,
+      message: options.message ?? "auth_callback_failed",
+    })}`,
+  );
+}
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -37,7 +62,7 @@ export async function GET(request: Request) {
           if (intent) params.set("intent", intent);
           const qs = params.toString();
           return NextResponse.redirect(
-            `${origin}/auth/complete-profile${qs ? `?${qs}` : ""}`
+            `${origin}/auth/complete-profile${qs ? `?${qs}` : ""}`,
           );
         }
 
@@ -48,7 +73,9 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}${getDashboardPath(profile?.role)}`);
       }
     }
+
+    return commerceAuthFailureRedirect(origin, { redirect, intent });
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  return commerceAuthFailureRedirect(origin, { redirect, intent });
 }

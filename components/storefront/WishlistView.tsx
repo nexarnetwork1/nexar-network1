@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
-import { useAuthModal } from "@/components/auth/AuthModalProvider";
+import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import { toggleWishlistAction } from "@/modules/marketplace/storefront/actions";
 import { StorefrontProductGrid } from "@/components/storefront/StorefrontProductCard";
@@ -16,7 +16,7 @@ type WishlistViewProps = {
 };
 
 export function WishlistView({ products: initialProducts, isAuthenticated }: WishlistViewProps) {
-  const { openAuthModal } = useAuthModal();
+  const { openCommerceAuth } = useCommerceAuth();
   const [products, setProducts] = useState(initialProducts);
   const [pending, startTransition] = useTransition();
 
@@ -28,7 +28,7 @@ export function WishlistView({ products: initialProducts, isAuthenticated }: Wis
         <p className="mt-2 text-sm text-muted">Save products you love and return anytime.</p>
         <Button
           className="mt-6"
-          onClick={() => openAuthModal({ mode: "signin", redirect: MARKETPLACE_ROUTES.wishlist })}
+          onClick={() => openCommerceAuth({ mode: "signin", redirect: MARKETPLACE_ROUTES.wishlist })}
         >
           Sign in
         </Button>

@@ -1,7 +1,7 @@
 import type { UserRole } from "@/types";
 
 const DASHBOARD_PATHS: Record<UserRole, string> = {
-  customer: "/customer",
+  customer: "/marketplace",
   merchant: "/merchant",
   admin: "/admin/dashboard",
 };

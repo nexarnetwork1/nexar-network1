@@ -4,9 +4,10 @@ import { Clock } from "lucide-react";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { signOutAction } from "@/modules/auth/actions";
-import { authModalHref } from "@/lib/auth/auth-modal-url";
+import { authModalHref } from "@/lib/commerce/commerce-auth-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { MerchantRealtimeProvider } from "@/components/realtime/MerchantRealtimeProvider";
+import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { Button } from "@/components/ui/Button";
 
 export default async function MerchantLayout({
@@ -24,7 +25,8 @@ export default async function MerchantLayout({
   const isPaymentsOnly = store?.mode === "payments_only";
 
   return (
-    <div className="min-h-screen bg-background">
+    <CommerceAuthShell>
+      <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface/50">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <nav className="flex flex-wrap items-center gap-6 text-sm">
@@ -120,5 +122,6 @@ export default async function MerchantLayout({
         <MerchantRealtimeProvider>{children}</MerchantRealtimeProvider>
       </main>
     </div>
+    </CommerceAuthShell>
   );
 }

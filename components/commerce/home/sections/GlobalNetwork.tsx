@@ -27,9 +27,9 @@ export function GlobalNetwork({
   return (
     <SectionShell
       id="global-network"
-      eyebrow="Network"
-      title="Global Nexar network"
-      description="Merchant locations, buyer activity, and cross-border commerce visualized across the Nexar global network."
+      eyebrow="Global commerce"
+      title="Global commerce network"
+      description="Live merchant regions, buyer activity, and cross-border transaction paths across the Nexar Network — powered by real platform data."
       className="overflow-hidden"
     >
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">

@@ -228,7 +228,7 @@ export async function resolveGlobalAssistantQuery(
     }
     return {
       content: `I couldn't find results for "${term}". Try searching the marketplace shop or ask about Nexar Network, NXR, or merchant onboarding.`,
-      links: [{ label: "Marketplace Shop", href: "/marketplace/shop" }],
+      links: [{ label: "Marketplace", href: "/marketplace" }],
       actions: filterActionsForRole(context.userRole),
       suggestedPrompts: suggestPromptsForContext(context),
       matchedTopic: "Search",

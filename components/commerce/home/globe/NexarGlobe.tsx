@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { usePrefersReducedMotion, useMediaQuery } from "@/hooks/useMediaQuery";
 import type { CommerceActivityEvent } from "@/lib/commerce/types";
 
 const GlobeCanvas = dynamic(
@@ -30,6 +30,9 @@ export function NexarGlobe({
   compact = false,
 }: NexarGlobeProps) {
   const reducedMotion = usePrefersReducedMotion();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isTablet = useMediaQuery("(max-width: 1024px)");
+  const useCompact = compact || isMobile || isTablet;
 
   if (reducedMotion) {
     return (
@@ -49,7 +52,7 @@ export function NexarGlobe({
       countryCodes={countryCodes}
       activity={activity}
       className={className}
-      compact={compact}
+      compact={useCompact}
     />
   );
 }

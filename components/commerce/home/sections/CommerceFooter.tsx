@@ -37,7 +37,7 @@ const COMMERCE_LINKS = [
   { label: "Featured stores", href: "/marketplace#featured-stores" },
   { label: "Browse categories", href: "/marketplace#categories" },
   { label: "Merchant plans", href: "/marketplace#pricing" },
-  { label: "Shop marketplace", href: "/marketplace/shop" },
+  { label: "Browse marketplace", href: "/marketplace" },
 ];
 
 type CommerceFooterProps = {

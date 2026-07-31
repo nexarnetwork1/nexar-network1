@@ -7,6 +7,7 @@ export { blockchainConfig } from "./blockchain";
 export { paymentsConfig, type PaymentMethodType } from "./payments";
 export { exchangeRatesConfig } from "./exchange-rates";
 export { platformFeesConfig } from "./platform-fees";
+export { merchantCommerceConfig } from "./merchant-commerce";
 export { merchantPromotionsConfig } from "./merchant-promotions";
 export { securityConfig } from "./security";
 export { loggingConfig, type LogLevel } from "./logging";

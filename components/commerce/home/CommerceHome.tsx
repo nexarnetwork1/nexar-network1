@@ -6,8 +6,11 @@ import { CommerceSpaceBackground } from "./CommerceSpaceBackground";
 import { CommerceHero } from "./sections/CommerceHero";
 import { LiveStatistics } from "./sections/LiveStatistics";
 
-const TrustedBrands = dynamic(() =>
-  import("./sections/TrustedBrands").then((m) => m.TrustedBrands),
+const GlobalNetwork = dynamic(() =>
+  import("./sections/GlobalNetwork").then((m) => m.GlobalNetwork),
+);
+const MerchantNetwork = dynamic(() =>
+  import("./sections/MerchantNetwork").then((m) => m.MerchantNetwork),
 );
 const FeaturedStores = dynamic(() =>
   import("./sections/FeaturedStores").then((m) => m.FeaturedStores),
@@ -18,21 +21,17 @@ const TrendingProducts = dynamic(() =>
 const MarketplaceCategories = dynamic(() =>
   import("./sections/MarketplaceCategories").then((m) => m.MarketplaceCategories),
 );
-const WhyNexarCommerce = dynamic(() =>
-  import("./sections/WhyNexarCommerce").then((m) => m.WhyNexarCommerce),
+const PaymentEcosystem = dynamic(() =>
+  import("./sections/PaymentEcosystem").then((m) => m.PaymentEcosystem),
 );
-const CryptoPayments = dynamic(() =>
-  import("./sections/CryptoPayments").then((m) => m.CryptoPayments),
+const WalletEcosystem = dynamic(() =>
+  import("./sections/WalletEcosystem").then((m) => m.WalletEcosystem),
 );
-const MerchantPlatform = dynamic(() =>
-  import("./sections/MerchantPlatform").then((m) => m.MerchantPlatform),
+const MerchantExperience = dynamic(() =>
+  import("./sections/MerchantExperience").then((m) => m.MerchantExperience),
 );
-const GlobalNetwork = dynamic(() =>
-  import("./sections/GlobalNetwork").then((m) => m.GlobalNetwork),
-);
-const NexarAi = dynamic(() => import("./sections/NexarAi").then((m) => m.NexarAi));
-const PricingSection = dynamic(() =>
-  import("./sections/PricingSection").then((m) => m.PricingSection),
+const MerchantPricing = dynamic(() =>
+  import("./sections/MerchantPricing").then((m) => m.MerchantPricing),
 );
 const FaqSection = dynamic(() => import("./sections/FaqSection").then((m) => m.FaqSection));
 const CommerceCta = dynamic(() =>
@@ -56,9 +55,14 @@ export function CommerceHome({ data }: CommerceHomeProps) {
     <>
       <CommerceSpaceBackground />
       <main className="relative">
-        <CommerceHero countryCodes={countryCodes} activity={data.activity} />
+        <CommerceHero initialMetrics={data.liveMetrics} />
         <LiveStatistics initialMetrics={data.liveMetrics} />
-        <TrustedBrands initialBrands={data.brands} />
+        <GlobalNetwork
+          countryCodes={countryCodes}
+          countries={data.countries}
+          initialActivity={data.activity}
+        />
+        <MerchantNetwork merchants={data.merchantNetwork} />
         <FeaturedStores initialStores={data.marketplace.featured_stores} />
         <TrendingProducts
           initialTrending={data.marketplace.trending_products}
@@ -67,17 +71,11 @@ export function CommerceHome({ data }: CommerceHomeProps) {
           initialFlashDeals={data.flashDealProducts}
         />
         <MarketplaceCategories categories={data.categories} />
-        <WhyNexarCommerce />
-        <CryptoPayments />
-        <MerchantPlatform />
-        <GlobalNetwork
-          countryCodes={countryCodes}
-          countries={data.countries}
-          initialActivity={data.activity}
-        />
-        <NexarAi />
-        <PricingSection plans={data.subscriptionPlans} />
-        <FaqSection items={data.faqItems} />
+        <PaymentEcosystem />
+        <WalletEcosystem />
+        <MerchantExperience />
+        <MerchantPricing plans={data.subscriptionPlans} />
+        <FaqSection />
         <CommerceCta />
         <CommerceFooter initialMetrics={data.liveMetrics} countries={data.countries} />
       </main>

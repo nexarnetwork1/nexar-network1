@@ -64,6 +64,19 @@ export type CommerceBrand = {
   approved_at?: string | null;
 };
 
+/** Approved merchant surfaced on the commerce homepage network carousel. */
+export type CommerceMerchantNetworkItem = {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url?: string | null;
+  store_id?: string;
+  category?: string | null;
+  country_code?: string | null;
+  is_verified: boolean;
+  approved_at?: string | null;
+};
+
 export type CommerceCategory = {
   id: string;
   name: string;
@@ -113,6 +126,7 @@ export type CommerceHomeData = {
   liveMetrics: LiveMetricsPayload;
   marketplace: MarketplaceStatisticsPayload;
   brands: CommerceBrand[];
+  merchantNetwork: CommerceMerchantNetworkItem[];
   countries: CommerceCountry[];
   activity: CommerceActivityEvent[];
   categories: CommerceCategory[];

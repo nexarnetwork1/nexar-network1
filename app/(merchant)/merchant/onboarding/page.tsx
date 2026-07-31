@@ -4,6 +4,9 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { StoreSetupProgress } from "@/components/merchant/StoreSetupProgress";
+import { createClient } from "@/lib/supabase/server";
+import { merchantCommerceConfig } from "@/config/merchant-commerce";
 
 export default async function MerchantOnboardingPage() {
   const profile = await getCurrentProfile();
@@ -19,6 +22,17 @@ export default async function MerchantOnboardingPage() {
   if (store.status === "active") {
     redirect("/merchant");
   }
+
+  const supabase = await createClient();
+  const { count: productCount } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .eq("store_id", store.id);
+
+  const completedStepIds = ["store"];
+  if (store.logo_url) completedStepIds.push("logo");
+  if ((productCount ?? 0) > 0) completedStepIds.push("products");
+  if (store.wallet_address) completedStepIds.push("payments");
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -38,6 +52,15 @@ export default async function MerchantOnboardingPage() {
         </div>
       </div>
 
+      <div className="mt-8 rounded-2xl border border-border bg-card/40 p-6">
+        <h2 className="font-heading text-sm font-medium text-white">Store setup checklist</h2>
+        <p className="mt-1 text-xs text-muted">
+          Complete these steps while your store is under review — ${merchantCommerceConfig.storeCreation.amountUsd}{" "}
+          activation + subscription billing applies at launch.
+        </p>
+        <StoreSetupProgress completedStepIds={completedStepIds} className="mt-5" />
+      </div>
+
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-border bg-card/40 p-5">
           <Store className="h-5 w-5 text-gold" aria-hidden />
@@ -51,7 +74,7 @@ export default async function MerchantOnboardingPage() {
           <ShieldCheck className="h-5 w-5 text-gold" aria-hidden />
           <h2 className="mt-3 font-heading text-sm font-medium text-white">What happens next</h2>
           <p className="mt-2 text-xs leading-relaxed text-muted">
-            Once approved, your storefront appears in the Nexar Commerce marketplace and you can
+            Once approved, your store appears in the unified Nexar Commerce marketplace and you can
             start accepting orders.
           </p>
         </div>

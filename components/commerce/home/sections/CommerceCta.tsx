@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
-import { AuthModalTrigger } from "@/components/auth/AuthModalProvider";
+import { CommerceAuthTrigger } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import { Container } from "@/components/ui/Container";
 
 export function CommerceCta() {
@@ -42,21 +42,21 @@ export function CommerceCta() {
               all on infrastructure designed for global settlement.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-              <AuthModalTrigger
+              <CommerceAuthTrigger
                 mode="register"
                 role="merchant"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold px-7 text-sm font-medium tracking-wide text-background shadow-[0_0_30px_-8px_rgba(212,175,55,0.55)] transition-all hover:bg-gold-secondary"
               >
                 Create merchant account
                 <ArrowUpRight className="h-4 w-4" />
-              </AuthModalTrigger>
-              <AuthModalTrigger
+              </CommerceAuthTrigger>
+              <CommerceAuthTrigger
                 mode="register"
                 role="customer"
                 className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-surface/70 px-7 text-sm font-medium text-white backdrop-blur-md transition-all hover:border-gold/30"
               >
                 Start shopping
-              </AuthModalTrigger>
+              </CommerceAuthTrigger>
             </div>
           </div>
         </motion.div>

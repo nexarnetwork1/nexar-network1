@@ -21,7 +21,12 @@ export async function calculatePlatformFee(
   });
 
   if (error || !data?.[0]) {
-    const baseRate = method === "NXR" ? 0.035 : method === "card" ? 0.029 : 0.05;
+    const baseRate =
+      method.toUpperCase() === "NXR"
+        ? 0.0035
+        : method.toLowerCase() === "card"
+          ? 0.035
+          : 0.005;
     return {
       platformFee: amountUsd * baseRate,
       merchantAmount: amountUsd * (1 - baseRate),

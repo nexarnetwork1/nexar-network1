@@ -1,27 +1,30 @@
 "use client";
 
-import { AuthModalTrigger } from "@/components/auth/AuthModalProvider";
+import { CommerceAuthTrigger } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import { Button } from "@/components/ui/Button";
 
-type MarketplaceAuthActionsProps = {
+type CommerceAuthActionsProps = {
   isSignedIn: boolean;
 };
 
-export function MarketplaceAuthActions({ isSignedIn }: MarketplaceAuthActionsProps) {
+export function CommerceAuthActions({ isSignedIn }: CommerceAuthActionsProps) {
   if (isSignedIn) return null;
 
   return (
     <div className="ml-auto flex items-center gap-2">
-      <AuthModalTrigger mode="signin">
+      <CommerceAuthTrigger mode="signin">
         <Button variant="ghost" size="sm" className="rounded-full px-3 py-1.5 text-xs">
           Sign in
         </Button>
-      </AuthModalTrigger>
-      <AuthModalTrigger mode="register">
+      </CommerceAuthTrigger>
+      <CommerceAuthTrigger mode="register">
         <Button variant="secondary" size="sm" className="rounded-full px-3 py-1.5 text-xs">
           Register
         </Button>
-      </AuthModalTrigger>
+      </CommerceAuthTrigger>
     </div>
   );
 }
+
+/** @deprecated Use CommerceAuthActions */
+export const MarketplaceAuthActions = CommerceAuthActions;

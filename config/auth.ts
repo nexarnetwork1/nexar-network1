@@ -2,7 +2,7 @@ export const authConfig = {
   providers: ["email", "google", "apple"] as const,
   sessionCookieName: "sb-access-token",
   redirectAfterLogin: {
-    customer: "/customer",
+    customer: "/marketplace",
     merchant: "/merchant",
     admin: "/admin/dashboard",
   },

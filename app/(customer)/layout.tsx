@@ -2,9 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
-import { authModalHref } from "@/lib/auth/auth-modal-url";
+import { authModalHref } from "@/lib/commerce/commerce-auth-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
+import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,7 +17,7 @@ export default async function CustomerLayout({
   const profile = await getCurrentProfile();
 
   if (!profile || profile.role !== "customer") {
-    redirect(authModalHref({ auth: "signin", redirect: "/customer" }));
+    redirect(authModalHref({ auth: "signin", redirect: "/marketplace" }));
   }
 
   const supabase = await createClient();
@@ -27,12 +28,13 @@ export default async function CustomerLayout({
     .in("status", ["pending", "draft"]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <CommerceAuthShell>
+      <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface/50">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <nav className="flex flex-wrap items-center gap-6 text-sm">
-            <Link href="/customer" className="font-heading text-gold">
-              Nexar
+            <Link href="/marketplace" className="font-heading text-gold">
+              Nexar Commerce
             </Link>
             <Link href="/customer/orders" className="text-muted hover:text-white">
               Orders
@@ -83,5 +85,6 @@ export default async function CustomerLayout({
         <CustomerRealtimeProvider>{children}</CustomerRealtimeProvider>
       </main>
     </div>
+    </CommerceAuthShell>
   );
 }

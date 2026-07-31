@@ -14,6 +14,7 @@ import type {
   CommerceCountry,
   CommerceFaqItem,
   CommerceHomeData,
+  CommerceMerchantNetworkItem,
   CommerceProduct,
   CommerceStore,
   CommerceSubscriptionPlan,
@@ -374,6 +375,79 @@ async function loadFlashDealProducts(limit = 12): Promise<CommerceProduct[]> {
   return results;
 }
 
+async function loadMerchantNetwork(): Promise<CommerceMerchantNetworkItem[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("brands")
+    .select(
+      "id, name, slug, logo_url, approved_at, store_id, store:stores(id, business_type, logo_url, status)",
+    )
+    .eq("status", "approved")
+    .order("approved_at", { ascending: false })
+    .limit(50);
+
+  if (!data?.length) return [];
+
+  const storeIds = data
+    .map((row) => {
+      const store = parseStoreRelation(row.store);
+      return store?.id ?? (row.store_id as string | undefined);
+    })
+    .filter(Boolean) as string[];
+
+  const countryByStore = new Map<string, string>();
+  if (storeIds.length) {
+    const { data: events } = await supabase
+      .from("commerce_analytics_events")
+      .select("store_id, country_code")
+      .in("store_id", storeIds)
+      .not("country_code", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    for (const row of events ?? []) {
+      const sid = row.store_id as string;
+      if (!countryByStore.has(sid) && row.country_code) {
+        countryByStore.set(sid, row.country_code as string);
+      }
+    }
+  }
+
+  const verifiedStoreIds = new Set<string>();
+  if (storeIds.length) {
+    const { data: verifications } = await supabase
+      .from("store_verifications")
+      .select("store_id")
+      .in("store_id", storeIds)
+      .eq("status", "verified");
+    for (const row of verifications ?? []) {
+      verifiedStoreIds.add(row.store_id as string);
+    }
+  }
+
+  return data
+    .map((row) => {
+      const store = parseStoreRelation(row.store);
+      const storeMeta =
+        row.store && typeof row.store === "object" && !Array.isArray(row.store)
+          ? (row.store as { business_type?: string | null; logo_url?: string | null })
+          : null;
+      const storeId = store?.id ?? (row.store_id as string);
+      return {
+        id: row.id as string,
+        name: row.name as string,
+        slug: row.slug as string,
+        logo_url: (row.logo_url as string | null) ?? storeMeta?.logo_url ?? null,
+        store_id: storeId,
+        category: storeMeta?.business_type ?? null,
+        country_code: countryByStore.get(storeId) ?? null,
+        is_verified: verifiedStoreIds.has(storeId),
+        approved_at: row.approved_at as string | null,
+      };
+    })
+    .filter((item) => Boolean(item.name));
+}
+
 async function loadFaqItems(): Promise<CommerceFaqItem[]> {
   const announcements = await getActiveTickerAnnouncements();
   if (announcements.length) {
@@ -433,6 +507,7 @@ export async function loadCommerceHomeData(): Promise<CommerceHomeData> {
   const [
     marketplaceRaw,
     brands,
+    merchantNetwork,
     countries,
     activity,
     categories,
@@ -443,6 +518,7 @@ export async function loadCommerceHomeData(): Promise<CommerceHomeData> {
   ] = await Promise.all([
     safe("marketplace statistics", () => getMarketplaceStatistics(24), emptyMarketplaceStats()),
     safe("brands", () => listApprovedBrands(50), [] as CommerceBrand[]),
+    safe("merchant network", loadMerchantNetwork, [] as CommerceMerchantNetworkItem[]),
     safe("countries", loadCountries, [] as CommerceCountry[]),
     safe("activity", () => loadActivity(40), [] as CommerceActivityEvent[]),
     safe("categories", loadCategories, [] as CommerceCategory[]),
@@ -481,6 +557,7 @@ export async function loadCommerceHomeData(): Promise<CommerceHomeData> {
       store_id: b.store_id,
       approved_at: b.approved_at,
     })),
+    merchantNetwork,
     countries,
     activity,
     categories,

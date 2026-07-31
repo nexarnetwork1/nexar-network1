@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { Heart, ShoppingBag, Store } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMarketplaceCartItemCount } from "@/modules/marketplace/cart/queries";
-import { MarketplaceAuthActions } from "@/components/marketplace/MarketplaceAuthActions";
+import { CommerceAuthActions } from "@/components/marketplace/CommerceAuthActions";
 
 export async function MarketplaceSubNav() {
   const profile = await getCurrentProfile();
@@ -18,14 +18,7 @@ export async function MarketplaceSubNav() {
           href={MARKETPLACE_ROUTES.root}
           className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-muted transition-colors hover:bg-white/5 hover:text-white"
         >
-          Home
-        </Link>
-        <Link
-          href={MARKETPLACE_ROUTES.shop}
-          className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-muted transition-colors hover:bg-white/5 hover:text-white"
-        >
-          <Store className="h-3.5 w-3.5" aria-hidden />
-          Shop
+          Marketplace
         </Link>
         <Link
           href={MARKETPLACE_ROUTES.cart}
@@ -46,7 +39,7 @@ export async function MarketplaceSubNav() {
           <Heart className="h-3.5 w-3.5" aria-hidden />
           Wishlist
         </Link>
-        <MarketplaceAuthActions isSignedIn={Boolean(profile)} />
+        <CommerceAuthActions isSignedIn={Boolean(profile)} />
       </Container>
     </div>
   );
