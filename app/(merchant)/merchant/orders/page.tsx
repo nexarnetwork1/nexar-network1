@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
@@ -8,7 +9,7 @@ import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function MerchantOrdersPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/orders" }));
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

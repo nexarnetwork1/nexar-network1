@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { ProfileSettingsForm } from "@/components/profile/ProfileSettingsForm";
 import { ActiveSessionsSection } from "@/components/profile/ActiveSessionsSection";
 
 export default async function MerchantProfilePage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/profile" }));
 
   return (
     <div>

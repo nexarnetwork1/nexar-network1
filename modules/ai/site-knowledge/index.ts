@@ -4,22 +4,10 @@ import { FOUNDER } from "@/lib/data/founder";
 import { ROADMAP } from "@/lib/data/roadmap";
 import { TOKENOMICS, MAX_SUPPLY } from "@/lib/data/tokenomics";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
+import { NEXAR_KNOWLEDGE } from "./nexar-knowledge";
+import type { SiteKnowledgeEntry, SiteKnowledgeLink } from "./types";
 
-export type SiteKnowledgeLink = {
-  label: string;
-  href: string;
-};
-
-export type SiteKnowledgeEntry = {
-  id: string;
-  title: string;
-  /** Words and phrases that boost match score for this entry. */
-  keywords: string[];
-  answer: string;
-  links?: SiteKnowledgeLink[];
-  /** Primary page when user asks to navigate here. */
-  primaryLink?: string;
-};
+export type { SiteKnowledgeEntry, SiteKnowledgeLink };
 
 const allocationSummary = TOKENOMICS.map(
   (item) => `${item.title} ${item.percent}% (${item.value.toLocaleString()} NXR)`,
@@ -32,7 +20,7 @@ const roadmapSummary = ROADMAP.map(
 const navSummary = NAV_ITEMS.map((item) => `${item.label} → ${item.href}`).join("\n");
 
 /** Curated site knowledge for the global Nexar Assistant (demo + future AI grounding). */
-export const SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
+const CORE_SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
   {
     id: "nexar-network",
     title: "Nexar Network",
@@ -46,7 +34,7 @@ export const SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
       "who are you",
       "what do you do",
     ],
-    answer: `${SITE.name} is a premium blockchain ecosystem focused on global payments. ${SITE.description} The NXR token (${SITE.ticker}) powers the network, starting on ${SITE.blockchain}.`,
+    answer: `${SITE.name} is a premium blockchain ecosystem focused on global payments. ${SITE.description} The NXR token (${SITE.ticker}) powers the network on ${SITE.blockchain}. Official website: ${SITE.url}.`,
     links: [
       { label: "About Nexar", href: "/#about" },
       { label: "Whitepaper", href: "/whitepaper" },
@@ -58,7 +46,7 @@ export const SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
     id: "vision",
     title: "Company vision",
     keywords: ["vision", "mission", "goal", "purpose", "why nexar", "future"],
-    answer: `${SITE.tagline} Nexar is evolving from BEP20 on BNB Smart Chain toward sovereign Nexar Chain infrastructure — payment rails for enterprises, merchants, and communities worldwide.`,
+    answer: `${SITE.tagline} Nexar Network is building the future of global blockchain payments — evolving from BEP-20 on BNB Smart Chain toward sovereign Nexar Chain infrastructure for enterprises, merchants, and communities worldwide.`,
     links: [
       { label: "About section", href: "/#about" },
       { label: "Read whitepaper", href: "/whitepaper" },
@@ -255,14 +243,17 @@ export const SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
   },
 ];
 
+export const SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [...CORE_SITE_KNOWLEDGE, ...NEXAR_KNOWLEDGE];
+
 export const ASSISTANT_SUGGESTED_PROMPTS = [
   "What is Nexar Network?",
   "Open Whitepaper",
   "Who is the founder?",
+  "How do I join the NXR presale?",
   "How do I become a merchant?",
   "Take me to Marketplace",
-  "Explain NXR",
-  "Where can I buy products?",
+  "Explain NXR token utility",
+  "Official social links",
 ] as const;
 
 /** Alias map for natural navigation commands. */
@@ -292,4 +283,13 @@ export const NAVIGATION_ALIASES: Record<string, string> = {
   disclaimer: "/disclaimer",
   admin: "/admin/login",
   addresses: "/official-addresses",
+  discord: SOCIAL.discord,
+  telegram: SOCIAL.telegram,
+  github: SOCIAL.github,
+  twitter: SOCIAL.x,
+  x: SOCIAL.x,
+  instagram: SOCIAL.instagram,
+  facebook: SOCIAL.facebook,
+  tiktok: SOCIAL.tiktok,
+  website: SITE.url,
 };

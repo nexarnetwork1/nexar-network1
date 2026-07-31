@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
-import { authModalHref } from "@/lib/commerce/commerce-auth-url";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
@@ -17,7 +17,7 @@ export default async function CustomerLayout({
   const profile = await getCurrentProfile();
 
   if (!profile || profile.role !== "customer") {
-    redirect(authModalHref({ auth: "signin", redirect: "/marketplace" }));
+    redirect(commerceAuthHref({ auth: "signin", redirect: "/customer" }));
   }
 
   const supabase = await createClient();

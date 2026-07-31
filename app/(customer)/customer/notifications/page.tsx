@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getUserNotifications, getUnreadNotificationCount } from "@/modules/notifications/repository";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
@@ -7,7 +8,7 @@ import { RealtimeScope } from "@/components/realtime/RealtimeScope";
 
 export default async function CustomerNotificationsPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/notifications" }));
 
   const [notifications, unreadCount] = await Promise.all([
     getUserNotifications(profile.id, 50),

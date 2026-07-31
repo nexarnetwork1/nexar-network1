@@ -4,7 +4,7 @@ import { Clock } from "lucide-react";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { signOutAction } from "@/modules/auth/actions";
-import { authModalHref } from "@/lib/commerce/commerce-auth-url";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { MerchantRealtimeProvider } from "@/components/realtime/MerchantRealtimeProvider";
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
@@ -18,7 +18,7 @@ export default async function MerchantLayout({
   const profile = await getCurrentProfile();
 
   if (!profile || profile.role !== "merchant") {
-    redirect(authModalHref({ auth: "signin", redirect: "/merchant" }));
+    redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant" }));
   }
 
   const store = await getMerchantStore(profile.id);

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
-import { authModalHref, commerceAuthBasePath } from "@/lib/commerce/commerce-auth-url";
+import { commerceAuthHref, commerceAuthBasePath } from "@/lib/commerce/commerce-auth-url";
 import { authConfig } from "@/config";
 import { hasRoleAccess, isProtectedRoute } from "./authorization";
 
@@ -29,23 +29,21 @@ export function handleAuthRouting(
   );
 
   if (!user && isProtected) {
-    const isCommerceProtected =
-      pathname.startsWith("/marketplace") ||
-      pathname.startsWith("/customer") ||
-      pathname.startsWith("/merchant") ||
-      pathname.startsWith("/pay/");
+    const isAdminProtected =
+      pathname === "/admin" || pathname.startsWith("/admin/");
 
-    const destination = isCommerceProtected
-      ? authModalHref({
+    const destination = isAdminProtected
+      ? (() => {
+          const loginUrl = new URL("/admin/login", request.url);
+          loginUrl.searchParams.set("redirect", pathname);
+          return loginUrl.pathname + loginUrl.search;
+        })()
+      : commerceAuthHref({
           auth: "signin",
           redirect: pathname,
           basePath: commerceAuthBasePath(pathname),
-        })
-      : (() => {
-          const loginUrl = new URL("/login", request.url);
-          loginUrl.searchParams.set("redirect", pathname);
-          return loginUrl.pathname + loginUrl.search;
-        })();
+        });
+
     return NextResponse.redirect(new URL(destination, request.url));
   }
 

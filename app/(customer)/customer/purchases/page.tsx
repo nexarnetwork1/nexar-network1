@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerPurchaseHistory } from "@/modules/wallet/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -8,7 +9,7 @@ import { UsdAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function CustomerPurchaseHistoryPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/purchases" }));
 
   const purchases = await getCustomerPurchaseHistory(profile.id);
 

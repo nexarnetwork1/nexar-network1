@@ -43,9 +43,6 @@ export function commerceAuthHref({
   return query ? `${basePath}?${query}` : basePath;
 }
 
-/** @deprecated Use commerceAuthHref */
-export const authModalHref = commerceAuthHref;
-
 /** Parses commerce auth modal params from search params. */
 export function parseCommerceAuthParams(searchParams: URLSearchParams): {
   open: boolean;
@@ -69,8 +66,3 @@ export function parseCommerceAuthParams(searchParams: URLSearchParams): {
   };
 }
 
-/** @deprecated Use parseCommerceAuthParams */
-export const parseAuthModalParams = parseCommerceAuthParams;
-
-export type AuthModalMode = CommerceAuthMode;
-export type AuthModalRole = CommerceAuthRole;

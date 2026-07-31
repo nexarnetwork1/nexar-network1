@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -13,7 +14,7 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?redirect=/profile");
+    redirect(commerceAuthHref({ auth: "signin", redirect: "/profile" }));
   }
 
   const { data: profile } = await supabase

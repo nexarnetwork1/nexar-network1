@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getPaymentMethods } from "@/modules/platform/repository";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 
 export default async function CustomerPaymentMethodsPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/payment-methods" }));
 
   const methods = await getPaymentMethods();
 

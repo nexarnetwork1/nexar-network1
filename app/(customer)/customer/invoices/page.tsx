@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerInvoices } from "@/modules/invoices/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -7,7 +8,7 @@ import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 
 export default async function CustomerInvoicesPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/invoices" }));
 
   const invoices = await getCustomerInvoices(profile.id);
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadNotificationCount } from "@/modules/notifications/repository";
@@ -17,7 +18,7 @@ const ACCOUNT_LINKS = [
 
 export default async function CustomerDashboardPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer" }));
 
   const supabase = await createClient();
 

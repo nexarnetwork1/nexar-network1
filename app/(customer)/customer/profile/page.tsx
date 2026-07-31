@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getUserNotificationPreferences } from "@/modules/notifications/repository";
 import { ProfileSettingsForm } from "@/components/profile/ProfileSettingsForm";
@@ -7,7 +8,7 @@ import { ActiveSessionsSection } from "@/components/profile/ActiveSessionsSectio
 
 export default async function CustomerProfilePage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/profile" }));
 
   const preferences = await getUserNotificationPreferences(profile.id);
 

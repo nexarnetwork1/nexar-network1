@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantAnalytics } from "@/modules/analytics/merchant";
@@ -10,7 +11,7 @@ import Link from "next/link";
 
 export default async function MerchantAnalyticsPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/analytics" }));
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

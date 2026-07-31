@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { createClient } from "@/lib/supabase/server";
 import { getDashboardPath } from "@/lib/auth/redirect";
 
@@ -7,7 +8,7 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?redirect=/dashboard");
+    redirect(commerceAuthHref({ auth: "signin", redirect: "/dashboard" }));
   }
 
   const { data: profile } = await supabase

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getInvoiceById } from "@/modules/invoices/repository";
 import { getInvoicePaymentOptions } from "@/modules/payments/repository";
@@ -14,7 +15,7 @@ type Props = { params: Promise<{ id: string }> };
 export default async function CustomerInvoiceDetailPage({ params }: Props) {
   const { id } = await params;
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: `/customer/invoices/${id}` }));
 
   const invoice = await getInvoiceById(id);
   if (!invoice || invoice.customer_id !== profile.id) notFound();

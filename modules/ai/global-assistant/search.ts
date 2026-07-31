@@ -1,6 +1,7 @@
 import { globalSearch } from "@/modules/search/repository";
 import { SITE_KNOWLEDGE } from "../site-knowledge";
 import { PAGE_KNOWLEDGE } from "../site-knowledge/page-index";
+import { scoreKnowledgeEntry } from "../site-knowledge/query-match";
 import type { AssistantSearchHit } from "./types";
 
 function normalize(text: string): string {
@@ -11,33 +12,39 @@ function searchStaticKnowledge(query: string, limit: number): AssistantSearchHit
   const q = normalize(query);
   const hits: AssistantSearchHit[] = [];
 
-  for (const entry of SITE_KNOWLEDGE) {
-    const match =
-      entry.title.toLowerCase().includes(q) ||
-      entry.keywords.some((kw) => q.includes(kw) || kw.includes(q));
-    if (match) {
-      hits.push({
-        type: "knowledge",
-        id: entry.id,
-        title: entry.title,
-        ref: entry.primaryLink ?? entry.links?.[0]?.href ?? "/",
-        snippet: entry.answer.slice(0, 120),
-      });
-    }
+  const scoredEntries = SITE_KNOWLEDGE.map((entry) => ({
+    entry,
+    score: scoreKnowledgeEntry(entry, query),
+  }))
+    .filter(({ score }) => score >= 2)
+    .sort((a, b) => b.score - a.score);
+
+  for (const { entry, score } of scoredEntries) {
+    hits.push({
+      type: "knowledge",
+      id: entry.id,
+      title: entry.title,
+      ref: entry.primaryLink ?? entry.links?.[0]?.href ?? "/",
+      snippet: entry.answer.slice(0, 120),
+    });
+    if (hits.length >= limit) break;
   }
 
-  for (const page of PAGE_KNOWLEDGE) {
-    const match =
-      page.title.toLowerCase().includes(q) ||
-      page.keywords.some((kw) => q.includes(kw));
-    if (match) {
-      hits.push({
-        type: "page",
-        id: page.title,
-        title: page.title,
-        ref: page.pathPrefixes[0] ?? "/",
-        snippet: page.summary.slice(0, 120),
-      });
+  if (hits.length < limit) {
+    for (const page of PAGE_KNOWLEDGE) {
+      const match =
+        page.title.toLowerCase().includes(q) ||
+        page.keywords.some((kw) => q.includes(kw) || kw.includes(q));
+      if (match) {
+        hits.push({
+          type: "page",
+          id: page.title,
+          title: page.title,
+          ref: page.pathPrefixes[0] ?? "/",
+          snippet: page.summary.slice(0, 120),
+        });
+      }
+      if (hits.length >= limit) break;
     }
   }
 
@@ -67,7 +74,7 @@ export async function assistantSearch(
   const seen = new Set<string>();
   const merged: AssistantSearchHit[] = [];
 
-  for (const hit of [...platformHits, ...staticHits]) {
+  for (const hit of [...staticHits, ...platformHits]) {
     const key = `${hit.type}:${hit.ref}`;
     if (seen.has(key)) continue;
     seen.add(key);

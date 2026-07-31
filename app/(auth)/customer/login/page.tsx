@@ -1,6 +1,18 @@
 import { redirect } from "next/navigation";
-import { authModalHref } from "@/lib/auth/auth-modal-url";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 
-export default function CustomerLoginPage() {
-  redirect(authModalHref({ auth: "signin", redirect: "/marketplace" }));
+type Props = {
+  searchParams: Promise<Record<string, string | undefined>>;
+};
+
+export default async function CustomerLoginPage({ searchParams }: Props) {
+  const sp = await searchParams;
+  redirect(
+    commerceAuthHref({
+      auth: "signin",
+      role: "customer",
+      redirect: sp.redirect ?? sp.next ?? "/marketplace",
+      message: sp.message,
+    }),
+  );
 }

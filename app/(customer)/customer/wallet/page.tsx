@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerWalletSummary } from "@/modules/wallet/repository";
 import { formatDateTime } from "@/utils/format";
@@ -6,7 +7,7 @@ import { CurrencyAmount, UsdAmount } from "@/components/payments/CurrencyAmount"
 
 export default async function CustomerWalletPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/wallet" }));
 
   const { profile: customerProfile, wallets, transactions } =
     await getCustomerWalletSummary(profile.id);

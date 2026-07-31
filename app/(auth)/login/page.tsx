@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { authModalHref } from "@/lib/auth/auth-modal-url";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 
 type Props = {
   searchParams: Promise<Record<string, string | undefined>>;
@@ -9,7 +9,7 @@ type Props = {
 export default async function LoginPage({ searchParams }: Props) {
   const sp = await searchParams;
   redirect(
-    authModalHref({
+    commerceAuthHref({
       auth: "signin",
       redirect: sp.redirect ?? sp.next,
       message: sp.message,

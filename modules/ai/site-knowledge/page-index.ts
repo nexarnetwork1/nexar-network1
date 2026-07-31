@@ -30,7 +30,7 @@ export const PAGE_KNOWLEDGE: PageKnowledgeEntry[] = [
     pathPrefixes: ["/about", "/#about"],
     title: "About",
     summary:
-      "Nexar Network connects traditional commerce with blockchain payments for merchants and customers worldwide with platform-controlled settlement.",
+      "Nexar Network connects traditional commerce with blockchain payments for merchants and customers worldwide with platform-controlled settlement. The platform includes a decentralized marketplace where merchants create stores and customers pay using NXR and supported cryptocurrencies.",
     keywords: ["about", "company", "mission"],
   },
   {

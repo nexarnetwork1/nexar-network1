@@ -5,6 +5,7 @@ import {
   type SiteKnowledgeEntry,
   type SiteKnowledgeLink,
 } from "../site-knowledge";
+import { findBestKnowledgeEntry, isNexarTopicQuery, searchKnowledgeEntries } from "../site-knowledge/query-match";
 import { getSectionKnowledge, summarizeCurrentPage } from "../site-knowledge/page-index";
 import { resolveContextualQuery, isContextualQuery } from "./conversation";
 import {
@@ -26,20 +27,8 @@ function normalize(text: string): string {
   return text.toLowerCase().trim().replace(/[^\w\s#/?=&.-]/g, " ");
 }
 
-function scoreEntry(entry: SiteKnowledgeEntry, query: string): number {
-  let score = 0;
-  const normalizedQuery = normalize(query);
-
-  if (normalizedQuery.includes(entry.id.replace(/-/g, " "))) score += 8;
-  if (normalizedQuery.includes(entry.title.toLowerCase())) score += 6;
-
-  for (const keyword of entry.keywords) {
-    const kw = keyword.toLowerCase();
-    if (normalizedQuery === kw) score += 12;
-    else if (normalizedQuery.includes(kw)) score += kw.split(/\s+/).length + 2;
-  }
-
-  return score;
+function findBestEntry(query: string): SiteKnowledgeEntry | null {
+  return findBestKnowledgeEntry(SITE_KNOWLEDGE, query, 3);
 }
 
 function resolveNavigationTarget(query: string): string | null {
@@ -59,21 +48,6 @@ function resolveNavigationTarget(query: string): string | null {
   }
 
   return null;
-}
-
-function findBestEntry(query: string): SiteKnowledgeEntry | null {
-  let best: SiteKnowledgeEntry | null = null;
-  let bestScore = 0;
-
-  for (const entry of SITE_KNOWLEDGE) {
-    const score = scoreEntry(entry, query);
-    if (score > bestScore) {
-      bestScore = score;
-      best = entry;
-    }
-  }
-
-  return bestScore >= 3 ? best : null;
 }
 
 function adaptAnswerForRole(
@@ -276,6 +250,27 @@ export async function resolveGlobalAssistantQuery(
       matchedTopic: best.title,
       mode: "demo",
     };
+  }
+
+  if (isNexarTopicQuery(effectiveQuery)) {
+    const knowledgeHits = searchKnowledgeEntries(SITE_KNOWLEDGE, effectiveQuery, 3);
+    if (knowledgeHits.length) {
+      const primary = knowledgeHits[0];
+      const extra = knowledgeHits.slice(1, 3).map((entry) => entry.title).join(", ");
+      const content = adaptAnswerForRole(primary, context);
+      const topicActions = pickActionsForTopic(primary.title, context.userRole);
+      const { links, actions } = mergeLinksAndActions(primary.links ?? [], topicActions);
+
+      return {
+        content: extra ? `${content}\n\nRelated: ${extra}.` : content,
+        links,
+        actions,
+        navigateTo: primary.primaryLink,
+        suggestedPrompts: suggestPromptsForContext(context),
+        matchedTopic: primary.title,
+        mode: "demo",
+      };
+    }
   }
 
   const fallback = buildFallback(context);

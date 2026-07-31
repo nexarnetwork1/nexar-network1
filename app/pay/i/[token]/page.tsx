@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { PayNowButton } from "@/components/payments/PayNowButton";
@@ -31,11 +32,13 @@ export default async function PublicInvoicePayPage({ params }: Props) {
 
   const profile = await getCurrentProfile();
   if (!profile) {
-    redirect(`/login?redirect=/pay/i/${token}`);
+    redirect(commerceAuthHref({ auth: "signin", redirect: `/pay/i/${token}` }));
   }
 
   if (profile.role !== "customer") {
-    redirect("/login");
+    redirect(
+      commerceAuthHref({ auth: "signin", role: "customer", redirect: `/pay/i/${token}` }),
+    );
   }
 
   const paymentOptions = await getInvoicePaymentOptions(invoice.store_id);

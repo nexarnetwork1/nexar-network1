@@ -1,7 +1,9 @@
 import { SITE } from "@/lib/constants/site";
 import { NAV_ITEMS } from "@/lib/constants/navigation";
+import { COMMERCE_FAQ_ITEMS } from "@/lib/commerce/faq-content";
 import { getPageKnowledge, summarizeCurrentPage } from "@/modules/ai/site-knowledge/page-index";
 import { SITE_KNOWLEDGE } from "@/modules/ai/site-knowledge";
+import { isNexarTopicQuery, searchKnowledgeEntries } from "@/modules/ai/site-knowledge/query-match";
 import type { EnrichedAssistantContext } from "@/modules/ai/global-assistant/types";
 import { assistantSearch } from "@/modules/ai/global-assistant/search";
 
@@ -11,13 +13,38 @@ function buildStaticKnowledgeDigest(): string {
   if (cachedKnowledgeDigest) return cachedKnowledgeDigest;
 
   const curated = SITE_KNOWLEDGE.map(
-    (entry) => `[${entry.title}] ${entry.answer.slice(0, 280)}`,
+    (entry) => `[${entry.title}] ${entry.answer.slice(0, 320)}`,
   ).join("\n\n");
+
+  const faq = COMMERCE_FAQ_ITEMS.map(
+    (item) => `FAQ: ${item.question} — ${item.answer.slice(0, 200)}`,
+  ).join("\n");
 
   const nav = NAV_ITEMS.map((item) => `${item.label}: ${item.href}`).join("\n");
 
-  cachedKnowledgeDigest = `Platform: ${SITE.name} (${SITE.ticker}) on ${SITE.blockchain}.\n${SITE.description}\n\nNavigation:\n${nav}\n\nCurated knowledge:\n${curated}`;
+  cachedKnowledgeDigest = `Platform: ${SITE.name} (${SITE.ticker}) on ${SITE.blockchain}.
+Website: ${SITE.url}
+${SITE.description}
+
+Navigation:
+${nav}
+
+Curated knowledge:
+${curated}
+
+Commerce FAQ:
+${faq}`;
   return cachedKnowledgeDigest;
+}
+
+function shouldRunKnowledgeSearch(query: string, context: EnrichedAssistantContext): boolean {
+  if (query.length < 3) return false;
+  if (isNexarTopicQuery(query)) return true;
+
+  return (
+    /\b(find|search|look for|where|product|store|brand|category|order)\b/i.test(query) ||
+    context.page.pageType === "shop"
+  );
 }
 
 /** Hybrid knowledge block — page first, then curated, then search if query warrants it. */
@@ -37,12 +64,15 @@ export async function assembleKnowledgeContext(
 
   sections.push(`## Platform knowledge\n${buildStaticKnowledgeDigest()}`);
 
-  const shouldSearch =
-    query.length >= 3 &&
-    (/\b(find|search|look for|where|product|store|brand|category|order)\b/i.test(query) ||
-      context.page.pageType === "shop");
+  if (shouldRunKnowledgeSearch(query, context)) {
+    const matchedEntries = searchKnowledgeEntries(SITE_KNOWLEDGE, query, 4);
+    if (matchedEntries.length) {
+      const matchedBlock = matchedEntries
+        .map((entry) => `### ${entry.title}\n${entry.answer}`)
+        .join("\n\n");
+      sections.push(`## Matched Nexar knowledge\n${matchedBlock}`);
+    }
 
-  if (shouldSearch) {
     try {
       const hits = await assistantSearch(query, 5);
       if (hits.length) {

@@ -1,6 +1,18 @@
 import { redirect } from "next/navigation";
-import { authModalHref } from "@/lib/auth/auth-modal-url";
+import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 
-export default function MerchantRegisterPage() {
-  redirect(authModalHref({ auth: "register", role: "merchant" }));
+type Props = {
+  searchParams: Promise<Record<string, string | undefined>>;
+};
+
+export default async function MerchantRegisterPage({ searchParams }: Props) {
+  const sp = await searchParams;
+  redirect(
+    commerceAuthHref({
+      auth: "register",
+      role: "merchant",
+      redirect: sp.redirect ?? sp.next,
+      message: sp.message,
+    }),
+  );
 }
