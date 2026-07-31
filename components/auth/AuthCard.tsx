@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils/cn";
+import { Logo } from "@/components/ui/Logo";
 
 type AuthCardProps = {
   title: string;
@@ -15,8 +16,14 @@ export function AuthCard({ title, subtitle, children, className }: AuthCardProps
         className
       )}
     >
-      <h1 className="font-heading text-xl font-semibold text-gold">{title}</h1>
-      {subtitle && <p className="mt-1.5 text-xs leading-relaxed text-muted">{subtitle}</p>}
+      <div className="mb-4 flex justify-center">
+        <Logo showText={false} />
+      </div>
+      <p className="text-center text-[10px] tracking-[0.2em] text-gold uppercase">Nexar Network</p>
+      <h1 className="mt-2 text-center font-heading text-xl font-semibold text-white">{title}</h1>
+      {subtitle && (
+        <p className="mt-1.5 text-center text-xs leading-relaxed text-muted">{subtitle}</p>
+      )}
       <div className="mt-5">{children}</div>
     </div>
   );

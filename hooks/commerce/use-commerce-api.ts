@@ -28,22 +28,25 @@ export function useLiveMetrics(initial?: LiveMetricsPayload) {
 
   useEffect(() => {
     const supabase = createClient();
-    const channel = supabase
-      .channel("commerce-live-metrics")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "commerce_live_metrics",
-          filter: "id=eq.global",
-        },
-        (payload) => {
-          const row = payload.new as { payload?: LiveMetricsPayload };
-          if (row.payload) setRealtimePayload(row.payload);
-        },
-      )
-      .subscribe();
+    const channel = supabase.channel(
+      `commerce-live-metrics-${crypto.randomUUID()}`,
+    );
+
+    channel.on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "commerce_live_metrics",
+        filter: "id=eq.global",
+      },
+      (payload) => {
+        const row = payload.new as { payload?: LiveMetricsPayload };
+        if (row.payload) setRealtimePayload(row.payload);
+      },
+    );
+
+    channel.subscribe();
 
     return () => {
       void supabase.removeChannel(channel);

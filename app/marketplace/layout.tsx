@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MarketplaceSubNav } from "@/components/marketplace/MarketplaceSubNav";
 
 export const metadata: Metadata = {
   title: "Nexar Commerce — Enterprise Marketplace",
@@ -12,7 +13,8 @@ export default function MarketplaceLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-[calc(100vh-var(--nxr-header-offset))] bg-background">
+    <div className="relative min-h-[calc(100vh-var(--nxr-header-offset))] bg-background">
+      <MarketplaceSubNav />
       {children}
     </div>
   );

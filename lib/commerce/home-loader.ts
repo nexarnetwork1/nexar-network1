@@ -19,6 +19,74 @@ import type {
   MarketplaceStatisticsPayload,
 } from "./types";
 
+function normalizeRpcProduct(raw: Record<string, unknown>): CommerceProduct | null {
+  const id = typeof raw.id === "string" ? raw.id : undefined;
+  const name = typeof raw.name === "string" ? raw.name : undefined;
+  if (!id || !name) return null;
+
+  return {
+    id,
+    name,
+    slug: typeof raw.slug === "string" && raw.slug.length > 0 ? raw.slug : id,
+    price: Number(raw.price ?? 0),
+    currency: typeof raw.currency === "string" ? raw.currency : "USD",
+    image_url: typeof raw.image_url === "string" ? raw.image_url : null,
+    created_at: typeof raw.created_at === "string" ? raw.created_at : undefined,
+    store_id: typeof raw.store_id === "string" ? raw.store_id : undefined,
+    store_name: typeof raw.store_name === "string" ? raw.store_name : undefined,
+    store_slug: typeof raw.store_slug === "string" ? raw.store_slug : undefined,
+    units_sold: raw.units_sold != null ? Number(raw.units_sold) : undefined,
+    revenue: raw.revenue != null ? Number(raw.revenue) : undefined,
+  };
+}
+
+function normalizeRpcStore(raw: Record<string, unknown>): CommerceStore | null {
+  const id = typeof raw.id === "string" ? raw.id : undefined;
+  const name = typeof raw.name === "string" ? raw.name : undefined;
+  const slug = typeof raw.slug === "string" ? raw.slug : undefined;
+  if (!id || !name || !slug) return null;
+
+  return {
+    id,
+    name,
+    slug,
+    logo_url: typeof raw.logo_url === "string" ? raw.logo_url : null,
+    banner_url: typeof raw.banner_url === "string" ? raw.banner_url : null,
+    tagline: typeof raw.tagline === "string" ? raw.tagline : null,
+    featured: raw.featured === true,
+  };
+}
+
+function normalizeRpcBrand(raw: Record<string, unknown>): CommerceBrand | null {
+  const id = typeof raw.id === "string" ? raw.id : undefined;
+  const name = typeof raw.name === "string" ? raw.name : undefined;
+  const slug = typeof raw.slug === "string" ? raw.slug : undefined;
+  if (!id || !name || !slug) return null;
+
+  return {
+    id,
+    name,
+    slug,
+    logo_url: typeof raw.logo_url === "string" ? raw.logo_url : null,
+    store_id: typeof raw.store_id === "string" ? raw.store_id : undefined,
+    approved_at: typeof raw.approved_at === "string" ? raw.approved_at : null,
+  };
+}
+
+function normalizeRpcProducts(rows: unknown[]): CommerceProduct[] {
+  return rows
+    .filter((row): row is Record<string, unknown> => !!row && typeof row === "object")
+    .map(normalizeRpcProduct)
+    .filter((row): row is CommerceProduct => row !== null);
+}
+
+function normalizeRpcStores(rows: unknown[]): CommerceStore[] {
+  return rows
+    .filter((row): row is Record<string, unknown> => !!row && typeof row === "object")
+    .map(normalizeRpcStore)
+    .filter((row): row is CommerceStore => row !== null);
+}
+
 function parseStoreRelation(
   store: unknown,
 ): { id?: string; name: string; slug: string } | null {
@@ -332,13 +400,33 @@ async function loadFaqItems(): Promise<CommerceFaqItem[]> {
   }));
 }
 
-export async function loadCommerceHomeData(): Promise<CommerceHomeData> {
-  let liveRow: { payload?: LiveMetricsPayload; updated_at?: string } | null = null;
+function emptyMarketplaceStats(): MarketplaceStatisticsPayload {
+  return {
+    latest_products: [],
+    trending_products: [],
+    featured_stores: [],
+    approved_brands: [],
+    computed_at: new Date().toISOString(),
+  };
+}
+
+async function safe<T>(label: string, loader: () => Promise<T>, fallback: T): Promise<T> {
   try {
-    liveRow = await getLiveCommerceMetrics();
-  } catch {
-    liveRow = { payload: {}, updated_at: new Date().toISOString() };
+    return await loader();
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[commerce] ${label} unavailable:`, error);
+    }
+    return fallback;
   }
+}
+
+export async function loadCommerceHomeData(): Promise<CommerceHomeData> {
+  const liveRow = await safe(
+    "live metrics",
+    () => getLiveCommerceMetrics(),
+    { payload: {}, updated_at: new Date().toISOString() },
+  );
 
   const [
     marketplaceRaw,
@@ -351,29 +439,34 @@ export async function loadCommerceHomeData(): Promise<CommerceHomeData> {
     flashDealProducts,
     activeCountryCodes,
   ] = await Promise.all([
-    getMarketplaceStatistics(24),
-    listApprovedBrands(50),
-    loadCountries(),
-    loadActivity(40),
-    loadCategories(),
-    loadSubscriptionPlans(),
-    loadTopRatedProducts(12),
-    loadFlashDealProducts(12),
-    loadActiveCountryCodes(),
+    safe("marketplace statistics", () => getMarketplaceStatistics(24), emptyMarketplaceStats()),
+    safe("brands", () => listApprovedBrands(50), [] as CommerceBrand[]),
+    safe("countries", loadCountries, [] as CommerceCountry[]),
+    safe("activity", () => loadActivity(40), [] as CommerceActivityEvent[]),
+    safe("categories", loadCategories, [] as CommerceCategory[]),
+    safe("subscription plans", loadSubscriptionPlans, [] as CommerceSubscriptionPlan[]),
+    safe("top rated products", () => loadTopRatedProducts(12), [] as CommerceProduct[]),
+    safe("flash deals", () => loadFlashDealProducts(12), [] as CommerceProduct[]),
+    safe("active country codes", loadActiveCountryCodes, [] as string[]),
   ]);
 
   const livePayload = (liveRow?.payload ?? {}) as LiveMetricsPayload;
   const marketplace: MarketplaceStatisticsPayload = {
-    latest_products: marketplaceRaw.latest_products as CommerceProduct[],
-    trending_products: marketplaceRaw.trending_products as CommerceProduct[],
-    approved_brands: marketplaceRaw.approved_brands as CommerceBrand[],
-    featured_stores: await enrichFeaturedStores(
-      marketplaceRaw.featured_stores as CommerceStore[],
+    latest_products: normalizeRpcProducts(marketplaceRaw.latest_products),
+    trending_products: normalizeRpcProducts(marketplaceRaw.trending_products),
+    approved_brands: marketplaceRaw.approved_brands
+      .filter((row): row is Record<string, unknown> => !!row && typeof row === "object")
+      .map(normalizeRpcBrand)
+      .filter((row): row is CommerceBrand => row !== null),
+    featured_stores: await safe(
+      "featured store enrichment",
+      () => enrichFeaturedStores(normalizeRpcStores(marketplaceRaw.featured_stores)),
+      [],
     ),
     computed_at: marketplaceRaw.computed_at,
   };
 
-  const faqItems = await loadFaqItems();
+  const faqItems = await safe("faq", loadFaqItems, [] as CommerceFaqItem[]);
 
   return {
     liveMetrics: livePayload,

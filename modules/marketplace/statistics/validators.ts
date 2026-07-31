@@ -1,18 +1,18 @@
 import { z } from "zod";
 
 export const globalCommerceStatisticsSchema = z.object({
-  total_users: z.number(),
-  total_merchants: z.number(),
-  total_customers: z.number(),
-  verified_stores: z.number(),
-  total_products: z.number(),
-  total_orders: z.number(),
-  paid_orders: z.number(),
-  sales_volume_usd: z.number(),
-  nxr_payments: z.number(),
-  usdt_payments: z.number(),
-  countries_active: z.number(),
-  new_stores_7d: z.number(),
+  total_users: z.coerce.number(),
+  total_merchants: z.coerce.number(),
+  total_customers: z.coerce.number(),
+  verified_stores: z.coerce.number(),
+  total_products: z.coerce.number(),
+  total_orders: z.coerce.number(),
+  paid_orders: z.coerce.number(),
+  sales_volume_usd: z.coerce.number(),
+  nxr_payments: z.coerce.number(),
+  usdt_payments: z.coerce.number(),
+  countries_active: z.coerce.number(),
+  new_stores_7d: z.coerce.number(),
   computed_at: z.string(),
 });
 

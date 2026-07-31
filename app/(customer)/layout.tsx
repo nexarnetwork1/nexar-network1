@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
+import { authModalHref } from "@/lib/auth/auth-modal-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
 import { Button } from "@/components/ui/Button";
@@ -15,7 +16,7 @@ export default async function CustomerLayout({
   const profile = await getCurrentProfile();
 
   if (!profile || profile.role !== "customer") {
-    redirect("/login");
+    redirect(authModalHref({ auth: "signin", redirect: "/customer" }));
   }
 
   const supabase = await createClient();
@@ -48,11 +49,23 @@ export default async function CustomerLayout({
             <Link href="/customer/purchases" className="text-muted hover:text-white">
               History
             </Link>
+            <Link href="/marketplace" className="text-muted hover:text-white">
+              Marketplace
+            </Link>
+            <Link href="/marketplace/wishlist" className="text-muted hover:text-white">
+              Wishlist
+            </Link>
+            <Link href="/marketplace/cart" className="text-muted hover:text-white">
+              Cart
+            </Link>
             <Link href="/customer/payment-methods" className="text-muted hover:text-white">
               Payment methods
             </Link>
             <Link href="/customer/profile" className="text-muted hover:text-white">
               Profile
+            </Link>
+            <Link href="/customer/addresses" className="text-muted hover:text-white">
+              Addresses
             </Link>
             <Link href="/customer/disputes" className="text-muted hover:text-white">
               Disputes

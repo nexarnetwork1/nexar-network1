@@ -54,7 +54,7 @@ export function MerchantPlatform() {
     <SectionShell
       eyebrow="Merchants"
       title="Merchant platform"
-      description="Interactive showcase of the operational modules merchants use to run storefronts on Nexar Commerce."
+      description="Interactive showcase of the tools merchants use to launch, manage, and grow premium storefronts on Nexar Commerce."
     >
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <div className="flex flex-wrap gap-2 lg:flex-col">

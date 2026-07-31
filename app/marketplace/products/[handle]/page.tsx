@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getProductDetail } from "@/modules/marketplace/storefront/repository";
 import { ProductDetailView } from "@/components/storefront/ProductDetailView";
+import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -23,9 +24,16 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProductDetail(handle, profile?.id);
   if (!product) notFound();
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
+  const shareUrl = `${baseUrl}${MARKETPLACE_ROUTES.product(product.slug || handle)}`;
+
   return (
     <Container className="py-8 sm:py-12">
-      <ProductDetailView product={product} />
+      <ProductDetailView
+        product={product}
+        isCustomer={profile?.role === "customer"}
+        shareUrl={shareUrl}
+      />
     </Container>
   );
 }

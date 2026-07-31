@@ -56,7 +56,7 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className="luxury-border rounded-2xl bg-card/40 px-5 py-5 backdrop-blur-md"
+      className="luxury-border rounded-2xl bg-card/40 px-5 py-5 backdrop-blur-md transition-shadow hover:shadow-[0_12px_40px_-20px_rgba(212,175,55,0.35)]"
     >
       <p className="text-[10px] tracking-[0.22em] text-muted uppercase">{label}</p>
       <p className="mt-3 font-mono text-2xl font-medium text-white sm:text-3xl">
@@ -80,8 +80,8 @@ export function LiveStatistics({ initialMetrics }: LiveStatisticsProps) {
     <SectionShell
       id="commerce-stats"
       eyebrow="Live Network"
-      title="Realtime marketplace statistics"
-      description="Every metric is computed from Supabase — users, merchants, orders, and payment volumes update automatically across the Nexar Commerce network."
+      title="Marketplace performance"
+      description="Live commerce metrics across verified merchants, products, orders, and global payment volume — updated in real time as the network grows."
     >
       <div ref={ref} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {STATS.map((stat, i) => {

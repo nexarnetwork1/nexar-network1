@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Clock } from "lucide-react";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { signOutAction } from "@/modules/auth/actions";
+import { authModalHref } from "@/lib/auth/auth-modal-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { MerchantRealtimeProvider } from "@/components/realtime/MerchantRealtimeProvider";
 import { Button } from "@/components/ui/Button";
@@ -15,7 +17,7 @@ export default async function MerchantLayout({
   const profile = await getCurrentProfile();
 
   if (!profile || profile.role !== "merchant") {
-    redirect("/login");
+    redirect(authModalHref({ auth: "signin", redirect: "/merchant" }));
   }
 
   const store = await getMerchantStore(profile.id);
@@ -98,6 +100,23 @@ export default async function MerchantLayout({
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-6 py-10">
+        {store?.status === "pending" ? (
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4">
+            <div className="flex items-start gap-3">
+              <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-amber-200">Your store is awaiting approval</p>
+                <p className="mt-1 text-xs text-muted">
+                  {store.name} is under review. You can prepare your catalog while our team verifies
+                  your storefront.
+                </p>
+              </div>
+            </div>
+            <Link href="/merchant/onboarding" className="text-xs text-gold hover:underline">
+              View status
+            </Link>
+          </div>
+        ) : null}
         <MerchantRealtimeProvider>{children}</MerchantRealtimeProvider>
       </main>
     </div>

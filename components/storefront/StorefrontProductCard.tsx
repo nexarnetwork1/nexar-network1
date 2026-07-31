@@ -14,9 +14,7 @@ type StorefrontProductCardProps = {
 
 export function StorefrontProductCard({ product, index = 0, storeSlug }: StorefrontProductCardProps) {
   const handle = product.slug || product.id;
-  const href = storeSlug
-    ? `${MARKETPLACE_ROUTES.store(storeSlug)}/products/${handle}`
-    : MARKETPLACE_ROUTES.product(handle);
+  const href = MARKETPLACE_ROUTES.product(handle);
 
   return (
     <motion.article

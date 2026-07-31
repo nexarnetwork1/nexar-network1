@@ -3,26 +3,37 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { Heart, ShieldCheck, Star } from "lucide-react";
+import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { ProductImageGallery } from "@/components/catalog/ProductImageGallery";
 import { ProductPrice } from "@/components/catalog/ProductPrice";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
+import { addToCartAction } from "@/modules/marketplace/cart";
+import { buyNowAction } from "@/modules/orders/actions";
 import {
   recordProductViewAction,
   submitProductReviewAction,
   toggleWishlistAction,
 } from "@/modules/marketplace/storefront/actions";
 import type { StorefrontProductDetail } from "@/modules/marketplace/storefront/types";
+import { ProductShareButton } from "@/components/storefront/ProductShareButton";
 import { StorefrontProductGrid } from "./StorefrontProductCard";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
 
 type Props = {
   product: StorefrontProductDetail;
+  isCustomer?: boolean;
+  shareUrl?: string;
 };
 
-export function ProductDetailView({ product }: Props) {
+export function ProductDetailView({ product, isCustomer = false, shareUrl }: Props) {
+  const { openAuthModal } = useAuthModal();
+  const productPath = MARKETPLACE_ROUTES.product(product.slug || product.id);
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]?.id ?? null);
   const [inWishlist, setInWishlist] = useState(product.in_wishlist);
+  const [quantity, setQuantity] = useState(1);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const variant = product.variants.find((v) => v.id === selectedVariant) ?? product.variants[0];
@@ -105,25 +116,106 @@ export function ProductDetailView({ product }: Props) {
             </div>
           </dl>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button size="lg" disabled={displayStock <= 0}>
-              {displayStock > 0 ? "Add to cart (coming soon)" : "Out of stock"}
-            </Button>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {displayStock > 0 && isCustomer ? (
+              <>
+                <div className="inline-flex items-center rounded-full border border-border/70 bg-background/50">
+                  <button
+                    type="button"
+                    aria-label="Decrease quantity"
+                    disabled={quantity <= 1 || pending}
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="px-3 py-2 text-muted hover:text-white"
+                  >
+                    −
+                  </button>
+                  <span className="min-w-[2rem] text-center text-sm">{quantity}</span>
+                  <button
+                    type="button"
+                    aria-label="Increase quantity"
+                    disabled={quantity >= displayStock || pending}
+                    onClick={() => setQuantity((q) => Math.min(displayStock, q + 1))}
+                    className="px-3 py-2 text-muted hover:text-white"
+                  >
+                    +
+                  </button>
+                </div>
+                <Button
+                  size="lg"
+                  disabled={pending}
+                  onClick={() => {
+                    setError(null);
+                    setMessage(null);
+                    startTransition(async () => {
+                      const result = await addToCartAction(product.id, quantity);
+                      if (!result.success) {
+                        setError(result.error ?? "Could not add to cart");
+                        return;
+                      }
+                      setMessage("Added to cart");
+                    });
+                  }}
+                >
+                  Add to cart
+                </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  disabled={pending}
+                  onClick={() => {
+                    setError(null);
+                    startTransition(async () => {
+                      const result = await buyNowAction(product.id, quantity);
+                      if (result && !result.success) {
+                        setError(result.error ?? "Checkout failed");
+                      }
+                    });
+                  }}
+                >
+                  Buy now
+                </Button>
+              </>
+            ) : displayStock > 0 ? (
+              <Button
+                size="lg"
+                onClick={() =>
+                  openAuthModal({ mode: "signin", redirect: productPath })
+                }
+              >
+                Sign in to purchase
+              </Button>
+            ) : (
+              <Button size="lg" disabled>
+                Out of stock
+              </Button>
+            )}
             <Button
               size="lg"
               variant="secondary"
               disabled={pending}
-              onClick={() =>
+              onClick={() => {
+                if (!isCustomer) {
+                  openAuthModal({ mode: "signin", redirect: productPath });
+                  return;
+                }
                 startTransition(async () => {
                   const result = await toggleWishlistAction(product.id);
                   if (result.success) setInWishlist(result.inWishlist ?? false);
-                })
-              }
+                });
+              }}
             >
               <Heart className={`h-4 w-4 ${inWishlist ? "fill-gold text-gold" : ""}`} />
               {inWishlist ? "Saved" : "Wishlist"}
             </Button>
+            {shareUrl ? <ProductShareButton title={product.name} url={shareUrl} /> : null}
           </div>
+          {message ? <p className="mt-3 text-sm text-emerald-400">{message}</p> : null}
+          {error ? <p className="mt-3 text-sm text-red-400">{error}</p> : null}
+          {isCustomer ? (
+            <Link href={MARKETPLACE_ROUTES.cart} className="mt-3 inline-block text-sm text-gold hover:underline">
+              View cart
+            </Link>
+          ) : null}
 
           {product.description && (
             <div className="mt-8">

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { SectionShell } from "@/components/commerce/home/shared/SectionShell";
+import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import type { CommerceSubscriptionPlan } from "@/lib/commerce/types";
 
 type PricingSectionProps = {
@@ -57,7 +58,7 @@ export function PricingSection({ plans }: PricingSectionProps) {
               </div>
               {plan.store_slug ? (
                 <Link
-                  href={`/marketplace/stores/${plan.store_slug}`}
+                  href={MARKETPLACE_ROUTES.store(plan.store_slug)}
                   className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-gold/30 bg-gold/10 text-sm font-medium text-gold transition-colors hover:bg-gold/15"
                 >
                   View plan

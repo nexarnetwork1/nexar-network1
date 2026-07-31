@@ -68,7 +68,7 @@ export function CommerceProductCard({
           </h3>
           <div className="flex items-center justify-between">
             <p className="font-mono text-base text-gold">
-              {product.price.toLocaleString(undefined, {
+              {Number(product.price).toLocaleString(undefined, {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2,
               })}{" "}

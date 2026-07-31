@@ -11,7 +11,7 @@ export default async function AdminDashboardLayout({
   const session = await getSuperAdminSession();
 
   if (!session) {
-    redirect("/?admin=wallet-required");
+    redirect("/admin/login");
   }
 
   return (

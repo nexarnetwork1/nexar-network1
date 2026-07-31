@@ -14,6 +14,7 @@ export {
   changeWalletAction,
   revokeSessionAction,
   revokeOtherSessionsAction,
+  uploadAvatarAction,
 } from "./actions";
 export type { ActionResult } from "./actions";
 export {

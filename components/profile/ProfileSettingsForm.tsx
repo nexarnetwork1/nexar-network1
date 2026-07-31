@@ -18,6 +18,7 @@ import {
   changePasswordAction,
   changeEmailAction,
   changeWalletAction,
+  uploadAvatarAction,
 } from "@/modules/auth/actions";
 import { objectToFormData } from "@/utils/form-data";
 import { Input } from "@/components/ui/Input";
@@ -154,6 +155,38 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
           className="mt-6 max-w-md space-y-4"
           noValidate
         >
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border bg-surface text-lg text-gold">
+              {profile.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                (profile.full_name ?? profile.email ?? "U").slice(0, 1).toUpperCase()
+              )}
+            </div>
+            <label className="text-sm text-muted">
+              <span className="mb-2 block font-medium text-white">Profile photo</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-gold/10 file:px-3 file:py-2 file:text-gold"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  const fd = new FormData();
+                  fd.set("avatar", file);
+                  void uploadAvatarAction(fd).then((result) => {
+                    if (result.success) {
+                      setMessage("Avatar updated");
+                      router.refresh();
+                    } else {
+                      setError(result.error ?? "Upload failed");
+                    }
+                  });
+                }}
+              />
+            </label>
+          </div>
           <Input
             {...profileForm.register("fullName")}
             label="Full name"

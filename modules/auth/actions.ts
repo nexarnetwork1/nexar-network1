@@ -307,7 +307,7 @@ export async function registerCustomerAction(
     metadata: { method: "email", role: "customer" },
   }).catch(() => undefined);
 
-  return { success: true, redirectTo: "/customer" };
+  return { success: true, redirectTo: "/marketplace" };
 }
 
 export async function registerMerchantAction(
@@ -446,7 +446,7 @@ export async function registerMerchantAction(
     metadata: { method: "email", role: "merchant", store_name: parsed.data.storeName },
   }).catch(() => undefined);
 
-  return { success: true, redirectTo: "/merchant" };
+  return { success: true, redirectTo: "/merchant/onboarding" };
 }
 
 export async function completeProfileAction(
@@ -863,6 +863,49 @@ export async function revokeOtherSessionsAction(): Promise<ActionResult> {
     entityType: "profile",
     entityId: user.id,
   }).catch(() => undefined);
+
+  return { success: true };
+}
+
+export async function uploadAvatarAction(formData: FormData): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const file = formData.get("avatar");
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, error: "Please choose an image" };
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    return { success: false, error: "Image must be under 2 MB" };
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
+  if (!["jpg", "jpeg", "png", "webp"].includes(ext)) {
+    return { success: false, error: "Use JPG, PNG, or WebP" };
+  }
+
+  const path = `${user.id}/avatar.${ext}`;
+  const { error: uploadError } = await supabase.storage
+    .from("user-avatars")
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if (uploadError) {
+    return { success: false, error: uploadError.message };
+  }
+
+  const { data } = supabase.storage.from("user-avatars").getPublicUrl(path);
+  const avatarUrl = `${data.publicUrl}?t=${Date.now()}`;
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ avatar_url: avatarUrl })
+    .eq("id", user.id);
+
+  if (error) return { success: false, error: error.message };
 
   return { success: true };
 }

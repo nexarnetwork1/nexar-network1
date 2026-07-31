@@ -1,10 +1,18 @@
-import { Suspense } from "react";
-import LoginForm from "./LoginForm";
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { authModalHref } from "@/lib/auth/auth-modal-url";
 
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<div className="h-64 animate-pulse rounded-2xl bg-card/40" />}>
-      <LoginForm />
-    </Suspense>
+type Props = {
+  searchParams: Promise<Record<string, string | undefined>>;
+};
+
+export default async function LoginPage({ searchParams }: Props) {
+  const sp = await searchParams;
+  redirect(
+    authModalHref({
+      auth: "signin",
+      redirect: sp.redirect ?? sp.next,
+      message: sp.message,
+    }),
   );
 }

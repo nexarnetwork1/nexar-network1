@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { CommerceHomeData } from "@/lib/commerce/types";
+import { CommerceSpaceBackground } from "./CommerceSpaceBackground";
 import { CommerceHero } from "./sections/CommerceHero";
 import { LiveStatistics } from "./sections/LiveStatistics";
 
@@ -30,9 +31,6 @@ const GlobalNetwork = dynamic(() =>
   import("./sections/GlobalNetwork").then((m) => m.GlobalNetwork),
 );
 const NexarAi = dynamic(() => import("./sections/NexarAi").then((m) => m.NexarAi));
-const DeveloperPlatform = dynamic(() =>
-  import("./sections/DeveloperPlatform").then((m) => m.DeveloperPlatform),
-);
 const PricingSection = dynamic(() =>
   import("./sections/PricingSection").then((m) => m.PricingSection),
 );
@@ -55,32 +53,34 @@ export function CommerceHome({ data }: CommerceHomeProps) {
       : data.countries.map((c) => c.code);
 
   return (
-    <main className="relative">
-      <CommerceHero countryCodes={countryCodes} activity={data.activity} />
-      <LiveStatistics initialMetrics={data.liveMetrics} />
-      <TrustedBrands initialBrands={data.brands} />
-      <FeaturedStores initialStores={data.marketplace.featured_stores} />
-      <TrendingProducts
-        initialTrending={data.marketplace.trending_products}
-        initialLatest={data.marketplace.latest_products}
-        initialTopRated={data.topRatedProducts}
-        initialFlashDeals={data.flashDealProducts}
-      />
-      <MarketplaceCategories categories={data.categories} />
-      <WhyNexarCommerce />
-      <CryptoPayments />
-      <MerchantPlatform />
-      <GlobalNetwork
-        countryCodes={countryCodes}
-        countries={data.countries}
-        initialActivity={data.activity}
-      />
-      <NexarAi />
-      <DeveloperPlatform />
-      <PricingSection plans={data.subscriptionPlans} />
-      <FaqSection items={data.faqItems} />
-      <CommerceCta />
-      <CommerceFooter initialMetrics={data.liveMetrics} countries={data.countries} />
-    </main>
+    <>
+      <CommerceSpaceBackground />
+      <main className="relative">
+        <CommerceHero countryCodes={countryCodes} activity={data.activity} />
+        <LiveStatistics initialMetrics={data.liveMetrics} />
+        <TrustedBrands initialBrands={data.brands} />
+        <FeaturedStores initialStores={data.marketplace.featured_stores} />
+        <TrendingProducts
+          initialTrending={data.marketplace.trending_products}
+          initialLatest={data.marketplace.latest_products}
+          initialTopRated={data.topRatedProducts}
+          initialFlashDeals={data.flashDealProducts}
+        />
+        <MarketplaceCategories categories={data.categories} />
+        <WhyNexarCommerce />
+        <CryptoPayments />
+        <MerchantPlatform />
+        <GlobalNetwork
+          countryCodes={countryCodes}
+          countries={data.countries}
+          initialActivity={data.activity}
+        />
+        <NexarAi />
+        <PricingSection plans={data.subscriptionPlans} />
+        <FaqSection items={data.faqItems} />
+        <CommerceCta />
+        <CommerceFooter initialMetrics={data.liveMetrics} countries={data.countries} />
+      </main>
+    </>
   );
 }

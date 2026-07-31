@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Globe2, Sparkles } from "lucide-react";
+import { AuthModalTrigger } from "@/components/auth/AuthModalProvider";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { StatusDot } from "@/components/ui/StatusDot";
@@ -53,13 +53,14 @@ export function CommerceHero({ countryCodes, activity }: CommerceHeroProps) {
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link
-                href="/auth/register?role=merchant"
+              <AuthModalTrigger
+                mode="register"
+                role="merchant"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold px-7 text-sm font-medium tracking-wide text-background shadow-[0_0_30px_-8px_rgba(212,175,55,0.55)] transition-all hover:bg-gold-secondary hover:shadow-[0_0_40px_-6px_rgba(212,175,55,0.7)]"
               >
                 Start Selling
                 <ArrowUpRight className="h-4 w-4" />
-              </Link>
+              </AuthModalTrigger>
               <Button
                 size="lg"
                 variant="secondary"

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import { requireRole } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import type { ActionResult } from "@/modules/auth/actions";
@@ -270,7 +271,7 @@ export async function updateStoreMarketplaceProfileAction(
 
   revalidatePath("/merchant/store");
   revalidatePath("/marketplace");
-  revalidatePath(`/marketplace/stores/${store.slug}`);
+  revalidatePath(MARKETPLACE_ROUTES.store(store.slug));
   return { success: true };
 }
 
@@ -341,7 +342,7 @@ export async function updateStoreAppearanceAction(
 
   revalidatePath("/merchant/store");
   revalidatePath("/marketplace");
-  revalidatePath(`/marketplace/stores/${store.slug}`);
+  revalidatePath(MARKETPLACE_ROUTES.store(store.slug));
   return { success: true };
 }
 
@@ -466,9 +467,9 @@ export async function saveStoreBuilderAction(formData: FormData): Promise<Action
   revalidatePath("/merchant/store");
   revalidatePath("/merchant/store/builder");
   revalidatePath("/marketplace");
-  revalidatePath(`/marketplace/stores/${store.slug}`);
+  revalidatePath(MARKETPLACE_ROUTES.store(store.slug));
   if (slugChanged) {
-    revalidatePath(`/marketplace/stores/${general.data.slug}`);
+    revalidatePath(MARKETPLACE_ROUTES.store(general.data.slug));
   }
 
   return { success: true };

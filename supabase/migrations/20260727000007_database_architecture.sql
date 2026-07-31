@@ -738,19 +738,19 @@ CREATE TRIGGER qr_codes_updated_at
 
 -- Auto-generate QR codes for existing stores
 INSERT INTO public.qr_codes (store_id, qr_type, payload)
-SELECT s.id, 'marketplace', 'nexar://store/' || s.slug || '?token=' || encode(gen_random_bytes(16), 'hex')
+SELECT s.id, 'marketplace'::public.qr_code_type, 'nexar://store/' || s.slug || '?token=' || encode(gen_random_bytes(16), 'hex')
 FROM public.stores s
 WHERE s.status = 'active'
   AND NOT EXISTS (
-    SELECT 1 FROM public.qr_codes q WHERE q.store_id = s.id AND q.qr_type = 'marketplace'
+    SELECT 1 FROM public.qr_codes q WHERE q.store_id = s.id AND q.qr_type = 'marketplace'::public.qr_code_type
   );
 
 INSERT INTO public.qr_codes (store_id, qr_type, payload)
-SELECT s.id, 'payment_only', 'nexar://pay/' || s.slug || '?token=' || encode(gen_random_bytes(16), 'hex')
+SELECT s.id, 'payment_only'::public.qr_code_type, 'nexar://pay/' || s.slug || '?token=' || encode(gen_random_bytes(16), 'hex')
 FROM public.stores s
 WHERE s.status = 'active'
   AND NOT EXISTS (
-    SELECT 1 FROM public.qr_codes q WHERE q.store_id = s.id AND q.qr_type = 'payment_only'
+    SELECT 1 FROM public.qr_codes q WHERE q.store_id = s.id AND q.qr_type = 'payment_only'::public.qr_code_type
   );
 
 -- ═══════════════════════════════════════════════════════════════════════════════

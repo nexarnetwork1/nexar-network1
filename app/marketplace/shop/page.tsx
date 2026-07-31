@@ -11,6 +11,7 @@ export default async function MarketplaceShopPage({ searchParams }: Props) {
   const sp = await searchParams;
 
   const result = await searchShop({
+    storeSlug: sp.store,
     query: sp.q,
     categorySlug: sp.category,
     brandId: sp.brand,

@@ -29,7 +29,7 @@ export function GlobalNetwork({
       id="global-network"
       eyebrow="Network"
       title="Global Nexar network"
-      description="Merchant locations, transaction paths, and country activity visualized in realtime from commerce analytics and activity feeds."
+      description="Merchant locations, buyer activity, and cross-border commerce visualized across the Nexar global network."
       className="overflow-hidden"
     >
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
