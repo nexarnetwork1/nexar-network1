@@ -1,8 +1,10 @@
 "use server";
 
+import "server-only";
+
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/modules/users/repository";
-import { wishlistRepository } from "@/modules/marketplace/wishlist";
+import { wishlistRepository } from "@/modules/marketplace/wishlist/infrastructure/supabase-wishlist-repository";
 import type { StorefrontProduct } from "@/modules/marketplace/storefront/types";
 
 const PRODUCT_SELECT =

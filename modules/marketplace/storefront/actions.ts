@@ -5,7 +5,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole, getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
-import { wishlistRepository } from "@/modules/marketplace/wishlist";
+import { wishlistRepository } from "@/modules/marketplace/wishlist/infrastructure/supabase-wishlist-repository";
 import type { ActionResult } from "@/modules/auth/actions";
 
 const reviewSchema = z.object({

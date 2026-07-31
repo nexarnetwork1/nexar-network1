@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import { SectionShell } from "@/components/commerce/home/shared/SectionShell";
 import { Button } from "@/components/ui/Button";
-import { generateMerchantAssistantAction } from "@/modules/ai";
-import type { MerchantAssistantTask } from "@/modules/ai";
+import { generateMerchantAssistantAction } from "@/modules/ai/actions";
+import type { MerchantAssistantTask } from "@/modules/ai/types";
 import { cn } from "@/lib/utils/cn";
 
 type AssistantTask = MerchantAssistantTask;

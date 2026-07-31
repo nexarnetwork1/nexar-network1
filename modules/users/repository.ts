@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, UserRole } from "@/types";
 import { requireSuperAdminSession } from "@/lib/admin/super-admin";

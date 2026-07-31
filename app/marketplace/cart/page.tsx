@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { CartView } from "@/components/storefront/CartView";
 import { getCurrentProfile } from "@/modules/users/repository";
-import { getMarketplaceCartWithItems } from "@/modules/marketplace/cart";
+import { getMarketplaceCartWithItems } from "@/modules/marketplace/cart/server";
 
 export const metadata: Metadata = {
   title: "Shopping cart · Nexar Commerce",

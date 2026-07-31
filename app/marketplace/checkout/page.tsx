@@ -6,7 +6,7 @@ import { CheckoutButton } from "@/components/orders/CheckoutButton";
 import { Button } from "@/components/ui/Button";
 import { authModalHref } from "@/lib/auth/auth-modal-url";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
-import { getMarketplaceCartWithItems } from "@/modules/marketplace/cart";
+import { getMarketplaceCartWithItems } from "@/modules/marketplace/cart/server";
 import { getCurrentProfile } from "@/modules/users/repository";
 
 export const metadata: Metadata = {

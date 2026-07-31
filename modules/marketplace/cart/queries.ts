@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateMarketplaceCart } from "./application/get-or-create-cart";
 

@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Cart } from "@/types";
 import { cartRepository } from "../infrastructure/supabase-cart-repository";
 

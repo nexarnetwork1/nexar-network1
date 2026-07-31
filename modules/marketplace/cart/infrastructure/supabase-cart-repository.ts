@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createClient } from "@/lib/supabase/server";
 import type { Cart, CartItemWithProduct } from "@/types";
 import type { CartRepository } from "../application/ports";

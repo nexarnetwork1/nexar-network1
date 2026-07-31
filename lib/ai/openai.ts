@@ -91,7 +91,7 @@ async function runWithTools(
       });
     }
 
-    currentInput = [...currentInput, ...response.output, ...toolOutputs];
+    currentInput = [...currentInput, ...response.output, ...toolOutputs] as ResponseInput;
   }
 
   return { text: finalText, navigateTo };

@@ -103,7 +103,7 @@ export function pickActionsForPage(
   const labels = byPage[pageType] ?? ["Open Marketplace", "Open Whitepaper", "Open FAQ"];
   return labels
     .map((label) => NAVIGATION_ACTIONS.find((a) => a.label === label))
-    .filter(Boolean)
-    .filter((a) => !a!.roles || a!.roles.includes(role))
-    .map(({ label, href, kind, prompt }) => ({ label, href, kind: kind, prompt }));
+    .filter((action): action is ActionDef => Boolean(action))
+    .filter((a) => !a.roles || a.roles.includes(role))
+    .map(({ label, href, kind, prompt }) => ({ label, href, kind, prompt }));
 }

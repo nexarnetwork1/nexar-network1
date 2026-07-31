@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, startTransition } from "react";
 
 const SESSION_KEY = "nxr-assistant-session";
 
@@ -53,9 +53,11 @@ export function useAssistantSession() {
 
   useEffect(() => {
     const session = readSession();
-    setMessages(session.messages);
-    setUnreadCount(session.unreadCount);
-    setHydrated(true);
+    startTransition(() => {
+      setMessages(session.messages);
+      setUnreadCount(session.unreadCount);
+      setHydrated(true);
+    });
   }, []);
 
   useEffect(() => {

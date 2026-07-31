@@ -54,7 +54,7 @@ function resolveNavigationTarget(query: string): string | null {
 
   for (const entry of SITE_KNOWLEDGE) {
     if (entry.keywords.some((kw) => target.includes(kw.toLowerCase()))) {
-      return entry.primaryLink ?? entry.links?.[0]?.href;
+      return entry.primaryLink ?? entry.links?.[0]?.href ?? null;
     }
   }
 

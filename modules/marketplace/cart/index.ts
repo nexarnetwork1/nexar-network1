@@ -1,9 +1,6 @@
-export type { CartRepository } from "./application/ports";
-export { getOrCreateMarketplaceCart, getMarketplaceCartWithItems } from "./application/get-or-create-cart";
-export { cartRepository } from "./infrastructure/supabase-cart-repository";
+/** Client-safe cart entry — server actions only. Import `@/modules/marketplace/cart/server` on the server. */
 export {
   addToCartAction,
   updateCartItemQuantityAction,
   removeCartItemAction,
 } from "./actions";
-export { getMarketplaceCartItemCount } from "./queries";

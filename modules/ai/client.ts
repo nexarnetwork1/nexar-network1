@@ -1,5 +1,4 @@
-import "server-only";
-
+/** Client-safe AI module exports (types, prompts). Import server actions from `@/modules/ai/actions`. */
 export type {
   MerchantAssistantTask,
   MerchantAssistantRequest,
@@ -11,5 +10,4 @@ export type {
   GlobalAssistantRequest,
   ConversationTurn,
 } from "./types";
-export { generateMerchantAssistantAction, askGlobalAssistantAction } from "./actions";
 export { ASSISTANT_SUGGESTED_PROMPTS } from "./site-knowledge";

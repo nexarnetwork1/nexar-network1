@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createClient } from "@/lib/supabase/server";
 import { listApprovedBrands } from "@/modules/marketplace/brands";
 import {

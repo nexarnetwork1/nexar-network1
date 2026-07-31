@@ -56,7 +56,7 @@ async function* demoStream(
 
 let openaiProvider: OpenAIGlobalAssistantProvider | null = null;
 
-export function getAssistantProvider(): GlobalAssistantProvider {
+export function getAssistantProvider(): OpenAIGlobalAssistantProvider {
   if (!openaiProvider) {
     openaiProvider = new OpenAIGlobalAssistantProvider();
   }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { WishlistView } from "@/components/storefront/WishlistView";
 import { getCurrentProfile } from "@/modules/users/repository";
-import { getWishlistProducts } from "@/modules/marketplace/wishlist";
+import { getWishlistProducts } from "@/modules/marketplace/wishlist/server";
 
 export const metadata: Metadata = {
   title: "Wishlist · Nexar Commerce",

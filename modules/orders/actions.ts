@@ -7,7 +7,7 @@ import { requireRole } from "@/modules/users/repository";
 import {
   getOrCreateMarketplaceCart,
   getMarketplaceCartWithItems,
-} from "@/modules/marketplace/cart";
+} from "@/modules/marketplace/cart/server";
 import { getCatalogProductById } from "@/modules/marketplace/catalog";
 import { generateAndStoreInvoicePdf } from "@/modules/invoices/pdf";
 import { createNotification } from "@/modules/notifications/repository";
