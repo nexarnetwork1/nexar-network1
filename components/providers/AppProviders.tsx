@@ -8,6 +8,9 @@ import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { Web3Provider } from "@/components/providers/Web3Provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { AdminAccessPrompt } from "@/components/layout/AdminAccessPrompt";
+import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
+import { AuthModalOpener } from "@/components/auth/AuthModalOpener";
+import { NexarAssistant } from "@/components/assistant/NexarAssistant";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -54,10 +57,14 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryProvider>
       <Web3Provider>
-        <Suspense fallback={null}>
-          <AdminAccessPrompt />
-        </Suspense>
-        {children}
+        <AuthModalProvider>
+          <Suspense fallback={null}>
+            <AdminAccessPrompt />
+            <AuthModalOpener />
+          </Suspense>
+          {children}
+          <NexarAssistant />
+        </AuthModalProvider>
       </Web3Provider>
     </QueryProvider>
   );

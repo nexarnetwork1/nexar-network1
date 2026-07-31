@@ -1,3 +1,5 @@
+import { AdminNexarAssistant } from "./AdminNexarAssistant";
+
 export const metadata = {
   title: "Nexar CMS",
   description: "Nexar Network Control Center",
@@ -10,7 +12,10 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <AdminNexarAssistant />
+      </body>
     </html>
   );
 }

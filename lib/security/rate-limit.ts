@@ -14,6 +14,7 @@ const PRESETS: Record<string, RateLimitConfig> = {
   auth: { limit: 5, windowMs: 60_000 },
   checkout: { limit: 10, windowMs: 60_000 },
   api: { limit: 100, windowMs: 60_000 },
+  assistant: { limit: 30, windowMs: 60_000 },
 };
 
 export function rateLimit(

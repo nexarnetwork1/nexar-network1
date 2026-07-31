@@ -20,6 +20,8 @@ export const env = createEnv({
     EMAIL_FROM: z.string().email().optional(),
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
     ADMIN_ALERT_WEBHOOK_URL: z.string().url().optional(),
+    OPENAI_API_KEY: z.string().min(1).optional(),
+    OPENAI_MODEL: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -50,6 +52,8 @@ export const env = createEnv({
     EMAIL_FROM: process.env.EMAIL_FROM,
     LOG_LEVEL: process.env.LOG_LEVEL,
     ADMIN_ALERT_WEBHOOK_URL: process.env.ADMIN_ALERT_WEBHOOK_URL,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_MODEL: process.env.OPENAI_MODEL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY:
