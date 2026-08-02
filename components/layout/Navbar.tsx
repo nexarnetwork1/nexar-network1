@@ -5,8 +5,7 @@ import { Menu } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useScrolled } from "@/hooks/useScrolled";
-import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
-import { WalletIconButton } from "@/components/web3/WalletIconButton";
+import { NavbarWallet } from "@/components/layout/NavbarWallet";
 import { SuperAdminNavLink } from "@/components/layout/SuperAdminNavLink";
 import { NavLink } from "@/components/layout/NavLink";
 import { Container } from "@/components/ui/Container";
@@ -53,16 +52,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <SuperAdminNavLink className="hidden sm:inline-flex" />
-            <WalletIconButton className="lg:hidden" />
-            <ConnectWalletButton
-              variant="primary"
-              size="sm"
-              magnetic
-              glow
-              className="hidden lg:inline-flex"
-            >
-              Connect Wallet
-            </ConnectWalletButton>
+            <NavbarWallet />
 
             <button
               type="button"

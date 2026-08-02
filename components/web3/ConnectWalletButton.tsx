@@ -6,14 +6,18 @@ import { Button, type ButtonProps } from "@/components/ui/Button";
 import { WalletMenu } from "./WalletMenu";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { markWalletSessionActive } from "@/lib/web3/wallet-session";
+import { useWalletPanel, type WalletPanelState } from "./useWalletPanel";
 
-type ConnectWalletButtonProps = ButtonProps;
+type ConnectWalletButtonProps = ButtonProps & {
+  panel?: WalletPanelState;
+};
 
-export function ConnectWalletButton({
+function ConnectWalletButtonView({
+  panel,
   children,
   className,
   ...props
-}: ConnectWalletButtonProps) {
+}: ConnectWalletButtonProps & { panel: WalletPanelState }) {
   const { login, ready, authenticated } = usePrivy();
   const [connecting, setConnecting] = useState(false);
 
@@ -34,7 +38,7 @@ export function ConnectWalletButton({
   }
 
   if (authenticated) {
-    return <WalletMenu className={className} />;
+    return <WalletMenu panel={panel} className={className} />;
   }
 
   return (
@@ -58,4 +62,16 @@ export function ConnectWalletButton({
       {connecting ? "Connecting…" : children ?? "Connect Wallet"}
     </Button>
   );
+}
+
+function ConnectWalletButtonWithPanel(props: ConnectWalletButtonProps) {
+  const panel = useWalletPanel();
+  return <ConnectWalletButtonView panel={panel} {...props} />;
+}
+
+export function ConnectWalletButton({ panel, ...props }: ConnectWalletButtonProps) {
+  if (panel) {
+    return <ConnectWalletButtonView panel={panel} {...props} />;
+  }
+  return <ConnectWalletButtonWithPanel {...props} />;
 }

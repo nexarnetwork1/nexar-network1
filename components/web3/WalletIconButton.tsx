@@ -6,18 +6,18 @@ import { usePrivy } from "@privy-io/react-auth";
 import { cn } from "@/lib/utils/cn";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { markWalletSessionActive } from "@/lib/web3/wallet-session";
-import { useWalletPanel } from "./useWalletPanel";
+import type { WalletPanelState } from "./useWalletPanel";
 import { WalletMobileSheet } from "./WalletMobileSheet";
 
 type WalletIconButtonProps = {
+  panel: WalletPanelState;
   className?: string;
 };
 
-export function WalletIconButton({ className }: WalletIconButtonProps) {
+export function WalletIconButton({ panel, className }: WalletIconButtonProps) {
   const { login, ready, authenticated } = usePrivy();
   const [connecting, setConnecting] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const panel = useWalletPanel();
 
   if (!isWeb3Configured()) {
     return (

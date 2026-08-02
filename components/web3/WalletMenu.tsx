@@ -3,15 +3,15 @@
 import { Menu, MenuButton, MenuItems } from "@headlessui/react";
 import { ChevronDown, Circle } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { useWalletPanel } from "./useWalletPanel";
 import { WalletMenuPanel } from "./WalletMenuPanel";
+import type { WalletPanelState } from "./useWalletPanel";
 
 type WalletMenuProps = {
+  panel: WalletPanelState;
   className?: string;
 };
 
-export function WalletMenu({ className }: WalletMenuProps) {
-  const panel = useWalletPanel();
+export function WalletMenu({ panel, className }: WalletMenuProps) {
   const { address, shortAddress } = panel;
 
   if (!address) return null;
