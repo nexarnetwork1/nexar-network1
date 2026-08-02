@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Shield } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 async function fetchAdminStatus(): Promise<boolean> {
   const res = await fetch("/api/admin/wallet/status");
@@ -10,7 +11,11 @@ async function fetchAdminStatus(): Promise<boolean> {
   return Boolean(data.authenticated);
 }
 
-export function SuperAdminNavLink() {
+type SuperAdminNavLinkProps = {
+  className?: string;
+};
+
+export function SuperAdminNavLink({ className }: SuperAdminNavLinkProps) {
   const [authenticated, setAuthenticated] = useState(false);
 
   const refresh = useCallback(() => {
@@ -30,9 +35,12 @@ export function SuperAdminNavLink() {
   return (
     <Link
       href="/admin/dashboard"
-      className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:bg-gold/20"
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:bg-gold/20",
+        className,
+      )}
     >
-      <Shield className="h-3.5 w-3.5" />
+      <Shield className="h-3.5 w-3.5" aria-hidden />
       Admin
     </Link>
   );

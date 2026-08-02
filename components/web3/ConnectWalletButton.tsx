@@ -11,6 +11,7 @@ type ConnectWalletButtonProps = ButtonProps;
 
 export function ConnectWalletButton({
   children,
+  className,
   ...props
 }: ConnectWalletButtonProps) {
   const { login, ready, authenticated } = usePrivy();
@@ -18,7 +19,7 @@ export function ConnectWalletButton({
 
   if (!isWeb3Configured()) {
     return (
-      <Button {...props} disabled title="Wallet provider not configured">
+      <Button {...props} className={className} disabled title="Wallet provider not configured">
         Wallet unavailable
       </Button>
     );
@@ -26,19 +27,20 @@ export function ConnectWalletButton({
 
   if (!ready) {
     return (
-      <Button {...props} disabled>
+      <Button {...props} className={className} disabled>
         Loading wallet…
       </Button>
     );
   }
 
   if (authenticated) {
-    return <WalletMenu />;
+    return <WalletMenu className={className} />;
   }
 
   return (
     <Button
       {...props}
+      className={className}
       disabled={connecting}
       onClick={async () => {
         if (connecting) return;

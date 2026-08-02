@@ -6,6 +6,7 @@ import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useScrolled } from "@/hooks/useScrolled";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
+import { WalletIconButton } from "@/components/web3/WalletIconButton";
 import { SuperAdminNavLink } from "@/components/layout/SuperAdminNavLink";
 import { NavLink } from "@/components/layout/NavLink";
 import { Container } from "@/components/ui/Container";
@@ -26,7 +27,7 @@ export function Navbar() {
             : "border-b border-transparent bg-transparent py-5",
         )}
       >
-        <Container className="flex items-center justify-between gap-6">
+        <Container className="flex items-center justify-between gap-4 sm:gap-6">
           <NavLink href="/" aria-label="Nexar Network home" className="relative z-10 shrink-0">
             <Logo />
           </NavLink>
@@ -51,14 +52,17 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <SuperAdminNavLink />
+            <SuperAdminNavLink className="hidden sm:inline-flex" />
+            <WalletIconButton className="lg:hidden" />
             <ConnectWalletButton
               variant="primary"
               size="sm"
               magnetic
               glow
-              className="hidden sm:inline-flex"
-            />
+              className="hidden lg:inline-flex"
+            >
+              Connect Wallet
+            </ConnectWalletButton>
 
             <button
               type="button"
@@ -66,7 +70,7 @@ export function Navbar() {
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
               onClick={() => setMobileOpen(true)}
-              className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-border text-white transition-colors hover:border-gold/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-white transition-colors hover:border-gold/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:hidden"
             >
               <Menu className="h-4 w-4" aria-hidden="true" />
             </button>

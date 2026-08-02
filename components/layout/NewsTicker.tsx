@@ -58,7 +58,7 @@ function PresaleTickerMessage() {
 
 export function NewsTicker({ announcements = [] }: NewsTickerProps) {
   return (
-    <div className="fixed top-[72px] left-0 z-20 w-full border-y border-gold/20 bg-black/90 backdrop-blur-md">
+    <div className="fixed top-[var(--nxr-nav-height)] left-0 z-20 w-full border-y border-gold/20 bg-black/90 backdrop-blur-md">
       <Marquee
         speed={35}
         gradient={false}
