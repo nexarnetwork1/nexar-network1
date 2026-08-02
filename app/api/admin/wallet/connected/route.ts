@@ -5,12 +5,15 @@ import { z } from "zod";
 import { walletConfig } from "@/config/wallet";
 import { writeWalletAuditLog } from "@/lib/admin/super-admin";
 import { getRequestAuditContext } from "@/lib/security/request-context";
+import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 const bodySchema = z.object({
   walletAddress: z.string().regex(walletConfig.addressPattern),
 });
 
 export async function POST(request: NextRequest) {
+  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+
   const context = getRequestAuditContext(request);
 
   try {

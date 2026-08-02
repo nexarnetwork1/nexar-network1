@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { trackAnalyticsEvent } from "@/modules/marketplace/analytics";
 import { analyticsEventSchema } from "@/modules/marketplace/statistics/validators";
+import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 export async function POST(request: Request) {
+  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+
   let body: unknown;
   try {
     body = await request.json();

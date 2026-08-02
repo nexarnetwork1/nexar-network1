@@ -7,8 +7,11 @@ import {
   writeWalletAuditLog,
 } from "@/lib/admin/super-admin";
 import { getRequestAuditContext } from "@/lib/security/request-context";
+import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 export async function POST(request: NextRequest) {
+  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+
   const context = getRequestAuditContext(request);
   const session = await getSuperAdminSessionFromRequest(request);
 

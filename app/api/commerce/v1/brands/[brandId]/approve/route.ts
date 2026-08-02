@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireSuperAdmin } from "@/modules/users/repository";
 import { approveBrand } from "@/modules/marketplace/brands";
+import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 type Props = { params: Promise<{ brandId: string }> };
 
-export async function POST(_request: Request, { params }: Props) {
+export async function POST(request: Request, { params }: Props) {
+  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+
   try {
     await requireSuperAdmin();
   } catch {

@@ -47,23 +47,30 @@ export async function isTreasuryWallet(address: string): Promise<boolean> {
   }
 }
 
+/**
+ * Third and strictest step of the Super Admin contract: a cryptographically
+ * valid, unexpired session only counts if its wallet is still the configured
+ * treasury wallet. Shared so every caller applies the same rule.
+ */
+export async function isCurrentTreasurySession(
+  session: SuperAdminSession | null
+): Promise<boolean> {
+  if (!session) return false;
+
+  const treasury = await getTreasuryWalletAddress();
+  if (!treasury) return false;
+
+  try {
+    return session.walletAddress === normalizeWalletAddress(treasury);
+  } catch {
+    return false;
+  }
+}
+
 export async function getSuperAdminSession(): Promise<SuperAdminSession | null> {
   const cookieStore = await cookies();
   const session = await parseSuperAdminSessionToken(cookieStore.get(SUPER_ADMIN_COOKIE)?.value);
-  if (!session) return null;
-
-  const treasury = await getTreasuryWalletAddress();
-  if (!treasury) return null;
-
-  try {
-    if (session.walletAddress !== normalizeWalletAddress(treasury)) {
-      return null;
-    }
-  } catch {
-    return null;
-  }
-
-  return session;
+  return (await isCurrentTreasurySession(session)) ? session : null;
 }
 
 export async function requireSuperAdminSession(): Promise<SuperAdminSession> {
@@ -162,10 +169,19 @@ export async function verifyWalletChallenge(params: {
   const treasuryMatch = await isTreasuryWallet(normalized);
   if (!treasuryMatch) return { verified: false, reason: "Wallet is not authorized" };
 
-  await admin
+  // Single atomic consume. Postgres locks the row for the duration of the
+  // UPDATE, so concurrent verifications of the same challenge race here and
+  // only the first one gets a row back — the rest replay against used_at.
+  const { data: consumed } = await admin
     .from("admin_wallet_challenges")
     .update({ used_at: new Date().toISOString() })
-    .eq("id", params.challengeId);
+    .eq("id", params.challengeId)
+    .is("used_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .select("id")
+    .maybeSingle();
+
+  if (!consumed) return { verified: false, reason: "Challenge already used" };
 
   return { verified: true };
 }

@@ -16,12 +16,34 @@ export type SuperAdminSession = {
   expiresAt: number;
 };
 
+/**
+ * Secret used to sign new super admin session cookies.
+ *
+ * SUPER_ADMIN_SESSION_SECRET is dedicated to this purpose so that a leaked
+ * CRON_SECRET (a bearer token shipped to the scheduler) can no longer be used
+ * to forge admin sessions. CRON_SECRET stays as a fallback so deployments that
+ * have not set the new variable keep working.
+ */
 function sessionSecret(): string {
-  if (env.CRON_SECRET) return env.CRON_SECRET;
+  const secret = env.SUPER_ADMIN_SESSION_SECRET ?? env.CRON_SECRET;
+  if (secret) return secret;
   if (process.env.NODE_ENV === "production") {
-    throw new Error("CRON_SECRET is required for super admin sessions in production");
+    throw new Error(
+      "SUPER_ADMIN_SESSION_SECRET (or legacy CRON_SECRET) is required for super admin sessions in production"
+    );
   }
   return "dev-only-secret";
+}
+
+/**
+ * Secrets accepted when verifying an existing cookie. During migration to a
+ * dedicated secret, sessions signed with CRON_SECRET stay valid until they
+ * expire; new cookies are always signed with the primary secret above.
+ */
+function acceptedSessionSecrets(): string[] {
+  const primary = sessionSecret();
+  const legacy = env.CRON_SECRET;
+  return legacy && legacy !== primary ? [primary, legacy] : [primary];
 }
 
 export function normalizeWalletAddress(address: string): Address {
@@ -55,8 +77,12 @@ export async function parseSuperAdminSessionToken(
     const expiresAt = Number(payload.slice(sep + 1));
     if (!Number.isFinite(expiresAt)) return null;
 
-    const expected = await hmacSha256Hex(sessionSecret(), payload);
-    if (!timingSafeEqualHex(signature, expected)) return null;
+    let signatureMatched = false;
+    for (const secret of acceptedSessionSecrets()) {
+      const expected = await hmacSha256Hex(secret, payload);
+      if (timingSafeEqualHex(signature, expected)) signatureMatched = true;
+    }
+    if (!signatureMatched) return null;
     if (expiresAt < Date.now()) return null;
 
     return { walletAddress: normalizeWalletAddress(walletAddress), expiresAt };

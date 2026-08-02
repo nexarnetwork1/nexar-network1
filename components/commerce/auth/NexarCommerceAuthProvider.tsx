@@ -13,6 +13,7 @@ import type {
   CommerceAuthMode,
   CommerceAuthRole,
 } from "@/lib/commerce/commerce-auth-url";
+import { safeRedirect } from "@/lib/auth/redirect";
 import { NexarCommerceAuthModal } from "@/components/commerce/auth/NexarCommerceAuthModal";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
@@ -72,7 +73,9 @@ export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProvide
   const handleSuccess = useCallback(
     (destination: string) => {
       closeCommerceAuth();
-      router.push(destination);
+      // Last line of defence before navigating: the server already validates
+      // its own redirectTo, but the modal can fall back to a URL-supplied value.
+      router.push(safeRedirect(destination, "/marketplace"));
       router.refresh();
     },
     [closeCommerceAuth, router],

@@ -4,6 +4,7 @@ import { checkAssistantRateLimit } from "@/lib/ai/rate-limit";
 import { getAssistantProvider, type StreamEvent } from "@/lib/ai/provider";
 import { demoGlobalAssistantProvider } from "@/modules/ai/global-assistant/provider";
 import { enrichAssistantContext } from "@/modules/ai/global-assistant/enrich-context";
+import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 const requestSchema = z.object({
   message: z.string().min(1).max(1000),
@@ -27,6 +28,8 @@ function encodeSse(event: StreamEvent): string {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+
   const { allowed } = await checkAssistantRateLimit();
   if (!allowed) {
     return Response.json({ error: "Too many requests" }, { status: 429 });

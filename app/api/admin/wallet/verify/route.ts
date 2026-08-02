@@ -9,6 +9,7 @@ import {
   writeWalletAuditLog,
 } from "@/lib/admin/super-admin";
 import { getRequestAuditContext } from "@/lib/security/request-context";
+import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 const bodySchema = z.object({
   challengeId: z.string().uuid(),
@@ -17,6 +18,8 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
+  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+
   const context = getRequestAuditContext(request);
 
   try {

@@ -1,3 +1,5 @@
+import { isValidRedirect } from "@/lib/auth/redirect";
+
 export type CommerceAuthMode = "signin" | "register";
 export type CommerceAuthRole = "customer" | "merchant";
 
@@ -37,7 +39,9 @@ export function commerceAuthHref({
   const params = new URLSearchParams();
   params.set("auth", auth);
   if (role) params.set("role", role);
-  if (redirect) params.set("redirect", redirect);
+  // Drop unsafe destinations at the point the link is built so an attacker
+  // cannot smuggle an external target through the auth modal.
+  if (redirect && isValidRedirect(redirect)) params.set("redirect", redirect);
   if (message) params.set("message", message);
   const query = params.toString();
   return query ? `${basePath}?${query}` : basePath;
@@ -56,12 +60,13 @@ export function parseCommerceAuthParams(searchParams: URLSearchParams): {
   const roleParam = searchParams.get("role");
   const role =
     roleParam === "customer" || roleParam === "merchant" ? roleParam : null;
+  const redirectParam = searchParams.get("redirect");
 
   return {
     open: mode !== null,
     mode,
     role,
-    redirect: searchParams.get("redirect"),
+    redirect: redirectParam && isValidRedirect(redirectParam) ? redirectParam : null,
     message: searchParams.get("message"),
   };
 }
