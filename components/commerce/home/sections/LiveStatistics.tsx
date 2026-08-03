@@ -79,8 +79,7 @@ export function LiveStatistics({ initialMetrics }: LiveStatisticsProps) {
   return (
     <SectionShell
       id="commerce-stats"
-      eyebrow="Live Network"
-      title="Marketplace performance"
+      title="Marketplace Performance"
       description="Live commerce metrics across verified merchants, products, orders, and global payment volume — updated in real time as the network grows."
     >
       <div ref={ref} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">

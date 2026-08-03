@@ -39,7 +39,7 @@ export function ShopSearchView({ result, storeSlug }: Props) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-      <aside className="space-y-6 rounded-2xl border border-border/70 bg-card/30 p-5">
+      <aside className="space-y-6 nxr-card p-5">
         <div>
           <label className="text-xs tracking-wide text-muted uppercase">Search</label>
           <input

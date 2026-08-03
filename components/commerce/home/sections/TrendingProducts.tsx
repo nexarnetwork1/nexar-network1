@@ -60,21 +60,21 @@ export function TrendingProducts({
   return (
     <SectionShell
       id="trending-products"
-      eyebrow="Discovery"
-      title="Trending products"
-      description="Realtime product discovery powered by order velocity, catalog freshness, reviews, and active merchant promotions."
+      title="Top Deals"
+      description="Handpicked products from verified merchants — quality, trust, and value."
+      align="center"
     >
-      <div className="mb-8 flex flex-wrap gap-2">
+      <div className="mb-8 flex flex-wrap justify-center gap-2">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActive(tab.id)}
             className={cn(
-              "rounded-full border px-4 py-2 text-xs tracking-wide uppercase transition-all",
+              "rounded-[0.625rem] border px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase transition-all",
               active === tab.id
-                ? "border-gold/40 bg-gold/10 text-gold"
-                : "border-border/70 bg-surface/40 text-muted hover:border-gold/20 hover:text-white",
+                ? "border-gold bg-gold text-background"
+                : "border-border bg-card text-muted hover:border-gold/40 hover:text-white",
             )}
           >
             {tab.label}

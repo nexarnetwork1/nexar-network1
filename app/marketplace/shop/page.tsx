@@ -1,7 +1,16 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Container } from "@/components/ui/Container";
 import { searchShop } from "@/modules/marketplace/storefront/repository";
 import { ShopSearchView } from "@/components/storefront/ShopSearchView";
+import { canonical } from "@/lib/constants/seo";
+
+export const metadata: Metadata = {
+  title: "Shop",
+  description:
+    "Browse verified merchants and products across the Nexar Commerce marketplace, with crypto and card checkout.",
+  alternates: canonical("/marketplace/shop"),
+};
 
 type Props = {
   searchParams: Promise<Record<string, string | undefined>>;

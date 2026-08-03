@@ -424,7 +424,7 @@ export function NexarAssistant() {
                 ))}
 
                 {loading ? (
-                  <div className="max-w-[85%] rounded-2xl border border-border/60 bg-card/50 px-4 py-3">
+                  <div className="max-w-[85%] nxr-card px-4 py-3">
                     <div className="flex gap-1.5" aria-busy="true" aria-label="Assistant is typing">
                       <span className="h-2 w-2 animate-pulse rounded-full bg-gold/70" />
                       <span className="h-2 w-2 animate-pulse rounded-full bg-gold/50 [animation-delay:120ms]" />

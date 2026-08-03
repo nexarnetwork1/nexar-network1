@@ -107,7 +107,7 @@ export function NotificationPreferencesForm({
 
       {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
 
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card/20">
+      <div className="mt-6 overflow-x-auto nxr-card">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="border-b border-border/60 text-left text-xs uppercase tracking-wide text-muted">
@@ -155,7 +155,7 @@ export function NotificationPreferencesForm({
         </table>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-border/60 bg-card/10 p-4">
+      <div className="mt-6 nxr-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">Coming soon</p>
         <ul className="mt-3 space-y-2 text-sm text-muted">
           {customerNotificationChannels

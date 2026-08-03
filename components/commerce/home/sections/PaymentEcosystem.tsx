@@ -46,7 +46,7 @@ export function PaymentEcosystem() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ y: -4 }}
-                className="rounded-2xl border border-border/70 bg-card/60 p-5 backdrop-blur-md"
+                className="nxr-card p-5 backdrop-blur-md"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">

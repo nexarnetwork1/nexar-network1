@@ -59,12 +59,31 @@ export const siteMetadata: Metadata = {
     creator: "@nexarnetwork",
     images: [OG_IMAGE],
   },
-  alternates: {
-    canonical: SITE.url,
-  },
+  // No `alternates.canonical` here on purpose: root metadata is inherited by
+  // every route, so a canonical set at this level would point all ~110 pages
+  // at the homepage. Pages declare their own via `canonical()` below.
   icons: {
     icon: [{ url: "/icon", type: "image/png" }],
     apple: [{ url: "/apple-icon", type: "image/png" }],
+  },
+};
+
+/** Per-page canonical URL. Pass a root-relative path such as `/whitepaper`. */
+export function canonical(path: string): Metadata["alternates"] {
+  return { canonical: path };
+}
+
+/**
+ * Metadata for authenticated and transactional areas — portals, auth screens,
+ * checkout and payment links. These must never reach the index, and the
+ * root's `index: true` would otherwise be inherited.
+ */
+export const privateAreaMetadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
   },
 };
 

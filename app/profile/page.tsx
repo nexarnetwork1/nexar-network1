@@ -31,7 +31,7 @@ export default async function ProfilePage() {
           title="Profile"
           description="Manage your account details."
         />
-        <dl className="mt-12 grid gap-6 rounded-2xl border border-border bg-card/60 p-8 md:grid-cols-2">
+        <dl className="mt-12 grid gap-6 nxr-card p-8 md:grid-cols-2">
           <div>
             <dt className="text-sm text-muted">Full Name</dt>
             <dd className="mt-1 font-medium">{profile?.full_name ?? "—"}</dd>

@@ -95,7 +95,7 @@ export function CookieConsent() {
                 <button
                   type="button"
                   onClick={handleAccept}
-                  className="rounded-full bg-gold px-6 py-2 text-sm font-medium text-background transition-colors hover:bg-gold-secondary"
+                  className="rounded-[0.625rem] bg-gold px-6 py-2 text-sm font-semibold uppercase tracking-wide text-background transition-colors hover:bg-gold-accent"
                 >
                   Accept All
                 </button>
@@ -155,7 +155,7 @@ export function CookieConsent() {
                   <button
                     type="button"
                     onClick={handleSavePreferences}
-                    className="rounded-full bg-gold px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-gold-secondary"
+                    className="rounded-[0.625rem] bg-gold px-4 py-2 text-sm font-semibold uppercase tracking-wide text-background transition-colors hover:bg-gold-accent"
                   >
                     Save
                   </button>

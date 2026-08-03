@@ -35,15 +35,15 @@ const SOCIAL_ICONS = [
 
 export function Footer() {
   return (
-    <footer id="contact" className="relative scroll-mt-[var(--nxr-header-offset)] border-t border-border bg-surface/40 backdrop-blur-xl">
-      <Container className="py-12 sm:py-16 lg:py-20">
-        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+    <footer id="contact" className="relative scroll-mt-[var(--nxr-header-offset)] border-t border-white/[0.06] bg-[#0a0a0a]">
+      <Container className="py-14 sm:py-18 lg:py-24">
+        <div className="grid gap-10 sm:gap-14 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <Logo />
-            <p className="mt-4 sm:mt-5 max-w-xs text-sm leading-7 text-muted">
+            <p className="mt-5 max-w-xs text-sm leading-7 text-text-secondary">
               {SITE.description}
             </p>
-            <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
+            <div className="mt-6 flex flex-wrap gap-2.5">
               {SOCIAL_ICONS.map(({ href, icon: Icon, label }) => (
                 <a
                   key={label}
@@ -51,7 +51,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-border text-muted transition-all hover:border-gold/30 hover:text-gold"
+                  className="flex h-10 w-10 items-center justify-center rounded-[0.625rem] border border-border text-gold/80 transition-all duration-300 hover:border-gold hover:text-gold"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -126,7 +126,7 @@ export function Footer() {
               .
             </p>
           </div>
-          <div className="luxury-border rounded-3xl bg-card/60 p-6 backdrop-blur-md sm:p-8">
+          <div className="nxr-card luxury-border p-6 sm:p-8">
             <ContactForm />
           </div>
         </div>

@@ -1,8 +1,6 @@
 "use client";
 
-import { GridLayer } from "@/components/background/GridLayer";
 import { NoiseLayer } from "@/components/background/NoiseLayer";
-import { SpaceBackground } from "@/components/background/SpaceBackground";
 import { cn } from "@/lib/utils/cn";
 
 type GlobalBackgroundProps = {
@@ -10,41 +8,47 @@ type GlobalBackgroundProps = {
   className?: string;
 };
 
-const VARIANT_GRADIENTS = {
-  home: "from-gold/[0.04] via-transparent to-emerald-500/[0.025]",
-  marketplace: "from-violet-500/[0.05] via-transparent to-gold/[0.03]",
-  presale: "from-amber-500/[0.05] via-transparent to-gold/[0.035]",
-  login: "from-gold/[0.06] via-blue-500/[0.04] to-violet-500/[0.03]",
-  default: "from-white/[0.025] via-transparent to-gold/[0.025]",
-} as const;
-
 /**
- * Site-wide space background. Mounted once in the root layout so every route
- * shares a single canvas and a single set of ambient layers.
- *
- * Layer order, back to front: the star field owns the opaque base, the ambient
- * gradients and horizon grid sit above it, and page content renders on top of
- * all three through translucent surfaces.
+ * Official Nexar matte-black stage: charcoal depth, soft studio gold light,
+ * fine grain — no stars, no grid, no neon crypto washes.
  */
 export function GlobalBackground({
   variant = "default",
   className,
 }: GlobalBackgroundProps) {
+  void variant;
+
   return (
     <>
-      <SpaceBackground />
       <div
         aria-hidden
         className={cn(
-          "pointer-events-none fixed inset-0 -z-20 overflow-hidden",
-          className
+          "pointer-events-none fixed inset-0 -z-30 overflow-hidden bg-[#050505]",
+          className,
         )}
       >
-        <div className={cn("absolute inset-0 bg-gradient-to-br", VARIANT_GRADIENTS[variant])} />
-        <div className="absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-gold/10 blur-[120px]" />
-        <div className="absolute -right-24 bottom-1/4 h-64 w-64 rounded-full bg-violet-500/8 blur-[100px]" />
-        <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/5 blur-[140px]" />
-        <GridLayer />
+        {/* Soft vertical studio falloff */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c] via-[#050505] to-[#030303]" />
+
+        {/* Warm key light — top center, very soft */}
+        <div className="absolute left-1/2 top-[-18%] h-[55vh] w-[90vw] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.07)_0%,transparent_68%)]" />
+
+        {/* Subtle side fill */}
+        <div className="absolute -left-[20%] top-[35%] h-[40vh] w-[45vw] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.035)_0%,transparent_70%)] blur-2xl" />
+        <div className="absolute -right-[15%] top-[20%] h-[35vh] w-[40vw] rounded-full bg-[radial-gradient(circle,rgba(200,155,60,0.03)_0%,transparent_70%)] blur-2xl" />
+
+        {/* Fine paper / leather grain via CSS (no canvas) */}
+        <div
+          className="absolute inset-0 opacity-[0.045] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "180px 180px",
+          }}
+        />
+
+        {/* Soft vignette — boutique depth, not space */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_35%,transparent_0%,rgba(0,0,0,0.45)_100%)]" />
       </div>
       <NoiseLayer />
     </>

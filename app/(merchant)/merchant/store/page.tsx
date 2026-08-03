@@ -26,7 +26,7 @@ export default async function MerchantStorePage() {
       <h1 className="font-heading text-3xl font-semibold">Store settings</h1>
       <p className="mt-2 text-muted">Manage your store profile and configuration</p>
 
-      <dl className="mt-8 max-w-lg space-y-4 rounded-2xl border border-border bg-card/60 p-6">
+      <dl className="mt-8 max-w-lg space-y-4 nxr-card p-6">
         <div>
           <dt className="text-xs uppercase tracking-wider text-muted">Store name</dt>
           <dd className="mt-1 font-medium">{store.name}</dd>

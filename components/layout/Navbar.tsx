@@ -14,16 +14,16 @@ import { MobileMenu } from "./MobileMenu";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const scrolled = useScrolled(24);
+  const scrolled = useScrolled(16);
 
   return (
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-30 transition-all duration-500",
+          "fixed inset-x-0 top-0 z-30 transition-all duration-400",
           scrolled
-            ? "border-b border-border/80 bg-background/70 py-3 backdrop-blur-2xl"
-            : "border-b border-transparent bg-transparent py-5",
+            ? "border-b border-white/[0.06] bg-[#050505]/92 py-3 backdrop-blur-xl"
+            : "border-b border-transparent bg-[#050505]/55 py-4 backdrop-blur-md",
         )}
       >
         <Container className="flex items-center justify-between gap-4 sm:gap-6">
@@ -33,19 +33,17 @@ export function Navbar() {
 
           <nav
             aria-label="Primary navigation"
-            className="hidden items-center gap-1 lg:flex xl:gap-1"
+            className="hidden items-center gap-1 lg:flex xl:gap-2"
           >
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.href}
                 href={item.href}
-                className="group relative px-2 py-2 lg:px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-full"
+                className="group relative rounded-md px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                <span className="relative z-10 text-[12px] lg:text-[13px] font-medium tracking-wide text-muted transition-colors duration-300 group-hover:text-white">
+                <span className="text-[13px] font-medium tracking-[0.04em] text-white/75 transition-colors duration-300 group-hover:text-white">
                   {item.label}
                 </span>
-                <span className="absolute inset-0 rounded-full bg-white/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <span className="absolute bottom-1 left-2 lg:left-3 h-px w-0 bg-gradient-to-r from-gold to-gold-secondary transition-all duration-300 group-hover:w-[calc(100%-1rem)] lg:group-hover:w-[calc(100%-1.5rem)]" />
               </NavLink>
             ))}
           </nav>
@@ -60,7 +58,7 @@ export function Navbar() {
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
               onClick={() => setMobileOpen(true)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-white transition-colors hover:border-gold/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-[0.625rem] border border-white/10 text-white transition-colors hover:border-gold/40 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 lg:hidden"
             >
               <Menu className="h-4 w-4" aria-hidden="true" />
             </button>

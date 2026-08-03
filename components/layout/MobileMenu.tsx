@@ -157,7 +157,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                     onClick={onClose}
                     className={cn(
                       "group flex items-center justify-between rounded-2xl px-4 py-3.5",
-                      "font-heading text-lg text-white/90 transition-colors hover:bg-card hover:text-gold-secondary",
+                      "font-heading text-lg tracking-wide text-white/90 transition-colors hover:bg-gold/[0.06] hover:text-gold-accent",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     )}
                   >

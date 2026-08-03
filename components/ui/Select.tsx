@@ -2,7 +2,6 @@
 
 import { forwardRef, type SelectHTMLAttributes } from "react";
 import { cn } from "@/lib/utils/cn";
-import { DROPDOWN_CLASS } from "@/lib/constants/navigation";
 
 export type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label?: string;
@@ -19,7 +18,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-sm font-medium text-muted"
+            className="block text-xs font-medium uppercase tracking-[0.14em] text-muted"
           >
             {label}
           </label>
@@ -27,7 +26,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           id={selectId}
-          className={cn(DROPDOWN_CLASS, error && "border-red-500/50", className)}
+          className={cn(
+            "w-full rounded-[14px] border border-border bg-surface/80 px-3.5 py-2.5 text-sm text-white outline-none transition-colors duration-300",
+            "focus:border-gold focus:ring-1 focus:ring-gold/25",
+            error && "border-error/60 focus:border-error focus:ring-error/20",
+            className,
+          )}
           {...props}
         >
           {options.map((opt) => (
@@ -36,10 +40,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-error">{error}</p>}
       </div>
     );
-  }
+  },
 );
 
 Select.displayName = "Select";

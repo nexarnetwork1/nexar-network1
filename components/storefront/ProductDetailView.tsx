@@ -258,7 +258,7 @@ function ProductReviewsSection({
     <section>
       <h2 className="font-heading text-xl font-semibold text-white">Reviews</h2>
       <form
-        className="mt-4 rounded-2xl border border-border/70 bg-card/30 p-5"
+        className="mt-4 nxr-card p-5"
         onSubmit={(e) => {
           e.preventDefault();
           startTransition(async () => {

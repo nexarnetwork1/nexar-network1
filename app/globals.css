@@ -1,62 +1,84 @@
 @import "tailwindcss";
 
 /* ============================================================
-   NEXAR NETWORK — DESIGN SYSTEM
-   Phase 1: Foundation & Global Theme
+   NEXAR NETWORK — OFFICIAL DESIGN SYSTEM
+   Matte black · Charcoal surfaces · Warm antique gold
+   Reference: Nexar Marketplace promotional artwork
    ============================================================ */
 
 :root {
   --nxr-background: #050505;
-  --nxr-surface: #0b0b0b;
-  --nxr-card: #101010;
-  --nxr-border: #1a1a1a;
+  --nxr-background-secondary: #0a0a0a;
+  --nxr-surface: #141414;
+  --nxr-card: #1a1a1a;
+  --nxr-card-elevated: #222222;
+  --nxr-border: rgba(212, 175, 55, 0.14);
+  --nxr-border-subtle: rgba(255, 255, 255, 0.06);
+  --nxr-border-hover: #d4af37;
   --nxr-gold: #d4af37;
-  --nxr-gold-secondary: #f5e39e;
+  --nxr-gold-secondary: #c89b3c;
+  --nxr-gold-accent: #e8c96a;
   --nxr-white: #ffffff;
-  --nxr-muted: #9a9a9a;
+  --nxr-text-secondary: #b8b8b8;
+  --nxr-muted: #7a7a7a;
+  --nxr-error: #ff5b5b;
+  --nxr-success: #37c978;
 
   --nxr-gradient-gold: linear-gradient(
     135deg,
-    var(--nxr-gold-secondary) 0%,
-    var(--nxr-gold) 100%
+    #e8c96a 0%,
+    #d4af37 50%,
+    #c89b3c 100%
   );
 
-  --nxr-shadow-gold: 0 0 40px -12px rgba(212, 175, 55, 0.45);
-  --nxr-shadow-soft: 0 24px 80px -24px rgba(0, 0, 0, 0.8);
+  /* Soft studio shadows — no neon glow */
+  --nxr-shadow-soft: 0 20px 50px -28px rgba(0, 0, 0, 0.85);
+  --nxr-shadow-card: 0 10px 32px -18px rgba(0, 0, 0, 0.75);
+  --nxr-shadow-gold: 0 8px 28px -12px rgba(212, 175, 55, 0.35);
 
-  --nxr-radius-sm: 0.75rem;
-  --nxr-radius-md: 1rem;
-  --nxr-radius-lg: 1.5rem;
-  --nxr-radius-xl: 2rem;
+  --nxr-radius-card: 0.75rem; /* ~12px — boutique, not bubbly */
+  --nxr-radius-sm: 0.5rem;
+  --nxr-radius-md: 0.75rem;
+  --nxr-radius-lg: 0.875rem;
+  --nxr-radius-xl: 1rem;
+  --nxr-radius-button: 0.625rem;
   --nxr-radius-full: 9999px;
 
-  --nxr-nav-height: 5rem;
+  --nxr-nav-height: 4.5rem;
   --nxr-ticker-height: 2.75rem;
   --nxr-header-offset: calc(var(--nxr-nav-height) + var(--nxr-ticker-height));
-  --nxr-section-gap: clamp(5rem, 10vw, 9rem);
+  --nxr-section-gap: clamp(4.5rem, 9vw, 8rem);
 
   color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--nxr-background);
+  --color-background-secondary: var(--nxr-background-secondary);
   --color-surface: var(--nxr-surface);
   --color-card: var(--nxr-card);
+  --color-card-elevated: var(--nxr-card-elevated);
   --color-border: var(--nxr-border);
   --color-gold: var(--nxr-gold);
   --color-gold-secondary: var(--nxr-gold-secondary);
+  --color-gold-accent: var(--nxr-gold-accent);
   --color-white: var(--nxr-white);
+  --color-text-secondary: var(--nxr-text-secondary);
   --color-muted: var(--nxr-muted);
   --color-foreground: var(--nxr-white);
+  --color-error: var(--nxr-error);
+  --color-success: var(--nxr-success);
 
   --font-sans: var(--font-inter);
   --font-heading: var(--font-sora);
-  --font-mono: var(--font-space-grotesk), ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  --font-mono: var(--font-space-grotesk), ui-monospace, Menlo, Consolas, monospace;
 
-  --radius-sm: var(--nxr-radius-sm);
-  --radius-md: var(--nxr-radius-md);
-  --radius-lg: var(--nxr-radius-lg);
-  --radius-xl: var(--nxr-radius-xl);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
 }
 
 @layer base {
@@ -93,7 +115,7 @@
   }
 
   ::selection {
-    background: rgba(212, 175, 55, 0.25);
+    background: rgba(212, 175, 55, 0.28);
     color: var(--nxr-white);
   }
 
@@ -104,8 +126,8 @@
   h5,
   h6 {
     font-family: var(--font-sora), system-ui, sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.03em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--nxr-white);
   }
 
@@ -114,7 +136,7 @@
   }
 
   .font-mono {
-    font-family: var(--font-space-grotesk), ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    font-family: var(--font-space-grotesk), ui-monospace, Menlo, Consolas, monospace;
   }
 
   .text-gradient-gold {
@@ -135,16 +157,75 @@
     border-radius: inherit;
     padding: 1px;
     background: linear-gradient(
-      135deg,
-      rgba(245, 227, 158, 0.35),
-      rgba(212, 175, 55, 0.08),
-      rgba(26, 26, 26, 0.4)
+      160deg,
+      rgba(232, 201, 106, 0.35) 0%,
+      rgba(212, 175, 55, 0.08) 40%,
+      rgba(26, 26, 26, 0.2) 100%
     );
     mask:
       linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
     mask-composite: exclude;
     pointer-events: none;
+  }
+}
+
+@layer components {
+  /* Charcoal product / content card — studio lift, thin gold edge */
+  .nxr-card {
+    border-radius: var(--nxr-radius-card);
+    border: 1px solid var(--nxr-border);
+    background: var(--nxr-card);
+    box-shadow: var(--nxr-shadow-card);
+  }
+
+  .nxr-card-interactive {
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.3s ease,
+      box-shadow 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  .nxr-card-interactive:hover {
+    transform: translateY(-4px);
+    border-color: rgba(212, 175, 55, 0.4);
+    background: var(--nxr-card-elevated);
+    box-shadow:
+      var(--nxr-shadow-soft),
+      0 0 0 1px rgba(212, 175, 55, 0.08);
+  }
+
+  .nxr-panel {
+    border-radius: var(--nxr-radius-card);
+    border: 1px solid var(--nxr-border-subtle);
+    background: var(--nxr-surface);
+  }
+
+  /* Trust / meta strip like the reference header icons */
+  .nxr-trust-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem 2rem;
+  }
+
+  .nxr-trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--nxr-text-secondary);
+  }
+
+  .nxr-trust-item svg {
+    color: var(--nxr-gold);
+    width: 1rem;
+    height: 1rem;
   }
 }
 
@@ -225,5 +306,8 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
 
+  .nxr-card-interactive:hover {
+    transform: none;
+  }
+}

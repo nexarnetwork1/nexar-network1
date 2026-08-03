@@ -93,7 +93,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {tab === "general" && (
-          <section className="space-y-4 rounded-2xl border border-border bg-card/60 p-6">
+          <section className="space-y-4 nxr-card p-6">
             <h2 className="font-heading text-lg font-semibold">General information</h2>
             <Input name="name" label="Store name" defaultValue={store.name} required />
             <Input name="slug" label="Store slug" defaultValue={store.slug} required />
@@ -111,7 +111,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
         )}
 
         {tab === "branding" && (
-          <section className="space-y-4 rounded-2xl border border-border bg-card/60 p-6">
+          <section className="space-y-4 nxr-card p-6">
             <h2 className="font-heading text-lg font-semibold">Branding</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -154,7 +154,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
         )}
 
         {tab === "social" && (
-          <section className="space-y-4 rounded-2xl border border-border bg-card/60 p-6">
+          <section className="space-y-4 nxr-card p-6">
             <h2 className="font-heading text-lg font-semibold">Social links</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <Input name="website" label="Website" defaultValue={profile.website ?? branding?.social_links?.website ?? ""} />
@@ -171,7 +171,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
         )}
 
         {tab === "policies" && (
-          <section className="space-y-4 rounded-2xl border border-border bg-card/60 p-6">
+          <section className="space-y-4 nxr-card p-6">
             <h2 className="font-heading text-lg font-semibold">Store policies</h2>
             <Textarea name="privacyPolicy" label="Privacy policy" rows={4} defaultValue={profile.privacy_policy ?? ""} />
             <Textarea name="refundPolicy" label="Refund policy" rows={4} defaultValue={profile.refund_policy ?? ""} />
@@ -182,7 +182,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
         )}
 
         {tab === "seo" && (
-          <section className="space-y-4 rounded-2xl border border-border bg-card/60 p-6">
+          <section className="space-y-4 nxr-card p-6">
             <h2 className="font-heading text-lg font-semibold">SEO</h2>
             <Input name="seoTitle" label="SEO title" defaultValue={profile.seo_title ?? store.name} />
             <Textarea name="seoDescription" label="SEO description" rows={3} defaultValue={profile.seo_description ?? profile.description ?? ""} />
@@ -201,7 +201,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
       </form>
 
       <aside className="hidden xl:block">
-        <div className="sticky top-24 rounded-2xl border border-border bg-card/60 p-4">
+        <div className="sticky top-24 nxr-card p-4">
           <p className="text-xs tracking-wide text-muted uppercase">Live preview</p>
           <div
             className="mt-4 overflow-hidden rounded-xl border border-border"

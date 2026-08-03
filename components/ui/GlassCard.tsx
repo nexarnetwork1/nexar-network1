@@ -6,13 +6,13 @@ type GlassCardProps = {
   hover?: boolean;
 };
 
+/** Charcoal surface card — named historically; no frosted glass / neon. */
 export function GlassCard({ children, className, hover = false }: GlassCardProps) {
   return (
     <div
       className={cn(
-        "luxury-border rounded-2xl bg-card/55 p-6 backdrop-blur-xl",
-        hover &&
-          "transition-all duration-500 hover:border-gold/20 hover:bg-card/70 hover:shadow-[0_0_60px_-20px_rgba(212,175,55,0.15)]",
+        "nxr-card luxury-border p-6",
+        hover && "nxr-card-interactive",
         className,
       )}
     >

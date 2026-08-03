@@ -17,7 +17,7 @@ import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import { SectionShell } from "@/components/commerce/home/shared/SectionShell";
 import type { CommerceCategory } from "@/lib/commerce/types";
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
   electronics: Laptop,
   fashion: Shirt,
   "digital-products": Cpu,
@@ -38,49 +38,43 @@ export function MarketplaceCategories({ categories }: MarketplaceCategoriesProps
   return (
     <SectionShell
       id="categories"
-      eyebrow="Catalog"
-      title="Marketplace categories"
-      description="Dynamic category taxonomy with live product counts from the Nexar Commerce catalog."
+      title="Popular Categories"
+      description="Browse curated collections from verified merchants."
+      align="center"
     >
       {categories.length ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {categories.map((category, i) => {
             const Icon = ICON_MAP[category.slug] ?? Sparkles;
             return (
               <motion.div
                 key={category.id}
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.04 }}
-                whileHover={{ y: -6, scale: 1.02 }}
+                transition={{ delay: i * 0.03 }}
               >
                 <Link
                   href={`${MARKETPLACE_ROUTES.shop}?category=${category.slug}`}
-                  className="group block rounded-2xl border border-border/70 bg-gradient-to-br from-card/60 to-surface/30 p-5 backdrop-blur-md transition-colors hover:border-gold/30"
+                  className="nxr-card nxr-card-interactive group flex flex-col items-center justify-center gap-3 px-4 py-7 text-center"
                 >
-                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-gold/20 bg-gold/5 text-gold transition-colors group-hover:bg-gold/10">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="font-heading text-base font-medium text-white group-hover:text-gold">
+                  <Icon
+                    className="h-8 w-8 text-gold transition-transform duration-300 group-hover:scale-105"
+                    strokeWidth={1.4}
+                    aria-hidden
+                  />
+                  <h3 className="font-heading text-sm font-medium tracking-wide text-white">
                     {category.name}
                   </h3>
-                  {category.description ? (
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
-                      {category.description}
-                    </p>
-                  ) : null}
-                  <p className="mt-4 font-mono text-sm text-gold">
-                    {category.product_count}{" "}
-                    <span className="text-xs text-muted">products</span>
-                  </p>
                 </Link>
               </motion.div>
             );
           })}
         </div>
       ) : (
-        <p className="text-sm text-muted">Categories will appear as the catalog grows.</p>
+        <p className="text-center text-sm text-muted">
+          Categories will appear as the catalog grows.
+        </p>
       )}
     </SectionShell>
   );

@@ -23,7 +23,7 @@ export function DashboardEmptyState({
     <div
       className={cn(
         "flex flex-col items-center justify-center gap-3 text-center",
-        inset ? "px-4 py-10" : "rounded-2xl border border-dashed border-border bg-card/20 px-6 py-14",
+        inset ? "px-4 py-10" : "nxr-card border-dashed px-6 py-14",
         className,
       )}
     >

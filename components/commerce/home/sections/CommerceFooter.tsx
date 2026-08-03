@@ -51,7 +51,7 @@ export function CommerceFooter({ initialMetrics, countries }: CommerceFooterProp
   return (
     <footer className="border-t border-border/70 bg-surface/50 backdrop-blur-xl">
       <Container className="py-14 sm:py-16 lg:py-20">
-        <div className="mb-10 grid gap-4 rounded-2xl border border-border/60 bg-card/30 p-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-10 grid gap-4 nxr-card p-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Verified merchants", value: metrics.total_merchants ?? 0 },
             { label: "Products listed", value: metrics.total_products ?? 0 },

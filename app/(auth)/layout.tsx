@@ -1,4 +1,7 @@
 import { Container } from "@/components/ui/Container";
+import { privateAreaMetadata } from "@/lib/constants/seo";
+
+export const metadata = privateAreaMetadata;
 
 export default function AuthLayout({
   children,

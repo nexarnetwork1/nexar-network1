@@ -34,7 +34,7 @@ export function WhyNexarSection() {
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.3 }}
                 className={cn(
-                  "group relative h-full overflow-hidden rounded-2xl border border-border bg-card/30 p-7 backdrop-blur-sm transition-colors duration-500 hover:border-gold/20 hover:bg-card/50",
+                  "group relative h-full overflow-hidden nxr-card p-7 backdrop-blur-sm transition-colors duration-500 hover:border-gold/20 hover:bg-card/50",
                   layoutStyles[feature.layout],
                 )}
               >

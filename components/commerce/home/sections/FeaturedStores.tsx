@@ -14,8 +14,7 @@ export function FeaturedStores({ initialStores }: FeaturedStoresProps) {
   return (
     <SectionShell
       id="featured-stores"
-      eyebrow="Marketplace"
-      title="Featured stores"
+      title="Featured Stores"
       description="Curated storefronts from active marketplace merchants — logos, banners, ratings, and follower counts from live database records."
     >
       {stores.length ? (

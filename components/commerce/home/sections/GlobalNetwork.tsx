@@ -43,7 +43,7 @@ export function GlobalNetwork({
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
             <motion.div
               whileHover={{ y: -3 }}
-              className="rounded-2xl border border-border/70 bg-card/60 p-5"
+              className="nxr-card p-5"
             >
               <div className="mb-2 flex items-center gap-2 text-gold">
                 <MapPin className="h-4 w-4" />
@@ -53,7 +53,7 @@ export function GlobalNetwork({
             </motion.div>
             <motion.div
               whileHover={{ y: -3 }}
-              className="rounded-2xl border border-border/70 bg-card/60 p-5"
+              className="nxr-card p-5"
             >
               <div className="mb-2 flex items-center gap-2 text-gold">
                 <Radio className="h-4 w-4" />

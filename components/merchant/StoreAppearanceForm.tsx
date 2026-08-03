@@ -37,7 +37,7 @@ export function StoreAppearanceForm({ store, settings }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-4 max-w-2xl space-y-6 rounded-2xl border border-border bg-card/60 p-6"
+      className="mt-4 max-w-2xl space-y-6 nxr-card p-6"
     >
       <div>
         <h3 className="font-heading text-lg font-semibold">Branding</h3>

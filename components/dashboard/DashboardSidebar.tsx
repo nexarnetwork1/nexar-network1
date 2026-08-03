@@ -35,7 +35,7 @@ export function DashboardSidebar({
   return (
     <aside
       className={cn(
-        "sticky top-[var(--nxr-header-offset)] hidden h-[calc(100dvh-var(--nxr-header-offset))] shrink-0 flex-col border-r border-border bg-surface/55 backdrop-blur-2xl md:flex",
+        "sticky top-[var(--nxr-header-offset)] hidden h-[calc(100dvh-var(--nxr-header-offset))] shrink-0 flex-col border-r border-white/[0.06] bg-[#0a0a0a] md:flex",
         collapsed ? "w-[68px]" : "w-64 xl:w-72",
         className,
       )}

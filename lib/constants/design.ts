@@ -1,12 +1,19 @@
 export const COLORS = {
   background: "#050505",
-  surface: "#0B0B0B",
-  card: "#101010",
-  border: "#1A1A1A",
+  backgroundSecondary: "#0A0A0A",
+  surface: "#141414",
+  card: "#1A1A1A",
+  cardElevated: "#222222",
+  border: "rgba(212, 175, 55, 0.14)",
+  borderHover: "#D4AF37",
   gold: "#D4AF37",
-  goldSecondary: "#F5E39E",
+  goldSecondary: "#C89B3C",
+  goldAccent: "#E8C96A",
   white: "#FFFFFF",
-  muted: "#9A9A9A",
+  textSecondary: "#B8B8B8",
+  muted: "#7A7A7A",
+  error: "#FF5B5B",
+  success: "#37C978",
 } as const;
 
 export const FONTS = {
@@ -18,8 +25,8 @@ export const FONTS = {
 export const ANIMATION = {
   ease: [0.22, 1, 0.36, 1] as const,
   duration: {
-    fast: 0.3,
-    normal: 0.6,
-    slow: 0.9,
+    fast: 0.25,
+    normal: 0.4,
+    slow: 0.65,
   },
 } as const;

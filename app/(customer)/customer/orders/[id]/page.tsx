@@ -137,7 +137,7 @@ export default async function CustomerOrderDetailPage({ params, searchParams }: 
           )}
         </div>
 
-        <aside className="rounded-2xl border border-border bg-card/60 p-6">
+        <aside className="nxr-card p-6">
           <h2 className="font-heading text-lg font-semibold">Order timeline</h2>
           <div className="mt-6">
             <OrderTimeline

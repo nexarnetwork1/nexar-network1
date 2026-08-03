@@ -99,7 +99,7 @@ export function CardPaymentPopup({
   if (!stripePromise) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4">
-        <div className="rounded-2xl border border-border bg-card/80 p-6 backdrop-blur-2xl">
+        <div className="nxr-card p-6 backdrop-blur-2xl">
           <p className="text-red-400">Card payments are not configured.</p>
           <Button type="button" className="mt-4" onClick={onClose}>
             Close
@@ -111,7 +111,7 @@ export function CardPaymentPopup({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-md rounded-2xl border border-border bg-card/80 p-6 shadow-2xl backdrop-blur-2xl">
+      <div className="relative w-full max-w-md nxr-card p-6 shadow-2xl backdrop-blur-2xl">
         <CloseButton onClick={onClose} className="absolute right-4 top-4" />
         <h2 className="flex items-center gap-2 font-heading text-xl font-semibold text-gold">
           Pay with <PaymentMethodLogo method="card" size={22} showLabel={false} />

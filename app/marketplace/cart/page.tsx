@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
+import { privateAreaMetadata } from "@/lib/constants/seo";
 import { CartView } from "@/components/storefront/CartView";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMarketplaceCartWithItems } from "@/modules/marketplace/cart/server";
 
 export const metadata: Metadata = {
+  ...privateAreaMetadata,
   title: "Shopping cart · Nexar Commerce",
   description: "Review items in your Nexar Commerce cart before checkout.",
 };

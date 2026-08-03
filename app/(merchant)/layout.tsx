@@ -11,6 +11,9 @@ import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell"
 import { Button } from "@/components/ui/Button";
 import { DashboardShell } from "@/components/dashboard";
 import { merchantNav } from "@/config/dashboard-nav";
+import { privateAreaMetadata } from "@/lib/constants/seo";
+
+export const metadata = privateAreaMetadata;
 
 export default async function MerchantLayout({
   children,

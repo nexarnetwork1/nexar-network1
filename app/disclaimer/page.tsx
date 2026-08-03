@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SITE } from "@/lib/constants/site";
+import { canonical } from "@/lib/constants/seo";
 
 export const metadata: Metadata = {
   title: "Disclaimer",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     title: `Disclaimer | ${SITE.name}`,
     description: `Risk disclaimer for ${SITE.name}.`,
   },
+  alternates: canonical("/disclaimer"),
 };
 
 export default function DisclaimerPage() {

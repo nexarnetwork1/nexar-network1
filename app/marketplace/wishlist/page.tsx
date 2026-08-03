@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
+import { privateAreaMetadata } from "@/lib/constants/seo";
 import { WishlistView } from "@/components/storefront/WishlistView";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getWishlistProducts } from "@/modules/marketplace/wishlist/server";
 
 export const metadata: Metadata = {
+  ...privateAreaMetadata,
   title: "Wishlist · Nexar Commerce",
   description: "Your saved products on Nexar Commerce.",
 };

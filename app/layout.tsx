@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { env } from "@/config/env";
 import { Navbar } from "@/components/layout/Navbar";
 import { NewsTicker } from "@/components/layout/NewsTicker";
 import { GlobalBackground } from "@/components/ui/GlobalBackground";
@@ -109,6 +111,15 @@ export default async function RootLayout({
           <CookieConsent />
         </AppProviders>
       </body>
+      {/*
+        Mounted once here so every route shares a single gtag instance.
+        Pageviews for client-side navigation come from GA4 Enhanced Measurement
+        (History API), so no manual page_view is sent — doing both is what
+        produces duplicate events.
+      */}
+      {env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+        <GoogleAnalytics gaId={env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+      )}
     </html>
   );
 }

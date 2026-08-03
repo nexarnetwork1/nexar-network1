@@ -22,7 +22,7 @@ export function PresaleArtwork({ className }: PresaleArtworkProps) {
         </svg>
       </div>
       <div className="absolute left-1/4 top-1/3 h-40 w-40 rounded-full bg-gold/5 blur-3xl" />
-      <div className="absolute right-1/4 bottom-1/4 h-48 w-48 rounded-full bg-violet-500/5 blur-3xl" />
+      <div className="absolute right-1/4 bottom-1/4 h-48 w-48 rounded-full bg-gold/[0.05] blur-3xl" />
     </div>
   );
 }

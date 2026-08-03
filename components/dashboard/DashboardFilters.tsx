@@ -39,6 +39,6 @@ export function DashboardFilters({
 
 /** Shared input/select styling so every filter control lines up. */
 export const dashboardFilterControlClass = cn(
-  "h-11 min-w-0 rounded-xl border border-border bg-surface/60 px-3 text-sm text-white",
-  "placeholder:text-muted focus:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/40",
+  "h-11 min-w-0 rounded-[14px] border border-border bg-surface/80 px-3 text-sm text-white",
+  "placeholder:text-muted/70 focus:border-gold focus:outline-none focus-visible:ring-1 focus-visible:ring-gold/25",
 );

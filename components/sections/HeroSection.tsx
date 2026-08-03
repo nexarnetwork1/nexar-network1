@@ -63,17 +63,17 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-10 inline-flex items-center gap-3 rounded-full border border-border/80 bg-surface/50 px-4 py-2 backdrop-blur-xl"
+              className="mb-10 inline-flex items-center gap-3 rounded-[0.625rem] border border-border bg-card px-4 py-2"
             >
               <span className="relative flex h-2 w-2">
                 <StatusDot color="gold" size="sm" />
               </span>
-              <span className="text-[11px] tracking-[0.2em] text-muted uppercase">
+              <span className="text-[11px] tracking-[0.18em] text-muted uppercase">
                 {SITE.blockchain}
               </span>
-              <span className="h-3 w-px bg-border" />
-              <span className="inline-flex items-center gap-1.5 text-[11px] text-gold-secondary">
-                <ShieldCheck className="h-3.5 w-3.5" />
+              <span className="h-3 w-px bg-gold/25" />
+              <span className="inline-flex items-center gap-1.5 text-[11px] text-gold">
+                <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.5} />
                 Verified Contract
               </span>
             </motion.div>

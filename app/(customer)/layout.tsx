@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/dashboard";
 import { customerNav } from "@/config/dashboard-nav";
+import { privateAreaMetadata } from "@/lib/constants/seo";
+
+export const metadata = privateAreaMetadata;
 
 export default async function CustomerLayout({
   children,

@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { canonical } from "@/lib/constants/seo";
 
+// Title is bare because the root metadata applies the `%s | Nexar Network`
+// template; repeating the site name here would double the suffix.
 export const metadata: Metadata = {
-  title: "About | Nexar Network",
+  title: "About",
   description: "Learn about Nexar Network — a fintech and crypto payment ecosystem.",
+  alternates: canonical("/about"),
 };
 
 export default function AboutPage() {

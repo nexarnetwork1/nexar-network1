@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { privateAreaMetadata } from "@/lib/constants/seo";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Container } from "@/components/ui/Container";
@@ -10,6 +11,7 @@ import { getMarketplaceCartWithItems } from "@/modules/marketplace/cart/server";
 import { getCurrentProfile } from "@/modules/users/repository";
 
 export const metadata: Metadata = {
+  ...privateAreaMetadata,
   title: "Checkout · Nexar Commerce",
   description: "Complete your Nexar Commerce purchase securely.",
 };
@@ -42,7 +44,7 @@ export default async function MarketplaceCheckoutPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-        <section className="rounded-2xl border border-border/70 bg-card/60 p-6">
+        <section className="nxr-card p-6">
           <h2 className="font-heading text-lg font-semibold text-white">Order items</h2>
           <ul className="mt-4 space-y-4">
             {items.map((line) => (
@@ -68,7 +70,7 @@ export default async function MarketplaceCheckoutPage() {
           </p>
         </section>
 
-        <aside className="h-fit rounded-2xl border border-border/70 bg-card/60 p-6">
+        <aside className="h-fit nxr-card p-6">
           <h2 className="font-heading text-lg font-semibold text-white">Payment summary</h2>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between text-muted">

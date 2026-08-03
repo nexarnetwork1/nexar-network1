@@ -73,7 +73,7 @@ export default function AdminLoginPanel() {
   return (
     <>
       <main className="flex min-h-screen items-center justify-center px-6 py-16">
-        <div className="mx-auto w-full max-w-[24rem] rounded-2xl border border-border/80 bg-card/55 p-6 text-center shadow-xl shadow-black/20 backdrop-blur-2xl">
+        <div className="nxr-card luxury-border mx-auto w-full max-w-[24rem] p-6 text-center">
           <div className="mb-4 flex justify-center">
             <Logo showText={false} />
           </div>

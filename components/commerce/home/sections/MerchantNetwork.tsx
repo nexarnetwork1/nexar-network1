@@ -15,7 +15,7 @@ function MerchantTile({ merchant }: { merchant: CommerceMerchantNetworkItem }) {
   return (
     <motion.div
       whileHover={{ scale: 1.03, y: -4 }}
-      className="group mx-3 flex h-36 w-52 shrink-0 flex-col justify-between rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur-md transition-colors hover:border-gold/30 sm:w-56"
+      className="group mx-3 flex h-36 w-52 shrink-0 flex-col justify-between nxr-card p-4 backdrop-blur-md transition-colors hover:border-gold/30 sm:w-56"
     >
       <div className="flex items-start gap-3">
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl">
@@ -51,8 +51,7 @@ export function MerchantNetwork({ merchants }: MerchantNetworkProps) {
   if (!merchants.length) {
     return (
       <SectionShell
-        eyebrow="Merchants"
-        title="Trusted merchant network"
+        title="Trusted Merchants"
         description="Approved merchants appear here automatically when verified by the Nexar Commerce team."
       >
         <p className="text-sm text-muted">No verified merchants yet. Approved stores will appear here.</p>
@@ -62,8 +61,7 @@ export function MerchantNetwork({ merchants }: MerchantNetworkProps) {
 
   return (
     <SectionShell
-      eyebrow="Merchants"
-      title="Trusted merchant network"
+      title="Trusted Merchants"
       description="Live approved merchants from the Nexar Commerce verification pipeline — logos, categories, and regions update automatically."
       className="overflow-hidden"
     >

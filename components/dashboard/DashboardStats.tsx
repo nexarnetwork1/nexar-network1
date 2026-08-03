@@ -7,9 +7,9 @@ export type DashboardStatTone = "default" | "gold" | "success" | "warning" | "da
 const TONE_STYLES: Record<DashboardStatTone, string> = {
   default: "text-white",
   gold: "text-gold",
-  success: "text-emerald-400",
-  warning: "text-amber-400",
-  danger: "text-red-400",
+  success: "text-success",
+  warning: "text-gold-accent",
+  danger: "text-error",
 };
 
 type DashboardStatProps = {

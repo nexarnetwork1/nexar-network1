@@ -7,7 +7,7 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const cspHeader = [
   "default-src 'self'",
 
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
 
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 
@@ -16,7 +16,9 @@ const cspHeader = [
 
 
   // السماح بتحميل صور المحافظ
-  "img-src 'self' data: blob: https://coin-images.coingecko.com https://assets.coingecko.com https://explorer-api.walletconnect.com https://explorer-api.walletconnect.org https://registry.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org",
+  // google-analytics/googletagmanager cover the GA4 pixel fallback used when
+  // beacon and fetch transports are unavailable.
+  "img-src 'self' data: blob: https://coin-images.coingecko.com https://assets.coingecko.com https://explorer-api.walletconnect.com https://explorer-api.walletconnect.org https://registry.walletconnect.com https://*.walletconnect.com https://*.walletconnect.org https://www.google-analytics.com https://www.googletagmanager.com",
 
 "connect-src 'self' \
 https://api.coingecko.com \
@@ -41,7 +43,11 @@ https://privy.io \
 https://*.privy.com \
 wss://*.privy.io \
 https://*.supabase.co \
-wss://*.supabase.co",
+wss://*.supabase.co \
+https://www.googletagmanager.com \
+https://www.google-analytics.com \
+https://*.google-analytics.com \
+https://*.analytics.google.com",
   "frame-src 'self' https://auth.privy.io",
 
   "object-src 'none'",

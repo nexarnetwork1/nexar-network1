@@ -48,7 +48,7 @@ export default async function PublicInvoicePayPage({ params }: Props) {
       <h1 className="font-heading text-3xl font-semibold">Pay invoice</h1>
       <p className="mt-2 text-muted">{invoice.store_name}</p>
 
-      <dl className="mt-8 space-y-3 rounded-2xl border border-border bg-card/60 p-6 text-sm">
+      <dl className="mt-8 space-y-3 nxr-card p-6 text-sm">
         <div className="flex justify-between">
           <dt className="text-muted">Invoice</dt>
           <dd className="font-mono">{invoice.invoice_number}</dd>

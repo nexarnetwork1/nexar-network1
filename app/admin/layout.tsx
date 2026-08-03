@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { AdminNexarAssistant } from "./AdminNexarAssistant";
+import { privateAreaMetadata } from "@/lib/constants/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
+  ...privateAreaMetadata,
   title: "Nexar CMS",
   description: "Nexar Network Control Center",
 };

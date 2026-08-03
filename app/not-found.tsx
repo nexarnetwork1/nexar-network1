@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 export default function NotFound() {
   return (
     <main className="flex min-h-[calc(100vh-var(--nxr-header-offset))] items-center justify-center px-6 py-16">
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-border/80 bg-card/50 p-8 text-center shadow-xl shadow-black/20 backdrop-blur-2xl">
+      <div className="mx-auto w-full max-w-md nxr-card p-8 text-center shadow-xl shadow-black/20 backdrop-blur-2xl">
         <p className="font-mono text-sm tracking-widest text-gold/60">404</p>
         <h1 className="mt-2 font-heading text-2xl font-semibold text-white">Page not found</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted">

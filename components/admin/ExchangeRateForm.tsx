@@ -66,7 +66,7 @@ export function ExchangeRateForm({ currencies = [] }: ExchangeRateFormProps) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-5 sm:flex-row sm:flex-wrap sm:items-end"
+      className="flex flex-col gap-4 nxr-card p-5 sm:flex-row sm:flex-wrap sm:items-end"
       noValidate
     >
       <CurrencySelectField

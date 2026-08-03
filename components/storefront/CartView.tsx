@@ -99,7 +99,7 @@ export function CartView({ items: initialItems, isAuthenticated }: CartViewProps
           return (
             <li
               key={line.id}
-              className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card/60 p-4 sm:flex-row sm:items-center"
+              className="flex flex-col gap-4 nxr-card p-4 sm:flex-row sm:items-center"
             >
               <Link href={href} className="shrink-0">
                 <div className="h-24 w-24 overflow-hidden rounded-xl bg-surface">
@@ -169,7 +169,7 @@ export function CartView({ items: initialItems, isAuthenticated }: CartViewProps
         })}
       </ul>
 
-      <aside className="h-fit rounded-2xl border border-border/70 bg-card/60 p-6 backdrop-blur-md">
+      <aside className="h-fit nxr-card p-6 backdrop-blur-md">
         <h2 className="font-heading text-lg font-semibold text-white">Order summary</h2>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted">

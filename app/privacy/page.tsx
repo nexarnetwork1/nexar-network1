@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SITE } from "@/lib/constants/site";
+import { canonical } from "@/lib/constants/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     title: `Privacy Policy | ${SITE.name}`,
     description: `Privacy Policy for ${SITE.name}.`,
   },
+  alternates: canonical("/privacy"),
 };
 
 export default function PrivacyPage() {

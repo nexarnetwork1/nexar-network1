@@ -33,4 +33,4 @@ export const FOOTER_LINKS = {
 
 /** Shared class for native & custom dropdowns */
 export const DROPDOWN_CLASS =
-  "rounded-xl border border-border/80 bg-card/70 px-4 py-2.5 text-sm text-white shadow-lg shadow-black/25 backdrop-blur-xl outline-none transition-all duration-200 hover:border-gold/30 hover:bg-card/80 focus:border-gold/40 focus:ring-2 focus:ring-gold/15 appearance-none cursor-pointer";
+  "rounded-[14px] border border-border bg-surface/90 px-4 py-2.5 text-sm text-white shadow-[0_12px_40px_-20px_rgba(0,0,0,0.8)] backdrop-blur-xl outline-none transition-all duration-300 hover:border-gold focus:border-gold focus:ring-1 focus:ring-gold/25 appearance-none cursor-pointer";

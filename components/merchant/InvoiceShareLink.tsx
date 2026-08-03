@@ -17,7 +17,7 @@ export function InvoiceShareLink({ payUrl }: InvoiceShareLinkProps) {
   }
 
   return (
-    <div className="mt-6 rounded-2xl border border-border bg-card/60 p-5">
+    <div className="mt-6 nxr-card p-5">
       <p className="text-sm font-medium">Customer pay link</p>
       <p className="mt-1 text-xs text-muted">Share this secure link with your customer</p>
       <p className="mt-3 break-all font-mono text-xs text-gold-secondary">{payUrl}</p>

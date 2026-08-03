@@ -24,7 +24,7 @@ export function FaqSection() {
           return (
             <div
               key={item.id}
-              className="overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-md"
+              className="overflow-hidden nxr-card"
             >
               <button
                 type="button"

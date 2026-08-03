@@ -30,7 +30,7 @@ export function DashboardHeader({
     <header
       className={cn(
         // z-20 keeps this under the site navbar (z-30), which stays fixed above it.
-        "sticky top-[var(--nxr-header-offset)] z-20 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background/60 px-4 backdrop-blur-2xl sm:px-6",
+        "sticky top-[var(--nxr-header-offset)] z-20 flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.06] bg-[#050505]/95 px-4 backdrop-blur-xl sm:px-6",
         className,
       )}
     >

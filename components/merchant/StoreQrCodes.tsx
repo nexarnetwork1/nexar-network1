@@ -32,7 +32,7 @@ export function StoreQrCodes({ codes }: StoreQrCodesProps) {
         return (
         <div
           key={code.id}
-          className="rounded-2xl border border-border bg-card/60 p-5"
+          className="nxr-card p-5"
         >
           <p className="text-sm font-medium">{LABELS[code.qr_type]}</p>
           <p className="mt-1 break-all font-mono text-xs text-muted">

@@ -18,21 +18,22 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   glow?: boolean;
 };
 
+/** Boutique rectangles — soft radius, not Web3 pills. */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gold text-background border border-gold/30 shadow-[0_0_30px_-8px_rgba(212,175,55,0.55)] hover:shadow-[0_0_40px_-6px_rgba(212,175,55,0.7)] hover:bg-gold-secondary hover:text-background",
+    "bg-gold text-background border border-gold/50 shadow-[0_8px_28px_-12px_rgba(212,175,55,0.4)] hover:bg-gold-accent hover:shadow-[0_10px_32px_-12px_rgba(212,175,55,0.5)]",
   secondary:
-    "bg-surface/80 text-white border border-border backdrop-blur-md hover:border-gold/30 hover:bg-card",
+    "bg-transparent text-gold border border-gold/45 hover:bg-gold hover:text-background",
   outline:
-    "bg-transparent text-white border border-border hover:border-gold/40 hover:bg-gold/5",
+    "bg-transparent text-white border border-white/15 hover:border-gold/50 hover:text-gold-accent",
   ghost:
-    "bg-transparent text-muted hover:text-white hover:bg-white/5 border border-transparent",
+    "bg-transparent text-muted hover:text-white hover:bg-white/[0.04] border border-transparent",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "h-9 px-4 text-xs",
-  md: "h-11 px-5 text-sm",
-  lg: "h-12 px-7 text-sm",
+  sm: "h-9 px-4 text-xs font-semibold tracking-[0.06em]",
+  md: "h-11 px-6 text-sm font-semibold tracking-[0.04em]",
+  lg: "h-12 px-8 text-sm font-semibold tracking-[0.06em]",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -63,7 +64,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         const rect = innerRef.current.getBoundingClientRect();
         const x = event.clientX - rect.left - rect.width / 2;
         const y = event.clientY - rect.top - rect.height / 2;
-        innerRef.current.style.transform = `translate(${x * 0.12}px, ${y * 0.18}px)`;
+        innerRef.current.style.transform = `translate(${x * 0.1}px, ${y * 0.14}px)`;
       }
       onMouseMove?.(event);
     };
@@ -79,24 +80,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={setRefs}
         className={cn(
-          "group relative inline-flex items-center justify-center overflow-hidden rounded-full font-medium tracking-wide transition-all duration-300 ease-out active:scale-[0.98]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "group relative inline-flex items-center justify-center overflow-hidden rounded-[0.625rem] transition-all duration-300 ease-out active:scale-[0.98]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           "disabled:pointer-events-none disabled:opacity-50",
           variantStyles[variant],
           sizeStyles[size],
-          // Glow: rendered via box-shadow so it works outside overflow-hidden boundaries
-          glow &&
-            "shadow-[0_0_0_0_rgba(212,175,55,0)] hover:shadow-[0_0_28px_4px_rgba(212,175,55,0.22)]",
+          glow && "shadow-[0_8px_28px_-12px_rgba(212,175,55,0.45)]",
           className,
         )}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
-        <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-          <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-500 group-hover:translate-y-0" />
-        </span>
-        <span className="relative z-10 inline-flex items-center gap-2">
+        <span className="relative z-10 inline-flex items-center gap-2 uppercase">
           {children}
         </span>
       </button>
