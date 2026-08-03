@@ -7,6 +7,7 @@ import {
 } from "@/modules/disputes/repository";
 import { DisputeThread } from "@/components/disputes/DisputeThread";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { DashboardCard, DashboardSection } from "@/components/dashboard";
 
 export default async function CustomerDisputeDetailPage({
   params,
@@ -29,11 +30,18 @@ export default async function CustomerDisputeDetailPage({
 
   return (
     <div className="max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white">Dispute</h1>
-        <div className="mt-2"><StatusBadge status={dispute.status} /></div>
-        <p className="mt-4 text-white">{dispute.reason}</p>
-      </div>
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Dispute"
+        actions={<StatusBadge status={dispute.status} />}
+      />
+
+      <DashboardCard>
+        <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted">Reason</h2>
+        <p className="mt-2 whitespace-pre-line break-words text-white">{dispute.reason}</p>
+      </DashboardCard>
+
       <DisputeThread
         disputeId={id}
         messages={messages}

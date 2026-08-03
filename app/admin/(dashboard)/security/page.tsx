@@ -1,6 +1,12 @@
+import { ShieldCheck } from "lucide-react";
 import { getPlatformSettings } from "@/modules/platform/repository";
 import { getRecentSecurityLogs } from "@/modules/audit/security";
 import { formatDateTime } from "@/utils/format";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+} from "@/components/dashboard";
 
 export default async function AdminSecurityPage() {
   const [settings, securityLogs] = await Promise.all([
@@ -44,53 +50,67 @@ export default async function AdminSecurityPage() {
   ];
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-yellow-400">Security</h1>
-      <p className="mt-2 text-zinc-400">Platform security configuration status</p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Security"
+        headingClassName="text-gold"
+        description="Platform security configuration status"
+      />
 
-      <div className="mt-8 space-y-3">
-        {checks.map((check) => (
-          <div
-            key={check.label}
-            className="flex items-center justify-between rounded-2xl border border-white/10 bg-zinc-900 px-6 py-4"
-          >
-            <div>
-              <p className="font-medium">{check.label}</p>
-              <p className="mt-1 text-sm text-zinc-400">{check.status}</p>
-            </div>
-            <span className={check.ok ? "text-emerald-400" : "text-amber-400"}>
-              {check.ok ? "OK" : "Action needed"}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <section className="mt-10 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold text-yellow-400">Recent security events</h2>
-        <ul className="mt-4 space-y-2">
-          {securityLogs.map((log) => (
-            <li
-              key={log.id}
-              className="flex items-center justify-between rounded-xl border border-white/5 px-4 py-3 text-sm"
-            >
-              <div>
-                <p className="font-medium capitalize">{log.event_type.replace(/_/g, " ")}</p>
-                <p className="text-xs text-zinc-500">{formatDateTime(log.created_at)}</p>
+      <DashboardSection level="h3" title="Configuration checks">
+        <ul className="space-y-3">
+          {checks.map((check) => (
+            <DashboardCard as="li" key={check.label}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-medium">{check.label}</p>
+                  <p className="mt-1 text-sm text-muted">{check.status}</p>
+                </div>
+                <span
+                  className={`shrink-0 text-sm ${check.ok ? "text-emerald-400" : "text-amber-400"}`}
+                >
+                  {check.ok ? "OK" : "Action needed"}
+                </span>
               </div>
-              {log.ip_address && (
-                <span className="font-mono text-xs text-zinc-400">{log.ip_address}</span>
-              )}
-            </li>
+            </DashboardCard>
           ))}
-          {securityLogs.length === 0 && (
-            <li className="text-sm text-zinc-500">No security events recorded yet.</li>
-          )}
         </ul>
-      </section>
+      </DashboardSection>
 
-      <section className="mt-10 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold text-yellow-400">Security policies</h2>
-        <ul className="mt-4 list-inside list-disc space-y-2 text-sm text-zinc-400">
+      <DashboardCard as="section">
+        <h2 className="font-heading text-lg font-semibold text-gold">Recent security events</h2>
+        {securityLogs.length === 0 ? (
+          <DashboardEmptyState
+            inset
+            icon={<ShieldCheck className="h-5 w-5" aria-hidden />}
+            title="No security events recorded yet"
+            description="Sign-ins, permission changes and other audited events will appear here."
+          />
+        ) : (
+          <ul className="mt-4 space-y-2">
+            {securityLogs.map((log) => (
+              <li
+                key={log.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border px-4 py-3 text-sm"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium capitalize">{log.event_type.replace(/_/g, " ")}</p>
+                  <p className="text-xs text-muted">{formatDateTime(log.created_at)}</p>
+                </div>
+                {log.ip_address && (
+                  <span className="shrink-0 font-mono text-xs text-muted">{log.ip_address}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </DashboardCard>
+
+      <DashboardCard as="section">
+        <h2 className="font-heading text-lg font-semibold text-gold">Security policies</h2>
+        <ul className="mt-4 list-inside list-disc space-y-2 text-sm text-muted">
           <li>Platform fees never remain in merchant wallets</li>
           <li>Treasury private keys stored in Supabase Vault (never in client code)</li>
           <li>Roles stored in profiles + app_metadata (never user_metadata)</li>
@@ -98,7 +118,7 @@ export default async function AdminSecurityPage() {
           <li>All mutations validated server-side with Zod</li>
           <li>Audit logs are append-only</li>
         </ul>
-      </section>
+      </DashboardCard>
     </div>
   );
 }

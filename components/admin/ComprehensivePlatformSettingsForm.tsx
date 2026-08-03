@@ -9,6 +9,10 @@ import {
 import type { PlatformSettings } from "@/types";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import { Button } from "@/components/ui/Button";
+import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { dashboardFilterControlClass } from "@/components/dashboard/DashboardFilters";
+import { cn } from "@/lib/utils/cn";
 
 type Props = {
   settings: PlatformSettings | null;
@@ -64,139 +68,156 @@ export function ComprehensivePlatformSettingsForm({ settings, latestFees }: Prop
   }
 
   if (!settings) {
-    return <p className="text-zinc-400">Platform settings unavailable.</p>;
+    return <p className="text-muted">Platform settings unavailable.</p>;
   }
 
   return (
-    <div className="space-y-10">
-      <form onSubmit={onSubmit} className="max-w-3xl space-y-8">
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-          <h2 className="text-lg font-semibold text-yellow-400">Treasury</h2>
-          <Field
-            label="Treasury Wallet Address"
-            name="treasuryWallet"
-            defaultValue={settings.treasury_wallet_address ?? ""}
-          />
-        </section>
+    <form onSubmit={onSubmit} className="max-w-3xl space-y-6">
+      <SettingsGroup title="Treasury">
+        <Field
+          label="Treasury Wallet Address"
+          name="treasuryWallet"
+          defaultValue={settings.treasury_wallet_address ?? ""}
+        />
+      </SettingsGroup>
 
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-yellow-400">Fees</h2>
-          {FEE_METHOD_KEYS.map((key) => (
-            <FeeField
-              key={key}
-              paymentType={key}
-              defaultValue={latestFees[key] ?? 0}
-              onSave={updateFee}
-            />
-          ))}
-        </section>
-
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-yellow-400">Merchant Promotion</h2>
-          <Field
-            label="New Merchant Discount (0–1)"
-            name="merchantPromotionDiscountPercent"
-            type="number"
-            step="0.0001"
-            defaultValue={String(settings.merchant_promotion_discount_percent ?? 0.1)}
+      <SettingsGroup title="Fees">
+        {FEE_METHOD_KEYS.map((key) => (
+          <FeeField
+            key={key}
+            paymentType={key}
+            defaultValue={latestFees[key] ?? 0}
+            onSave={updateFee}
           />
-          <Field
-            label="Promotion Duration (days)"
-            name="merchantPromotionDurationDays"
-            type="number"
-            defaultValue={String(settings.merchant_promotion_duration_days ?? 90)}
-          />
-        </section>
+        ))}
+      </SettingsGroup>
 
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-yellow-400">Security</h2>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="maintenanceMode" defaultChecked={settings.maintenance_mode} />
-            Maintenance Mode
+      <SettingsGroup title="Merchant Promotion">
+        <Field
+          label="New Merchant Discount (0–1)"
+          name="merchantPromotionDiscountPercent"
+          type="number"
+          step="0.0001"
+          defaultValue={String(settings.merchant_promotion_discount_percent ?? 0.1)}
+        />
+        <Field
+          label="Promotion Duration (days)"
+          name="merchantPromotionDurationDays"
+          type="number"
+          defaultValue={String(settings.merchant_promotion_duration_days ?? 90)}
+        />
+      </SettingsGroup>
+
+      <SettingsGroup title="Security">
+        <Checkbox
+          name="maintenanceMode"
+          label="Maintenance Mode"
+          defaultChecked={settings.maintenance_mode}
+        />
+        <div>
+          <label htmlFor="platformStatus" className="text-xs text-muted">
+            Platform Status
           </label>
-          <div>
-            <label className="text-xs text-zinc-400">Platform Status</label>
-            <select
-              name="platformStatus"
-              defaultValue={settings.platform_status}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
-            >
-              <option value="operational">Operational</option>
-              <option value="degraded">Degraded</option>
-              <option value="maintenance">Maintenance</option>
-            </select>
-          </div>
-        </section>
+          <select
+            id="platformStatus"
+            name="platformStatus"
+            defaultValue={settings.platform_status}
+            className={cn("mt-1 w-full", dashboardFilterControlClass)}
+          >
+            <option value="operational">Operational</option>
+            <option value="degraded">Degraded</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+        </div>
+      </SettingsGroup>
 
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-yellow-400">Payments</h2>
-          <Field
-            label="Minimum Payment"
-            name="minPaymentUsd"
-            type="number"
-            step="0.01"
-            defaultValue={String(settings.min_payment_usd ?? 1)}
-            suffix={<UsdAmount amount={1} size={14} />}
-          />
-          <Field
-            label="Maximum Payment"
-            name="maxPaymentUsd"
-            type="number"
-            step="0.01"
-            defaultValue={String(settings.max_payment_usd ?? 100000)}
-            suffix={<UsdAmount amount={1} size={14} />}
-          />
-        </section>
+      <SettingsGroup title="Payments">
+        <Field
+          label="Minimum Payment"
+          name="minPaymentUsd"
+          type="number"
+          step="0.01"
+          defaultValue={String(settings.min_payment_usd ?? 1)}
+          suffix={<UsdAmount amount={1} size={14} />}
+        />
+        <Field
+          label="Maximum Payment"
+          name="maxPaymentUsd"
+          type="number"
+          step="0.01"
+          defaultValue={String(settings.max_payment_usd ?? 100000)}
+          suffix={<UsdAmount amount={1} size={14} />}
+        />
+      </SettingsGroup>
 
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-yellow-400">Notifications</h2>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="emailNotificationsEnabled"
-              defaultChecked={settings.email_notifications_enabled}
-            />
-            Email Notifications
-          </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="telegramNotificationsEnabled"
-              defaultChecked={settings.telegram_notifications_enabled}
-            />
-            Telegram Notifications (future)
-          </label>
-        </section>
+      <SettingsGroup title="Notifications">
+        <Checkbox
+          name="emailNotificationsEnabled"
+          label="Email Notifications"
+          defaultChecked={settings.email_notifications_enabled}
+        />
+        <Checkbox
+          name="telegramNotificationsEnabled"
+          label="Telegram Notifications (future)"
+          defaultChecked={settings.telegram_notifications_enabled}
+        />
+      </SettingsGroup>
 
-        <section className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-yellow-400">Tokens & Support</h2>
-          <Field label="Support Email" name="supportEmail" defaultValue={settings.support_email} />
-          <Field
-            label="NXR Token"
-            name="nxrToken"
-            defaultValue={settings.nxr_token_address ?? ""}
-            prefix={<PaymentMethodLogo method="nxr" size={18} showLabel={false} />}
-          />
-          <Field
-            label="USDT Token"
-            name="usdtToken"
-            defaultValue={settings.usdt_token_address ?? ""}
-            prefix={<PaymentMethodLogo method="usdt" size={18} showLabel={false} />}
-          />
-        </section>
+      <SettingsGroup title="Tokens & Support">
+        <Field label="Support Email" name="supportEmail" defaultValue={settings.support_email} />
+        <Field
+          label="NXR Token"
+          name="nxrToken"
+          defaultValue={settings.nxr_token_address ?? ""}
+          prefix={<PaymentMethodLogo method="nxr" size={18} showLabel={false} />}
+        />
+        <Field
+          label="USDT Token"
+          name="usdtToken"
+          defaultValue={settings.usdt_token_address ?? ""}
+          prefix={<PaymentMethodLogo method="usdt" size={18} showLabel={false} />}
+        />
+      </SettingsGroup>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        {success && <p className="text-sm text-emerald-400">Settings saved</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
+      {success && <p className="text-sm text-emerald-400">Settings saved</p>}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
-        >
-          {saving ? "Saving…" : "Save platform settings"}
-        </button>
-      </form>
-    </div>
+      <Button type="submit" size="sm" disabled={saving}>
+        {saving ? "Saving…" : "Save platform settings"}
+      </Button>
+    </form>
+  );
+}
+
+function SettingsGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <DashboardCard as="section" className="space-y-4">
+      <h2 className="font-heading text-base font-semibold text-gold">{title}</h2>
+      {children}
+    </DashboardCard>
+  );
+}
+
+function Checkbox({
+  name,
+  label,
+  defaultChecked,
+}: {
+  name: string;
+  label: string;
+  defaultChecked?: boolean;
+}) {
+  return (
+    <label htmlFor={name} className="flex min-h-11 items-center gap-2.5 text-sm text-white">
+      <input
+        id={name}
+        type="checkbox"
+        name={name}
+        defaultChecked={defaultChecked}
+        className="h-4 w-4 rounded border-border bg-surface accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+      />
+      {label}
+    </label>
   );
 }
 
@@ -219,17 +240,18 @@ function Field({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-2 text-xs text-zinc-400">
+      <label htmlFor={name} className="flex items-center gap-2 text-xs text-muted">
         {prefix}
         {label}
         {suffix && <span className="inline-flex items-center">({suffix})</span>}
       </label>
       <input
+        id={name}
         name={name}
         type={type}
         step={step}
         defaultValue={defaultValue}
-        className="mt-1 w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
+        className={cn("mt-1 w-full", dashboardFilterControlClass)}
       />
     </div>
   );
@@ -246,8 +268,11 @@ function FeeField({
 }) {
   return (
     <div className="flex items-end gap-3">
-      <div className="flex-1">
-        <label className="flex items-center gap-2 text-xs text-zinc-400">
+      <div className="min-w-0 flex-1">
+        <label
+          htmlFor={`fee-${paymentType}`}
+          className="flex items-center gap-2 text-xs text-muted"
+        >
           <PaymentMethodLogo method={paymentType} size={18} showLabel={false} />
           {FEE_LABELS[paymentType] ?? paymentType}
         </label>
@@ -258,19 +283,20 @@ function FeeField({
           min="0"
           max="1"
           defaultValue={defaultValue}
-          className="mt-1 w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
+          className={cn("mt-1 w-full", dashboardFilterControlClass)}
         />
       </div>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => {
           const input = document.getElementById(`fee-${paymentType}`) as HTMLInputElement;
           onSave(paymentType, Number(input.value));
         }}
-        className="rounded-lg border border-yellow-500/40 px-3 py-2 text-xs text-yellow-400"
       >
         Update
-      </button>
+      </Button>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { History } from "lucide-react";
 import {
   getPlatformSettings,
   getLatestFeeRates,
@@ -6,6 +7,20 @@ import {
 import { PlatformSettingsForm } from "@/components/admin/PlatformSettingsForm";
 import { FeeScheduleForm } from "@/components/admin/FeeScheduleForm";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardStat,
+  DashboardStats,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
 
 export default async function AdminPlatformFeesPage() {
   const [settings, latestRates, schedules] = await Promise.all([
@@ -15,13 +30,17 @@ export default async function AdminPlatformFeesPage() {
   ]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-yellow-400">Platform fees</h1>
-      <p className="mt-2 text-zinc-400">Treasury and fee configuration</p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Platform fees"
+        headingClassName="text-gold"
+        description="Treasury and fee configuration"
+      />
 
-      <section className="mt-8 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold">Treasury & tokens</h2>
-        <div className="mt-4">
+      <DashboardSection title="Treasury & tokens" level="h3">
+        <DashboardCard>
           <PlatformSettingsForm
             defaultValues={{
               treasuryWallet: settings?.treasury_wallet_address ?? "",
@@ -30,60 +49,73 @@ export default async function AdminPlatformFeesPage() {
               usdtToken: settings?.usdt_token_address ?? "",
             }}
           />
+        </DashboardCard>
+      </DashboardSection>
+
+      <DashboardSection title="Current fee rates" level="h3">
+        <div className="space-y-4">
+          <DashboardStats columns={3}>
+            <DashboardStat
+              label={<PaymentMethodLogo method="nxr" size={18} />}
+              value={latestRates.nxr != null ? `${(latestRates.nxr * 100).toFixed(2)}%` : "—"}
+            />
+            <DashboardStat
+              label={<PaymentMethodLogo method="crypto_other" size={18} />}
+              value={
+                latestRates.crypto_other != null
+                  ? `${(latestRates.crypto_other * 100).toFixed(2)}%`
+                  : "—"
+              }
+            />
+            <DashboardStat
+              label={<PaymentMethodLogo method="card" size={18} />}
+              value={latestRates.card != null ? `${(latestRates.card * 100).toFixed(2)}%` : "—"}
+            />
+          </DashboardStats>
+
+          <DashboardCard>
+            <FeeScheduleForm />
+          </DashboardCard>
         </div>
-      </section>
+      </DashboardSection>
 
-      <section className="mt-8 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold">Current fee rates</h2>
-        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-          <Rate method="nxr" rate={latestRates.nxr} />
-          <Rate method="crypto_other" rate={latestRates.crypto_other} />
-          <Rate method="card" rate={latestRates.card} />
-        </dl>
-
-        <FeeScheduleForm />
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold">Fee history</h2>
-        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 bg-zinc-900 text-left text-zinc-400">
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Rate</th>
-                <th className="px-4 py-3">Effective from</th>
-              </tr>
-            </thead>
-            <tbody>
-              {schedules.slice(0, 20).map((s) => (
-                <tr key={s.id} className="border-b border-white/5">
-                  <td className="px-4 py-3">
-                    <PaymentMethodLogo method={s.payment_type} size={18} />
-                  </td>
-                  <td className="px-4 py-3">{(Number(s.base_rate) * 100).toFixed(2)}%</td>
-                  <td className="px-4 py-3 text-zinc-400">
-                    {new Date(s.effective_from).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function Rate({ method, rate }: { method: string; rate?: number }) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-zinc-950 p-4">
-      <dt className="text-xs text-zinc-500">
-        <PaymentMethodLogo method={method} size={18} />
-      </dt>
-      <dd className="mt-1 text-xl font-bold">
-        {rate != null ? `${(rate * 100).toFixed(2)}%` : "—"}
-      </dd>
+      <DashboardSection title="Fee history" level="h3">
+        <DashboardCard flush className="overflow-hidden">
+          <DashboardTable caption="Platform fee schedule history" minWidth="36rem">
+            <DashboardTableHead>
+              <DashboardTableRow>
+                <DashboardTableHeader>Type</DashboardTableHeader>
+                <DashboardTableHeader>Rate</DashboardTableHeader>
+                <DashboardTableHeader hideBelow="sm">Effective from</DashboardTableHeader>
+              </DashboardTableRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
+              {schedules.length === 0 ? (
+                <DashboardTableEmpty colSpan={3}>
+                  <DashboardEmptyState
+                    inset
+                    icon={<History className="h-5 w-5" aria-hidden />}
+                    title="No fee schedules yet"
+                    description="Every rate change you publish is recorded here with its effective date."
+                  />
+                </DashboardTableEmpty>
+              ) : (
+                schedules.slice(0, 20).map((s) => (
+                  <DashboardTableRow key={s.id} interactive>
+                    <DashboardTableCell>
+                      <PaymentMethodLogo method={s.payment_type} size={18} />
+                    </DashboardTableCell>
+                    <DashboardTableCell>{(Number(s.base_rate) * 100).toFixed(2)}%</DashboardTableCell>
+                    <DashboardTableCell hideBelow="sm" className="text-muted">
+                      {new Date(s.effective_from).toLocaleString()}
+                    </DashboardTableCell>
+                  </DashboardTableRow>
+                ))
+              )}
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardCard>
+      </DashboardSection>
     </div>
   );
 }

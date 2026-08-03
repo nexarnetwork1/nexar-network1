@@ -1,0 +1,77 @@
+import {
+  Activity,
+  Bell,
+  Boxes,
+  Building2,
+  ChartNoAxesColumn,
+  ClipboardList,
+  Coins,
+  Cog,
+  CreditCard,
+  Database,
+  FileText,
+  Gauge,
+  Heart,
+  Home,
+  Layers,
+  LifeBuoy,
+  Megaphone,
+  Package,
+  Receipt,
+  Scale,
+  Search,
+  Shield,
+  ShoppingBag,
+  ShoppingCart,
+  Store,
+  Tag,
+  Truck,
+  User,
+  Users,
+  Wallet,
+  Webhook,
+  type LucideIcon,
+} from "lucide-react";
+import type { DashboardIconName } from "@/config/dashboard-nav";
+
+/**
+ * Nav config is passed from server layouts to client components, so icons are
+ * referenced by name and resolved here rather than shipped as props.
+ */
+export const DASHBOARD_ICONS: Record<DashboardIconName, LucideIcon> = {
+  activity: Activity,
+  bell: Bell,
+  boxes: Boxes,
+  building: Building2,
+  chart: ChartNoAxesColumn,
+  clipboard: ClipboardList,
+  coins: Coins,
+  cog: Cog,
+  creditCard: CreditCard,
+  database: Database,
+  fileText: FileText,
+  gauge: Gauge,
+  heart: Heart,
+  home: Home,
+  layers: Layers,
+  lifeBuoy: LifeBuoy,
+  megaphone: Megaphone,
+  package: Package,
+  receipt: Receipt,
+  scale: Scale,
+  search: Search,
+  shield: Shield,
+  shoppingBag: ShoppingBag,
+  shoppingCart: ShoppingCart,
+  store: Store,
+  tag: Tag,
+  truck: Truck,
+  user: User,
+  users: Users,
+  wallet: Wallet,
+  webhook: Webhook,
+};
+
+export function resolveDashboardIcon(name?: DashboardIconName): LucideIcon | null {
+  return name ? DASHBOARD_ICONS[name] ?? null : null;
+}

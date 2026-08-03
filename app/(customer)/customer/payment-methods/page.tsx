@@ -1,8 +1,14 @@
 import { redirect } from "next/navigation";
+import { CreditCard } from "lucide-react";
 import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getPaymentMethods } from "@/modules/platform/repository";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+} from "@/components/dashboard";
 
 export default async function CustomerPaymentMethodsPage() {
   const profile = await getCurrentProfile();
@@ -11,28 +17,32 @@ export default async function CustomerPaymentMethodsPage() {
   const methods = await getPaymentMethods();
 
   return (
-    <div>
-      <h1 className="font-heading text-3xl font-semibold">Payment methods</h1>
-      <p className="mt-2 text-muted">
-        Supported payment options on Nexar Network. Card payments require Stripe configuration.
-      </p>
+    <div className="space-y-6">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Payment methods"
+        description="Supported payment options on Nexar Network. Card payments require Stripe configuration."
+      />
 
-      <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-        {methods.map((method) => (
-          <li
-            key={method.id}
-            className="rounded-2xl border border-border bg-card/40 p-5"
-          >
-            <PaymentMethodLogo method={method.code} size={18} />
-            <p className="mt-1 text-xs uppercase text-muted">{method.kind}</p>
-            <p className="mt-2 text-sm text-muted">
-              {method.is_active ? "Available" : "Coming soon"}
-            </p>
-          </li>
-        ))}
-      </ul>
-      {methods.length === 0 && (
-        <p className="mt-8 text-muted">No payment methods configured.</p>
+      {methods.length === 0 ? (
+        <DashboardEmptyState
+          icon={<CreditCard className="h-6 w-6" aria-hidden />}
+          title="No payment methods configured"
+          description="Once the platform enables a payment option it will be listed here."
+        />
+      ) : (
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {methods.map((method) => (
+            <DashboardCard as="li" key={method.id} className="min-w-0">
+              <PaymentMethodLogo method={method.code} size={18} />
+              <p className="mt-1 truncate text-xs uppercase text-muted">{method.kind}</p>
+              <p className="mt-2 text-sm text-muted">
+                {method.is_active ? "Available" : "Coming soon"}
+              </p>
+            </DashboardCard>
+          ))}
+        </ul>
       )}
     </div>
   );

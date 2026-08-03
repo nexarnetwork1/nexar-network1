@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireSuperAdmin } from "@/modules/users/repository";
+import {
+  DashboardCard,
+  DashboardSection,
+  DashboardStat,
+  DashboardStats,
+} from "@/components/dashboard";
 
 export default async function AdminMarketplacePage() {
   await requireSuperAdmin();
@@ -31,40 +37,38 @@ export default async function AdminMarketplacePage() {
   ];
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-yellow-400">Marketplace operations</h1>
-      <p className="mt-2 max-w-2xl text-zinc-400">
-        Commerce catalog, orders, and trust &amp; safety tools for the Nexar marketplace.
-      </p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Marketplace operations"
+        headingClassName="text-gold"
+        description="Commerce catalog, orders, and trust & safety tools for the Nexar marketplace."
+      />
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: "Products", value: products ?? 0 },
-          { label: "Active listings", value: activeProducts ?? 0 },
-          { label: "Marketplace stores", value: stores ?? 0 },
-          { label: "Orders", value: orders ?? 0 },
-          { label: "Reviews", value: productReviews ?? 0 },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-white/10 bg-zinc-900/50 p-5">
-            <p className="text-xs uppercase tracking-wide text-zinc-500">{stat.label}</p>
-            <p className="mt-2 text-2xl font-semibold text-white">{stat.value}</p>
-          </div>
-        ))}
-      </div>
+      <DashboardStats columns={5}>
+        <DashboardStat label="Products" value={products ?? 0} />
+        <DashboardStat label="Active listings" value={activeProducts ?? 0} />
+        <DashboardStat label="Marketplace stores" value={stores ?? 0} />
+        <DashboardStat label="Orders" value={orders ?? 0} />
+        <DashboardStat label="Reviews" value={productReviews ?? 0} />
+      </DashboardStats>
 
-      <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              className="block rounded-2xl border border-white/10 bg-zinc-900/40 p-5 transition-colors hover:border-yellow-500/30"
-            >
-              <p className="font-medium text-yellow-300">{link.label}</p>
-              <p className="mt-1 text-sm text-zinc-500">{link.hint}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <DashboardSection level="h3" title="Jump to">
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {links.map((link) => (
+            <DashboardCard as="li" key={link.href} flush interactive>
+              <Link
+                href={link.href}
+                className="block rounded-2xl p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+              >
+                <p className="font-medium text-gold">{link.label}</p>
+                <p className="mt-1 text-sm text-muted">{link.hint}</p>
+              </Link>
+            </DashboardCard>
+          ))}
+        </ul>
+      </DashboardSection>
     </div>
   );
 }

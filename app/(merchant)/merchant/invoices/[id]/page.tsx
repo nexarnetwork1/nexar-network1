@@ -9,6 +9,7 @@ import { InvoiceItemsTable } from "@/components/invoices/InvoiceItemsTable";
 import { InvoiceShareLink } from "@/components/merchant/InvoiceShareLink";
 import { buildInvoicePayUrl } from "@/lib/qr/payload";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import { DashboardCard, DashboardSection } from "@/components/dashboard";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -29,52 +30,56 @@ export default async function MerchantInvoiceDetailPage({ params }: Props) {
       : null;
 
   return (
-    <div>
-      <Link href="/merchant/invoices" className="text-sm text-muted hover:text-gold">
-        ← Back to invoices
-      </Link>
+    <div className="space-y-6">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title={<span className="break-all">{invoice.invoice_number}</span>}
+        actions={<StatusBadge status={invoice.status} />}
+      />
 
-      <div className="mt-4 flex items-center gap-4">
-        <h1 className="font-heading text-3xl font-semibold">{invoice.invoice_number}</h1>
-        <StatusBadge status={invoice.status} />
-      </div>
-
-      <dl className="mt-8 max-w-2xl space-y-4 rounded-2xl border border-border bg-card/40 p-6">
-        <div className="flex justify-between">
-          <dt className="text-muted">Customer</dt>
-          <dd>{invoice.customer.full_name ?? invoice.customer.email}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-muted">Amount</dt>
-          <dd className="font-heading text-xl text-gold">
-            <CurrencyAmount amount={Number(invoice.amount)} currency={invoice.currency} size={20} />
-          </dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-muted">Order</dt>
-          <dd>
-            <Link
-              href={`/merchant/orders/${invoice.order_id}`}
-              className="text-gold hover:text-gold-secondary"
-            >
-              View order
-            </Link>
-          </dd>
-        </div>
-      </dl>
+      <DashboardCard className="max-w-2xl">
+        <dl className="space-y-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <dt className="text-muted">Customer</dt>
+            <dd className="break-words text-right">
+              {invoice.customer.full_name ?? invoice.customer.email}
+            </dd>
+          </div>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <dt className="text-muted">Amount</dt>
+            <dd className="font-heading text-xl text-gold">
+              <CurrencyAmount amount={Number(invoice.amount)} currency={invoice.currency} size={20} />
+            </dd>
+          </div>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <dt className="text-muted">Order</dt>
+            <dd>
+              <Link
+                href={`/merchant/orders/${invoice.order_id}`}
+                className="rounded-md text-gold hover:text-gold-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+              >
+                View order
+              </Link>
+            </dd>
+          </div>
+        </dl>
+      </DashboardCard>
 
       <InvoiceItemsTable items={invoice.items ?? []} currency={invoice.currency} />
 
       {payUrl && <InvoiceShareLink payUrl={payUrl} />}
 
-      <a
-        href={`/api/invoices/${invoice.id}/pdf`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 inline-block text-sm text-gold hover:text-gold-secondary"
-      >
-        Download PDF
-      </a>
+      <div>
+        <a
+          href={`/api/invoices/${invoice.id}/pdf`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 items-center rounded-md text-sm text-gold hover:text-gold-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+        >
+          Download PDF
+        </a>
+      </div>
     </div>
   );
 }

@@ -1,42 +1,86 @@
 import Link from "next/link";
+import { Gavel } from "lucide-react";
 import { requireSuperAdmin } from "@/modules/users/repository";
 import { getAllDisputes } from "@/modules/disputes/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
 
 export default async function AdminDisputesPage() {
   await requireSuperAdmin();
   const disputes = await getAllDisputes();
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-white">Disputes</h1>
-      <p className="mt-2 text-muted">Review and resolve customer–merchant disputes.</p>
-      <div className="mt-8 overflow-x-auto rounded-xl border border-border">
-        <table className="min-w-full text-sm">
-          <thead className="bg-surface/60 text-left text-muted">
-            <tr>
-              <th className="px-4 py-3">Order</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Reason</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {disputes.map((d) => (
-              <tr key={d.id} className="border-t border-border">
-                <td className="px-4 py-3 font-mono text-xs">{d.order_id.slice(0, 8)}…</td>
-                <td className="px-4 py-3"><StatusBadge status={d.status} /></td>
-                <td className="px-4 py-3 text-muted">{d.reason.slice(0, 80)}</td>
-                <td className="px-4 py-3 text-muted">{new Date(d.created_at).toLocaleDateString()}</td>
-                <td className="px-4 py-3">
-                  <Link href={`/admin/disputes/${d.id}`} className="text-gold hover:underline">Review</Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="space-y-6">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Disputes"
+        description="Review and resolve customer–merchant disputes."
+      />
+
+      <DashboardCard flush className="overflow-hidden">
+        <DashboardTable caption="Open and resolved disputes" minWidth="48rem">
+          <DashboardTableHead>
+            <DashboardTableRow>
+              <DashboardTableHeader>Order</DashboardTableHeader>
+              <DashboardTableHeader>Status</DashboardTableHeader>
+              <DashboardTableHeader hideBelow="md">Reason</DashboardTableHeader>
+              <DashboardTableHeader hideBelow="sm">Created</DashboardTableHeader>
+              <DashboardTableHeader align="right">Actions</DashboardTableHeader>
+            </DashboardTableRow>
+          </DashboardTableHead>
+          <DashboardTableBody>
+            {disputes.length === 0 ? (
+              <DashboardTableEmpty colSpan={5}>
+                <DashboardEmptyState
+                  inset
+                  icon={<Gavel className="h-5 w-5" aria-hidden />}
+                  title="No disputes"
+                  description="Disputes raised between customers and merchants will show up here."
+                />
+              </DashboardTableEmpty>
+            ) : (
+              disputes.map((d) => (
+                <DashboardTableRow key={d.id} interactive>
+                  <DashboardTableCell className="font-mono text-xs">
+                    {d.order_id.slice(0, 8)}…
+                  </DashboardTableCell>
+                  <DashboardTableCell>
+                    <StatusBadge status={d.status} />
+                  </DashboardTableCell>
+                  <DashboardTableCell wrap hideBelow="md" className="max-w-[24rem] text-muted">
+                    {d.reason.slice(0, 80)}
+                  </DashboardTableCell>
+                  <DashboardTableCell hideBelow="sm" className="text-muted">
+                    {new Date(d.created_at).toLocaleDateString()}
+                  </DashboardTableCell>
+                  <DashboardTableCell align="right">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/disputes/${d.id}`}
+                        className="inline-flex min-h-11 items-center rounded-lg px-2 text-sm font-medium text-gold transition-colors hover:text-gold-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                      >
+                        Review
+                      </Link>
+                    </div>
+                  </DashboardTableCell>
+                </DashboardTableRow>
+              ))
+            )}
+          </DashboardTableBody>
+        </DashboardTable>
+      </DashboardCard>
     </div>
   );
 }

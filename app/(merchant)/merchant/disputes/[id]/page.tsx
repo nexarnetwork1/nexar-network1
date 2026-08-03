@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getStoreById } from "@/modules/stores/repository";
@@ -14,6 +13,11 @@ import {
 import { DisputeThread } from "@/components/disputes/DisputeThread";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
+import {
+  DashboardActions,
+  DashboardCard,
+  DashboardSection,
+} from "@/components/dashboard";
 
 export default async function MerchantDisputeDetailPage({
   params,
@@ -39,29 +43,41 @@ export default async function MerchantDisputeDetailPage({
 
   return (
     <div className="max-w-3xl space-y-6">
-      <Link href="/merchant/disputes" className="text-sm text-gold hover:underline">← Back</Link>
-      <div>
-        <h1 className="text-3xl font-bold text-white">Dispute</h1>
-        <div className="mt-2"><StatusBadge status={dispute.status} /></div>
-        <p className="mt-4 text-white">{dispute.reason}</p>
-      </div>
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Dispute"
+        actions={<StatusBadge status={dispute.status} />}
+      />
 
-      {canReply && (
-        <div className="flex gap-3">
-          <form action={async () => {
-            "use server";
-            await merchantAcceptRefundAction(id);
-          }}>
-            <Button type="submit" size="sm">Accept refund</Button>
-          </form>
-          <form action={async () => {
-            "use server";
-            await merchantRejectClaimAction(id);
-          }}>
-            <Button type="submit" size="sm" variant="ghost">Reject claim</Button>
-          </form>
-        </div>
-      )}
+      <DashboardCard>
+        <p className="break-words text-white">{dispute.reason}</p>
+
+        {canReply && (
+          <DashboardActions className="mt-4" stackOnMobile>
+            <form
+              action={async () => {
+                "use server";
+                await merchantAcceptRefundAction(id);
+              }}
+            >
+              <Button type="submit" size="sm" className="w-full sm:w-auto">
+                Accept refund
+              </Button>
+            </form>
+            <form
+              action={async () => {
+                "use server";
+                await merchantRejectClaimAction(id);
+              }}
+            >
+              <Button type="submit" size="sm" variant="ghost" className="w-full sm:w-auto">
+                Reject claim
+              </Button>
+            </form>
+          </DashboardActions>
+        )}
+      </DashboardCard>
 
       <DisputeThread
         disputeId={id}

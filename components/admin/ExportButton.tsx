@@ -9,7 +9,7 @@ export function ExportButton({ resource, label = "Export CSV" }: ExportButtonPro
   return (
     <Link
       href={`/api/admin/export/${resource}`}
-      className="inline-flex items-center rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-sm font-medium text-yellow-400 transition hover:bg-yellow-500/20"
+      className="inline-flex h-11 items-center rounded-xl border border-gold/30 bg-gold/10 px-4 text-sm font-medium text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       download
     >
       {label}

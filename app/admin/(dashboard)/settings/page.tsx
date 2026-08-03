@@ -4,6 +4,7 @@ import {
   getLatestFeeRates,
 } from "@/modules/platform/repository";
 import { ComprehensivePlatformSettingsForm } from "@/components/admin/ComprehensivePlatformSettingsForm";
+import { DashboardSection } from "@/components/dashboard";
 
 export default async function AdminSettingsPage() {
   const [settings, feeSchedules, latestFees] = await Promise.all([
@@ -13,18 +14,19 @@ export default async function AdminSettingsPage() {
   ]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-yellow-400">Platform Settings</h1>
-      <p className="mt-2 text-zinc-400">
-        Super Admin only — treasury, fees, security, payments, and notifications
-      </p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Platform settings"
+        headingClassName="text-gold"
+        description="Super Admin only — treasury, fees, security, payments, and notifications"
+      />
 
-      <div className="mt-8">
-        <ComprehensivePlatformSettingsForm
-          settings={settings}
-          latestFees={latestFees}
-        />
-      </div>
+      <ComprehensivePlatformSettingsForm
+        settings={settings}
+        latestFees={latestFees}
+      />
     </div>
   );
 }

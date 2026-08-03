@@ -1,7 +1,19 @@
+import { Package } from "lucide-react";
 import { getAllProducts } from "@/modules/platform/repository";
 import { moderateProductAction } from "@/modules/platform/actions";
-import { ExportButton } from "@/components/admin/ExportButton";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
 
 async function moderateFormAction(formData: FormData) {
   "use server";
@@ -11,75 +23,101 @@ async function moderateFormAction(formData: FormData) {
   );
 }
 
+const moderationButtonClass =
+  "inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-medium transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50";
+
 export default async function AdminProductsPage() {
   const products = await getAllProducts();
 
   return (
-    <div>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-yellow-400">Products</h1>
-          <p className="mt-2 text-zinc-400">Moderate marketplace catalog — approve, hide, or restore products</p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Products"
+        description="Moderate marketplace catalog — approve, hide, or restore products"
+      />
 
-      <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/10 bg-zinc-900 text-left text-zinc-400">
-              <th className="px-4 py-3">Product</th>
-              <th className="px-4 py-3">Store</th>
-              <th className="px-4 py-3">Price</th>
-              <th className="px-4 py-3">Stock</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => {
-              const store = product.store as { name?: string; status?: string } | null;
-              return (
-                <tr key={product.id} className="border-b border-white/5">
-                  <td className="px-4 py-3 font-medium">{product.name}</td>
-                  <td className="px-4 py-3">
-                    {store?.name ?? "—"}
-                    {store?.status !== "active" && (
-                      <span className="ml-2 text-xs text-amber-400">({store?.status})</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <CurrencyAmount amount={Number(product.price)} currency={product.currency} size={16} />
-                  </td>
-                  <td className="px-4 py-3">{product.stock}</td>
-                  <td className="px-4 py-3">
-                    {product.is_active ? (
-                      <span className="text-emerald-400">Active</span>
-                    ) : (
-                      <span className="text-red-400">Hidden</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <form action={moderateFormAction} className="flex gap-2">
-                      <input type="hidden" name="productId" value={product.id} />
-                      {product.is_active ? (
-                        <>
-                          <input type="hidden" name="isActive" value="false" />
-                          <button type="submit" className="text-xs text-red-400 hover:underline">Hide</button>
-                        </>
-                      ) : (
-                        <>
-                          <input type="hidden" name="isActive" value="true" />
-                          <button type="submit" className="text-xs text-emerald-400 hover:underline">Approve</button>
-                        </>
+      <DashboardCard flush className="overflow-hidden">
+        <DashboardTable caption="Marketplace products awaiting moderation" minWidth="52rem">
+          <DashboardTableHead>
+            <DashboardTableRow>
+              <DashboardTableHeader>Product</DashboardTableHeader>
+              <DashboardTableHeader hideBelow="md">Store</DashboardTableHeader>
+              <DashboardTableHeader>Price</DashboardTableHeader>
+              <DashboardTableHeader hideBelow="sm">Stock</DashboardTableHeader>
+              <DashboardTableHeader>Status</DashboardTableHeader>
+              <DashboardTableHeader align="right">Actions</DashboardTableHeader>
+            </DashboardTableRow>
+          </DashboardTableHead>
+          <DashboardTableBody>
+            {products.length === 0 ? (
+              <DashboardTableEmpty colSpan={6}>
+                <DashboardEmptyState
+                  inset
+                  icon={<Package className="h-5 w-5" aria-hidden />}
+                  title="No products to moderate"
+                  description="Products published by merchants will appear here for review."
+                />
+              </DashboardTableEmpty>
+            ) : (
+              products.map((product) => {
+                const store = product.store as { name?: string; status?: string } | null;
+                return (
+                  <DashboardTableRow key={product.id} interactive>
+                    <DashboardTableCell wrap className="font-medium">
+                      {product.name}
+                    </DashboardTableCell>
+                    <DashboardTableCell hideBelow="md" wrap>
+                      {store?.name ?? "—"}
+                      {store?.status !== "active" && (
+                        <span className="ml-2 text-xs text-amber-400">({store?.status})</span>
                       )}
-                    </form>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </DashboardTableCell>
+                    <DashboardTableCell>
+                      <CurrencyAmount amount={Number(product.price)} currency={product.currency} size={16} />
+                    </DashboardTableCell>
+                    <DashboardTableCell hideBelow="sm">{product.stock}</DashboardTableCell>
+                    <DashboardTableCell>
+                      {product.is_active ? (
+                        <span className="text-emerald-400">Active</span>
+                      ) : (
+                        <span className="text-red-400">Hidden</span>
+                      )}
+                    </DashboardTableCell>
+                    <DashboardTableCell align="right">
+                      <form action={moderateFormAction} className="flex justify-end gap-2">
+                        <input type="hidden" name="productId" value={product.id} />
+                        {product.is_active ? (
+                          <>
+                            <input type="hidden" name="isActive" value="false" />
+                            <button
+                              type="submit"
+                              className={`${moderationButtonClass} text-red-400 hover:text-red-300`}
+                            >
+                              Hide
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <input type="hidden" name="isActive" value="true" />
+                            <button
+                              type="submit"
+                              className={`${moderationButtonClass} text-emerald-400 hover:text-emerald-300`}
+                            >
+                              Approve
+                            </button>
+                          </>
+                        )}
+                      </form>
+                    </DashboardTableCell>
+                  </DashboardTableRow>
+                );
+              })
+            )}
+          </DashboardTableBody>
+        </DashboardTable>
+      </DashboardCard>
     </div>
   );
 }

@@ -11,17 +11,23 @@ import {
   YAxis,
 } from "recharts";
 import type { MonthlyRevenue } from "@/modules/analytics/repository";
+import { DashboardEmptyState } from "@/components/dashboard/DashboardEmptyState";
 
 type RevenueChartProps = {
   data: MonthlyRevenue[];
 };
 
+// Matches --nxr-gold and --nxr-gold-secondary; recharts needs literal colours.
+const REVENUE_FILL = "#d4af37";
+const FEES_FILL = "#8a7124";
+
 export function RevenueChart({ data }: RevenueChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-2xl border border-white/10 bg-zinc-900 text-zinc-500">
-        No revenue data yet
-      </div>
+      <DashboardEmptyState
+        title="No revenue data yet"
+        description="Monthly revenue appears here once orders start settling."
+      />
     );
   }
 
@@ -32,22 +38,24 @@ export function RevenueChart({ data }: RevenueChartProps) {
   }));
 
   return (
-    <div className="h-72 rounded-2xl border border-white/10 bg-zinc-900 p-4">
+    <div className="h-72 rounded-2xl border border-border bg-card/40 p-4">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-          <XAxis dataKey="month" stroke="#888" fontSize={12} />
-          <YAxis stroke="#888" fontSize={12} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" />
+          <XAxis dataKey="month" stroke="#9a9a9a" fontSize={12} />
+          <YAxis stroke="#9a9a9a" fontSize={12} />
           <Tooltip
+            cursor={{ fill: "rgba(255,255,255,0.04)" }}
             contentStyle={{
-              backgroundColor: "#18181b",
-              border: "1px solid #333",
-              borderRadius: "8px",
+              backgroundColor: "#0b0b0b",
+              border: "1px solid #1a1a1a",
+              borderRadius: "12px",
+              color: "#ffffff",
             }}
           />
           <Legend />
-          <Bar dataKey="Revenue" fill="#eab308" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="Fees" fill="#ca8a04" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Revenue" fill={REVENUE_FILL} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Fees" fill={FEES_FILL} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

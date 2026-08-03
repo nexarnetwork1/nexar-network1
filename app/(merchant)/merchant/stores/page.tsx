@@ -1,7 +1,13 @@
-import { getCurrentProfile } from "@/modules/users/repository";
-import { getMerchantStore, getMerchantStores } from "@/modules/stores/repository";
-import { StoreSwitcher } from "@/components/stores/StoreSwitcher";
 import Link from "next/link";
+import { Building2 } from "lucide-react";
+import { getCurrentProfile } from "@/modules/users/repository";
+import { getMerchantStores } from "@/modules/stores/repository";
+import { StoreSwitcher } from "@/components/stores/StoreSwitcher";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+} from "@/components/dashboard";
 
 export default async function MerchantStoresPage() {
   const profile = await getCurrentProfile();
@@ -9,21 +15,41 @@ export default async function MerchantStoresPage() {
   const stores = await getMerchantStores(profile.id);
 
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">My Stores</h1>
-        <StoreSwitcher stores={stores} />
-      </div>
-      <p className="mt-2 text-muted">Manage multiple storefronts from one merchant account.</p>
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        {stores.map((store) => (
-          <Link key={store.id} href={`/merchant?store=${store.id}`} className="rounded-xl border border-border p-6 hover:border-gold/40">
-            <h2 className="font-semibold text-white">{store.name}</h2>
-            <p className="text-sm text-muted">{store.slug} · {store.mode}</p>
-            <p className="mt-2 text-xs uppercase text-muted">{store.status}</p>
-          </Link>
-        ))}
-      </div>
+    <div className="space-y-6">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="My Stores"
+        description="Manage multiple storefronts from one merchant account."
+        actions={<StoreSwitcher stores={stores} />}
+      />
+
+      {stores.length === 0 ? (
+        <DashboardEmptyState
+          icon={<Building2 className="h-5 w-5" aria-hidden />}
+          title="No stores yet"
+          description="Storefronts linked to this merchant account will be listed here."
+        />
+      ) : (
+        <ul className="grid gap-4 md:grid-cols-2">
+          {stores.map((store) => (
+            <li key={store.id} className="min-w-0">
+              <Link
+                href={`/merchant?store=${store.id}`}
+                className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+              >
+                <DashboardCard interactive className="h-full">
+                  <h2 className="break-words font-semibold text-white">{store.name}</h2>
+                  <p className="break-words text-sm text-muted">
+                    {store.slug} · {store.mode}
+                  </p>
+                  <p className="mt-2 text-xs uppercase text-muted">{store.status}</p>
+                </DashboardCard>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

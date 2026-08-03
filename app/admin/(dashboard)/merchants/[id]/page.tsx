@@ -1,9 +1,18 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { QrCode, ShoppingBag } from "lucide-react";
 import { getMerchantDetail } from "@/modules/platform/repository";
 import { updateStoreStatusAction, banUserAction, resetUserPasswordAction } from "@/modules/platform/actions";
 import type { StoreStatus } from "@/types";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { Button } from "@/components/ui/Button";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardStat,
+  DashboardStats,
+  dashboardFilterControlClass,
+} from "@/components/dashboard";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -39,75 +48,121 @@ export default async function AdminMerchantDetailPage({ params }: Props) {
     .order("created_at", { ascending: false })
     .limit(10);
 
+  const recentOrders = orders ?? [];
+
   return (
-    <div>
-      <Link href="/admin/merchants" className="text-sm text-yellow-400 hover:underline">← Merchants</Link>
-      <h1 className="mt-4 text-3xl font-bold text-yellow-400">{store.name}</h1>
-      <p className="mt-2 capitalize text-zinc-400">{store.mode.replace("_", " ")} · {store.status}</p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title={store.name}
+        headingClassName="text-gold"
+        description={
+          <span className="capitalize">
+            {store.mode.replace("_", " ")} · {store.status}
+          </span>
+        }
+      />
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Stat label="Revenue" value={`$${Number(mp?.total_revenue_usd ?? 0).toFixed(2)}`} />
-        <Stat label="Orders" value={String(mp?.total_orders ?? 0)} />
-        <Stat label="Owner" value={owner?.full_name ?? owner?.email ?? "—"} />
-      </div>
+      <DashboardStats columns={3}>
+        <DashboardStat label="Revenue" value={`$${Number(mp?.total_revenue_usd ?? 0).toFixed(2)}`} />
+        <DashboardStat label="Orders" value={String(mp?.total_orders ?? 0)} />
+        <DashboardStat label="Owner" value={owner?.full_name ?? owner?.email ?? "—"} />
+      </DashboardStats>
 
-      <section className="mt-10 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold text-yellow-400">Wallet & QR codes</h2>
-        <p className="mt-2 font-mono text-sm">{store.wallet_address}</p>
-        <ul className="mt-4 space-y-2 text-sm">
-          {qrCodes.map((qr) => (
-            <li key={qr.id} className="flex justify-between">
-              <span className="capitalize">{qr.qr_type.replace("_", " ")}</span>
-              <span className="max-w-md truncate font-mono text-xs text-zinc-400">{qr.payload}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mt-8 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold text-yellow-400">Recent orders</h2>
-        <ul className="mt-4 space-y-2 text-sm">
-          {(orders ?? []).map((o) => (
-            <li key={o.id} className="flex justify-between">
-              <span>{o.id.slice(0, 8)}…</span>
-              <span>${Number(o.subtotal).toFixed(2)} · {o.status}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <div className="mt-8 flex flex-wrap gap-4">
-        <form action={updateStoreFormAction} className="flex items-center gap-2">
-          <input type="hidden" name="storeId" value={store.id} />
-          <select name="status" defaultValue={store.status} className="rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm">
-            <option value="pending">Pending</option>
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-          </select>
-          <button type="submit" className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black">Update status</button>
-        </form>
-        {owner?.id && (
-          <>
-            <form action={resetPasswordFormAction}>
-              <input type="hidden" name="userId" value={owner.id} />
-              <button type="submit" className="rounded-lg border border-yellow-500/30 px-4 py-2 text-sm text-yellow-400">Reset password</button>
-            </form>
-            <form action={banFormAction}>
-              <input type="hidden" name="userId" value={owner.id} />
-              <button type="submit" className="rounded-lg border border-red-500/40 px-4 py-2 text-sm text-red-400">Ban merchant</button>
-            </form>
-          </>
+      <DashboardCard as="section">
+        <h2 className="font-heading text-lg font-semibold text-gold">Wallet &amp; QR codes</h2>
+        <p className="mt-2 break-all font-mono text-sm">{store.wallet_address}</p>
+        {qrCodes.length === 0 ? (
+          <DashboardEmptyState
+            inset
+            icon={<QrCode className="h-5 w-5" aria-hidden />}
+            title="No QR codes"
+            description="Payment and storefront QR codes generated for this merchant will appear here."
+          />
+        ) : (
+          <ul className="mt-4 space-y-2 text-sm">
+            {qrCodes.map((qr) => (
+              <li key={qr.id} className="flex flex-wrap justify-between gap-2">
+                <span className="capitalize">{qr.qr_type.replace("_", " ")}</span>
+                <span className="max-w-full truncate font-mono text-xs text-muted sm:max-w-md">
+                  {qr.payload}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
-      </div>
-    </div>
-  );
-}
+      </DashboardCard>
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900 p-5">
-      <p className="text-xs uppercase tracking-wider text-zinc-500">{label}</p>
-      <p className="mt-2 text-xl font-bold">{value}</p>
+      <DashboardCard as="section">
+        <h2 className="font-heading text-lg font-semibold text-gold">Recent orders</h2>
+        {recentOrders.length === 0 ? (
+          <DashboardEmptyState
+            inset
+            icon={<ShoppingBag className="h-5 w-5" aria-hidden />}
+            title="No orders yet"
+            description="Orders placed with this merchant will be listed here."
+          />
+        ) : (
+          <ul className="mt-4 space-y-2 text-sm">
+            {recentOrders.map((o) => (
+              <li key={o.id} className="flex flex-wrap justify-between gap-2">
+                <span className="font-mono text-xs sm:text-sm">{o.id.slice(0, 8)}…</span>
+                <span>
+                  ${Number(o.subtotal).toFixed(2)} · <span className="capitalize">{o.status}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </DashboardCard>
+
+      <DashboardSection level="h3" title="Merchant actions">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          <form
+            action={updateStoreFormAction}
+            className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"
+          >
+            <input type="hidden" name="storeId" value={store.id} />
+            <label htmlFor="store-status" className="sr-only">
+              Store status
+            </label>
+            <select
+              id="store-status"
+              name="status"
+              defaultValue={store.status}
+              className={`${dashboardFilterControlClass} w-full sm:w-auto`}
+            >
+              <option value="pending">Pending</option>
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+            </select>
+            <Button type="submit" className="w-full sm:w-auto">
+              Update status
+            </Button>
+          </form>
+          {owner?.id && (
+            <>
+              <form action={resetPasswordFormAction} className="w-full sm:w-auto">
+                <input type="hidden" name="userId" value={owner.id} />
+                <Button type="submit" variant="outline" className="w-full text-gold sm:w-auto">
+                  Reset password
+                </Button>
+              </form>
+              <form action={banFormAction} className="w-full sm:w-auto">
+                <input type="hidden" name="userId" value={owner.id} />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="w-full border-red-500/40 text-red-400 hover:border-red-500/60 hover:bg-red-500/10 sm:w-auto"
+                >
+                  Ban merchant
+                </Button>
+              </form>
+            </>
+          )}
+        </div>
+      </DashboardSection>
     </div>
   );
 }

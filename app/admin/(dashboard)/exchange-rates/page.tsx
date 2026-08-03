@@ -1,8 +1,21 @@
+import { TrendingUp } from "lucide-react";
 import { getExchangeRates, getActiveSupportedCurrencies } from "@/modules/platform/repository";
 import { ExchangeRateForm } from "@/components/admin/ExchangeRateForm";
 import { formatDateTime } from "@/utils/format";
 import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
 
 export default async function AdminExchangeRatesPage() {
   const [rates, currencies] = await Promise.all([
@@ -17,57 +30,79 @@ export default async function AdminExchangeRatesPage() {
     }
   }
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold text-yellow-400">Exchange rates</h1>
-      <p className="mt-2 text-zinc-400">Crypto to USD conversion rates for payments</p>
+  const latestRates = Object.values(latestByAsset);
 
-      <div className="mt-6 flex flex-wrap gap-2">
+  return (
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Exchange rates"
+        headingClassName="text-gold"
+        description="Crypto to USD conversion rates for payments"
+      />
+
+      <ul className="flex flex-wrap gap-2" aria-label="Active currencies">
         {currencies.map((c) => (
-          <span
+          <li
             key={c.id}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-white/80"
           >
             <CurrencyLogo code={c.code} size={14} showLabel />
             <span>· {c.kind}</span>
-          </span>
+          </li>
         ))}
-      </div>
+      </ul>
 
-      <div className="mt-8">
+      <DashboardSection title="Update rate" level="h3">
         <ExchangeRateForm
           currencies={currencies.map((c) => ({ code: c.code, kind: c.kind }))}
         />
-      </div>
+      </DashboardSection>
 
-      <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/10 bg-zinc-900 text-left text-zinc-400">
-              <th className="px-4 py-3">Asset</th>
-              <th className="px-4 py-3">Rate (USD)</th>
-              <th className="px-4 py-3">Source</th>
-              <th className="px-4 py-3">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.values(latestByAsset).map((r) => (
-              <tr key={r.id} className="border-b border-white/5">
-                <td className="px-4 py-3 font-medium">
-                  <CurrencyLogo code={r.base_currency} size={18} showLabel />
-                </td>
-                <td className="px-4 py-3">
-                  <UsdAmount amount={Number(r.rate)} size={16} />
-                </td>
-                <td className="px-4 py-3 text-zinc-400">{r.source}</td>
-                <td className="px-4 py-3 text-zinc-400">
-                  {formatDateTime(r.fetched_at)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DashboardSection title="Latest rates" level="h3">
+        <DashboardCard flush className="overflow-hidden">
+          <DashboardTable caption="Latest exchange rate per asset" minWidth="38rem">
+            <DashboardTableHead>
+              <DashboardTableRow>
+                <DashboardTableHeader>Asset</DashboardTableHeader>
+                <DashboardTableHeader>Rate (USD)</DashboardTableHeader>
+                <DashboardTableHeader hideBelow="md">Source</DashboardTableHeader>
+                <DashboardTableHeader hideBelow="sm">Updated</DashboardTableHeader>
+              </DashboardTableRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
+              {latestRates.length === 0 ? (
+                <DashboardTableEmpty colSpan={4}>
+                  <DashboardEmptyState
+                    inset
+                    icon={<TrendingUp className="h-5 w-5" aria-hidden />}
+                    title="No exchange rates yet"
+                    description="Publish a rate above and the latest value per asset will appear here."
+                  />
+                </DashboardTableEmpty>
+              ) : (
+                latestRates.map((r) => (
+                  <DashboardTableRow key={r.id} interactive>
+                    <DashboardTableCell className="font-medium">
+                      <CurrencyLogo code={r.base_currency} size={18} showLabel />
+                    </DashboardTableCell>
+                    <DashboardTableCell>
+                      <UsdAmount amount={Number(r.rate)} size={16} />
+                    </DashboardTableCell>
+                    <DashboardTableCell hideBelow="md" className="text-muted">
+                      {r.source}
+                    </DashboardTableCell>
+                    <DashboardTableCell hideBelow="sm" className="text-muted">
+                      {formatDateTime(r.fetched_at)}
+                    </DashboardTableCell>
+                  </DashboardTableRow>
+                ))
+              )}
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardCard>
+      </DashboardSection>
     </div>
   );
 }

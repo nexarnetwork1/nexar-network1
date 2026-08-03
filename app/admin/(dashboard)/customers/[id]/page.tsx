@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Receipt, Wallet } from "lucide-react";
 import { getCustomerById } from "@/modules/platform/repository";
 import { getCustomerWalletSummaryAdmin, getCustomerPurchaseHistoryAdmin } from "@/modules/wallet/repository";
 import { banUserAction, resetUserPasswordAction } from "@/modules/platform/actions";
@@ -7,6 +7,14 @@ import { formatDateTime } from "@/utils/format";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import { Button } from "@/components/ui/Button";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardStat,
+  DashboardStats,
+} from "@/components/dashboard";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -36,74 +44,99 @@ export default async function AdminCustomerDetailPage({ params }: Props) {
     preferred_currency?: string;
   } | null;
 
+  const transactions = wallet.transactions.slice(0, 10);
+
   return (
-    <div>
-      <Link href="/admin/customers" className="text-sm text-yellow-400 hover:underline">
-        ← Back to customers
-      </Link>
-      <h1 className="mt-4 text-3xl font-bold text-yellow-400">
-        {customer.full_name ?? customer.email}
-      </h1>
-      <p className="mt-2 text-zinc-400">{customer.email}</p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title={customer.full_name ?? customer.email}
+        headingClassName="text-gold"
+        description={customer.email}
+      />
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Stat label="Total orders" value={String(cp?.total_orders ?? 0)} />
-        <Stat label="Total spent" value={<UsdAmount amount={Number(cp?.total_spent_usd ?? 0)} />} />
-        <Stat label="Preferred currency" value={<CurrencyLogo code={cp?.preferred_currency ?? "USD"} size={18} showLabel />} />
-      </div>
+      <DashboardStats columns={3}>
+        <DashboardStat label="Total orders" value={String(cp?.total_orders ?? 0)} />
+        <DashboardStat label="Total spent" value={<UsdAmount amount={Number(cp?.total_spent_usd ?? 0)} />} />
+        <DashboardStat
+          label="Preferred currency"
+          value={<CurrencyLogo code={cp?.preferred_currency ?? "USD"} size={18} showLabel />}
+        />
+      </DashboardStats>
 
-      <section className="mt-10 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold text-yellow-400">Wallet</h2>
-        <p className="mt-2 font-mono text-sm">{customer.wallet_address ?? "No wallet linked"}</p>
-        <ul className="mt-4 space-y-2 text-sm">
-          {wallet.transactions.slice(0, 10).map((tx) => (
-            <li key={tx.id} className="flex justify-between border-b border-white/5 pb-2">
-              <span className="capitalize">{tx.tx_type.replace("_", " ")}</span>
-              <CurrencyAmount amount={Number(tx.amount)} currency={tx.currency} size={16} />
-            </li>
-          ))}
-        </ul>
-      </section>
+      <DashboardCard as="section">
+        <h2 className="font-heading text-lg font-semibold text-gold">Wallet</h2>
+        <p className="mt-2 break-all font-mono text-sm">
+          {customer.wallet_address ?? "No wallet linked"}
+        </p>
+        {transactions.length === 0 ? (
+          <DashboardEmptyState
+            inset
+            icon={<Wallet className="h-5 w-5" aria-hidden />}
+            title="No wallet activity"
+            description="Deposits, payments and refunds for this customer will show up here."
+          />
+        ) : (
+          <ul className="mt-4 space-y-2 text-sm">
+            {transactions.map((tx) => (
+              <li
+                key={tx.id}
+                className="flex flex-wrap justify-between gap-2 border-b border-border pb-2 last:border-b-0"
+              >
+                <span className="capitalize">{tx.tx_type.replace("_", " ")}</span>
+                <CurrencyAmount amount={Number(tx.amount)} currency={tx.currency} size={16} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </DashboardCard>
 
-      <section className="mt-8 rounded-2xl border border-white/10 bg-zinc-900 p-6">
-        <h2 className="text-lg font-semibold text-yellow-400">Purchase history</h2>
-        <ul className="mt-4 space-y-2 text-sm">
-          {purchases.map((p) => (
-            <li key={p.order_id} className="flex justify-between items-center gap-4">
-              <span>{p.store_name}</span>
-              <span className="flex items-center gap-2">
-                <UsdAmount amount={Number(p.total)} size={16} />
-                <span className="text-zinc-500">· {formatDateTime(p.paid_at ?? p.created_at)}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <DashboardCard as="section">
+        <h2 className="font-heading text-lg font-semibold text-gold">Purchase history</h2>
+        {purchases.length === 0 ? (
+          <DashboardEmptyState
+            inset
+            icon={<Receipt className="h-5 w-5" aria-hidden />}
+            title="No purchases yet"
+            description="Completed orders will be listed here once this customer checks out."
+          />
+        ) : (
+          <ul className="mt-4 space-y-2 text-sm">
+            {purchases.map((p) => (
+              <li key={p.order_id} className="flex flex-wrap items-center justify-between gap-2">
+                <span className="min-w-0 truncate">{p.store_name}</span>
+                <span className="flex flex-wrap items-center gap-2">
+                  <UsdAmount amount={Number(p.total)} size={16} />
+                  <span className="text-muted">· {formatDateTime(p.paid_at ?? p.created_at)}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </DashboardCard>
 
-      <div className="mt-8 flex gap-4">
-        <form action={resetPasswordFormAction}>
-          <input type="hidden" name="userId" value={customer.id} />
-          <button type="submit" className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black">
-            Send password reset
-          </button>
-        </form>
-        <form action={banFormAction}>
-          <input type="hidden" name="userId" value={customer.id} />
-          <input type="hidden" name="ban" value="true" />
-          <button type="submit" className="rounded-lg border border-red-500/40 px-4 py-2 text-sm text-red-400">
-            Ban customer
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900 p-5">
-      <p className="text-xs uppercase tracking-wider text-zinc-500">{label}</p>
-      <p className="mt-2 text-xl font-bold">{value}</p>
+      <DashboardSection level="h3" title="Customer actions">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <form action={resetPasswordFormAction} className="w-full sm:w-auto">
+            <input type="hidden" name="userId" value={customer.id} />
+            <Button type="submit" className="w-full sm:w-auto">
+              Send password reset
+            </Button>
+          </form>
+          <form action={banFormAction} className="w-full sm:w-auto">
+            <input type="hidden" name="userId" value={customer.id} />
+            <input type="hidden" name="ban" value="true" />
+            <Button
+              type="submit"
+              variant="outline"
+              className="w-full border-red-500/40 text-red-400 hover:border-red-500/60 hover:bg-red-500/10 sm:w-auto"
+            >
+              Ban customer
+            </Button>
+          </form>
+        </div>
+      </DashboardSection>
     </div>
   );
 }

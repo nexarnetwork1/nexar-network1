@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSuperAdminSession } from "@/lib/admin/super-admin";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminHeaderActions } from "@/components/admin/AdminHeaderActions";
+import { DashboardShell } from "@/components/dashboard";
+import { ADMIN_NAV } from "@/config/dashboard-nav";
 
 export default async function AdminDashboardLayout({
   children,
@@ -15,14 +16,15 @@ export default async function AdminDashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white pt-24">
-      <div className="flex">
-        <AdminSidebar />
-        <div className="flex-1">
-          <AdminHeader walletAddress={session.walletAddress} />
-          <main className="p-8">{children}</main>
-        </div>
-      </div>
-    </div>
+    <DashboardShell
+      sections={ADMIN_NAV}
+      brand="Nexar Admin"
+      brandHref="/admin/dashboard"
+      subtitle="Platform control"
+      storageKey="admin"
+      actions={<AdminHeaderActions walletAddress={session.walletAddress} />}
+    >
+      {children}
+    </DashboardShell>
   );
 }

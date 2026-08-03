@@ -1,10 +1,23 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { redirect } from "next/navigation";
+import { Receipt } from "lucide-react";
 import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerInvoices } from "@/modules/invoices/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
 
 export default async function CustomerInvoicesPage() {
   const profile = await getCurrentProfile();
@@ -13,47 +26,51 @@ export default async function CustomerInvoicesPage() {
   const invoices = await getCustomerInvoices(profile.id);
 
   return (
-    <div>
-      <h1 className="font-heading text-3xl font-semibold">Invoices</h1>
-      <p className="mt-2 text-muted">Your payment invoices</p>
+    <div className="space-y-6">
+      <DashboardSection as="div" level="h1" title="Invoices" description="Your payment invoices" />
 
-      {invoices.length === 0 ? (
-        <div className="mt-12 rounded-2xl border border-border bg-card/40 p-12 text-center text-muted">
-          No invoices yet.
-        </div>
-      ) : (
-        <div className="mt-8 overflow-hidden rounded-2xl border border-border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-surface/50 text-left text-muted">
-                <th className="px-4 py-3">Invoice</th>
-                <th className="px-4 py-3">Amount</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Issued</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.map((invoice) => (
-                <tr key={invoice.id} className="border-b border-border/50">
-                  <td className="px-4 py-3">
+      <DashboardCard flush className="overflow-hidden">
+        <DashboardTable caption="Your invoices" minWidth="42rem">
+          <DashboardTableHead>
+            <DashboardTableRow>
+              <DashboardTableHeader>Invoice</DashboardTableHeader>
+              <DashboardTableHeader>Amount</DashboardTableHeader>
+              <DashboardTableHeader>Status</DashboardTableHeader>
+              <DashboardTableHeader hideBelow="sm">Issued</DashboardTableHeader>
+              <DashboardTableHeader align="right">Actions</DashboardTableHeader>
+            </DashboardTableRow>
+          </DashboardTableHead>
+          <DashboardTableBody>
+            {invoices.length === 0 ? (
+              <DashboardTableEmpty colSpan={5}>
+                <DashboardEmptyState
+                  inset
+                  icon={<Receipt className="h-5 w-5" aria-hidden />}
+                  title="No invoices yet"
+                  description="Invoices issued to you by merchants will show up here."
+                />
+              </DashboardTableEmpty>
+            ) : (
+              invoices.map((invoice) => (
+                <DashboardTableRow key={invoice.id} interactive>
+                  <DashboardTableCell>
                     <Link
                       href={`/customer/invoices/${invoice.id}`}
                       className="font-mono text-gold hover:text-gold-secondary"
                     >
                       {invoice.invoice_number}
                     </Link>
-                  </td>
-                  <td className="px-4 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     <CurrencyAmount amount={Number(invoice.amount)} currency={invoice.currency} size={16} />
-                  </td>
-                  <td className="px-4 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell>
                     <StatusBadge status={invoice.status} />
-                  </td>
-                  <td className="px-4 py-3 text-muted">
+                  </DashboardTableCell>
+                  <DashboardTableCell hideBelow="sm" className="text-muted">
                     {new Date(invoice.issued_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
+                  </DashboardTableCell>
+                  <DashboardTableCell align="right">
                     <a
                       href={`/api/invoices/${invoice.id}/pdf`}
                       target="_blank"
@@ -62,13 +79,13 @@ export default async function CustomerInvoicesPage() {
                     >
                       PDF
                     </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                  </DashboardTableCell>
+                </DashboardTableRow>
+              ))
+            )}
+          </DashboardTableBody>
+        </DashboardTable>
+      </DashboardCard>
     </div>
   );
 }

@@ -1,9 +1,23 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PackageOpen } from "lucide-react";
 import { requireSuperAdmin } from "@/modules/users/repository";
 import { getOrderById } from "@/modules/orders/repository";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardStat,
+  DashboardStats,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -17,63 +31,80 @@ export default async function AdminOrderDetailPage({ params }: Props) {
   const invoice = order.invoice;
 
   return (
-    <div>
-      <Link href="/admin/orders" className="text-sm text-muted hover:text-yellow-400">
-        ← Back to orders
-      </Link>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title={`Order ${order.id.slice(0, 8)}…`}
+        actions={<StatusBadge status={order.status} />}
+      />
 
-      <div className="mt-4 flex flex-wrap items-center gap-4">
-        <h1 className="text-3xl font-bold text-yellow-400">Order {order.id.slice(0, 8)}…</h1>
-        <StatusBadge status={order.status} />
-      </div>
-
-      <dl className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-white/10 bg-zinc-900 p-4">
-          <dt className="text-xs text-zinc-500">Store</dt>
-          <dd className="mt-1 font-medium">{order.store.name}</dd>
-        </div>
-        <div className="rounded-xl border border-white/10 bg-zinc-900 p-4">
-          <dt className="text-xs text-zinc-500">Subtotal</dt>
-          <dd className="mt-1">
+      <DashboardStats columns={4}>
+        <DashboardStat label="Store" value={order.store.name} />
+        <DashboardStat
+          label="Subtotal"
+          value={
             <CurrencyAmount amount={Number(order.subtotal)} currency={order.currency} size={16} />
-          </dd>
-        </div>
-        <div className="rounded-xl border border-white/10 bg-zinc-900 p-4">
-          <dt className="text-xs text-zinc-500">Platform fee</dt>
-          <dd className="mt-1">
-            <CurrencyAmount amount={Number(order.platform_fee)} currency={order.currency} size={16} />
-          </dd>
-        </div>
+          }
+        />
+        <DashboardStat
+          label="Platform fee"
+          tone="gold"
+          value={
+            <CurrencyAmount
+              amount={Number(order.platform_fee)}
+              currency={order.currency}
+              size={16}
+            />
+          }
+        />
         {invoice && (
-          <div className="rounded-xl border border-white/10 bg-zinc-900 p-4">
-            <dt className="text-xs text-zinc-500">Invoice</dt>
-            <dd className="mt-1 font-mono text-sm">{invoice.invoice_number}</dd>
-          </div>
+          <DashboardStat
+            label="Invoice"
+            value={<span className="font-mono text-base">{invoice.invoice_number}</span>}
+          />
         )}
-      </dl>
+      </DashboardStats>
 
-      <div className="mt-8 overflow-hidden rounded-2xl border border-white/10">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/10 bg-zinc-900 text-left text-zinc-400">
-              <th className="px-4 py-3">Product</th>
-              <th className="px-4 py-3">Qty</th>
-              <th className="px-4 py-3">Line total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.items.map((item) => (
-              <tr key={item.id} className="border-b border-white/5">
-                <td className="px-4 py-3">{item.product_name}</td>
-                <td className="px-4 py-3">{item.quantity}</td>
-                <td className="px-4 py-3">
-                  <CurrencyAmount amount={Number(item.line_total)} currency={order.currency} size={16} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DashboardSection as="section" level="h2" title="Items">
+        <DashboardCard flush className="overflow-hidden">
+          <DashboardTable caption="Items in this order" minWidth="32rem">
+            <DashboardTableHead>
+              <DashboardTableRow>
+                <DashboardTableHeader>Product</DashboardTableHeader>
+                <DashboardTableHeader>Qty</DashboardTableHeader>
+                <DashboardTableHeader>Line total</DashboardTableHeader>
+              </DashboardTableRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
+              {order.items.length === 0 ? (
+                <DashboardTableEmpty colSpan={3}>
+                  <DashboardEmptyState
+                    inset
+                    icon={<PackageOpen className="h-5 w-5" aria-hidden />}
+                    title="No line items"
+                    description="This order was created without any product line items."
+                  />
+                </DashboardTableEmpty>
+              ) : (
+                order.items.map((item) => (
+                  <DashboardTableRow key={item.id} interactive>
+                    <DashboardTableCell wrap>{item.product_name}</DashboardTableCell>
+                    <DashboardTableCell>{item.quantity}</DashboardTableCell>
+                    <DashboardTableCell>
+                      <CurrencyAmount
+                        amount={Number(item.line_total)}
+                        currency={order.currency}
+                        size={16}
+                      />
+                    </DashboardTableCell>
+                  </DashboardTableRow>
+                ))
+              )}
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardCard>
+      </DashboardSection>
     </div>
   );
 }

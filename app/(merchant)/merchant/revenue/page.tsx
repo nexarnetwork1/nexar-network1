@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Coins } from "lucide-react";
 import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
@@ -6,6 +7,13 @@ import { getMerchantOrders } from "@/modules/orders/repository";
 import { getMerchantProfile } from "@/modules/wallet/repository";
 import { createClient } from "@/lib/supabase/server";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardStat,
+  DashboardStats,
+} from "@/components/dashboard";
 
 export default async function MerchantRevenuePage() {
   const profile = await getCurrentProfile();
@@ -39,53 +47,52 @@ export default async function MerchantRevenuePage() {
     (settlements ?? []).reduce((sum, s) => sum + Number(s.merchant_amount), 0);
 
   return (
-    <div>
-      <h1 className="font-heading text-3xl font-semibold">Revenue</h1>
-      <p className="mt-2 text-muted">{store.name} — earnings overview</p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Revenue"
+        description={`${store.name} — earnings overview`}
+      />
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Stat label="Gross sales" value={<UsdAmount amount={totalGross} size={24} />} />
-        <Stat label="Platform fees" value={<UsdAmount amount={totalFees} size={24} />} />
-        <Stat label="Net received" value={<UsdAmount amount={totalNet} size={24} />} highlight />
-      </div>
+      <DashboardStats columns={3}>
+        <DashboardStat label="Gross sales" value={<UsdAmount amount={totalGross} size={20} />} />
+        <DashboardStat label="Platform fees" value={<UsdAmount amount={totalFees} size={20} />} />
+        <DashboardStat
+          label="Net received"
+          tone="gold"
+          value={<UsdAmount amount={totalNet} size={20} />}
+        />
+      </DashboardStats>
 
-      <h2 className="mt-10 font-heading text-lg font-semibold">Payout wallet</h2>
-      <p className="mt-2 break-all font-mono text-sm text-muted">{store.wallet_address}</p>
+      <DashboardSection title="Payout wallet" level="h3">
+        <DashboardCard>
+          <p className="break-all font-mono text-sm">{store.wallet_address}</p>
+        </DashboardCard>
+      </DashboardSection>
 
-      <h2 className="mt-10 font-heading text-lg font-semibold">Recent paid orders</h2>
-      <ul className="mt-4 space-y-2">
-        {paidOrders.slice(0, 10).map((order) => (
-          <li
-            key={order.id}
-            className="flex justify-between rounded-xl border border-border bg-card/40 px-4 py-3 text-sm"
-          >
-            <span className="font-mono text-xs">{order.id.slice(0, 8)}…</span>
-            <UsdAmount amount={Number(order.subtotal)} size={16} />
-          </li>
-        ))}
-        {paidOrders.length === 0 && (
-          <li className="text-muted">No paid orders yet.</li>
+      <DashboardSection title="Recent paid orders" level="h3">
+        {paidOrders.length === 0 ? (
+          <DashboardEmptyState
+            icon={<Coins className="h-5 w-5" aria-hidden />}
+            title="No paid orders yet"
+            description="Settled orders will show up here as soon as customers pay."
+          />
+        ) : (
+          <ul className="space-y-2">
+            {paidOrders.slice(0, 10).map((order) => (
+              <DashboardCard
+                as="li"
+                key={order.id}
+                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm"
+              >
+                <span className="break-all font-mono text-xs">{order.id.slice(0, 8)}…</span>
+                <UsdAmount amount={Number(order.subtotal)} size={16} />
+              </DashboardCard>
+            ))}
+          </ul>
         )}
-      </ul>
-    </div>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: React.ReactNode;
-  highlight?: boolean;
-}) {
-  return (
-    <div className="rounded-2xl border border-border bg-card/40 p-5">
-      <p className="text-xs uppercase tracking-wider text-muted">{label}</p>
-      <p className={`mt-2 text-2xl font-bold ${highlight ? "text-gold" : ""}`}>
-        {value}
-      </p>
+      </DashboardSection>
     </div>
   );
 }

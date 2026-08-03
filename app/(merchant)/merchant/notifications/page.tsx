@@ -5,6 +5,7 @@ import { getMerchantStore } from "@/modules/stores/repository";
 import { getUserNotifications, getUnreadNotificationCount } from "@/modules/notifications/repository";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { RealtimeScope } from "@/components/realtime/RealtimeScope";
+import { DashboardSection } from "@/components/dashboard";
 
 export default async function MerchantNotificationsPage() {
   const profile = await getCurrentProfile();
@@ -17,13 +18,17 @@ export default async function MerchantNotificationsPage() {
   ]);
 
   return (
-    <div>
+    <div className="space-y-6">
       <RealtimeScope userId={profile.id} storeId={store?.id} initialUnreadCount={unreadCount} />
-      <h1 className="font-heading text-3xl font-semibold">Notification Center</h1>
-      <p className="mt-2 text-muted">Orders, payments, and store updates</p>
-      <div className="mt-8">
-        <NotificationCenter notifications={notifications} basePath="/merchant" />
-      </div>
+
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Notification Center"
+        description="Orders, payments, and store updates"
+      />
+
+      <NotificationCenter notifications={notifications} basePath="/merchant" />
     </div>
   );
 }

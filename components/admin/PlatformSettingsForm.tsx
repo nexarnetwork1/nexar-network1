@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type InputHTMLAttributes } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useZodForm } from "@/hooks/useZodForm";
 import {
@@ -10,6 +10,8 @@ import {
 import { updatePlatformSettingsAction } from "@/modules/platform/actions";
 import { objectToFormData } from "@/utils/form-data";
 import type { ZodSchema } from "zod";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 
 type PlatformSettingsFormProps = {
   defaultValues: PlatformSettingsInput;
@@ -46,47 +48,25 @@ export function PlatformSettingsForm({ defaultValues }: PlatformSettingsFormProp
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-xl space-y-4" noValidate>
-      <AdminField
+      <Input
         label="Treasury wallet address"
         error={errors.treasuryWallet?.message}
         {...register("treasuryWallet")}
       />
-      <AdminField
+      <Input
         label="Support email"
         error={errors.supportEmail?.message}
         {...register("supportEmail")}
       />
-      <AdminField label="NXR token address" {...register("nxrToken")} />
-      <AdminField label="USDT token address" {...register("usdtToken")} />
+      <Input label="NXR token address" {...register("nxrToken")} />
+      <Input label="USDT token address" {...register("usdtToken")} />
 
       {serverError && <p className="text-sm text-red-400">{serverError}</p>}
       {success && <p className="text-sm text-emerald-400">Settings saved</p>}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
-      >
+      <Button type="submit" size="sm" disabled={isSubmitting}>
         {isSubmitting ? "Saving…" : "Save settings"}
-      </button>
+      </Button>
     </form>
-  );
-}
-
-type AdminFieldProps = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
-  error?: string;
-};
-
-function AdminField({ label, error, ...props }: AdminFieldProps) {
-  return (
-    <div>
-      <label className="text-xs text-zinc-400">{label}</label>
-      <input
-        {...props}
-        className="mt-1 w-full rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
-      />
-      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
-    </div>
   );
 }

@@ -11,6 +11,9 @@ import { updateFeeScheduleAction } from "@/modules/platform/actions";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
 import { getPaymentMethodLabel } from "@/lib/constants/payment-branding";
 import type { ZodSchema } from "zod";
+import { Button } from "@/components/ui/Button";
+import { dashboardFilterControlClass } from "@/components/dashboard/DashboardFilters";
+import { cn } from "@/lib/utils/cn";
 
 const FEE_METHODS = ["nxr", "crypto_other", "card"] as const;
 
@@ -49,14 +52,21 @@ export function FeeScheduleForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-wrap items-end gap-3" noValidate>
-      <div>
-        <label className="text-xs text-zinc-400">Type</label>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
+      noValidate
+    >
+      <div className="min-w-0">
+        <label htmlFor="fee-payment-type" className="text-xs text-muted">
+          Type
+        </label>
         <div className="mt-1 flex items-center gap-2">
           <PaymentMethodLogo method={paymentType} size={20} />
           <select
             {...register("paymentType")}
-            className="rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
+            id="fee-payment-type"
+            className={dashboardFilterControlClass}
           >
             {FEE_METHODS.map((method) => (
               <option key={method} value={method}>
@@ -66,27 +76,26 @@ export function FeeScheduleForm() {
           </select>
         </div>
       </div>
-      <div>
-        <label className="text-xs text-zinc-400">Base rate (e.g. 0.035 = 3.5%)</label>
+      <div className="min-w-0">
+        <label htmlFor="fee-base-rate" className="text-xs text-muted">
+          Base rate (e.g. 0.035 = 3.5%)
+        </label>
         <input
           {...register("baseRate", { valueAsNumber: true })}
+          id="fee-base-rate"
           type="number"
           step="0.0001"
           min="0"
           max="1"
-          className="mt-1 block rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
+          className={cn("mt-1 block w-full sm:w-48", dashboardFilterControlClass)}
         />
         {errors.baseRate && (
           <p className="mt-1 text-xs text-red-400">{errors.baseRate.message}</p>
         )}
       </div>
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
-      >
+      <Button type="submit" size="sm" disabled={isSubmitting}>
         {isSubmitting ? "Saving…" : "Add schedule"}
-      </button>
+      </Button>
       {serverError && <p className="w-full text-sm text-red-400">{serverError}</p>}
       {success && <p className="w-full text-sm text-emerald-400">Fee schedule added</p>}
     </form>

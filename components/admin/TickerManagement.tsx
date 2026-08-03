@@ -13,6 +13,9 @@ import {
   updateTickerAnnouncementAction,
 } from "@/modules/ticker/actions";
 import { formatDateTime } from "@/utils/format";
+import { Button } from "@/components/ui/Button";
+import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { DashboardEmptyState } from "@/components/dashboard/DashboardEmptyState";
 
 type Props = {
   initialAnnouncements: TickerAnnouncement[];
@@ -25,6 +28,9 @@ type FormState = {
   startsAt: string;
   endsAt: string;
 };
+
+const FIELD_CLASS =
+  "mt-1 w-full rounded-xl border border-border bg-surface/60 px-4 py-3 text-sm text-white placeholder:text-muted outline-none transition-colors focus:border-gold/40 focus-visible:ring-2 focus-visible:ring-gold/40";
 
 const emptyForm: FormState = {
   message: "",
@@ -180,20 +186,22 @@ export function TickerManagement({ initialAnnouncements }: Props) {
 
   return (
     <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
-      <section className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/40">
-        <div className="border-b border-white/10 px-6 py-4">
-          <h2 className="text-lg font-semibold text-white">Announcements</h2>
-          <p className="mt-1 text-sm text-zinc-400">
+      <DashboardCard as="section" flush className="overflow-hidden">
+        <div className="border-b border-border px-5 py-4">
+          <h2 className="font-heading text-lg font-semibold text-white">Announcements</h2>
+          <p className="mt-1 text-sm text-muted">
             Drag to reorder. Active items appear in the public ticker between static messages.
           </p>
         </div>
 
         {items.length === 0 ? (
-          <div className="flex h-48 items-center justify-center p-8 text-center text-zinc-400">
-            No ticker announcements yet. Add one using the form.
-          </div>
+          <DashboardEmptyState
+            inset
+            title="No ticker announcements yet"
+            description="Add one using the form to show it in the public ticker."
+          />
         ) : (
-          <ul className="divide-y divide-white/5">
+          <ul className="divide-y divide-border">
             {items.map((item) => (
               <li
                 key={item.id}
@@ -202,14 +210,14 @@ export function TickerManagement({ initialAnnouncements }: Props) {
                 onDragOver={handleDragOver}
                 onDrop={() => handleDrop(item.id)}
                 onDragEnd={() => setDraggingId(null)}
-                className={`flex items-start gap-4 px-6 py-4 transition ${
+                className={`flex items-start gap-3 px-4 py-4 transition sm:gap-4 sm:px-5 ${
                   draggingId === item.id ? "opacity-50" : ""
                 }`}
               >
                 <button
                   type="button"
                   aria-label="Drag to reorder"
-                  className="mt-1 cursor-grab text-zinc-500 hover:text-yellow-400 active:cursor-grabbing"
+                  className="mt-1 cursor-grab text-muted transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 active:cursor-grabbing"
                 >
                   <GripVertical className="h-5 w-5" />
                 </button>
@@ -218,7 +226,7 @@ export function TickerManagement({ initialAnnouncements }: Props) {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium text-white">{item.message}</p>
                     {item.priority > 0 && (
-                      <span className="rounded-full bg-yellow-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-yellow-400">
+                      <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-gold">
                         Priority {item.priority}
                       </span>
                     )}
@@ -228,7 +236,7 @@ export function TickerManagement({ initialAnnouncements }: Props) {
                           ? "bg-emerald-500/15 text-emerald-400"
                           : item.is_enabled
                             ? "bg-amber-500/15 text-amber-400"
-                            : "bg-zinc-700/50 text-zinc-400"
+                            : "bg-white/5 text-muted"
                       }`}
                     >
                       {isCurrentlyActive(item)
@@ -238,24 +246,28 @@ export function TickerManagement({ initialAnnouncements }: Props) {
                           : "Disabled"}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-zinc-500">{scheduleLabel(item)}</p>
+                  <p className="mt-1 text-xs text-muted">{scheduleLabel(item)}</p>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-2">
-                  <label className="flex items-center gap-2 text-xs text-zinc-400">
+                <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+                  <label
+                    htmlFor={`ticker-enabled-${item.id}`}
+                    className="hidden items-center gap-2 text-xs text-muted sm:flex"
+                  >
                     <input
+                      id={`ticker-enabled-${item.id}`}
                       type="checkbox"
                       checked={item.is_enabled}
                       disabled={pending}
                       onChange={(e) => handleToggle(item.id, e.target.checked)}
-                      className="rounded border-zinc-600"
+                      className="h-4 w-4 rounded border-border bg-surface accent-gold"
                     />
                     Enabled
                   </label>
                   <button
                     type="button"
                     onClick={() => startEdit(item)}
-                    className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-yellow-400"
+                    className="flex h-11 w-11 items-center justify-center rounded-xl text-muted transition-colors hover:bg-white/5 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
                     aria-label="Edit announcement"
                   >
                     <Pencil className="h-4 w-4" />
@@ -264,7 +276,7 @@ export function TickerManagement({ initialAnnouncements }: Props) {
                     type="button"
                     onClick={() => handleDelete(item.id)}
                     disabled={pending}
-                    className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-red-400"
+                    className="flex h-11 w-11 items-center justify-center rounded-xl text-muted transition-colors hover:bg-white/5 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50 disabled:opacity-50"
                     aria-label="Delete announcement"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -274,89 +286,97 @@ export function TickerManagement({ initialAnnouncements }: Props) {
             ))}
           </ul>
         )}
-      </section>
+      </DashboardCard>
 
-      <section className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6">
-        <h2 className="text-lg font-semibold text-white">
+      <DashboardCard as="section">
+        <h2 className="font-heading text-lg font-semibold text-white">
           {editingId ? "Edit announcement" : "Add announcement"}
         </h2>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label className="text-xs text-zinc-400">Message</label>
+            <label htmlFor="ticker-message" className="text-xs text-muted">
+              Message
+            </label>
             <textarea
+              id="ticker-message"
               value={form.message}
               onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
               rows={3}
               maxLength={500}
               required
               placeholder="e.g. 🎉 New merchant stores launching this week"
-              className="mt-1 w-full resize-none rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-yellow-400"
+              className={`${FIELD_CLASS} resize-none`}
             />
           </div>
 
           <div>
-            <label className="text-xs text-zinc-400">Priority (optional, higher shows first)</label>
+            <label htmlFor="ticker-priority" className="text-xs text-muted">
+              Priority (optional, higher shows first)
+            </label>
             <input
+              id="ticker-priority"
               type="number"
               min={0}
               max={100}
               value={form.priority}
               onChange={(e) => setForm((f) => ({ ...f, priority: Number(e.target.value) }))}
-              className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-yellow-400"
+              className={FIELD_CLASS}
             />
           </div>
 
           <div>
-            <label className="text-xs text-zinc-400">Start date (optional)</label>
+            <label htmlFor="ticker-starts-at" className="text-xs text-muted">
+              Start date (optional)
+            </label>
             <input
+              id="ticker-starts-at"
               type="datetime-local"
               value={form.startsAt}
               onChange={(e) => setForm((f) => ({ ...f, startsAt: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-yellow-400"
+              className={FIELD_CLASS}
             />
           </div>
 
           <div>
-            <label className="text-xs text-zinc-400">End date (optional)</label>
+            <label htmlFor="ticker-ends-at" className="text-xs text-muted">
+              End date (optional)
+            </label>
             <input
+              id="ticker-ends-at"
               type="datetime-local"
               value={form.endsAt}
               onChange={(e) => setForm((f) => ({ ...f, endsAt: e.target.value }))}
-              className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none focus:border-yellow-400"
+              className={FIELD_CLASS}
             />
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
+          <label
+            htmlFor="ticker-form-enabled"
+            className="flex min-h-11 items-center gap-2.5 text-sm text-white"
+          >
             <input
+              id="ticker-form-enabled"
               type="checkbox"
               checked={form.isEnabled}
               onChange={(e) => setForm((f) => ({ ...f, isEnabled: e.target.checked }))}
-              className="rounded border-zinc-600"
+              className="h-4 w-4 rounded border-border bg-surface accent-gold"
             />
             Enabled
           </label>
 
           <div className="flex flex-wrap gap-2 pt-2">
-            <button
-              type="submit"
-              disabled={pending}
-              className="rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-bold text-black disabled:opacity-50"
-            >
+            <Button type="submit" size="sm" disabled={pending}>
               {pending ? "Saving…" : editingId ? "Save changes" : "Add announcement"}
-            </button>
+            </Button>
             {editingId && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="rounded-xl border border-zinc-700 px-5 py-2.5 text-sm text-white hover:bg-zinc-800"
-              >
+              <Button type="button" variant="outline" size="sm" onClick={resetForm}>
                 Cancel
-              </button>
+              </Button>
             )}
           </div>
         </form>
-      </section>
+      </DashboardCard>
     </div>
   );
 }

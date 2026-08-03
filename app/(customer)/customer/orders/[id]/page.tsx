@@ -11,6 +11,16 @@ import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import { Button } from "@/components/ui/Button";
 import { CurrencyAmount } from "@/components/payments/CurrencyAmount";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import {
+  DashboardCard,
+  DashboardSection,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -74,33 +84,34 @@ export default async function CustomerOrderDetailPage({ params, searchParams }: 
             )}
           </dl>
 
-          <h2 className="mt-10 font-heading text-lg font-semibold">Items</h2>
-          <div className="mt-4 overflow-hidden rounded-2xl border border-border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-surface/50 text-left text-muted">
-                  <th className="px-4 py-3" scope="col">Product</th>
-                  <th className="px-4 py-3" scope="col">Qty</th>
-                  <th className="px-4 py-3" scope="col">Unit price</th>
-                  <th className="px-4 py-3" scope="col">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.items.map((item) => (
-                  <tr key={item.id} className="border-b border-border/50">
-                    <td className="px-4 py-3">{item.product_name}</td>
-                    <td className="px-4 py-3">{item.quantity}</td>
-                    <td className="px-4 py-3">
-                      <CurrencyAmount amount={Number(item.unit_price)} currency={order.currency} size={16} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <CurrencyAmount amount={Number(item.line_total)} currency={order.currency} size={16} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DashboardSection title="Items" level="h3" className="mt-10">
+            <DashboardCard flush className="overflow-hidden">
+              <DashboardTable caption="Order items" minWidth="34rem">
+                <DashboardTableHead>
+                  <DashboardTableRow>
+                    <DashboardTableHeader>Product</DashboardTableHeader>
+                    <DashboardTableHeader>Qty</DashboardTableHeader>
+                    <DashboardTableHeader>Unit price</DashboardTableHeader>
+                    <DashboardTableHeader>Total</DashboardTableHeader>
+                  </DashboardTableRow>
+                </DashboardTableHead>
+                <DashboardTableBody>
+                  {order.items.map((item) => (
+                    <DashboardTableRow key={item.id}>
+                      <DashboardTableCell wrap>{item.product_name}</DashboardTableCell>
+                      <DashboardTableCell>{item.quantity}</DashboardTableCell>
+                      <DashboardTableCell>
+                        <CurrencyAmount amount={Number(item.unit_price)} currency={order.currency} size={16} />
+                      </DashboardTableCell>
+                      <DashboardTableCell>
+                        <CurrencyAmount amount={Number(item.line_total)} currency={order.currency} size={16} />
+                      </DashboardTableCell>
+                    </DashboardTableRow>
+                  ))}
+                </DashboardTableBody>
+              </DashboardTable>
+            </DashboardCard>
+          </DashboardSection>
 
           {invoice && (
             <div className="mt-8 flex flex-wrap gap-3">

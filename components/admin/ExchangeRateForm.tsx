@@ -12,6 +12,9 @@ import { objectToFormData } from "@/utils/form-data";
 import type { ZodSchema } from "zod";
 import { CurrencySelectField } from "@/components/payments/CurrencySelectField";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
+import { Button } from "@/components/ui/Button";
+import { dashboardFilterControlClass } from "@/components/dashboard/DashboardFilters";
+import { cn } from "@/lib/utils/cn";
 
 type ExchangeRateFormProps = {
   currencies?: Array<{ code: string; kind: string }>;
@@ -63,41 +66,38 @@ export function ExchangeRateForm({ currencies = [] }: ExchangeRateFormProps) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-wrap items-end gap-4 rounded-2xl border border-white/10 bg-zinc-900 p-6"
+      className="flex flex-col gap-4 rounded-2xl border border-border bg-card/40 p-5 sm:flex-row sm:flex-wrap sm:items-end"
       noValidate
     >
       <CurrencySelectField
         {...register("baseCurrency")}
         selectedCode={watch("baseCurrency")}
         label="Asset"
-        className="border-white/10 bg-zinc-950"
+        className="border-border bg-surface"
       />
       {errors.baseCurrency && (
         <p className="text-xs text-red-400">{errors.baseCurrency.message}</p>
       )}
-      <div>
-        <label className="flex items-center gap-2 text-xs text-zinc-400">
+      <div className="min-w-0">
+        <label htmlFor="exchange-rate" className="flex items-center gap-2 text-xs text-muted">
           Rate (<UsdAmount amount={1} size={14} /> per 1 unit)
         </label>
         <input
           {...register("rate", { valueAsNumber: true })}
+          id="exchange-rate"
           type="number"
           step="0.000001"
           min="0"
           placeholder="600.00"
-          className="mt-1 block rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-sm"
+          className={cn("mt-1 block w-full sm:w-44", dashboardFilterControlClass)}
         />
         {errors.rate && (
           <p className="mt-1 text-xs text-red-400">{errors.rate.message}</p>
         )}
       </div>
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
-      >
+      <Button type="submit" size="sm" disabled={isSubmitting}>
         {isSubmitting ? "Updating…" : "Update rate"}
-      </button>
+      </Button>
       {serverError && <p className="w-full text-sm text-red-400">{serverError}</p>}
       {success && <p className="w-full text-sm text-emerald-400">Rate updated</p>}
     </form>

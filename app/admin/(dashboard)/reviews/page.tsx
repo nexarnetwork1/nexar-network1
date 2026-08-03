@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Star, Store } from "lucide-react";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import {
   listRecentProductReviews,
@@ -6,6 +7,27 @@ import {
   moderateReviewAction,
 } from "@/modules/marketplace/reviews/actions";
 import { requireSuperAdmin } from "@/modules/users/repository";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardSection,
+  DashboardTable,
+  DashboardTableBody,
+  DashboardTableCell,
+  DashboardTableEmpty,
+  DashboardTableHead,
+  DashboardTableHeader,
+  DashboardTableRow,
+} from "@/components/dashboard";
+
+const moderationButtonClass =
+  "inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50";
+
+const MODERATION_ACTIONS = [
+  { value: "approved", label: "Approve", tone: "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" },
+  { value: "hidden", label: "Hide", tone: "bg-surface text-white/80 hover:bg-white/10" },
+  { value: "rejected", label: "Reject", tone: "bg-red-500/10 text-red-400 hover:bg-red-500/20" },
+] as const;
 
 async function moderateFormAction(formData: FormData) {
   "use server";
@@ -20,155 +42,175 @@ export default async function AdminReviewsPage() {
   ]);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-yellow-400">Review moderation</h1>
-      <p className="mt-2 text-zinc-400">Approve, hide, or reject marketplace product and store reviews.</p>
+    <div className="space-y-8">
+      <DashboardSection
+        as="div"
+        level="h1"
+        title="Review moderation"
+        description="Approve, hide, or reject marketplace product and store reviews."
+      />
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold text-white">Product reviews</h2>
-        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 bg-zinc-900 text-left text-zinc-400">
-                <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Rating</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productReviews.map((review) => {
-                const product = review.product as { name?: string; slug?: string } | null;
-                const customer = review.customer as { full_name?: string } | null;
-                return (
-                  <tr key={review.id as string} className="border-b border-white/5">
-                    <td className="px-4 py-3">
-                      {product?.slug ? (
-                        <Link href={`/marketplace/products/${product.slug}`} className="hover:text-yellow-400">
-                          {product.name}
-                        </Link>
-                      ) : (
-                        product?.name ?? "—"
-                      )}
-                      <p className="mt-1 line-clamp-2 text-xs text-zinc-500">{review.body as string}</p>
-                    </td>
-                    <td className="px-4 py-3">{customer?.full_name ?? "Customer"}</td>
-                    <td className="px-4 py-3">{review.rating as number}</td>
-                    <td className="px-4 py-3 capitalize">{review.status as string}</td>
-                    <td className="px-4 py-3">
-                      <form action={moderateFormAction} className="flex flex-wrap gap-2">
-                        <input type="hidden" name="reviewId" value={review.id as string} />
-                        <input type="hidden" name="type" value="product" />
-                        <button
-                          type="submit"
-                          name="status"
-                          value="approved"
-                          className="rounded-lg bg-emerald-500/10 px-2 py-1 text-xs text-emerald-400"
+      <DashboardSection title="Product reviews">
+        <DashboardCard flush className="overflow-hidden">
+          <DashboardTable caption="Recent product reviews" minWidth="52rem">
+            <DashboardTableHead>
+              <DashboardTableRow>
+                <DashboardTableHeader>Product</DashboardTableHeader>
+                <DashboardTableHeader hideBelow="md">Customer</DashboardTableHeader>
+                <DashboardTableHeader hideBelow="sm">Rating</DashboardTableHeader>
+                <DashboardTableHeader>Status</DashboardTableHeader>
+                <DashboardTableHeader align="right">Actions</DashboardTableHeader>
+              </DashboardTableRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
+              {productReviews.length === 0 ? (
+                <DashboardTableEmpty colSpan={5}>
+                  <DashboardEmptyState
+                    inset
+                    icon={<Star className="h-5 w-5" aria-hidden />}
+                    title="No product reviews yet"
+                    description="Product reviews awaiting moderation will appear here."
+                  />
+                </DashboardTableEmpty>
+              ) : (
+                productReviews.map((review) => {
+                  const product = review.product as { name?: string; slug?: string } | null;
+                  const customer = review.customer as { full_name?: string } | null;
+                  return (
+                    <DashboardTableRow key={review.id as string} interactive>
+                      <DashboardTableCell wrap className="max-w-[22rem]">
+                        {product?.slug ? (
+                          <Link
+                            href={`/marketplace/products/${product.slug}`}
+                            className="font-medium hover:text-gold"
+                          >
+                            {product.name}
+                          </Link>
+                        ) : (
+                          product?.name ?? "—"
+                        )}
+                        <p className="mt-1 line-clamp-2 text-xs text-muted">
+                          {review.body as string}
+                        </p>
+                      </DashboardTableCell>
+                      <DashboardTableCell wrap hideBelow="md">
+                        {customer?.full_name ?? "Customer"}
+                      </DashboardTableCell>
+                      <DashboardTableCell hideBelow="sm">
+                        {review.rating as number}
+                      </DashboardTableCell>
+                      <DashboardTableCell className="capitalize">
+                        {review.status as string}
+                      </DashboardTableCell>
+                      <DashboardTableCell align="right">
+                        <form
+                          action={moderateFormAction}
+                          className="flex flex-wrap items-center justify-end gap-2"
                         >
-                          Approve
-                        </button>
-                        <button
-                          type="submit"
-                          name="status"
-                          value="hidden"
-                          className="rounded-lg bg-zinc-500/10 px-2 py-1 text-xs text-zinc-300"
-                        >
-                          Hide
-                        </button>
-                        <button
-                          type="submit"
-                          name="status"
-                          value="rejected"
-                          className="rounded-lg bg-red-500/10 px-2 py-1 text-xs text-red-400"
-                        >
-                          Reject
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {productReviews.length === 0 && (
-            <p className="p-8 text-center text-zinc-500">No product reviews yet.</p>
-          )}
-        </div>
-      </section>
+                          <input type="hidden" name="reviewId" value={review.id as string} />
+                          <input type="hidden" name="type" value="product" />
+                          {MODERATION_ACTIONS.map((action) => (
+                            <button
+                              key={action.value}
+                              type="submit"
+                              name="status"
+                              value={action.value}
+                              className={`${moderationButtonClass} ${action.tone}`}
+                            >
+                              {action.label}
+                            </button>
+                          ))}
+                        </form>
+                      </DashboardTableCell>
+                    </DashboardTableRow>
+                  );
+                })
+              )}
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardCard>
+      </DashboardSection>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold text-white">Store reviews</h2>
-        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 bg-zinc-900 text-left text-zinc-400">
-                <th className="px-4 py-3">Store</th>
-                <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Rating</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {storeReviews.map((review) => {
-                const store = review.store as { name?: string; slug?: string } | null;
-                const customer = review.customer as { full_name?: string } | null;
-                return (
-                  <tr key={review.id as string} className="border-b border-white/5">
-                    <td className="px-4 py-3">
-                      {store?.slug ? (
-                        <Link href={MARKETPLACE_ROUTES.store(store.slug)} className="hover:text-yellow-400">
-                          {store.name}
-                        </Link>
-                      ) : (
-                        store?.name ?? "—"
-                      )}
-                      <p className="mt-1 line-clamp-2 text-xs text-zinc-500">{review.body as string}</p>
-                    </td>
-                    <td className="px-4 py-3">{customer?.full_name ?? "Customer"}</td>
-                    <td className="px-4 py-3">{review.rating as number}</td>
-                    <td className="px-4 py-3 capitalize">{review.status as string}</td>
-                    <td className="px-4 py-3">
-                      <form action={moderateFormAction} className="flex flex-wrap gap-2">
-                        <input type="hidden" name="reviewId" value={review.id as string} />
-                        <input type="hidden" name="type" value="store" />
-                        <button
-                          type="submit"
-                          name="status"
-                          value="approved"
-                          className="rounded-lg bg-emerald-500/10 px-2 py-1 text-xs text-emerald-400"
+      <DashboardSection title="Store reviews">
+        <DashboardCard flush className="overflow-hidden">
+          <DashboardTable caption="Recent store reviews" minWidth="52rem">
+            <DashboardTableHead>
+              <DashboardTableRow>
+                <DashboardTableHeader>Store</DashboardTableHeader>
+                <DashboardTableHeader hideBelow="md">Customer</DashboardTableHeader>
+                <DashboardTableHeader hideBelow="sm">Rating</DashboardTableHeader>
+                <DashboardTableHeader>Status</DashboardTableHeader>
+                <DashboardTableHeader align="right">Actions</DashboardTableHeader>
+              </DashboardTableRow>
+            </DashboardTableHead>
+            <DashboardTableBody>
+              {storeReviews.length === 0 ? (
+                <DashboardTableEmpty colSpan={5}>
+                  <DashboardEmptyState
+                    inset
+                    icon={<Store className="h-5 w-5" aria-hidden />}
+                    title="No store reviews yet"
+                    description="Store reviews awaiting moderation will appear here."
+                  />
+                </DashboardTableEmpty>
+              ) : (
+                storeReviews.map((review) => {
+                  const store = review.store as { name?: string; slug?: string } | null;
+                  const customer = review.customer as { full_name?: string } | null;
+                  return (
+                    <DashboardTableRow key={review.id as string} interactive>
+                      <DashboardTableCell wrap className="max-w-[22rem]">
+                        {store?.slug ? (
+                          <Link
+                            href={MARKETPLACE_ROUTES.store(store.slug)}
+                            className="font-medium hover:text-gold"
+                          >
+                            {store.name}
+                          </Link>
+                        ) : (
+                          store?.name ?? "—"
+                        )}
+                        <p className="mt-1 line-clamp-2 text-xs text-muted">
+                          {review.body as string}
+                        </p>
+                      </DashboardTableCell>
+                      <DashboardTableCell wrap hideBelow="md">
+                        {customer?.full_name ?? "Customer"}
+                      </DashboardTableCell>
+                      <DashboardTableCell hideBelow="sm">
+                        {review.rating as number}
+                      </DashboardTableCell>
+                      <DashboardTableCell className="capitalize">
+                        {review.status as string}
+                      </DashboardTableCell>
+                      <DashboardTableCell align="right">
+                        <form
+                          action={moderateFormAction}
+                          className="flex flex-wrap items-center justify-end gap-2"
                         >
-                          Approve
-                        </button>
-                        <button
-                          type="submit"
-                          name="status"
-                          value="hidden"
-                          className="rounded-lg bg-zinc-500/10 px-2 py-1 text-xs text-zinc-300"
-                        >
-                          Hide
-                        </button>
-                        <button
-                          type="submit"
-                          name="status"
-                          value="rejected"
-                          className="rounded-lg bg-red-500/10 px-2 py-1 text-xs text-red-400"
-                        >
-                          Reject
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {storeReviews.length === 0 && (
-            <p className="p-8 text-center text-zinc-500">No store reviews yet.</p>
-          )}
-        </div>
-      </section>
+                          <input type="hidden" name="reviewId" value={review.id as string} />
+                          <input type="hidden" name="type" value="store" />
+                          {MODERATION_ACTIONS.map((action) => (
+                            <button
+                              key={action.value}
+                              type="submit"
+                              name="status"
+                              value={action.value}
+                              className={`${moderationButtonClass} ${action.tone}`}
+                            >
+                              {action.label}
+                            </button>
+                          ))}
+                        </form>
+                      </DashboardTableCell>
+                    </DashboardTableRow>
+                  );
+                })
+              )}
+            </DashboardTableBody>
+          </DashboardTable>
+        </DashboardCard>
+      </DashboardSection>
     </div>
   );
 }

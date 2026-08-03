@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
 import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
@@ -8,6 +7,8 @@ import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtime
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
+import { DashboardShell } from "@/components/dashboard";
+import { customerNav } from "@/config/dashboard-nav";
 
 export default async function CustomerLayout({
   children,
@@ -29,62 +30,25 @@ export default async function CustomerLayout({
 
   return (
     <CommerceAuthShell>
-      <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-surface/50">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <nav className="flex flex-wrap items-center gap-6 text-sm">
-            <Link href="/marketplace" className="font-heading text-gold">
-              Nexar Commerce
-            </Link>
-            <Link href="/customer/orders" className="text-muted hover:text-white">
-              Orders
-            </Link>
-            <Link href="/customer/invoices" className="text-muted hover:text-white">
-              Invoices
-              {(pendingInvoices ?? 0) > 0 && (
-                <span className="ml-1 text-amber-400">({pendingInvoices})</span>
-              )}
-            </Link>
-            <Link href="/customer/wallet" className="text-muted hover:text-white">
-              Wallet
-            </Link>
-            <Link href="/customer/purchases" className="text-muted hover:text-white">
-              History
-            </Link>
-            <Link href="/marketplace" className="text-muted hover:text-white">
-              Marketplace
-            </Link>
-            <Link href="/marketplace/wishlist" className="text-muted hover:text-white">
-              Wishlist
-            </Link>
-            <Link href="/marketplace/cart" className="text-muted hover:text-white">
-              Cart
-            </Link>
-            <Link href="/customer/payment-methods" className="text-muted hover:text-white">
-              Payment methods
-            </Link>
-            <Link href="/customer/profile" className="text-muted hover:text-white">
-              Profile
-            </Link>
-            <Link href="/customer/addresses" className="text-muted hover:text-white">
-              Addresses
-            </Link>
-            <Link href="/customer/disputes" className="text-muted hover:text-white">
-              Disputes
-            </Link>
+      <DashboardShell
+        sections={customerNav({ pendingInvoices })}
+        brand="Nexar Commerce"
+        brandHref="/customer"
+        subtitle="Customer account"
+        storageKey="customer"
+        actions={
+          <>
             <NotificationBadge userId={profile.id} />
-          </nav>
-          <form action={signOutAction}>
-            <Button type="submit" variant="ghost" size="sm">
-              Sign out
-            </Button>
-          </form>
-        </div>
-      </header>
-      <main className="mx-auto max-w-7xl px-6 py-10">
+            <form action={signOutAction}>
+              <Button type="submit" variant="ghost" size="sm">
+                Sign out
+              </Button>
+            </form>
+          </>
+        }
+      >
         <CustomerRealtimeProvider>{children}</CustomerRealtimeProvider>
-      </main>
-    </div>
+      </DashboardShell>
     </CommerceAuthShell>
   );
 }
