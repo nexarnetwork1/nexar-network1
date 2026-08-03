@@ -14,7 +14,7 @@ type StatItemProps = {
 
 function StatItem({ label, children }: StatItemProps) {
   return (
-    <div className="luxury-border rounded-2xl bg-card/40 px-5 py-4 backdrop-blur-md sm:px-6 sm:py-5">
+    <div className="luxury-border rounded-2xl bg-card/60 px-5 py-4 backdrop-blur-md sm:px-6 sm:py-5">
       <p className="text-[10px] tracking-[0.22em] text-muted uppercase">{label}</p>
       <p className="mt-2 font-mono text-xl font-medium text-white sm:text-2xl">{children}</p>
     </div>

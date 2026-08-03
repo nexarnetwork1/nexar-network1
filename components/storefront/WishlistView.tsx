@@ -22,7 +22,7 @@ export function WishlistView({ products: initialProducts, isAuthenticated }: Wis
 
   if (!isAuthenticated) {
     return (
-      <div className="rounded-3xl border border-border/70 bg-card/40 p-10 text-center">
+      <div className="rounded-3xl border border-border/70 bg-card/60 p-10 text-center">
         <Heart className="mx-auto h-10 w-10 text-gold/70" aria-hidden />
         <h2 className="mt-4 font-heading text-xl font-semibold text-white">Sign in to view your wishlist</h2>
         <p className="mt-2 text-sm text-muted">Save products you love and return anytime.</p>
@@ -38,7 +38,7 @@ export function WishlistView({ products: initialProducts, isAuthenticated }: Wis
 
   if (!products.length) {
     return (
-      <div className="rounded-3xl border border-border/70 bg-card/40 p-10 text-center">
+      <div className="rounded-3xl border border-border/70 bg-card/60 p-10 text-center">
         <Heart className="mx-auto h-10 w-10 text-gold/70" aria-hidden />
         <h2 className="mt-4 font-heading text-xl font-semibold text-white">Your wishlist is empty</h2>
         <p className="mt-2 text-sm text-muted">Tap the heart on any product to save it here.</p>

@@ -42,7 +42,7 @@ export default async function MarketplaceCheckoutPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-        <section className="rounded-2xl border border-border/70 bg-card/40 p-6">
+        <section className="rounded-2xl border border-border/70 bg-card/60 p-6">
           <h2 className="font-heading text-lg font-semibold text-white">Order items</h2>
           <ul className="mt-4 space-y-4">
             {items.map((line) => (
@@ -68,7 +68,7 @@ export default async function MarketplaceCheckoutPage() {
           </p>
         </section>
 
-        <aside className="h-fit rounded-2xl border border-border/70 bg-card/40 p-6">
+        <aside className="h-fit rounded-2xl border border-border/70 bg-card/60 p-6">
           <h2 className="font-heading text-lg font-semibold text-white">Payment summary</h2>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between text-muted">

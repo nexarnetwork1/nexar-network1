@@ -30,8 +30,8 @@ export default async function MerchantWithdrawalsPage() {
 
       <form action={requestWithdrawalFormAction} className="mt-8 max-w-md space-y-4 rounded-xl border border-border p-6">
         <input type="hidden" name="storeId" value={store.id} />
-        <input name="amount" type="number" step="0.01" min="1" placeholder="Amount (USD)" required className="w-full rounded-lg border border-border bg-surface px-3 py-2" disabled={escrowHeld > 0} />
-        <input name="walletAddress" placeholder="0x… wallet address" required className="w-full rounded-lg border border-border bg-surface px-3 py-2" disabled={escrowHeld > 0} />
+        <input name="amount" type="number" step="0.01" min="1" placeholder="Amount (USD)" required className="w-full rounded-lg border border-border bg-surface/60 px-3 py-2" disabled={escrowHeld > 0} />
+        <input name="walletAddress" placeholder="0x… wallet address" required className="w-full rounded-lg border border-border bg-surface/60 px-3 py-2" disabled={escrowHeld > 0} />
         <Button type="submit" disabled={escrowHeld > 0}>Request withdrawal</Button>
       </form>
 

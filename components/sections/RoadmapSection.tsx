@@ -18,7 +18,7 @@ gsap.registerPlugin(ScrollTrigger);
 const STATUS_CONFIG = {
   completed: { icon: Check, color: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10" },
   active: { icon: Circle, color: "text-gold border-gold/30 bg-gold/10" },
-  upcoming: { icon: Circle, color: "text-muted border-border bg-card/40" },
+  upcoming: { icon: Circle, color: "text-muted border-border bg-card/60" },
 };
 
 export function RoadmapSection() {
@@ -92,7 +92,7 @@ export function RoadmapSection() {
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 className="w-[320px] shrink-0"
               >
-                <div className="luxury-border h-full rounded-2xl bg-card/40 p-6 backdrop-blur-md">
+                <div className="luxury-border h-full rounded-2xl bg-card/60 p-6 backdrop-blur-md">
                   <div className="mb-4 flex items-center justify-between">
                     <span className="font-mono text-xs tracking-wide text-gold">
                       {phase.quarter}

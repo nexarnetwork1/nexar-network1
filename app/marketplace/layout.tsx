@@ -15,7 +15,7 @@ export default function MarketplaceLayout({
 }) {
   return (
     <CommerceAuthShell>
-      <div className="relative min-h-[calc(100vh-var(--nxr-header-offset))] bg-background">
+      <div className="relative min-h-[calc(100vh-var(--nxr-header-offset))]">
         <MarketplaceSubNav />
         {children}
       </div>

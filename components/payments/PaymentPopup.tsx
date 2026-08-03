@@ -175,7 +175,7 @@ export function PaymentPopup({
         role="dialog"
         aria-modal="true"
         aria-labelledby="payment-popup-title"
-        className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
+        className="relative w-full max-w-md rounded-2xl border border-border bg-card/80 p-6 shadow-2xl backdrop-blur-2xl"
       >
         <CloseButton onClick={onClose} className="absolute right-4 top-4" />
 

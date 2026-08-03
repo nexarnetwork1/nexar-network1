@@ -1,6 +1,6 @@
 export function PresalePanelSkeleton() {
   return (
-    <div className="luxury-border animate-pulse rounded-3xl bg-card/40 p-6 backdrop-blur-md">
+    <div className="luxury-border animate-pulse rounded-3xl bg-card/60 p-6 backdrop-blur-md">
       <div className="mb-5 flex justify-between">
         <div className="h-6 w-32 rounded-lg bg-border/80" />
         <div className="h-6 w-20 rounded-full bg-border/80" />

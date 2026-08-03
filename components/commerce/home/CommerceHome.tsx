@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import type { CommerceHomeData } from "@/lib/commerce/types";
-import { CommerceSpaceBackground } from "./CommerceSpaceBackground";
 import { CommerceHero } from "./sections/CommerceHero";
 import { LiveStatistics } from "./sections/LiveStatistics";
 
@@ -53,7 +52,6 @@ export function CommerceHome({ data }: CommerceHomeProps) {
 
   return (
     <>
-      <CommerceSpaceBackground />
       <main className="relative">
         <CommerceHero initialMetrics={data.liveMetrics} />
         <LiveStatistics initialMetrics={data.liveMetrics} />

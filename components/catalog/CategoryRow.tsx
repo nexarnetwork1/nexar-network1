@@ -46,7 +46,7 @@ export function CategoryRow({ category }: CategoryRowProps) {
 
   if (editing) {
     return (
-      <li className="flex items-center gap-3 rounded-xl border border-border bg-card/40 px-4 py-3">
+      <li className="flex items-center gap-3 rounded-xl border border-border bg-card/60 px-4 py-3">
         <form onSubmit={handleUpdate} className="flex flex-1 items-center gap-3">
           <Input
             name="name"
@@ -75,7 +75,7 @@ export function CategoryRow({ category }: CategoryRowProps) {
   }
 
   return (
-    <li className="flex items-center justify-between rounded-xl border border-border bg-card/40 px-4 py-3">
+    <li className="flex items-center justify-between rounded-xl border border-border bg-card/60 px-4 py-3">
       <div>
         <span>{category.name}</span>
         <span className="ml-3 font-mono text-xs text-muted">{category.slug}</span>

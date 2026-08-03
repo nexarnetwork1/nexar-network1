@@ -5,7 +5,7 @@ import AdminLoginPanel from "./AdminLoginPanel";
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <Suspense fallback={<div className="min-h-screen" />}>
       <AdminLoginPanel />
     </Suspense>
   );

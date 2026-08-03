@@ -67,7 +67,7 @@ export function DisputeThread({ disputeId, messages, evidence, canReply }: Dispu
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Write a message…"
-              className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className="flex-1 rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm"
             />
             <Button type="button" size="sm" onClick={sendMessage} disabled={pending}>
               Send
@@ -93,13 +93,13 @@ export function DisputeThread({ disputeId, messages, evidence, canReply }: Dispu
               value={evidenceUrl}
               onChange={(e) => setEvidenceUrl(e.target.value)}
               placeholder="Evidence file URL"
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm"
             />
             <input
               value={evidenceDesc}
               onChange={(e) => setEvidenceDesc(e.target.value)}
               placeholder="Description (optional)"
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm"
             />
             <Button type="button" size="sm" variant="ghost" onClick={uploadEvidence} disabled={pending}>
               Upload evidence

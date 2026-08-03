@@ -184,7 +184,7 @@ export default function MarketPage() {
               </div>
             </div>
 
-            <div className="luxury-border rounded-3xl bg-card/40 backdrop-blur-xl overflow-hidden">
+            <div className="luxury-border rounded-3xl bg-card/60 backdrop-blur-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -279,7 +279,7 @@ export default function MarketPage() {
           </div>
 
           {/* Token Contract Card */}
-          <div className="mt-12 luxury-border rounded-3xl bg-card/40 p-8 backdrop-blur-xl">
+          <div className="mt-12 luxury-border rounded-3xl bg-card/60 p-8 backdrop-blur-xl">
             <h2 className="font-heading text-xl font-semibold">Token Contract</h2>
             <p className="mt-2 text-sm text-muted">
               {SITE.ticker} is deployed on {SITE.blockchain}
@@ -329,49 +329,49 @@ export default function MarketPage() {
 
           {/* Token Stats */}
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Ticker</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-white">
                 {SITE.ticker}
               </p>
             </div>
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Network</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-white">
                 BEP20
               </p>
             </div>
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Max Supply</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-white">
                 {SITE.maxSupply}
               </p>
             </div>
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Mint Status</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-gold">
                 Disabled
               </p>
             </div>
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Decimals</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-white">
                 18
               </p>
             </div>
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Contract</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-emerald-400">
                 Verified
               </p>
             </div>
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Token Type</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-white">
                 Utility
               </p>
             </div>
-            <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+            <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Blockchain</p>
               <p className="mt-2 font-heading text-2xl font-semibold text-white">
                 BSC
@@ -394,7 +394,7 @@ export default function MarketPage() {
                     href={exchange.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl transition-all hover:border-gold/30 hover:bg-card/60"
+                    className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl transition-all hover:border-gold/30 hover:bg-card/60"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{exchange.icon}</span>
@@ -408,7 +408,7 @@ export default function MarketPage() {
                 ) : (
                   <div
                     key={exchange.name}
-                    className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl"
+                    className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl"
                     aria-label={`${exchange.name} — ${exchange.status}`}
                   >
                     <div className="flex items-center gap-3">

@@ -93,7 +93,7 @@ export function DashboardMobileDrawer({
             role="dialog"
             aria-modal="true"
             aria-label="Dashboard navigation"
-            className="fixed inset-y-0 left-0 z-[80] flex h-dvh w-[min(20rem,86vw)] flex-col border-r border-border bg-surface/95 backdrop-blur-2xl will-change-transform md:hidden"
+            className="fixed inset-y-0 left-0 z-[80] flex h-dvh w-[min(20rem,86vw)] flex-col border-r border-border bg-surface/85 backdrop-blur-2xl will-change-transform md:hidden"
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}

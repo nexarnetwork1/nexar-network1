@@ -38,7 +38,7 @@ export function StoreSettingsForm({ settings }: StoreSettingsFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 max-w-lg space-y-4 rounded-2xl border border-border bg-card/40 p-6">
+    <form onSubmit={handleSubmit} className="mt-4 max-w-lg space-y-4 rounded-2xl border border-border bg-card/60 p-6">
       <Input
         name="notificationEmail"
         type="email"

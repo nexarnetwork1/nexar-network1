@@ -29,7 +29,7 @@ export function GlobalSearch({ apiPath = "/api/search" }: { apiPath?: string }) 
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="Search products, orders, invoices…"
-        className="w-full rounded-xl border border-border bg-surface px-4 py-2 text-sm text-white"
+        className="w-full rounded-xl border border-border bg-surface/60 px-4 py-2 text-sm text-white"
       />
       {(results.length > 0 || pending) && query.length >= 2 && (
         <div className="absolute z-20 mt-2 w-full rounded-xl border border-border bg-black/95 p-2 shadow-xl">

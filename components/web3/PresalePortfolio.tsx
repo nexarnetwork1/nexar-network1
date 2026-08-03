@@ -15,7 +15,7 @@ export function PresalePortfolio() {
 
   if (!address) {
     return (
-      <div className="luxury-border rounded-2xl bg-card/40 p-5 backdrop-blur-md">
+      <div className="luxury-border rounded-2xl bg-card/60 p-5 backdrop-blur-md">
         <h2 className="font-heading text-lg font-semibold">Your Portfolio</h2>
         <p className="mt-3 text-sm text-muted">Connect wallet to view your presale holdings.</p>
       </div>
@@ -23,7 +23,7 @@ export function PresalePortfolio() {
   }
 
   return (
-    <div className="luxury-border rounded-2xl bg-card/40 p-5 backdrop-blur-md">
+    <div className="luxury-border rounded-2xl bg-card/60 p-5 backdrop-blur-md">
       <h2 className="font-heading text-lg font-semibold">Your Portfolio</h2>
       {isLoading ? (
         <p className="mt-3 text-sm text-muted">Loading from contract…</p>

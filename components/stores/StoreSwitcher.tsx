@@ -17,7 +17,7 @@ export function StoreSwitcher({ stores, activeStoreId }: StoreSwitcherProps) {
     <label className="flex items-center gap-2 text-sm text-muted">
       Store
       <select
-        className="rounded-lg border border-border bg-surface px-3 py-1.5 text-white"
+        className="rounded-lg border border-border bg-surface/60 px-3 py-1.5 text-white"
         value={activeStoreId ?? stores[0]?.id}
         onChange={(e) => router.push(`/merchant?store=${e.target.value}`)}
       >

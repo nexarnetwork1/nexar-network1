@@ -35,7 +35,7 @@ export function MerchantExperience() {
       description="Shopify-grade onboarding and operations — register, configure your store, list products, and accept global crypto payments on Nexar Commerce."
     >
       <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-3xl border border-border/70 bg-card/40 p-6 sm:p-8">
+        <div className="rounded-3xl border border-border/70 bg-card/60 p-6 sm:p-8">
           <p className="text-xs tracking-[0.2em] text-gold uppercase">Store setup progress</p>
           <ol className="mt-6 space-y-4">
             {merchantCommerceConfig.setupSteps.map((step, index) => (

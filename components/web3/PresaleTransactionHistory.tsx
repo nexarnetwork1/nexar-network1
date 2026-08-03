@@ -11,7 +11,7 @@ export function PresaleTransactionHistory() {
   const { transactions, isLoading } = usePresaleTransactions(address);
 
   return (
-    <div className="luxury-border rounded-2xl bg-card/40 p-5 backdrop-blur-md">
+    <div className="luxury-border rounded-2xl bg-card/60 p-5 backdrop-blur-md">
       <h2 className="font-heading text-lg font-semibold">Transaction History</h2>
 
       {!address && (

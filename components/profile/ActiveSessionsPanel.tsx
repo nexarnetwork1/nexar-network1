@@ -63,7 +63,7 @@ export function ActiveSessionsPanel({ sessions }: ActiveSessionsPanelProps) {
         {sessions.map((session, index) => (
           <li
             key={session.id}
-            className="flex items-center justify-between rounded-xl border border-border bg-card/40 px-4 py-3"
+            className="flex items-center justify-between rounded-xl border border-border bg-card/60 px-4 py-3"
           >
             <div>
               <p className="text-sm font-medium">

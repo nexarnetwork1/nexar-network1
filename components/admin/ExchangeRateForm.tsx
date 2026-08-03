@@ -66,14 +66,14 @@ export function ExchangeRateForm({ currencies = [] }: ExchangeRateFormProps) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 rounded-2xl border border-border bg-card/40 p-5 sm:flex-row sm:flex-wrap sm:items-end"
+      className="flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-5 sm:flex-row sm:flex-wrap sm:items-end"
       noValidate
     >
       <CurrencySelectField
         {...register("baseCurrency")}
         selectedCode={watch("baseCurrency")}
         label="Asset"
-        className="border-border bg-surface"
+        className="border-border bg-surface/60"
       />
       {errors.baseCurrency && (
         <p className="text-xs text-red-400">{errors.baseCurrency.message}</p>

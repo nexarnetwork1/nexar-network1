@@ -120,7 +120,7 @@ export function EcosystemSection() {
                     "group w-full rounded-2xl border p-5 text-left transition-all duration-500",
                     mod.id === activeId
                       ? "border-gold/25 bg-card/60"
-                      : "border-border bg-card/20 hover:border-gold/15 hover:bg-card/40",
+                      : "border-border bg-card/20 hover:border-gold/15 hover:bg-card/60",
                   )}
                 >
                   <div className="flex items-start gap-4">

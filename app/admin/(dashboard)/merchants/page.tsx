@@ -22,7 +22,7 @@ const rowActionClass =
   "inline-flex min-h-11 items-center rounded-lg px-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50";
 
 const statusSelectClass =
-  "h-11 min-w-0 rounded-xl border border-border bg-surface px-3 text-xs text-white focus:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/50";
+  "h-11 min-w-0 rounded-xl border border-border bg-surface/60 px-3 text-xs text-white focus:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/50";
 
 async function updateStoreFormAction(formData: FormData) {
   "use server";

@@ -46,7 +46,7 @@ export function PaymentEcosystem() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
                 whileHover={{ y: -4 }}
-                className="rounded-2xl border border-border/70 bg-card/40 p-5 backdrop-blur-md"
+                className="rounded-2xl border border-border/70 bg-card/60 p-5 backdrop-blur-md"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -102,7 +102,7 @@ export function PaymentEcosystem() {
             </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/40 p-6 sm:p-8">
+          <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/60 p-6 sm:p-8">
             <p className="mb-5 text-xs tracking-[0.2em] text-gold uppercase">Settlement flow</p>
             <div className="space-y-4">
               {FLOW.map((step, i) => (

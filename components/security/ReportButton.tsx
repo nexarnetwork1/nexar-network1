@@ -58,7 +58,7 @@ export function ReportButton({ targetType, targetId, label = "Report" }: ReportB
   return (
     <form
       action={submit}
-      className="w-full max-w-sm rounded-xl border border-border bg-surface p-4"
+      className="w-full max-w-sm rounded-xl border border-border bg-surface/60 p-4 backdrop-blur-xl"
       aria-label="Report form"
     >
       <p className="text-sm font-medium">Report content</p>
@@ -67,7 +67,7 @@ export function ReportButton({ targetType, targetId, label = "Report" }: ReportB
         <select
           name="reason"
           required
-          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm"
         >
           {REASONS.map((r) => (
             <option key={r} value={r}>
@@ -82,7 +82,7 @@ export function ReportButton({ targetType, targetId, label = "Report" }: ReportB
           name="details"
           rows={2}
           maxLength={500}
-          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm"
         />
       </label>
       <div className="mt-3 flex gap-2">

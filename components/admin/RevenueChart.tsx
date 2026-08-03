@@ -38,7 +38,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
   }));
 
   return (
-    <div className="h-72 rounded-2xl border border-border bg-card/40 p-4">
+    <div className="h-72 rounded-2xl border border-border bg-card/60 p-4">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" />

@@ -63,7 +63,7 @@ export function CartView({ items: initialItems, isAuthenticated }: CartViewProps
 
   if (!isAuthenticated) {
     return (
-      <div className="rounded-3xl border border-border/70 bg-card/40 p-10 text-center">
+      <div className="rounded-3xl border border-border/70 bg-card/60 p-10 text-center">
         <ShoppingBag className="mx-auto h-10 w-10 text-gold/70" aria-hidden />
         <h2 className="mt-4 font-heading text-xl font-semibold text-white">Sign in to view your cart</h2>
         <p className="mt-2 text-sm text-muted">Your saved items and checkout are available after login.</p>
@@ -79,7 +79,7 @@ export function CartView({ items: initialItems, isAuthenticated }: CartViewProps
 
   if (!items.length) {
     return (
-      <div className="rounded-3xl border border-border/70 bg-card/40 p-10 text-center">
+      <div className="rounded-3xl border border-border/70 bg-card/60 p-10 text-center">
         <ShoppingBag className="mx-auto h-10 w-10 text-gold/70" aria-hidden />
         <h2 className="mt-4 font-heading text-xl font-semibold text-white">Your cart is empty</h2>
         <p className="mt-2 text-sm text-muted">Discover products from verified merchants across the marketplace.</p>
@@ -99,7 +99,7 @@ export function CartView({ items: initialItems, isAuthenticated }: CartViewProps
           return (
             <li
               key={line.id}
-              className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card/40 p-4 sm:flex-row sm:items-center"
+              className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card/60 p-4 sm:flex-row sm:items-center"
             >
               <Link href={href} className="shrink-0">
                 <div className="h-24 w-24 overflow-hidden rounded-xl bg-surface">
@@ -169,7 +169,7 @@ export function CartView({ items: initialItems, isAuthenticated }: CartViewProps
         })}
       </ul>
 
-      <aside className="h-fit rounded-2xl border border-border/70 bg-card/40 p-6 backdrop-blur-md">
+      <aside className="h-fit rounded-2xl border border-border/70 bg-card/60 p-6 backdrop-blur-md">
         <h2 className="font-heading text-lg font-semibold text-white">Order summary</h2>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between text-muted">

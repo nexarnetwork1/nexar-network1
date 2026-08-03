@@ -50,7 +50,7 @@ export function ShopSearchView({ result, storeSlug }: Props) {
               }
             }}
             placeholder="Search products…"
-            className="mt-2 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-white outline-none focus:border-gold/40"
+            className="mt-2 w-full rounded-xl border border-border bg-surface/60 px-3 py-2 text-sm text-white outline-none focus:border-gold/40"
           />
         </div>
 

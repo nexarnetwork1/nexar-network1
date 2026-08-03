@@ -54,7 +54,7 @@ export function PresaleInfo({ className, compact = false }: PresaleInfoProps) {
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={cn("luxury-border rounded-2xl bg-card/40 backdrop-blur-md", compact ? "p-5" : "p-6", className)}
+      className={cn("luxury-border rounded-2xl bg-card/60 backdrop-blur-md", compact ? "p-5" : "p-6", className)}
     >
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">

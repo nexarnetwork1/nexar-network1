@@ -126,7 +126,7 @@ export function Footer() {
               .
             </p>
           </div>
-          <div className="luxury-border rounded-3xl bg-card/40 p-6 backdrop-blur-md sm:p-8">
+          <div className="luxury-border rounded-3xl bg-card/60 p-6 backdrop-blur-md sm:p-8">
             <ContactForm />
           </div>
         </div>

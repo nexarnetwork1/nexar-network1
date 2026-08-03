@@ -226,7 +226,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   }
 
   return (
-    <div className={cn("luxury-border rounded-3xl bg-card/40 p-6 backdrop-blur-md", className)}>
+    <div className={cn("luxury-border rounded-3xl bg-card/60 p-6 backdrop-blur-md", className)}>
       <div className="mb-5 flex items-center justify-between">
         <h2 className="font-heading text-xl font-semibold">NXR Presale</h2>
         <span

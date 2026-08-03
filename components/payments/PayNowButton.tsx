@@ -139,7 +139,7 @@ export function PayNowButton({
           Pay now
         </Button>
       ) : (
-        <div className="rounded-xl border border-border bg-card/40 p-4">
+        <div className="rounded-xl border border-border bg-card/60 p-4">
           <p className="text-sm text-muted">Select payment method</p>
           <PaymentMethodPicker
             className="mt-3"

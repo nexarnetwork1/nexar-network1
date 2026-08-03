@@ -68,7 +68,8 @@ export function DashboardShell({
       className={cn(
         // The portals render inside the site's `nav-offset` wrapper, so full
         // height here means the viewport minus the fixed navbar and ticker.
-        "min-h-[calc(100dvh-var(--nxr-header-offset))] w-full bg-background text-white",
+        // Left transparent so the global star field shows through the chrome.
+        "min-h-[calc(100dvh-var(--nxr-header-offset))] w-full text-white",
         className,
       )}
     >

@@ -102,7 +102,7 @@ export function MerchantPricing({ plans }: MerchantPricingProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.06 }}
-              className="flex flex-col rounded-3xl border border-border/70 bg-card/40 p-6 backdrop-blur-md"
+              className="flex flex-col rounded-3xl border border-border/70 bg-card/60 p-6 backdrop-blur-md"
             >
               <h3 className="font-heading text-lg font-semibold text-white">{plan.name}</h3>
               {plan.description ? (

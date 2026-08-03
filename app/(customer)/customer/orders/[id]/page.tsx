@@ -62,22 +62,22 @@ export default async function CustomerOrderDetailPage({ params, searchParams }: 
       <div className="mt-8 grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-border bg-card/40 p-4">
+            <div className="rounded-xl border border-border bg-card/60 p-4">
               <dt className="text-xs text-muted">Store</dt>
               <dd className="mt-1 font-medium">{order.store.name}</dd>
             </div>
-            <div className="rounded-xl border border-border bg-card/40 p-4">
+            <div className="rounded-xl border border-border bg-card/60 p-4">
               <dt className="text-xs text-muted">Subtotal</dt>
               <dd className="mt-1 font-medium">
                 <CurrencyAmount amount={Number(order.subtotal)} currency={order.currency} size={16} />
               </dd>
             </div>
-            <div className="rounded-xl border border-border bg-card/40 p-4">
+            <div className="rounded-xl border border-border bg-card/60 p-4">
               <dt className="text-xs text-muted">Created</dt>
               <dd className="mt-1">{new Date(order.created_at).toLocaleString()}</dd>
             </div>
             {invoice && (
-              <div className="rounded-xl border border-border bg-card/40 p-4">
+              <div className="rounded-xl border border-border bg-card/60 p-4">
                 <dt className="text-xs text-muted">Invoice</dt>
                 <dd className="mt-1 font-mono text-sm">{invoice.invoice_number}</dd>
               </div>
@@ -137,7 +137,7 @@ export default async function CustomerOrderDetailPage({ params, searchParams }: 
           )}
         </div>
 
-        <aside className="rounded-2xl border border-border bg-card/40 p-6">
+        <aside className="rounded-2xl border border-border bg-card/60 p-6">
           <h2 className="font-heading text-lg font-semibold">Order timeline</h2>
           <div className="mt-6">
             <OrderTimeline

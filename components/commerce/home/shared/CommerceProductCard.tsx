@@ -34,7 +34,7 @@ export function CommerceProductCard({
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: index * 0.05, duration: 0.45 }}
       whileHover={{ y: -4 }}
-      className="group overflow-hidden rounded-2xl border border-border/70 bg-card/40 backdrop-blur-md transition-colors hover:border-gold/25"
+      className="group overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-md transition-colors hover:border-gold/25"
     >
       <Link href={MARKETPLACE_ROUTES.product(product.slug || product.id)}>
         <div className="relative aspect-[4/3] overflow-hidden">

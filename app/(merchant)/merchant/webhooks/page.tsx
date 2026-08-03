@@ -19,8 +19,8 @@ export default async function MerchantWebhooksPage() {
 
       <form action={createWebhookFormAction} className="mt-8 max-w-lg space-y-4 rounded-xl border border-border p-6">
         <input type="hidden" name="storeId" value={store.id} />
-        <input name="url" type="url" placeholder="https://your-server.com/webhooks/nexar" required className="w-full rounded-lg border border-border bg-surface px-3 py-2" />
-        <input name="events" placeholder="payment.success,order.created,invoice.paid" defaultValue="payment.success,payment.failure,refund,order.created,invoice.paid" required className="w-full rounded-lg border border-border bg-surface px-3 py-2" />
+        <input name="url" type="url" placeholder="https://your-server.com/webhooks/nexar" required className="w-full rounded-lg border border-border bg-surface/60 px-3 py-2" />
+        <input name="events" placeholder="payment.success,order.created,invoice.paid" defaultValue="payment.success,payment.failure,refund,order.created,invoice.paid" required className="w-full rounded-lg border border-border bg-surface/60 px-3 py-2" />
         <Button type="submit">Add webhook</Button>
       </form>
 

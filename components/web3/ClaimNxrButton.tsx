@@ -55,7 +55,7 @@ export function ClaimNxrButton({
     return (
       <div
         className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-2 text-xs text-muted",
+          "inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2 text-xs text-muted",
           className
         )}
       >

@@ -12,7 +12,14 @@ type DashboardCardProps = {
   interactive?: boolean;
 };
 
-/** Surface primitive replacing the ad-hoc `rounded-2xl border border-border bg-card/40` blocks. */
+/**
+ * Surface primitive replacing the ad-hoc `rounded-2xl border border-border
+ * bg-card/60` blocks.
+ *
+ * Deliberately translucent but *not* backdrop-blurred: a page can hold a dozen
+ * cards, and one compositing layer each is the expensive way to buy a frosted
+ * look. Blur is reserved for chrome and overlays, which appear once per screen.
+ */
 export function DashboardCard({
   children,
   className,
@@ -25,10 +32,10 @@ export function DashboardCard({
   return (
     <Component
       className={cn(
-        "rounded-2xl border border-border bg-card/40",
+        "rounded-2xl border border-border bg-card/60",
         !flush && "p-5",
         interactive &&
-          "transition-colors hover:border-gold/30 hover:bg-card/60 focus-within:border-gold/30",
+          "transition-colors hover:border-gold/30 hover:bg-card/75 focus-within:border-gold/30",
         className,
       )}
     >

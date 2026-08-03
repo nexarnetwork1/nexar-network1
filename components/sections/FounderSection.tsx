@@ -31,7 +31,7 @@ export function FounderSection() {
               <div className="absolute -inset-4 rounded-3xl bg-gold/5 blur-2xl" />
 
               {/* Card frame */}
-              <div className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-b from-card via-surface to-background">
+              <div className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-b from-card/70 via-surface/60 to-background/70">
                 {/* Founder image - real photo */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -128,7 +128,7 @@ export function FounderSection() {
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-4 py-2.5 text-sm font-medium transition-all duration-300 hover:border-gold/30 hover:bg-card/70 hover:text-gold"
+                      className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-2.5 text-sm font-medium transition-all duration-300 hover:border-gold/30 hover:bg-card/70 hover:text-gold"
                       aria-label={`Connect with ${FOUNDER.name} on ${label}`}
                     >
                       <Icon className="h-4 w-4" />

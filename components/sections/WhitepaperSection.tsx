@@ -66,7 +66,7 @@ export function WhitepaperSection() {
             <motion.div
               whileHover={{ y: -6 }}
               transition={{ duration: 0.4 }}
-              className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-surface to-background p-8 backdrop-blur-xl"
+              className="luxury-border relative overflow-hidden rounded-3xl bg-gradient-to-br from-card/70 via-surface/60 to-background/70 p-8 backdrop-blur-xl"
             >
               <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-gold/5 blur-3xl" />
               <div className="relative">

@@ -35,7 +35,7 @@ export function BrandedCurrencySelect({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className={cn(
-        "rounded-lg border border-border bg-surface px-3 py-2 text-sm",
+        "rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm",
         className
       )}
     >
@@ -90,7 +90,7 @@ export function BrandedPaymentMethodSelect({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className={cn(
-        "rounded-lg border border-border bg-surface px-3 py-2 text-sm",
+        "rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm",
         className
       )}
     >

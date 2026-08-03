@@ -30,7 +30,7 @@ export function WalletEcosystem() {
             viewport={{ once: true }}
             transition={{ delay: i * 0.06 }}
             whileHover={{ y: -4 }}
-            className="rounded-2xl border border-border/70 bg-card/40 p-5 backdrop-blur-md"
+            className="rounded-2xl border border-border/70 bg-card/60 p-5 backdrop-blur-md"
           >
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}

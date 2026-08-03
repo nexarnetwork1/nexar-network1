@@ -23,7 +23,7 @@ export function StorefrontProductCard({ product, index = 0, storeSlug }: Storefr
       viewport={{ once: true }}
       transition={{ delay: index * 0.04 }}
       whileHover={{ y: -4 }}
-      className="group overflow-hidden rounded-2xl border border-border/70 bg-card/40 transition-colors hover:border-gold/25"
+      className="group overflow-hidden rounded-2xl border border-border/70 bg-card/60 transition-colors hover:border-gold/25"
     >
       <Link href={href}>
         <div className="relative aspect-[4/3] overflow-hidden bg-surface">

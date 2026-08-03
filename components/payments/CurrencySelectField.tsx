@@ -40,7 +40,7 @@ export function CurrencySelectField({
           {...selectProps}
           defaultValue={defaultValue}
           className={cn(
-            "flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm",
+            "flex-1 rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm",
             className
           )}
         >

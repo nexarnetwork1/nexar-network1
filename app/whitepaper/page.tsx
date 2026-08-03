@@ -77,7 +77,7 @@ export default function WhitepaperPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen">
       <Container className="py-16 lg:py-24">
         <Link
           href="/#whitepaper"
@@ -312,7 +312,7 @@ export default function WhitepaperPage() {
       businesses, developers, merchants and global users.
     </p>
 
-    <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+    <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
       <h3 className="mb-4 font-heading text-lg font-semibold text-white">
         Long-Term Infrastructure
       </h3>
@@ -401,7 +401,7 @@ export default function WhitepaperPage() {
 
   <div className="space-y-6">
 
-    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+    <div className="luxury-border rounded-2xl bg-card/60 p-6">
       <h3 className="mb-2 text-lg font-semibold text-gold">Security</h3>
       <p className="text-muted leading-8">
         Protecting users, digital assets and infrastructure remains our
@@ -409,7 +409,7 @@ export default function WhitepaperPage() {
       </p>
     </div>
 
-    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+    <div className="luxury-border rounded-2xl bg-card/60 p-6">
       <h3 className="mb-2 text-lg font-semibold text-gold">Transparency</h3>
       <p className="text-muted leading-8">
         Open communication regarding development, token allocation,
@@ -417,7 +417,7 @@ export default function WhitepaperPage() {
       </p>
     </div>
 
-    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+    <div className="luxury-border rounded-2xl bg-card/60 p-6">
       <h3 className="mb-2 text-lg font-semibold text-gold">Innovation</h3>
       <p className="text-muted leading-8">
         Continuous research and development of technologies that improve
@@ -425,7 +425,7 @@ export default function WhitepaperPage() {
       </p>
     </div>
 
-    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+    <div className="luxury-border rounded-2xl bg-card/60 p-6">
       <h3 className="mb-2 text-lg font-semibold text-gold">Community</h3>
       <p className="text-muted leading-8">
         Building a decentralized ecosystem together with users,
@@ -503,7 +503,7 @@ export default function WhitepaperPage() {
       preparing for future independent blockchain development.
     </p>
 
-    <div className="luxury-border rounded-2xl bg-card/40 p-6">
+    <div className="luxury-border rounded-2xl bg-card/60 p-6">
 
       <h3 className="mb-4 text-lg font-semibold text-white">
         Technical Specifications
@@ -553,7 +553,7 @@ export default function WhitepaperPage() {
     11. Token Overview
   </h2>
 
-  <div className="luxury-border rounded-2xl bg-card/40 p-6 backdrop-blur-xl">
+  <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
     <div className="grid gap-4 sm:grid-cols-2">
 
       <div><p className="text-xs uppercase text-muted">Project</p><p className="text-white">Nexar Network</p></div>
@@ -578,7 +578,7 @@ export default function WhitepaperPage() {
 12. Tokenomics
 </h2>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 
 <div className="space-y-4 text-muted">
 
@@ -672,32 +672,32 @@ inside a dedicated vesting smart contract.
 
 <div className="grid gap-5 md:grid-cols-2">
 
-<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<div className="luxury-border rounded-2xl bg-card/60 p-5">
 <h3 className="text-gold font-semibold mb-2">Nexar Wallet</h3>
 <p className="text-muted">Secure non-custodial wallet for digital assets.</p>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<div className="luxury-border rounded-2xl bg-card/60 p-5">
 <h3 className="text-gold font-semibold mb-2">Nexar Pay</h3>
 <p className="text-muted">Merchant payment infrastructure.</p>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<div className="luxury-border rounded-2xl bg-card/60 p-5">
 <h3 className="text-gold font-semibold mb-2">Explorer</h3>
 <p className="text-muted">Blockchain explorer for transparency.</p>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<div className="luxury-border rounded-2xl bg-card/60 p-5">
 <h3 className="text-gold font-semibold mb-2">Bridge</h3>
 <p className="text-muted">Cross-chain asset transfers.</p>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<div className="luxury-border rounded-2xl bg-card/60 p-5">
 <h3 className="text-gold font-semibold mb-2">Launchpad</h3>
 <p className="text-muted">Support promising blockchain projects.</p>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-5">
+<div className="luxury-border rounded-2xl bg-card/60 p-5">
 <h3 className="text-gold font-semibold mb-2">Nexar Chain</h3>
 <p className="text-muted">Future independent blockchain network.</p>
 </div>
@@ -757,7 +757,7 @@ addresses of Nexar Network and are publicly disclosed for
 transparency, verification and community reference.
 </p>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 
 <h3 className="text-gold font-semibold mb-2">
 NXR Token Contract
@@ -773,7 +773,7 @@ Official BEP-20 smart contract of the NXR token.
 
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 
 <h3 className="text-gold font-semibold mb-2">
 Treasury Wallet
@@ -791,7 +791,7 @@ partnerships and long-term development of Nexar Network.
 
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 
 <h3 className="text-gold font-semibold mb-2">
 Presale Contract
@@ -807,7 +807,7 @@ Official smart contract used for the Nexar Network presale.
 
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 
 <h3 className="text-gold font-semibold mb-2">
 Team Vesting Contract
@@ -837,7 +837,7 @@ releasing team allocations according to the official vesting schedule.
 
 <div className="space-y-6">
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 <h3 className="text-gold font-semibold mb-3">Phase 1 — Foundation</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
 <li>Website Launch</li>
@@ -849,7 +849,7 @@ releasing team allocations according to the official vesting schedule.
 </ul>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 <h3 className="text-gold font-semibold mb-3">Phase 2 — Growth</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
 <li>Presale Launch</li>
@@ -862,7 +862,7 @@ releasing team allocations according to the official vesting schedule.
 </ul>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 <h3 className="text-gold font-semibold mb-3">Phase 3 — Expansion</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
 <li>Nexar Wallet</li>
@@ -878,7 +878,7 @@ releasing team allocations according to the official vesting schedule.
 </ul>
 </div>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-6">
+<div className="luxury-border rounded-2xl bg-card/60 p-6">
 <h3 className="text-gold font-semibold mb-3">Phase 4 — Nexar Chain</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
 <li>Validator Network</li>
@@ -899,7 +899,7 @@ releasing team allocations according to the official vesting schedule.
 19. Founder
 </h2>
 
-<div className="luxury-border rounded-2xl bg-card/40 p-8">
+<div className="luxury-border rounded-2xl bg-card/60 p-8">
 
 <h3 className="text-2xl font-semibold text-gold mb-2">
 Mahmoud Elgabry

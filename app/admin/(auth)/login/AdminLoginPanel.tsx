@@ -7,7 +7,6 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useAccount } from "wagmi";
 import { getAddress } from "viem";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
-import { GlobalBackground } from "@/components/ui/GlobalBackground";
 import { Logo } from "@/components/ui/Logo";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { SuperAdminVerifyButton } from "@/components/web3/SuperAdminVerifyButton";
@@ -73,7 +72,6 @@ export default function AdminLoginPanel() {
 
   return (
     <>
-      <GlobalBackground variant="login" />
       <main className="flex min-h-screen items-center justify-center px-6 py-16">
         <div className="mx-auto w-full max-w-[24rem] rounded-2xl border border-border/80 bg-card/55 p-6 text-center shadow-xl shadow-black/20 backdrop-blur-2xl">
           <div className="mb-4 flex justify-center">
