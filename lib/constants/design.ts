@@ -25,8 +25,8 @@ export const FONTS = {
 export const ANIMATION = {
   ease: [0.22, 1, 0.36, 1] as const,
   duration: {
-    fast: 0.25,
-    normal: 0.4,
-    slow: 0.65,
+    fast: 0.15,
+    normal: 0.25,
+    slow: 0.4,
   },
 } as const;

@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { usePrivy } from "@privy-io/react-auth";
-import { useAccount, useBalance, useChainId, useDisconnect, useReadContracts, useSwitchChain } from "wagmi";
+import {
+  useAccount,
+  useBalance,
+  useChainId,
+  useDisconnect,
+  useReadContracts,
+  useSwitchChain,
+} from "wagmi";
 import { bsc } from "wagmi/chains";
 import { formatUnits } from "viem";
 import { toast } from "sonner";
@@ -32,16 +39,20 @@ export function useWalletPanel() {
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   const { address: wagmiAddress, isConnected } = useAccount();
   const chainId = useChainId();
-  const [isTreasuryWallet, setIsTreasuryWallet] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const treasuryPromptRef = useRef<string | null>(null);
 
-  const address = (wagmiAddress ?? user?.wallet?.address ?? "") as `0x${string}` | "";
+  const address = (wagmiAddress ?? user?.wallet?.address ?? "") as
+    | `0x${string}`
+    | "";
   const walletType = user?.wallet?.walletClientType ?? "wallet";
-  const meta = WALLET_META[walletType] ?? { label: "Connected Wallet", icon: "👛" };
+  const meta = WALLET_META[walletType] ?? {
+    label: "Connected Wallet",
+    icon: "👛",
+  };
 
   const shortAddress =
-    address.length > 10 ? `${address.slice(0, 6)}…${address.slice(-4)}` : address;
+    address.length > 10
+      ? `${address.slice(0, 6)}…${address.slice(-4)}`
+      : address;
 
   const onBsc = chainId === bsc.id;
   const networkLabel = onBsc ? "BNB Smart Chain" : `Chain ${chainId}`;
@@ -79,7 +90,12 @@ export function useWalletPanel() {
     contracts:
       address && usdtToken
         ? [
-            { address: usdtToken, abi: ERC20_ABI, functionName: "decimals" as const, chainId: bsc.id },
+            {
+              address: usdtToken,
+              abi: ERC20_ABI,
+              functionName: "decimals" as const,
+              chainId: bsc.id,
+            },
             {
               address: usdtToken,
               abi: ERC20_ABI,
@@ -98,9 +114,17 @@ export function useWalletPanel() {
 
   const balances = useMemo(
     () => ({
-      bnb: bnbBalance ? trimBalance(formatUnits(bnbBalance.value, 18)) : "—",
-      nxr: nxrBalance !== undefined ? trimBalance(formatUnits(nxrBalance, 18)) : "—",
-      usdt: usdtBalance !== undefined ? trimBalance(formatUnits(usdtBalance, usdtDecimals)) : "—",
+      bnb: bnbBalance
+        ? trimBalance(formatUnits(bnbBalance.value, 18))
+        : "—",
+      nxr:
+        nxrBalance !== undefined
+          ? trimBalance(formatUnits(nxrBalance, 18))
+          : "—",
+      usdt:
+        usdtBalance !== undefined
+          ? trimBalance(formatUnits(usdtBalance, usdtDecimals))
+          : "—",
     }),
     [bnbBalance, nxrBalance, usdtBalance, usdtDecimals],
   );
@@ -118,59 +142,9 @@ export function useWalletPanel() {
 
   async function disconnectWallet() {
     clearWalletSession();
-    await fetch("/api/admin/wallet/logout", { method: "POST" }).catch(() => undefined);
     disconnect();
     await logout();
-    setIsSuperAdmin(false);
-    window.dispatchEvent(new CustomEvent("nxr:super-admin-updated"));
   }
-
-  useEffect(() => {
-    if (!address) return;
-
-    fetch(`/api/admin/wallet/status?wallet=${encodeURIComponent(address)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const treasury = Boolean(data.isTreasuryWallet);
-        const admin = Boolean(data.authenticated);
-        setIsTreasuryWallet(treasury);
-        setIsSuperAdmin(admin);
-
-        if (treasury && !admin && treasuryPromptRef.current !== address) {
-          treasuryPromptRef.current = address;
-          toast.message("Treasury wallet connected", {
-            description: "Open your wallet menu and verify your signature for Super Admin access.",
-            duration: 7000,
-          });
-        }
-      })
-      .catch(() => {
-        setIsTreasuryWallet(false);
-        setIsSuperAdmin(false);
-      });
-
-    fetch("/api/admin/wallet/connected", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ walletAddress: address }),
-    }).catch(() => undefined);
-  }, [address]);
-
-  useEffect(() => {
-    function handleSuperAdminUpdated() {
-      if (!address) return;
-      fetch(`/api/admin/wallet/status?wallet=${encodeURIComponent(address)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setIsTreasuryWallet(Boolean(data.isTreasuryWallet));
-          setIsSuperAdmin(Boolean(data.authenticated));
-        })
-        .catch(() => undefined);
-    }
-
-    window.addEventListener("nxr:super-admin-updated", handleSuperAdminUpdated);
-    return () => window.removeEventListener("nxr:super-admin-updated", handleSuperAdminUpdated);
-  }, [address]);
 
   return {
     address,
@@ -181,9 +155,6 @@ export function useWalletPanel() {
     networkLabel,
     chainId,
     balances,
-    isTreasuryWallet,
-    isSuperAdmin,
-    setIsSuperAdmin,
     isSwitchingChain,
     copyAddress,
     switchToBsc,

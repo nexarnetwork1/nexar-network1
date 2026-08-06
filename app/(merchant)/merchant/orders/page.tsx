@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
+
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import { getCurrentProfile } from "@/modules/users/repository";
@@ -22,7 +22,9 @@ import {
 
 export default async function MerchantOrdersPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/orders" }));
+ if (!profile) {
+  redirect("/login?redirect=/merchant/orders");
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

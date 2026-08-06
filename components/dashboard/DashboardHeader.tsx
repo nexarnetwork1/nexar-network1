@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 import type { DashboardNavSection } from "@/config/dashboard-nav";
+import { AtlasLogo } from "@/components/ui/AtlasLogo";
 import { DashboardBreadcrumb } from "./DashboardBreadcrumb";
 
 type DashboardHeaderProps = {
@@ -44,6 +45,10 @@ export function DashboardHeader({
       >
         <Menu className="h-[18px] w-[18px]" aria-hidden />
       </button>
+
+      <div className="hidden shrink-0 sm:block md:hidden" aria-hidden>
+        <AtlasLogo height={28} decorative />
+      </div>
 
       <DashboardBreadcrumb
         sections={sections}

@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { CheckoutButton } from "@/components/orders/CheckoutButton";
 import { Button } from "@/components/ui/Button";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import { getMarketplaceCartWithItems } from "@/modules/marketplace/cart/server";
 import { getCurrentProfile } from "@/modules/users/repository";
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
 export default async function MarketplaceCheckoutPage() {
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "customer") {
-    redirect(commerceAuthHref({ auth: "signin", redirect: MARKETPLACE_ROUTES.checkout }));
+    redirect("/login?redirect=" + encodeURIComponent(MARKETPLACE_ROUTES.checkout));
   }
 
   const { items } = await getMarketplaceCartWithItems(profile.id);

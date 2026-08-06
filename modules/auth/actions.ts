@@ -1,9 +1,26 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { tryCreateAdminClient } from "@/lib/supabase/admin";
+import bcrypt from "bcrypt";
+import { auth } from "@/auth";
+import { tryCreateAdminClient, createAdminClient } from "@/lib/supabase/admin";
 import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
+import {
+  createDatabaseSession,
+  destroyDatabaseSession,
+  rotateDatabaseSession,
+} from "@/lib/auth/database-session";
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  sendChangeEmailVerification,
+  consumeToken,
+} from "@/lib/auth/auth-email";
+import {
+  getUserPasswordHash,
+  setUserPassword,
+} from "@/lib/auth/authjs-adapter";
 import {
   loginSchema,
   customerRegisterSchema,
@@ -18,7 +35,11 @@ import {
 } from "./validators";
 import { writeSecurityLog } from "@/modules/audit/security";
 import { writeAuditLog } from "@/modules/audit/repository";
-import { enforceSingleSession, trackUserSession, revokeCurrentSessionsOnLogout } from "./session";
+import {
+  enforceSingleSession,
+  trackUserSession,
+  revokeCurrentSessionsOnLogout,
+} from "./session";
 import { setRememberMePreference } from "@/lib/auth/remember-me";
 import {
   checkAccountLockout,
@@ -26,6 +47,15 @@ import {
   clearLoginAttempts,
 } from "@/lib/security/brute-force";
 import type { UserRole } from "@/types";
+
+const BCRYPT_ROUNDS = 12;
+
+export type ActionResult = {
+  success: boolean;
+  error?: string;
+  redirectTo?: string;
+  needsEmailConfirmation?: boolean;
+};
 
 function slugifyStoreName(name: string, userId: string): string {
   const base =
@@ -37,13 +67,12 @@ function slugifyStoreName(name: string, userId: string): string {
 }
 
 async function resolveUniqueStoreSlug(
-  admin: NonNullable<ReturnType<typeof tryCreateAdminClient>>,
+  admin: ReturnType<typeof createAdminClient>,
   storeName: string,
-  userId: string
+  userId: string,
 ): Promise<string> {
   let slug = slugifyStoreName(storeName, userId);
   let counter = 0;
-
   while (true) {
     const { data } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
     if (!data) return slug;
@@ -52,158 +81,45 @@ async function resolveUniqueStoreSlug(
   }
 }
 
-async function persistCustomerProfile(
-  userId: string,
-  fullName: string,
-  walletAddress: string
-): Promise<ActionResult | null> {
-  const admin = tryCreateAdminClient();
-  if (!admin) {
-    return {
-      success: false,
-      error: "Registration saved but profile setup requires server configuration.",
-    };
-  }
-
-  try {
-    const { error } = await admin
-      .from("profiles")
-      .update({
-        full_name: fullName,
-        wallet_address: walletAddress.toLowerCase(),
-        role: "customer",
-        profile_completed: true,
-      })
-      .eq("id", userId);
-
-    if (error) return { success: false, error: error.message };
-    return null;
-  } catch {
-    return {
-      success: false,
-      error: "Registration saved but profile setup failed. Contact support.",
-    };
-  }
+async function requireSessionUserId(): Promise<string> {
+  const session = await auth();
+  const id = session?.user?.id;
+  if (!id) throw new Error("Not authenticated");
+  return id;
 }
-
-async function persistMerchantRegistration(
-  userId: string,
-  data: {
-    merchantName: string;
-    storeName: string;
-    businessType: string;
-    walletAddress: string;
-    mode: "marketplace" | "payments_only";
-    logoUrl?: string | null;
-  }
-): Promise<ActionResult | null> {
-  const admin = tryCreateAdminClient();
-  if (!admin) {
-    return {
-      success: false,
-      error: "Registration saved but merchant setup requires server configuration.",
-    };
-  }
-
-  try {
-    const { error: profileError } = await admin
-      .from("profiles")
-      .update({
-        full_name: data.merchantName,
-        wallet_address: data.walletAddress.toLowerCase(),
-        role: "merchant",
-        profile_completed: true,
-      })
-      .eq("id", userId);
-
-    if (profileError) return { success: false, error: profileError.message };
-
-    await admin.auth.admin.updateUserById(userId, {
-      app_metadata: { role: "merchant" },
-    });
-
-    const slug = await resolveUniqueStoreSlug(admin, data.storeName, userId);
-
-    const { error: storeError } = await admin.from("stores").insert({
-      owner_id: userId,
-      name: data.storeName,
-      slug,
-      business_type: data.businessType,
-      logo_url: data.logoUrl ?? null,
-      mode: data.mode,
-      status: "pending",
-      wallet_address: data.walletAddress.toLowerCase(),
-    });
-
-    if (storeError) return { success: false, error: storeError.message };
-    return null;
-  } catch {
-    return {
-      success: false,
-      error: "Registration saved but merchant setup failed. Contact support.",
-    };
-  }
-}
-
-export type ActionResult = {
-  success: boolean;
-  error?: string;
-  redirectTo?: string;
-  needsEmailConfirmation?: boolean;
-};
 
 export async function loginAction(formData: FormData): Promise<ActionResult> {
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const lockout = checkAccountLockout(parsed.data.email);
+  const email = parsed.data.email.toLowerCase().trim();
+  const lockout = await checkAccountLockout(email);
   if (lockout.locked) {
-    const minutes = Math.ceil((lockout.retryAfterMs ?? 0) / 60_000);
+    const seconds = Math.ceil((lockout.retryAfterMs ?? 60_000) / 1000);
     return {
       success: false,
-      error: `Account temporarily locked. Try again in ${minutes} minute(s).`,
+      error: `Too many attempts. Try again in ${seconds}s.`,
     };
   }
 
-  const supabase = await createClient();
-  const rememberMe = formData.get("rememberMe") === "true";
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: parsed.data.email,
-    password: parsed.data.password,
-  });
-
-  if (error) {
-    const attempt = recordFailedLoginAttempt(parsed.data.email);
-    await writeSecurityLog({
-      eventType: "failed_login",
-      metadata: {
-        email: parsed.data.email,
-        message: error.message,
-        attempts: attempt.attempts,
-        locked: attempt.locked,
-      },
-    }).catch(() => undefined);
-    if (attempt.locked) {
-      const minutes = Math.ceil((attempt.retryAfterMs ?? 0) / 60_000);
-      return {
-        success: false,
-        error: `Too many failed attempts. Account locked for ${minutes} minute(s).`,
-      };
-    }
-    return { success: false, error: error.message };
+  const user = await getUserPasswordHash(email);
+  if (!user?.password) {
+    await recordFailedLoginAttempt(email);
+    return { success: false, error: "Invalid email or password" };
   }
 
-  clearLoginAttempts(parsed.data.email);
+  const valid = await bcrypt.compare(parsed.data.password, user.password);
+  if (!valid) {
+    await recordFailedLoginAttempt(email);
+    return { success: false, error: "Invalid email or password" };
+  }
 
-  if (!data.user.email_confirmed_at) {
-    await supabase.auth.signOut();
+  if (!user.emailVerified) {
     return {
       success: false,
       error: "Please confirm your email before signing in.",
@@ -211,31 +127,76 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     };
   }
 
-  await enforceSingleSession(data.user.id);
-  await trackUserSession(data.user.id).catch(() => undefined);
+  clearLoginAttempts(email);
+  const rememberMe =
+    formData.get("rememberMe") === "true" || formData.get("rememberMe") === "on";
+  await rotateDatabaseSession(user.id, rememberMe);
   await setRememberMePreference(rememberMe);
+  await enforceSingleSession(user.id).catch(() => undefined);
+  await trackUserSession(user.id).catch(() => undefined);
 
-  const { data: profile } = await supabase
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
     .select("role, profile_completed")
-    .eq("id", data.user.id)
+    .eq("id", user.id)
     .single();
 
-  if (profile && !profile.profile_completed) {
+  if (!profile || !profile.profile_completed) {
     return { success: true, redirectTo: "/auth/complete-profile" };
+  }
+
+  await writeAuditLog({
+    actorId: user.id,
+    actorRole: (profile.role as UserRole) ?? "customer",
+    action: "auth.login",
+    entityType: "profile",
+    entityId: user.id,
+    metadata: { method: "credentials" },
+  }).catch(() => undefined);
+
+  try {
+    const { publishDomainEvent } = await import("@/domains/events/bus");
+    await publishDomainEvent({
+      id: randomUUID(),
+      name: "user.logged_in",
+      occurredAt: new Date(),
+      actorId: user.id,
+      businessId: null,
+      payload: { userId: user.id, method: "credentials" },
+      correlationId: randomUUID(),
+    });
+  } catch {
+    /* non-fatal */
+  }
+
+  // NEXAR HQ — Platform Owner opens ATLAS + NEXAR workspace; customers never see HQ
+  try {
+    const { resolveHqSessionContext } = await import(
+      "@/modules/atlas-hq/service"
+    );
+    const { resolvePostLoginPath } = await import(
+      "@/modules/atlas-hq/founder"
+    );
+    const hq = await resolveHqSessionContext(user.id, profile.role);
+    if (hq.isPlatformOwner || hq.hqVisibleInSidebar) {
+      return { success: true, redirectTo: resolvePostLoginPath(hq) };
+    }
+  } catch {
+    /* non-fatal — fall through to role dashboard */
   }
 
   const redirectParam = formData.get("redirect") as string | null;
   const redirectTo =
     redirectParam && isValidRedirect(redirectParam)
       ? redirectParam
-      : getDashboardPath(profile?.role);
+      : getDashboardPath(profile.role);
 
   return { success: true, redirectTo };
 }
 
 export async function registerCustomerAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   const parsed = customerRegisterSchema.safeParse({
     fullName: formData.get("fullName"),
@@ -243,75 +204,66 @@ export async function registerCustomerAction(
     password: formData.get("password"),
     walletAddress: formData.get("walletAddress"),
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email: parsed.data.email,
-    password: parsed.data.password,
-    options: {
-      data: {
-        full_name: parsed.data.fullName,
-        wallet_address: parsed.data.walletAddress.toLowerCase(),
-        role: "customer",
-      },
-    },
+  const email = parsed.data.email.toLowerCase().trim();
+  const admin = tryCreateAdminClient();
+  if (!admin) {
+    return { success: false, error: "Server auth is not configured" };
+  }
+
+  const existing = await getUserPasswordHash(email);
+  if (existing) {
+    return { success: false, error: "An account with this email already exists" };
+  }
+
+  const passwordHash = await bcrypt.hash(parsed.data.password, BCRYPT_ROUNDS);
+  const userId = randomUUID();
+
+  const { error: userError } = await admin.from("authjs_users").insert({
+    id: userId,
+    email,
+    name: parsed.data.fullName,
+    password: passwordHash,
+    emailVerified: null,
   });
+  if (userError) return { success: false, error: userError.message };
 
-  if (error) {
-    return { success: false, error: error.message };
+  const { error: profileError } = await admin.from("profiles").insert({
+    id: userId,
+    email,
+    full_name: parsed.data.fullName,
+    wallet_address: parsed.data.walletAddress.toLowerCase(),
+    role: "customer",
+    profile_completed: true,
+  });
+  if (profileError) {
+    await admin.from("authjs_users").delete().eq("id", userId);
+    return { success: false, error: profileError.message };
   }
 
-  if (!data.user) {
-    return { success: false, error: "Registration failed" };
-  }
-
-  if (!data.session) {
-    const pendingError = await persistCustomerProfile(
-      data.user.id,
-      parsed.data.fullName,
-      parsed.data.walletAddress
-    );
-    if (pendingError) return pendingError;
-
+  const mail = await sendVerificationEmail(email);
+  if (!mail.success) {
+    // Account created; surface mail failure but allow resend.
     return {
       success: true,
       needsEmailConfirmation: true,
       redirectTo: "/login?message=confirm_email",
+      error: mail.error,
     };
   }
 
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .update({
-      full_name: parsed.data.fullName,
-      wallet_address: parsed.data.walletAddress.toLowerCase(),
-      role: "customer",
-      profile_completed: true,
-    })
-    .eq("id", data.user.id);
-
-  if (profileError) {
-    return { success: false, error: profileError.message };
-  }
-
-  await writeAuditLog({
-    actorId: data.user.id,
-    actorRole: "customer",
-    action: "auth.register",
-    entityType: "profile",
-    entityId: data.user.id,
-    metadata: { method: "email", role: "customer" },
-  }).catch(() => undefined);
-
-  return { success: true, redirectTo: "/marketplace" };
+  return {
+    success: true,
+    needsEmailConfirmation: true,
+    redirectTo: "/login?message=confirm_email",
+  };
 }
 
 export async function registerMerchantAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   const parsed = merchantRegisterSchema.safeParse({
     merchantName: formData.get("merchantName"),
@@ -322,136 +274,108 @@ export async function registerMerchantAction(
     walletAddress: formData.get("walletAddress"),
     mode: formData.get("mode"),
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email: parsed.data.email,
-    password: parsed.data.password,
-    options: {
-      data: {
-        full_name: parsed.data.merchantName,
-        role: "merchant",
-        store_name: parsed.data.storeName,
-        business_type: parsed.data.businessType,
-        wallet_address: parsed.data.walletAddress.toLowerCase(),
-        mode: parsed.data.mode,
-      },
-    },
+  const email = parsed.data.email.toLowerCase().trim();
+  const admin = tryCreateAdminClient();
+  if (!admin) return { success: false, error: "Server auth is not configured" };
+
+  if (await getUserPasswordHash(email)) {
+    return { success: false, error: "An account with this email already exists" };
+  }
+
+  const passwordHash = await bcrypt.hash(parsed.data.password, BCRYPT_ROUNDS);
+  const userId = randomUUID();
+
+  const { error: userError } = await admin.from("authjs_users").insert({
+    id: userId,
+    email,
+    name: parsed.data.merchantName,
+    password: passwordHash,
+    emailVerified: null,
   });
+  if (userError) return { success: false, error: userError.message };
 
-  if (error) {
-    return { success: false, error: error.message };
+  const { error: profileError } = await admin.from("profiles").insert({
+    id: userId,
+    email,
+    full_name: parsed.data.merchantName,
+    wallet_address: parsed.data.walletAddress.toLowerCase(),
+    role: "merchant",
+    profile_completed: true,
+  });
+  if (profileError) {
+    await admin.from("authjs_users").delete().eq("id", userId);
+    return { success: false, error: profileError.message };
   }
 
-  if (!data.user) {
-    return { success: false, error: "Registration failed" };
-  }
-
-  if (!data.session) {
-    const pendingError = await persistMerchantRegistration(data.user.id, {
-      merchantName: parsed.data.merchantName,
-      storeName: parsed.data.storeName,
-      businessType: parsed.data.businessType,
-      walletAddress: parsed.data.walletAddress,
-      mode: parsed.data.mode,
-    });
-    if (pendingError) return pendingError;
-
-    return {
-      success: true,
-      needsEmailConfirmation: true,
-      redirectTo: "/login?message=confirm_email",
-    };
-  }
-
+  const slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, userId);
   let logoUrl: string | null = null;
   const logoFile = formData.get("logo") as File | null;
   if (logoFile && logoFile.size > 0) {
     const ext = logoFile.name.split(".").pop() ?? "png";
-    const filePath = `${data.user.id}/${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
+    const filePath = `${userId}/${Date.now()}.${ext}`;
+    const { error: uploadError } = await admin.storage
       .from("store-logos")
       .upload(filePath, logoFile, { upsert: true });
-
     if (!uploadError) {
-      const { data: urlData } = supabase.storage
-        .from("store-logos")
-        .getPublicUrl(filePath);
-      logoUrl = urlData.publicUrl;
+      const { data: pub } = admin.storage.from("store-logos").getPublicUrl(filePath);
+      logoUrl = pub.publicUrl;
     }
   }
 
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .update({
-      full_name: parsed.data.merchantName,
-      wallet_address: parsed.data.walletAddress.toLowerCase(),
-      role: "merchant",
-      profile_completed: true,
-    })
-    .eq("id", data.user.id);
-
-  if (profileError) {
-    return { success: false, error: profileError.message };
-  }
-
-  try {
-    const admin = tryCreateAdminClient();
-    if (admin) {
-      await admin.auth.admin.updateUserById(data.user.id, {
-        app_metadata: { role: "merchant" },
-      });
-    }
-  } catch {
-    // Service role key not configured in dev — profile.role is source of truth
-  }
-
-  const admin = tryCreateAdminClient();
-  let slug: string;
-  if (admin) {
-    slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, data.user.id);
-  } else {
-    slug = slugifyStoreName(parsed.data.storeName, data.user.id);
-  }
-
-  const storePayload = {
-    owner_id: data.user.id,
+  await admin.from("stores").insert({
+    owner_id: userId,
     name: parsed.data.storeName,
     slug,
     business_type: parsed.data.businessType,
-    logo_url: logoUrl,
     mode: parsed.data.mode,
-    status: "pending" as const,
+    status: "pending",
+    logo_url: logoUrl,
     wallet_address: parsed.data.walletAddress.toLowerCase(),
-  };
+  });
 
-  const { error: storeError } = admin
-    ? await admin.from("stores").insert(storePayload)
-    : await supabase.from("stores").insert(storePayload);
-
-  if (storeError) {
-    return { success: false, error: storeError.message };
+  // Business Hub: store insert trigger creates/links Business; ensure ownership + events.
+  const { data: createdStore } = await admin
+    .from("stores")
+    .select("id, business_id, status")
+    .eq("owner_id", userId)
+    .eq("slug", slug)
+    .maybeSingle();
+  if (createdStore?.id) {
+    const { ensureBusinessForStoreOwner } = await import(
+      "@/modules/business-hub/service"
+    );
+    await ensureBusinessForStoreOwner({
+      ownerUserId: userId,
+      storeId: createdStore.id,
+      storeName: parsed.data.storeName,
+      storeSlug: slug,
+      businessType: parsed.data.businessType,
+      logoUrl,
+      storeStatus: "pending",
+    }).catch(() => undefined);
   }
 
-  await writeAuditLog({
-    actorId: data.user.id,
-    actorRole: "merchant",
-    action: "auth.register",
-    entityType: "profile",
-    entityId: data.user.id,
-    metadata: { method: "email", role: "merchant", store_name: parsed.data.storeName },
-  }).catch(() => undefined);
+  await sendVerificationEmail(email);
 
-  return { success: true, redirectTo: "/merchant/onboarding" };
+  return {
+    success: true,
+    needsEmailConfirmation: true,
+    redirectTo: "/login?message=confirm_email",
+  };
 }
 
 export async function completeProfileAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated" };
+  }
+
   const parsed = completeProfileSchema.safeParse({
     fullName: formData.get("fullName"),
     walletAddress: formData.get("walletAddress"),
@@ -460,23 +384,13 @@ export async function completeProfileAction(
     businessType: formData.get("businessType") || undefined,
     mode: formData.get("mode") || undefined,
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  const role: UserRole = parsed.data.role ?? "customer";
-
-  const { error: profileError } = await supabase
+  const admin = createAdminClient();
+  const role = (parsed.data.role ?? "customer") as UserRole;
+  const { error } = await admin
     .from("profiles")
     .update({
       full_name: parsed.data.fullName,
@@ -484,428 +398,363 @@ export async function completeProfileAction(
       role,
       profile_completed: true,
     })
-    .eq("id", user.id);
+    .eq("id", session.user.id);
+  if (error) return { success: false, error: error.message };
 
-  if (profileError) {
-    return { success: false, error: profileError.message };
-  }
-
-  if (role === "merchant" && parsed.data.storeName && parsed.data.businessType && parsed.data.mode) {
-    const admin = tryCreateAdminClient();
-    if (admin) {
-      await admin.auth.admin.updateUserById(user.id, {
-        app_metadata: { role: "merchant" },
+  if (role === "merchant" && parsed.data.storeName) {
+    const slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, session.user.id);
+    const { data: storeRow, error: storeError } = await admin
+      .from("stores")
+      .insert({
+        owner_id: session.user.id,
+        name: parsed.data.storeName,
+        slug,
+        business_type: parsed.data.businessType,
+        mode: parsed.data.mode ?? "marketplace",
+        status: "pending",
+        wallet_address: parsed.data.walletAddress.toLowerCase(),
+      })
+      .select("id")
+      .single();
+    if (storeError) return { success: false, error: storeError.message };
+    if (storeRow?.id) {
+      const { ensureBusinessForStoreOwner } = await import(
+        "@/modules/business-hub/service"
+      );
+      await ensureBusinessForStoreOwner({
+        ownerUserId: session.user.id,
+        storeId: storeRow.id,
+        storeName: parsed.data.storeName,
+        storeSlug: slug,
+        businessType: parsed.data.businessType,
+        storeStatus: "pending",
       }).catch(() => undefined);
     }
-
-    let slug: string;
-    if (admin) {
-      slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, user.id);
-    } else {
-      slug = slugifyStoreName(parsed.data.storeName, user.id);
-    }
-
-    const storePayload = {
-      owner_id: user.id,
-      name: parsed.data.storeName,
-      slug,
-      business_type: parsed.data.businessType,
-      logo_url: null,
-      mode: parsed.data.mode,
-      status: "pending" as const,
-      wallet_address: parsed.data.walletAddress.toLowerCase(),
-    };
-
-    const { error: storeError } = admin
-      ? await admin.from("stores").insert(storePayload)
-      : await supabase.from("stores").insert(storePayload);
-
-    if (storeError) {
-      return { success: false, error: storeError.message };
-    }
   }
-
-  await writeAuditLog({
-    actorId: user.id,
-    actorRole: role,
-    action: "auth.profile_completed",
-    entityType: "profile",
-    entityId: user.id,
-    metadata: { role },
-  }).catch(() => undefined);
 
   return { success: true, redirectTo: getDashboardPath(role) };
 }
 
 export async function signOutAction(): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    await revokeCurrentSessionsOnLogout(user.id).catch(() => undefined);
-
+  const session = await auth();
+  if (session?.user?.id) {
+    await revokeCurrentSessionsOnLogout(session.user.id).catch(() => undefined);
     await writeAuditLog({
-      actorId: user.id,
-      actorRole: profile?.role ?? "customer",
+      actorId: session.user.id,
+      actorRole: "customer",
       action: "auth.logout",
       entityType: "profile",
-      entityId: user.id,
+      entityId: session.user.id,
     }).catch(() => undefined);
   }
-
-  await supabase.auth.signOut();
+  await destroyDatabaseSession();
   redirect("/login");
 }
 
 export async function forgotPasswordAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
-  const parsed = forgotPasswordSchema.safeParse({
-    email: formData.get("email"),
-  });
-
+  const parsed = forgotPasswordSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid email" };
   }
-
-  const supabase = await createClient();
-  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`;
-
-  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
+  const email = parsed.data.email.toLowerCase().trim();
+  const user = await getUserPasswordHash(email);
+  // Always succeed to avoid account enumeration.
+  if (user) await sendPasswordResetEmail(email);
   return { success: true };
 }
 
 export async function resetPasswordAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
+  const email = String(formData.get("email") ?? "").toLowerCase().trim();
+  const token = String(formData.get("token") ?? "");
   const parsed = resetPasswordSchema.safeParse({
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
+  if (!email || !token) return { success: false, error: "Invalid reset link" };
 
-  const supabase = await createClient();
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const consumed = await consumeToken(`reset:${email}`, token);
+  if (!consumed) return { success: false, error: "Reset link expired or invalid" };
 
-  if (userError || !user) {
-    return { success: false, error: "Invalid or expired reset link. Request a new one." };
-  }
+  const user = await getUserPasswordHash(email);
+  if (!user) return { success: false, error: "Account not found" };
 
-  const { error } = await supabase.auth.updateUser({
-    password: parsed.data.password,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  await writeAuditLog({
-    actorId: user.id,
-    actorRole: "customer",
-    action: "auth.password_reset",
-    entityType: "profile",
-    entityId: user.id,
-  }).catch(() => undefined);
-
+  const hash = await bcrypt.hash(parsed.data.password, BCRYPT_ROUNDS);
+  await setUserPassword(user.id, hash);
+  await destroyDatabaseSession();
   return { success: true, redirectTo: "/login?message=password_reset" };
 }
 
 export async function changePasswordAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
+  const userId = await requireSessionUserId();
   const parsed = changePasswordSchema.safeParse({
     currentPassword: formData.get("currentPassword"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const admin = createAdminClient();
+  const { data: user } = await admin
+    .from("authjs_users")
+    .select("password, email")
+    .eq("id", userId)
+    .single();
+  if (!user?.password) return { success: false, error: "Password login not available" };
 
-  if (!user?.email) {
-    return { success: false, error: "Not authenticated" };
-  }
+  const ok = await bcrypt.compare(parsed.data.currentPassword, user.password);
+  if (!ok) return { success: false, error: "Current password is incorrect" };
 
-  const { error: verifyError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: parsed.data.currentPassword,
-  });
-
-  if (verifyError) {
-    return { success: false, error: "Current password is incorrect" };
-  }
-
-  const { error } = await supabase.auth.updateUser({
-    password: parsed.data.password,
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  await writeAuditLog({
-    actorId: user.id,
-    actorRole: "customer",
-    action: "auth.password_changed",
-    entityType: "profile",
-    entityId: user.id,
-  }).catch(() => undefined);
-
+  const hash = await bcrypt.hash(parsed.data.password, BCRYPT_ROUNDS);
+  await setUserPassword(userId, hash);
+  await rotateDatabaseSession(userId);
   return { success: true };
 }
 
 export async function resendConfirmationAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   const email = formData.get("email");
   if (typeof email !== "string" || !email.includes("@")) {
     return { success: false, error: "Valid email required" };
   }
-
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resend({
-    type: "signup",
-    email,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
+  const user = await getUserPasswordHash(email.toLowerCase().trim());
+  if (!user) return { success: true };
+  if (user.emailVerified) return { success: true };
+  const mail = await sendVerificationEmail(user.email);
+  if (!mail.success) return { success: false, error: mail.error ?? "Failed to send email" };
   return { success: true };
 }
 
 export async function updateProfileAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
+  const userId = await requireSessionUserId();
   const parsed = updateProfileSchema.safeParse({
     fullName: formData.get("fullName"),
     singleSession:
       formData.get("singleSession") === "on" ||
       formData.get("singleSession") === "true",
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: "Not authenticated" };
-
-  const { error } = await supabase
+  const admin = createAdminClient();
+  const { error } = await admin
     .from("profiles")
     .update({
       full_name: parsed.data.fullName,
       single_session_enabled: parsed.data.singleSession ?? false,
     })
-    .eq("id", user.id);
-
+    .eq("id", userId);
   if (error) return { success: false, error: error.message };
-
+  await admin
+    .from("authjs_users")
+    .update({ name: parsed.data.fullName, updated_at: new Date().toISOString() })
+    .eq("id", userId);
   return { success: true };
 }
 
 export async function changeEmailAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
+  const userId = await requireSessionUserId();
   const parsed = changeEmailSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.email) return { success: false, error: "Not authenticated" };
+  const admin = createAdminClient();
+  const { data: user } = await admin
+    .from("authjs_users")
+    .select("password")
+    .eq("id", userId)
+    .single();
+  if (!user?.password) return { success: false, error: "Password required" };
+  const ok = await bcrypt.compare(parsed.data.password, user.password);
+  if (!ok) return { success: false, error: "Password is incorrect" };
 
-  const { error: verifyError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: parsed.data.password,
-  });
-
-  if (verifyError) {
-    return { success: false, error: "Password is incorrect" };
-  }
-
-  const { error } = await supabase.auth.updateUser({
-    email: parsed.data.email,
-  });
-
-  if (error) return { success: false, error: error.message };
-
-  return {
-    success: true,
-    redirectTo: "/login?message=confirm_email",
-  };
+  const mail = await sendChangeEmailVerification(
+    parsed.data.email.toLowerCase().trim(),
+    userId,
+  );
+  if (!mail.success) return { success: false, error: mail.error ?? "Failed to send email" };
+  return { success: true };
 }
 
 export async function changeWalletAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
+  const userId = await requireSessionUserId();
   const parsed = changeWalletSchema.safeParse({
     walletAddress: formData.get("walletAddress"),
     confirmWalletAddress: formData.get("confirmWalletAddress"),
     password: formData.get("password"),
   });
-
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.email) return { success: false, error: "Not authenticated" };
-
-  const { error: verifyError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: parsed.data.password,
-  });
-
-  if (verifyError) {
-    return { success: false, error: "Password is incorrect" };
-  }
+  const admin = createAdminClient();
+  const { data: user } = await admin
+    .from("authjs_users")
+    .select("password")
+    .eq("id", userId)
+    .single();
+  if (!user?.password) return { success: false, error: "Password required" };
+  const ok = await bcrypt.compare(parsed.data.password, user.password);
+  if (!ok) return { success: false, error: "Password is incorrect" };
 
   const wallet = parsed.data.walletAddress.toLowerCase();
+  const { data: taken } = await admin
+    .from("profiles")
+    .select("id")
+    .ilike("wallet_address", wallet)
+    .neq("id", userId)
+    .maybeSingle();
+  if (taken) return { success: false, error: "Wallet already linked to another account" };
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("profiles")
     .update({ wallet_address: wallet })
-    .eq("id", user.id);
-
+    .eq("id", userId);
   if (error) return { success: false, error: error.message };
+  return { success: true };
+}
 
-  await writeAuditLog({
-    actorId: user.id,
-    actorRole: "customer",
-    action: "profile.wallet_changed",
-    entityType: "profile",
-    entityId: user.id,
-  }).catch(() => undefined);
+export async function linkOrLoginWalletAction(
+  walletAddress: string,
+): Promise<ActionResult> {
+  const wallet = walletAddress.toLowerCase();
+  if (!/^0x[a-f0-9]{40}$/.test(wallet)) {
+    return { success: false, error: "Invalid wallet address" };
+  }
 
+  const admin = createAdminClient();
+  const session = await auth();
+
+  const { data: linked } = await admin
+    .from("profiles")
+    .select("id, role, profile_completed")
+    .ilike("wallet_address", wallet)
+    .maybeSingle();
+
+  if (linked) {
+    if (session?.user?.id && session.user.id !== linked.id) {
+      return {
+        success: false,
+        error: "This wallet is already linked to another account.",
+      };
+    }
+    await rotateDatabaseSession(linked.id);
+    await trackUserSession(linked.id).catch(() => undefined);
+    if (!linked.profile_completed) {
+      return { success: true, redirectTo: "/auth/complete-profile" };
+    }
+    return { success: true, redirectTo: getDashboardPath(linked.role) };
+  }
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "Sign in or register first, then connect your wallet to link it.",
+    };
+  }
+
+  const { error } = await admin
+    .from("profiles")
+    .update({ wallet_address: wallet })
+    .eq("id", session.user.id);
+  if (error) return { success: false, error: error.message };
   return { success: true };
 }
 
 export async function revokeSessionAction(
-  sessionId: string
+  sessionIdOrFormData: string | FormData,
 ): Promise<ActionResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: "Not authenticated" };
-
-  const { error } = await supabase.rpc("revoke_user_session", {
+  const userId = await requireSessionUserId();
+  const sessionId =
+    typeof sessionIdOrFormData === "string"
+      ? sessionIdOrFormData
+      : String(sessionIdOrFormData.get("sessionId") ?? "");
+  if (!sessionId) {
+    return { success: false, error: "Session id required" };
+  }
+  const admin = createAdminClient();
+  const { error } = await admin.rpc("revoke_user_session", {
+    p_user_id: userId,
     p_session_id: sessionId,
   });
-
   if (error) return { success: false, error: error.message };
-
-  await writeAuditLog({
-    actorId: user.id,
-    actorRole: "customer",
-    action: "auth.session_revoked",
-    entityType: "user_session",
-    entityId: sessionId,
-  }).catch(() => undefined);
-
   return { success: true };
 }
 
 export async function revokeOtherSessionsAction(): Promise<ActionResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: "Not authenticated" };
-
-  const { error } = await supabase.rpc("revoke_other_user_sessions");
-
-  if (error) return { success: false, error: error.message };
-
-  try {
-    const admin = tryCreateAdminClient();
-    if (admin) {
-      await admin.auth.admin.signOut(user.id, "others");
-    }
-  } catch {
-    // Service role not configured in dev
-  }
-
-  await writeAuditLog({
-    actorId: user.id,
-    actorRole: "customer",
-    action: "auth.sessions_revoked_all",
-    entityType: "profile",
-    entityId: user.id,
-  }).catch(() => undefined);
-
+  const userId = await requireSessionUserId();
+  const admin = createAdminClient();
+  await admin.rpc("revoke_other_user_sessions", { p_user_id: userId });
+  await admin.from("authjs_sessions").delete().eq("userId", userId);
+  await rotateDatabaseSession(userId);
   return { success: true };
 }
 
-export async function uploadAvatarAction(formData: FormData): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: "Not authenticated" };
+export async function uploadAvatarAction(
+  formData: FormData,
+): Promise<ActionResult> {
+  const userId = await requireSessionUserId();
+  const file = formData.get("avatar") as File | null;
+  if (!file || file.size === 0) return { success: false, error: "Avatar file required" };
 
-  const file = formData.get("avatar");
-  if (!(file instanceof File) || file.size === 0) {
-    return { success: false, error: "Please choose an image" };
-  }
-
-  if (file.size > 2 * 1024 * 1024) {
-    return { success: false, error: "Image must be under 2 MB" };
-  }
-
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "png";
-  if (!["jpg", "jpeg", "png", "webp"].includes(ext)) {
-    return { success: false, error: "Use JPG, PNG, or WebP" };
-  }
-
-  const path = `${user.id}/avatar.${ext}`;
-  const { error: uploadError } = await supabase.storage
+  const admin = createAdminClient();
+  const ext = file.name.split(".").pop() ?? "png";
+  const path = `${userId}/${Date.now()}.${ext}`;
+  const { error: uploadError } = await admin.storage
     .from("user-avatars")
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(path, file, { upsert: true });
+  if (uploadError) return { success: false, error: uploadError.message };
 
-  if (uploadError) {
-    return { success: false, error: uploadError.message };
-  }
-
-  const { data } = supabase.storage.from("user-avatars").getPublicUrl(path);
-  const avatarUrl = `${data.publicUrl}?t=${Date.now()}`;
-
-  const { error } = await supabase
+  const { data: pub } = admin.storage.from("user-avatars").getPublicUrl(path);
+  const { error } = await admin
     .from("profiles")
-    .update({ avatar_url: avatarUrl })
-    .eq("id", user.id);
-
+    .update({ avatar_url: pub.publicUrl })
+    .eq("id", userId);
   if (error) return { success: false, error: error.message };
-
+  await admin
+    .from("authjs_users")
+    .update({ image: pub.publicUrl, updated_at: new Date().toISOString() })
+    .eq("id", userId);
   return { success: true };
+}
+
+export async function verifyEmailTokenAction(
+  email: string,
+  token: string,
+): Promise<ActionResult> {
+  const normalized = email.toLowerCase().trim();
+  const consumed = await consumeToken(`verify:${normalized}`, token);
+  if (!consumed) return { success: false, error: "Verification link expired or invalid" };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("authjs_users")
+    .update({
+      emailVerified: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("email", normalized);
+  if (error) return { success: false, error: error.message };
+  return { success: true, redirectTo: "/dashboard" };
 }

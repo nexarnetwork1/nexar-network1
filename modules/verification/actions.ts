@@ -43,6 +43,30 @@ export async function adminUpdateVerificationAction(params: {
     metadata: { status: params.status },
   }).catch(() => undefined);
 
+  // Keep Business Hub verification_state in sync with merchant profile KYC.
+  try {
+    const { getBusinessesForOwner } = await import(
+      "@/modules/business-hub/repository"
+    );
+    const { setBusinessVerificationState } = await import(
+      "@/modules/business-hub/service"
+    );
+    const businesses = await getBusinessesForOwner(params.profileId);
+    const mapped =
+      params.status === "verified"
+        ? "verified"
+        : params.status === "rejected"
+          ? "rejected"
+          : params.status === "pending" || params.status === "under_review"
+            ? "pending"
+            : "unverified";
+    for (const business of businesses) {
+      await setBusinessVerificationState(business.id, profile.id, mapped);
+    }
+  } catch {
+    // Non-fatal: merchant profile remains source for legacy admin UI.
+  }
+
   revalidatePath("/admin/verification");
   revalidatePath("/admin/merchants");
   return { success: true };

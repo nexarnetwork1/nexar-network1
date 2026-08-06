@@ -1,10 +1,8 @@
 /**
- * Navigation for the customer, merchant and admin portals.
+ * Portal navigation (customer, merchant, admin).
  *
- * Previously each portal hardcoded its links inside its layout file, which is
- * why the same list had to be repeated for the sidebar, the mobile drawer and
- * the breadcrumb trail. Every link and every URL here is carried over verbatim
- * from those layouts — nothing was added, removed or renamed.
+ * ATLAS root module tree: `config/atlas-nav.ts`
+ * Platform branding: `config/atlas-branding.ts`
  */
 
 /** Icon names resolved against the registry in `components/dashboard/icons.ts`. */

@@ -12,7 +12,7 @@ import { DashboardActions, DashboardCard } from "@/components/dashboard";
 export default async function MerchantOnboardingPage() {
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "merchant") {
-    redirect("/marketplace?auth=signin&redirect=/merchant/onboarding");
+    redirect("/login?redirect=" + encodeURIComponent("/merchant/onboarding"));
   }
 
   const store = await getMerchantStore(profile.id);

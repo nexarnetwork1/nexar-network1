@@ -63,13 +63,18 @@ export default async function RootLayout({
       lang="en"
       className={`${inter.variable} ${sora.variable} ${spaceGrotesk.variable} h-full scroll-smooth`}
     >
-
-<Toaster
-  position="bottom-center"
-  richColors
-  theme="dark"
-/>
       <body className="relative min-h-full bg-background font-sans text-white antialiased">
+        <Toaster
+          position="bottom-center"
+          richColors
+          theme="dark"
+          toastOptions={{
+            classNames: {
+              toast: "nxr-card border-border text-white",
+            },
+            duration: 4200,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -98,16 +103,16 @@ export default async function RootLayout({
           </a>
           <GlobalBackground variant="default" />
           <HashScrollHandler />
-         <Navbar />
+          <Navbar />
 
-<NewsTicker announcements={tickerAnnouncements} />
+          <NewsTicker announcements={tickerAnnouncements} />
 
-<div
-  id="main-content"
-  className="relative z-10 flex min-h-screen flex-col nav-offset"
->
-  {children}
-</div>
+          <div
+            id="main-content"
+            className="relative z-10 flex min-h-screen flex-col nav-offset bg-black"
+          >
+            {children}
+          </div>
           <CookieConsent />
         </AppProviders>
       </body>

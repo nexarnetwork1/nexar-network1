@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { Coins } from "lucide-react";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantOrders } from "@/modules/orders/repository";
@@ -17,7 +16,9 @@ import {
 
 export default async function MerchantRevenuePage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/revenue" }));
+  if (!profile) {
+  redirect("/login?redirect=/merchant/revenue");
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

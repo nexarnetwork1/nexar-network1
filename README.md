@@ -1,6 +1,8 @@
-# Nexar Network
+# Nexar Network · ATLAS
 
-Production fintech + crypto payment platform built on Next.js and Supabase.
+**ATLAS** is the Business Operating System by NEXAR NETWORK — production fintech + crypto infrastructure on Next.js and Supabase.
+
+> Platform constitution: [docs/ATLAS.md](docs/ATLAS.md)
 
 ## Features
 
@@ -34,6 +36,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Doc | Description |
 |---|---|
+| [docs/ATLAS.md](docs/ATLAS.md) | **ATLAS platform constitution** |
 | [docs/architecture.md](docs/architecture.md) | System design |
 | [docs/database.md](docs/database.md) | Schema & RLS |
 | [docs/security.md](docs/security.md) | Security model |

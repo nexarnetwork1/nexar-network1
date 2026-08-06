@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Shield } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
@@ -28,26 +27,8 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const pathname = usePathname();
   const pathnameRef = useRef(pathname);
   const { authenticated } = usePrivy();
-  const [adminLinkVisible, setAdminLinkVisible] = useState(false);
 
   useScrollLock(open);
-
-  useEffect(() => {
-    fetch("/api/admin/wallet/status")
-      .then((res) => res.json())
-      .then((data) => setAdminLinkVisible(Boolean(data.authenticated)))
-      .catch(() => setAdminLinkVisible(false));
-
-    function onAdminUpdate() {
-      fetch("/api/admin/wallet/status")
-        .then((res) => res.json())
-        .then((data) => setAdminLinkVisible(Boolean(data.authenticated)))
-        .catch(() => setAdminLinkVisible(false));
-    }
-
-    window.addEventListener("nxr:super-admin-updated", onAdminUpdate);
-    return () => window.removeEventListener("nxr:super-admin-updated", onAdminUpdate);
-  }, [open]);
 
   useEffect(() => {
     if (pathnameRef.current !== pathname) {
@@ -171,20 +152,6 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
                   </NavLink>
                 </motion.div>
               ))}
-              {adminLinkVisible && (
-                <NavLink
-                  href="/admin/dashboard"
-                  onClick={onClose}
-                  className={cn(
-                    "group flex items-center gap-3 rounded-2xl px-4 py-3.5",
-                    "font-heading text-lg text-gold transition-colors hover:bg-card",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                  )}
-                >
-                  <Shield className="h-5 w-5 shrink-0" aria-hidden />
-                  <span>Admin dashboard</span>
-                </NavLink>
-              )}
             </nav>
 
             {!authenticated && (

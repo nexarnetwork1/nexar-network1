@@ -1,13 +1,19 @@
 {
-  "name": "Nexar Network",
-  "short_name": "Nexar",
-  "description": "Decentralized payment infrastructure for the global economy",
+  "name": "ATLAS by NEXAR NETWORK",
+  "short_name": "ATLAS",
+  "description": "ATLAS is the Business Operating System of NEXAR NETWORK — Web2 + Web3 infrastructure for companies, commerce, finance, and network growth.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
   "orientation": "portrait-primary",
   "icons": [
+    {
+      "src": "/brand/atlas/atlas-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icon",
       "sizes": "512x512",
@@ -20,9 +26,21 @@
       "type": "image/png"
     }
   ],
-  "categories": ["finance", "business"],
+  "categories": ["business", "finance", "productivity"],
   "screenshots": [],
   "shortcuts": [
+    {
+      "name": "Marketplace",
+      "short_name": "Market",
+      "description": "Browse the ATLAS marketplace",
+      "url": "/marketplace",
+      "icons": [
+        {
+          "src": "/brand/atlas/atlas-icon-512.png",
+          "sizes": "512x512"
+        }
+      ]
+    },
     {
       "name": "Buy NXR",
       "short_name": "Buy",
@@ -30,31 +48,19 @@
       "url": "/#buy",
       "icons": [
         {
-          "src": "/icon",
+          "src": "/brand/atlas/atlas-icon-512.png",
           "sizes": "512x512"
         }
       ]
     },
     {
-      "name": "Whitepaper",
+      "name": "Documentation",
       "short_name": "Docs",
-      "description": "Read the whitepaper",
-      "url": "/whitepaper",
+      "description": "Platform documentation",
+      "url": "/documentation",
       "icons": [
         {
-          "src": "/icon",
-          "sizes": "512x512"
-        }
-      ]
-    },
-    {
-      "name": "Market",
-      "short_name": "Market",
-      "description": "View market data",
-      "url": "/market",
-      "icons": [
-        {
-          "src": "/icon",
+          "src": "/brand/atlas/atlas-icon-512.png",
           "sizes": "512x512"
         }
       ]

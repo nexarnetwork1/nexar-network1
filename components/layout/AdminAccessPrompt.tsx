@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-/** Sends users to the admin login screen when redirected without a super-admin session. */
+/** Sends users to NEXAR HQ login when an admin redirect param is present. */
 export function AdminAccessPrompt() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
   useEffect(() => {
-    if (searchParams.get("admin") !== "wallet-required") return;
+    const adminParam = searchParams.get("admin");
+    if (adminParam !== "hq-required" && adminParam !== "wallet-required") return;
 
     const url = new URL(window.location.href);
     url.searchParams.delete("admin");

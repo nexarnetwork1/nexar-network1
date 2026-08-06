@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { Layers } from "lucide-react";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getStoreCategories } from "@/modules/catalog/repository";
@@ -25,7 +24,9 @@ async function createCategoryFormAction(formData: FormData) {
 
 export default async function MerchantCategoriesPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/categories" }));
+  if (!profile) {
+  redirect("/login?redirect=/merchant/categories");
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

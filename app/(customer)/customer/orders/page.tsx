@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { Suspense } from "react";
 import { ShoppingBag } from "lucide-react";
 import { getCurrentProfile } from "@/modules/users/repository";
@@ -30,7 +29,9 @@ type Props = {
 
 export default async function CustomerOrdersPage({ searchParams }: Props) {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/orders" }));
+  if (!profile) {
+  redirect("/login?redirect=/customer/orders");
+}
 
   const { status: statusFilter } = await searchParams;
   const allOrders = await getCustomerOrders(profile.id);

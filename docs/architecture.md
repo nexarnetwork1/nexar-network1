@@ -1,6 +1,28 @@
 # Nexar Network — Architecture
 
+**Platform:** [ATLAS](./ATLAS.md) — Business Operating System by NEXAR NETWORK
+
 Production fintech + crypto payment ecosystem on Next.js App Router and Supabase.
+
+## ATLAS Platform Layer
+
+ATLAS is the application shell. Bounded contexts (`domains/map.ts`) are capabilities inside ATLAS:
+
+- **Business** (internal: `businessHub`) — company aggregate, stores, product master
+- **Marketplace** (`marketplace`) — sales channel; listings reference Business Product masters
+- **Network** (`atlasNetwork`) — business social graph
+- **Pulse** (`atlasPulse`) — business intelligence feed
+- **Connect** (`atlasConnect`) — collaboration platform (not chat); messages become business actions
+- **AI** (`atlasAi`) — business intelligence engine (not a chatbot); agents, workflows, knowledge
+- **Apps** (`atlasApps`) — business applications platform; installable CRM/HR/Finance/… plugins
+- **Finance** (`atlasFinance`) — financial OS; GL/tax/budgets over Invoice/Payment/Wallet masters
+- **Mobile** (`atlasMobile`) — complete mobile platform; offline sync, push, devices (not a companion app)
+- **NXR** (`nxrToken`) — digital economy utility token; blockchain-optional
+- **Core** (`atlasCore`) — integration spine: outbox, timeline, search, notification hub, analytics bridge
+- **NEXAR HQ** (`atlasHq`) — sole internal administration (Platform Owner, Website CMS, Team); legacy Admin evolved here
+- **Wallet, Analytics, …** — satellite modules
+
+See [ATLAS Constitution](./ATLAS.md). HQ: [ATLAS-HQ.md](./ATLAS-HQ.md). Core: [ATLAS-CORE.md](./ATLAS-CORE.md). NXR: [ATLAS-NXR.md](./ATLAS-NXR.md). Mobile: [ATLAS-MOBILE.md](./ATLAS-MOBILE.md). Finance: [ATLAS-FINANCE.md](./ATLAS-FINANCE.md). Apps: [ATLAS-APPS.md](./ATLAS-APPS.md). Marketplace: [ATLAS-MARKETPLACE.md](./ATLAS-MARKETPLACE.md). AI: [ATLAS-AI.md](./ATLAS-AI.md). Connect: [ATLAS-CONNECT.md](./ATLAS-CONNECT.md).
 
 ## Principles
 
@@ -56,6 +78,7 @@ Lower layers never import from higher layers.
 
 Cross-cutting infrastructure (config, errors, logging, security, providers, store) is documented in:
 
+- [ATLAS](./ATLAS.md) — platform constitution, module tree, ownership
 - [Foundation](./foundation.md) — folder structure, state management, forms, security
 - [Modules](./modules.md) — domain module reference
 - [Configuration](./configuration.md) — env vars and config modules

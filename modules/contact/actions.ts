@@ -30,13 +30,11 @@ export async function submitContactMessageAction(
 
   let userId: string | null = null;
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    userId = user?.id ?? null;
+    const { auth } = await import("@/auth");
+    const session = await auth();
+    userId = session?.user?.id ?? null;
   } catch {
-    // Supabase not configured — still deliver via email
+    // Auth not available — still deliver via email
   }
 
   const admin = tryCreateAdminClient();

@@ -45,6 +45,47 @@ export async function finalizeCryptoPayment(params: {
       amountUsd: Number(order.subtotal),
       merchantAmount: settlement.merchant_amount,
     }).catch(() => undefined);
+
+    // ATLAS Core integration — publish domain events so peer modules + core spine react
+    try {
+      const { randomUUID } = await import("node:crypto");
+      const { publishDomainEvent } = await import("@/domains/events/bus");
+      const amount = Number(order.subtotal);
+      const store = (order as { store?: { business_id?: string | null } }).store;
+      const businessId =
+        (order as { business_id?: string }).business_id ??
+        store?.business_id ??
+        null;
+      const payload = {
+        orderId: settlement.order_id,
+        sessionId: params.sessionId,
+        amount,
+        currency: (order as { currency?: string }).currency ?? "USD",
+        customerId: (order as { customer_id?: string }).customer_id ?? null,
+        storeId: (order as { store_id?: string }).store_id ?? null,
+        settlementId: settlement.settlement_id,
+      };
+      await publishDomainEvent({
+        id: randomUUID(),
+        name: "payment.confirmed",
+        occurredAt: new Date(),
+        actorId: (order as { customer_id?: string }).customer_id ?? null,
+        businessId,
+        payload,
+        correlationId: randomUUID(),
+      });
+      await publishDomainEvent({
+        id: randomUUID(),
+        name: "order.paid",
+        occurredAt: new Date(),
+        actorId: (order as { customer_id?: string }).customer_id ?? null,
+        businessId,
+        payload,
+        correlationId: randomUUID(),
+      });
+    } catch {
+      /* non-fatal */
+    }
   }
 
   return {

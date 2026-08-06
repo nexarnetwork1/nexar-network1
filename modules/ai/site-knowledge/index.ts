@@ -149,11 +149,14 @@ const CORE_SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
     answer:
       "Merchants can register on Nexar Commerce, create a storefront, list products, manage orders, accept crypto and card payments, track revenue, and use the merchant dashboard. New stores are reviewed before going live on the marketplace.",
     links: [
-      { label: "Become a merchant", href: `${MARKETPLACE_ROUTES.root}?auth=register&role=merchant` },
+     {
+  label: "Become a merchant",
+  href: "/login?mode=register&role=merchant",
+},
       { label: "Merchant dashboard", href: "/merchant" },
       { label: "Marketplace", href: MARKETPLACE_ROUTES.root },
     ],
-    primaryLink: `${MARKETPLACE_ROUTES.root}?auth=register&role=merchant`,
+    primaryLink: "/login?mode=register&role=merchant",
   },
   {
     id: "customer",
@@ -164,7 +167,10 @@ const CORE_SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
     links: [
       { label: "Marketplace", href: MARKETPLACE_ROUTES.root },
       { label: "Orders", href: "/customer/orders" },
-      { label: "Sign in", href: `${MARKETPLACE_ROUTES.root}?auth=signin` },
+      {
+  label: "Sign in",
+  href: "/login",
+},
     ],
     primaryLink: MARKETPLACE_ROUTES.root,
   },
@@ -250,7 +256,7 @@ export const ASSISTANT_SUGGESTED_PROMPTS = [
   "Open Whitepaper",
   "Who is the founder?",
   "How do I join the NXR presale?",
-  "How do I become a merchant?",
+  "Register as a merchant",
   "Take me to Marketplace",
   "Explain NXR token utility",
   "Official social links",

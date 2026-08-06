@@ -4,11 +4,13 @@ import { Suspense, useEffect } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SessionProvider } from "next-auth/react";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { Web3Provider } from "@/components/providers/Web3Provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { AdminAccessPrompt } from "@/components/layout/AdminAccessPrompt";
 import { NexarAssistant } from "@/components/assistant/NexarAssistant";
+import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -54,13 +56,17 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   return (
     <QueryProvider>
-      <Web3Provider>
-        <Suspense fallback={null}>
-          <AdminAccessPrompt />
-        </Suspense>
-        {children}
-        <NexarAssistant />
-      </Web3Provider>
+      <SessionProvider>
+        <Web3Provider>
+          <CommerceAuthShell>
+            <Suspense fallback={null}>
+              <AdminAccessPrompt />
+            </Suspense>
+            {children}
+            <NexarAssistant />
+          </CommerceAuthShell>
+        </Web3Provider>
+      </SessionProvider>
     </QueryProvider>
   );
 }

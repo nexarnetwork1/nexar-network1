@@ -6,7 +6,6 @@ import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useScrolled } from "@/hooks/useScrolled";
 import { NavbarWallet } from "@/components/layout/NavbarWallet";
-import { SuperAdminNavLink } from "@/components/layout/SuperAdminNavLink";
 import { NavLink } from "@/components/layout/NavLink";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
@@ -27,7 +26,7 @@ export function Navbar() {
         )}
       >
         <Container className="flex items-center justify-between gap-4 sm:gap-6">
-          <NavLink href="/" aria-label="Nexar Network home" className="relative z-10 shrink-0">
+          <NavLink href="/" aria-label="ATLAS home" className="relative z-10 shrink-0">
             <Logo />
           </NavLink>
 
@@ -49,7 +48,6 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <SuperAdminNavLink className="hidden sm:inline-flex" />
             <NavbarWallet />
 
             <button

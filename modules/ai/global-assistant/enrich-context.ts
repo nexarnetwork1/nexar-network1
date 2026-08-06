@@ -1,4 +1,4 @@
-import { getSuperAdminSession } from "@/lib/admin/super-admin";
+import { hasHqAuthority } from "@/lib/hq/authorization";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getProductDetail } from "@/modules/marketplace/storefront/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
@@ -20,12 +20,12 @@ export async function enrichAssistantContext(
   const pathname = request.pathname ?? "/";
   const page = parseRouteContext(pathname, request.hash);
 
-  const [profile, adminSession] = await Promise.all([
+  const [profile, hqAccess] = await Promise.all([
     getCurrentProfile().catch(() => null),
-    getSuperAdminSession().catch(() => null),
+    hasHqAuthority().catch(() => false),
   ]);
 
-  const userRole = resolveUserRole(profile?.role, Boolean(adminSession), pathname);
+  const userRole = resolveUserRole(profile?.role, Boolean(hqAccess), pathname);
 
   if (page.pageType === "product" && page.entitySlug) {
     try {

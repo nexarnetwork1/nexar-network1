@@ -1,8 +1,9 @@
 import "server-only";
 
+import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, UserRole } from "@/types";
-import { requireSuperAdminSession } from "@/lib/admin/super-admin";
+import { requireHqAccess } from "@/lib/hq/authorization";
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   const supabase = await createClient();
@@ -17,13 +18,9 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 }
 
 export async function getCurrentProfile(): Promise<Profile | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-  return getProfile(user.id);
+  const session = await auth();
+  if (!session?.user?.id) return null;
+  return getProfile(session.user.id);
 }
 
 export async function requireRole(roles: UserRole[]): Promise<Profile> {
@@ -34,7 +31,7 @@ export async function requireRole(roles: UserRole[]): Promise<Profile> {
   return profile;
 }
 
-/** Super Admin access via treasury wallet signature session. */
+/** NEXAR HQ access via Platform Owner / HQ RBAC (resolvePermissions). */
 export async function requireSuperAdmin() {
-  return requireSuperAdminSession();
+  return requireHqAccess({ permission: "hq:access" });
 }

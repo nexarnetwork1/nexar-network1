@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { parseCommerceAuthParams } from "@/lib/commerce/commerce-auth-url";
 import {
   NexarCommerceAuthProvider,
   useCommerceAuth,
@@ -18,15 +17,41 @@ function CommerceAuthOpener() {
     const key = searchParams.toString();
     if (handledRef.current === key) return;
 
-    const parsed = parseCommerceAuthParams(searchParams);
-    if (!parsed.open || !parsed.mode) return;
+    const modeParam = searchParams.get("mode");
+    const authParam = searchParams.get("auth");
+
+    // Only open modal if explicitly requested via auth parameter
+    if (!authParam && !modeParam) {
+      handledRef.current = key;
+      return;
+    }
+
+    const mode =
+      modeParam === "register"
+        ? "register"
+        : authParam === "signin"
+          ? "signin"
+          : null;
+
+    if (!mode) {
+      handledRef.current = key;
+      return;
+    }
+
+    const roleParam = searchParams.get("role");
+
+    const role =
+      roleParam === "customer" || roleParam === "merchant"
+        ? roleParam
+        : undefined;
 
     handledRef.current = key;
+
     openCommerceAuth({
-      mode: parsed.mode,
-      role: parsed.role ?? undefined,
-      redirect: parsed.redirect ?? undefined,
-      message: parsed.message ?? undefined,
+      mode,
+      role,
+      redirect: searchParams.get("redirect") ?? undefined,
+      message: searchParams.get("message") ?? undefined,
     });
 
     const url = new URL(window.location.href);

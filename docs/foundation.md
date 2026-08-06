@@ -1,6 +1,8 @@
 # Project Foundation
 
-This document describes the foundation layer prepared before business logic implementation. Prompt 1 (domain modules, database, routes) is preserved; this layer adds cross-cutting infrastructure.
+This document describes the foundation layer prepared before business logic implementation.
+
+**Platform:** [ATLAS](./ATLAS.md) — Business Operating System by NEXAR NETWORK. Domain boundaries live in `domains/`.
 
 ## Layer Model
 

@@ -1,5 +1,4 @@
 import { redirect, notFound } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getProductById, getStoreCategories } from "@/modules/catalog/repository";
@@ -14,7 +13,9 @@ type Props = {
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: `/merchant/products/${id}/edit` }));
+ if (!profile) {
+  redirect("/login?redirect=" + encodeURIComponent(`/merchant/products/${id}/edit`));
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant/products");

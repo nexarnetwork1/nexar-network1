@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { CreditCard } from "lucide-react";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getPaymentMethods } from "@/modules/platform/repository";
 import { PaymentMethodLogo } from "@/components/payments/PaymentMethodLogo";
@@ -12,7 +11,9 @@ import {
 
 export default async function CustomerPaymentMethodsPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/payment-methods" }));
+  if (!profile) {
+  redirect("/login?redirect=/customer/payment-methods");
+}
 
   const methods = await getPaymentMethods();
 

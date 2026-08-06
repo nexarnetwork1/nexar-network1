@@ -1,5 +1,8 @@
 export const SITE = {
   name: "Nexar Network",
+  /** ATLAS — Business Operating System product name */
+  platform: "ATLAS",
+  platformByline: "by NEXAR NETWORK",
   ticker: "NXR",
   tagline: "Build the future decentralized payment infrastructure.",
   description:

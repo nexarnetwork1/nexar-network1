@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 
 type Props = {
   searchParams: Promise<Record<string, string | undefined>>;
@@ -7,11 +6,9 @@ type Props = {
 
 export default async function RegisterPage({ searchParams }: Props) {
   const sp = await searchParams;
-  redirect(
-    commerceAuthHref({
-      auth: "register",
-      redirect: sp.redirect ?? sp.next,
-      message: sp.message,
-    }),
-  );
+  const dest = new URLSearchParams({ mode: "register" });
+  if (sp.redirect) dest.set("redirect", sp.redirect);
+  if (sp.next) dest.set("redirect", sp.next);
+  if (sp.message) dest.set("message", sp.message);
+  redirect(`/login?${dest.toString()}`);
 }

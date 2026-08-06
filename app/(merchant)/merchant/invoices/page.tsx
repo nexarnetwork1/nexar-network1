@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Receipt } from "lucide-react";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantInvoices } from "@/modules/invoices/repository";
@@ -23,7 +22,9 @@ import {
 
 export default async function MerchantInvoicesPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/invoices" }));
+  if (!profile) {
+  redirect("/login?redirect=/merchant/invoices");
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

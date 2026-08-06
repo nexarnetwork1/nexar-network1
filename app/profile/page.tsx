@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
+import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -10,17 +10,16 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect(commerceAuthHref({ auth: "signin", redirect: "/profile" }));
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login?redirect=/profile");
   }
 
+  const supabase = await createClient();
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name, email, role, wallet_address, created_at")
-    .eq("id", user.id)
+    .eq("id", session.user.id)
     .single();
 
   return (
@@ -38,7 +37,7 @@ export default async function ProfilePage() {
           </div>
           <div>
             <dt className="text-sm text-muted">Email</dt>
-            <dd className="mt-1 font-medium">{profile?.email ?? user.email}</dd>
+            <dd className="mt-1 font-medium">{profile?.email ?? session.user.email ?? "—"}</dd>
           </div>
           <div>
             <dt className="text-sm text-muted">Role</dt>

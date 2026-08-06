@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getStoreBySlug } from "@/modules/stores/repository";
 import { getCurrentProfile } from "@/modules/users/repository";
 
@@ -39,7 +38,7 @@ export default async function PaymentsOnlyStorePage({ params }: Props) {
           </Link>
         ) : (
           <Link
-            href={commerceAuthHref({ auth: "signin", redirect: `/pay/s/${slug}` })}
+            href={`/login?redirect=${encodeURIComponent(`/pay/s/${slug}`)}`}
             className="rounded-xl bg-gold px-6 py-3 text-sm font-medium text-background"
           >
             Sign in to pay

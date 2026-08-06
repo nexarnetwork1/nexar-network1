@@ -20,9 +20,10 @@ import { createNotification } from "@/modules/notifications/repository";
 import { buildQrPayload } from "@/lib/qr/payload";
 import type { ActionResult } from "@/modules/auth/actions";
 import type { StoreStatus } from "@/types";
+import type { HqSessionContext } from "@/modules/atlas-hq/types";
 
 async function logAdminAction(
-  session: { walletAddress: string },
+  session: HqSessionContext,
   action: string,
   entityType: string,
   entityId?: string,
@@ -32,15 +33,24 @@ async function logAdminAction(
     action,
     entityType,
     entityId,
-    metadata: { wallet_address: session.walletAddress, ...metadata },
+    metadata: {
+      actor_user_id: session.userId,
+      hq_role: session.staffRole,
+      is_platform_owner: session.isPlatformOwner,
+      ...metadata,
+    },
   });
   await writeAuditLog({
-    actorId: null,
-    actorRole: "admin",
+    actorId: session.userId,
+    actorRole: session.isPlatformOwner ? "platform_owner" : "admin",
     action,
     entityType,
     entityId,
-    metadata: { wallet_address: session.walletAddress, ...metadata },
+    metadata: {
+      hq_role: session.staffRole,
+      is_platform_owner: session.isPlatformOwner,
+      ...metadata,
+    },
   });
 }
 
@@ -309,14 +319,6 @@ export async function updateUserRoleAction(
 
   if (error) return { success: false, error: error.message };
 
-  try {
-    await admin.auth.admin.updateUserById(parsed.data.userId, {
-      app_metadata: { role: parsed.data.role },
-    });
-  } catch {
-    // app_metadata sync optional
-  }
-
   await logAdminAction(session, "admin.user.role_updated", "profile", parsed.data.userId, {
     role: parsed.data.role,
   });
@@ -459,11 +461,15 @@ export async function banUserAction(userId: string, ban: boolean): Promise<Actio
   }
 
   const admin = createAdminClient();
-  const { error } = await admin.auth.admin.updateUserById(parsed.data.userId, {
-    ban_duration: parsed.data.ban ? "876000h" : "none",
-  });
-
-  if (error) return { success: false, error: error.message };
+  // Ban by clearing Auth.js sessions and marking profile suspended via role metadata.
+  if (parsed.data.ban) {
+    await admin.from("authjs_sessions").delete().eq("userId", parsed.data.userId);
+    const { error } = await admin
+      .from("profiles")
+      .update({ profile_completed: false })
+      .eq("id", parsed.data.userId);
+    if (error) return { success: false, error: error.message };
+  }
 
   await logAdminAction(session, parsed.data.ban ? "admin.user.banned" : "admin.user.unbanned", "profile", parsed.data.userId);
 
@@ -487,16 +493,13 @@ export async function resetUserPasswordAction(userId: string): Promise<ActionRes
     return { success: false, error: "User not found" };
   }
 
-  const { data, error } = await admin.auth.admin.generateLink({
-    type: "recovery",
-    email: target.email,
-  });
-
-  if (error) return { success: false, error: error.message };
+  const { sendPasswordResetEmail } = await import("@/lib/auth/auth-email");
+  const mail = await sendPasswordResetEmail(target.email);
+  if (!mail.success) return { success: false, error: mail.error ?? "Failed to send reset email" };
 
   await logAdminAction(session, "admin.user.password_reset", "profile", userId);
 
   revalidatePath("/admin/customers");
   revalidatePath("/admin/users");
-  return { success: true, link: data.properties?.action_link };
+  return { success: true };
 }

@@ -4,8 +4,13 @@ import { Container } from "@/components/ui/Container";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMarketplaceCartItemCount } from "@/modules/marketplace/cart/queries";
-import { CommerceAuthActions } from "@/components/marketplace/CommerceAuthActions";
 
+/**
+ * Marketplace sub-navigation.
+ * CommerceAuthActions removed — authentication is handled exclusively at /login.
+ *
+ * Classification: Public Website
+ */
 export async function MarketplaceSubNav() {
   const profile = await getCurrentProfile();
   const cartCount =
@@ -39,7 +44,6 @@ export async function MarketplaceSubNav() {
           <Heart className="h-3.5 w-3.5" aria-hidden />
           Wishlist
         </Link>
-        <CommerceAuthActions isSignedIn={Boolean(profile)} />
       </Container>
     </div>
   );

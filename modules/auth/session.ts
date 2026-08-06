@@ -1,8 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
+import { auth } from "@/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 
 export type UserSessionRecord = {
   id: string;
@@ -20,8 +20,8 @@ export async function trackUserSession(userId: string): Promise<void> {
   const forwarded = headerStore.get("x-forwarded-for");
   const ip = forwarded?.split(",")[0]?.trim();
 
-  const supabase = await createClient();
-  await supabase.from("user_sessions").insert({
+  const admin = createAdminClient();
+  await admin.from("user_sessions").insert({
     user_id: userId,
     user_agent: userAgent ?? null,
     ip_address: ip ?? null,
@@ -30,8 +30,8 @@ export async function trackUserSession(userId: string): Promise<void> {
 }
 
 export async function enforceSingleSession(userId: string): Promise<void> {
-  const supabase = await createClient();
-  const { data: profile } = await supabase
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("profiles")
     .select("single_session_enabled")
     .eq("id", userId)
@@ -39,14 +39,23 @@ export async function enforceSingleSession(userId: string): Promise<void> {
 
   if (!profile?.single_session_enabled) return;
 
-  try {
-    const admin = createAdminClient();
-    await admin.auth.admin.signOut(userId, "others");
-  } catch {
-    // Service role not configured in dev
+  // Keep the newest Auth.js session; revoke older DB sessions.
+  const { data: sessions } = await admin
+    .from("authjs_sessions")
+    .select("sessionToken, expires")
+    .eq("userId", userId)
+    .order("expires", { ascending: false });
+
+  if (sessions && sessions.length > 1) {
+    const keep = (sessions[0] as { sessionToken: string }).sessionToken;
+    await admin
+      .from("authjs_sessions")
+      .delete()
+      .eq("userId", userId)
+      .neq("sessionToken", keep);
   }
 
-  await supabase
+  await admin
     .from("user_sessions")
     .update({ revoked_at: new Date().toISOString() })
     .eq("user_id", userId)
@@ -54,14 +63,16 @@ export async function enforceSingleSession(userId: string): Promise<void> {
 }
 
 export async function listUserSessions(): Promise<UserSessionRecord[]> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+  const session = await auth();
+  if (!session?.user?.id) return [];
 
-  const { data } = await supabase
+  const admin = createAdminClient();
+  const { data } = await admin
     .from("user_sessions")
-    .select("id, user_agent, ip_address, created_at, last_seen_at, expires_at, revoked_at")
-    .eq("user_id", user.id)
+    .select(
+      "id, user_agent, ip_address, created_at, last_seen_at, expires_at, revoked_at",
+    )
+    .eq("user_id", session.user.id)
     .is("revoked_at", null)
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false })
@@ -70,11 +81,14 @@ export async function listUserSessions(): Promise<UserSessionRecord[]> {
   return (data ?? []) as UserSessionRecord[];
 }
 
-export async function revokeCurrentSessionsOnLogout(userId: string): Promise<void> {
-  const supabase = await createClient();
-  await supabase
+export async function revokeCurrentSessionsOnLogout(
+  userId: string,
+): Promise<void> {
+  const admin = createAdminClient();
+  await admin
     .from("user_sessions")
     .update({ revoked_at: new Date().toISOString() })
     .eq("user_id", userId)
     .is("revoked_at", null);
+  await admin.from("authjs_sessions").delete().eq("userId", userId);
 }

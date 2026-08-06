@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { ArrowLeftRight } from "lucide-react";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
+
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getCustomerWalletSummary } from "@/modules/wallet/repository";
 import { formatDateTime } from "@/utils/format";
@@ -15,7 +15,9 @@ import {
 
 export default async function CustomerWalletPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/wallet" }));
+  if (!profile) {
+  redirect("/login?redirect=/customer/wallet");
+}
 
   const { profile: customerProfile, wallets, transactions } =
     await getCustomerWalletSummary(profile.id);

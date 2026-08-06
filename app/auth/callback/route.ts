@@ -1,81 +1,64 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
 import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { enforceSingleSession, trackUserSession } from "@/modules/auth/session";
 
-function commerceAuthFailureRedirect(
-  origin: string,
-  options: {
-    redirect?: string | null;
-    intent?: string | null;
-    message?: string;
-  },
-): NextResponse {
-  const role =
-    options.intent === "merchant" || options.intent === "customer"
-      ? options.intent
-      : undefined;
-
-  return NextResponse.redirect(
-    `${origin}${commerceAuthHref({
-      auth: "signin",
-      redirect:
-        options.redirect && isValidRedirect(options.redirect) ? options.redirect : undefined,
-      role,
-      message: options.message ?? "auth_callback_failed",
-    })}`,
-  );
-}
-
+/**
+ * Post-auth landing used after Auth.js OAuth (Google) and email verification.
+ * Supabase exchangeCodeForSession has been removed.
+ */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code");
   const redirect = searchParams.get("redirect");
   const intent = searchParams.get("intent");
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (!error) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        await enforceSingleSession(user.id);
-        await trackUserSession(user.id).catch(() => undefined);
-
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role, profile_completed")
-          .eq("id", user.id)
-          .single();
-
-        if (!user.email_confirmed_at) {
-          return NextResponse.redirect(`${origin}/verify-email`);
-        }
-
-        if (!profile || !profile.profile_completed) {
-          const params = new URLSearchParams();
-          if (intent) params.set("intent", intent);
-          const qs = params.toString();
-          return NextResponse.redirect(
-            `${origin}/auth/complete-profile${qs ? `?${qs}` : ""}`,
-          );
-        }
-
-        if (redirect && isValidRedirect(redirect)) {
-          return NextResponse.redirect(`${origin}${redirect}`);
-        }
-
-        return NextResponse.redirect(`${origin}${getDashboardPath(profile?.role)}`);
-      }
-    }
-
-    return commerceAuthFailureRedirect(origin, { redirect, intent });
+  const session = await auth();
+  if (!session?.user?.id) {
+    const role =
+      intent === "merchant" || intent === "customer" ? intent : undefined;
+    const loginUrl = new URL("/login", origin);
+    if (redirect && isValidRedirect(redirect)) loginUrl.searchParams.set("redirect", redirect);
+    if (role) loginUrl.searchParams.set("role", role);
+    loginUrl.searchParams.set("message", "auth_callback_failed");
+    return NextResponse.redirect(loginUrl.toString());
   }
 
-  return commerceAuthFailureRedirect(origin, { redirect, intent });
+  const userId = session.user.id;
+  await enforceSingleSession(userId).catch(() => undefined);
+  await trackUserSession(userId).catch(() => undefined);
+
+  const admin = createAdminClient();
+  const { data: authUser } = await admin
+    .from("authjs_users")
+    .select("emailVerified")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!(authUser as { emailVerified?: string | null } | null)?.emailVerified) {
+    return NextResponse.redirect(`${origin}/verify-email`);
+  }
+
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("role, profile_completed")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!profile || !(profile as { profile_completed: boolean }).profile_completed) {
+    const params = new URLSearchParams();
+    if (intent) params.set("intent", intent);
+    const qs = params.toString();
+    return NextResponse.redirect(
+      `${origin}/auth/complete-profile${qs ? `?${qs}` : ""}`,
+    );
+  }
+
+  if (redirect && isValidRedirect(redirect)) {
+    return NextResponse.redirect(`${origin}${redirect}`);
+  }
+
+  return NextResponse.redirect(
+    `${origin}${getDashboardPath((profile as { role: string }).role)}`,
+  );
 }

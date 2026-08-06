@@ -29,6 +29,40 @@ async function uploadProductImage(
   return data.publicUrl;
 }
 
+/** ATLAS Core — notify marketplace / pulse / search / AI when a product goes live. */
+async function emitProductPublished(input: {
+  productId: string;
+  storeId: string;
+  businessId: string | null;
+  actorId: string;
+  name: string;
+  price?: number;
+  currency?: string;
+}): Promise<void> {
+  try {
+    const { randomUUID } = await import("node:crypto");
+    const { publishDomainEvent } = await import("@/domains/events/bus");
+    await publishDomainEvent({
+      id: randomUUID(),
+      name: "product.published",
+      occurredAt: new Date(),
+      actorId: input.actorId,
+      businessId: input.businessId,
+      payload: {
+        productId: input.productId,
+        storeId: input.storeId,
+        name: input.name,
+        title: input.name,
+        price: input.price,
+        currency: input.currency,
+      },
+      correlationId: randomUUID(),
+    });
+  } catch {
+    /* non-fatal */
+  }
+}
+
 async function syncProductCatalogData(
   supabase: Awaited<ReturnType<typeof createClient>>,
   productId: string,
@@ -98,7 +132,7 @@ function parseSpecifications(raw: FormDataEntryValue | null): Record<string, str
 export async function createCategoryAction(
   formData: FormData
 ): Promise<CatalogActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
 
   if (!store) {
@@ -150,7 +184,7 @@ export async function updateCategoryAction(
   categoryId: string,
   formData: FormData
 ): Promise<CatalogActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
 
   if (!store) {
@@ -187,7 +221,7 @@ export async function updateCategoryAction(
 export async function deleteCategoryAction(
   categoryId: string
 ): Promise<CatalogActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
 
   if (!store) {
@@ -232,7 +266,7 @@ export async function deleteCategoryFormAction(formData: FormData): Promise<void
 export async function createProductAction(
   formData: FormData
 ): Promise<CatalogActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
 
   if (!store) {
@@ -272,6 +306,7 @@ export async function createProductAction(
     .from("products")
     .insert({
       store_id: store.id,
+      business_id: store.business_id ?? null,
       name: parsed.data.name,
       description: parsed.data.description ?? null,
       price: parsed.data.price,
@@ -293,6 +328,18 @@ export async function createProductAction(
 
   await syncProductCatalogData(supabase, data.id, parsed.data.stock, imageUrl);
 
+  if (parsed.data.isActive) {
+    await emitProductPublished({
+      productId: data.id,
+      storeId: store.id,
+      businessId: store.business_id ?? null,
+      actorId: profile.id,
+      name: parsed.data.name,
+      price: parsed.data.price,
+      currency: parsed.data.currency,
+    });
+  }
+
   revalidatePath("/merchant/products");
   revalidatePath("/marketplace");
   return { success: true, productId: data.id, redirectTo: "/merchant/products" };
@@ -302,7 +349,7 @@ export async function updateProductAction(
   productId: string,
   formData: FormData
 ): Promise<CatalogActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
 
   if (!store) {
@@ -373,9 +420,20 @@ export async function updateProductAction(
     imageUrl ?? null
   );
 
+  if (parsed.data.isActive) {
+    await emitProductPublished({
+      productId,
+      storeId: store.id,
+      businessId: store.business_id ?? null,
+      actorId: profile.id,
+      name: parsed.data.name,
+      price: parsed.data.price,
+      currency: parsed.data.currency,
+    });
+  }
+
   revalidatePath("/merchant/products");
   revalidatePath(`/merchant/products/${productId}/edit`);
-  revalidatePath("/marketplace");
   revalidatePath("/marketplace");
   return { success: true, redirectTo: "/merchant/products" };
 }
@@ -383,7 +441,7 @@ export async function updateProductAction(
 export async function deleteProductAction(
   productId: string
 ): Promise<CatalogActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
 
   if (!store) {
@@ -409,7 +467,7 @@ export async function toggleProductActiveAction(
   productId: string,
   isActive: boolean
 ): Promise<CatalogActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
 
   if (!store) {
@@ -427,7 +485,25 @@ export async function toggleProductActiveAction(
     return { success: false, error: error.message };
   }
 
+  if (isActive) {
+    const { data: product } = await supabase
+      .from("products")
+      .select("name, price, currency")
+      .eq("id", productId)
+      .single();
+    await emitProductPublished({
+      productId,
+      storeId: store.id,
+      businessId: store.business_id ?? null,
+      actorId: profile.id,
+      name: product?.name ?? "Product",
+      price: product?.price != null ? Number(product.price) : undefined,
+      currency: product?.currency ?? undefined,
+    });
+  }
+
   revalidatePath("/merchant/products");
+  revalidatePath("/marketplace");
   return { success: true };
 }
 

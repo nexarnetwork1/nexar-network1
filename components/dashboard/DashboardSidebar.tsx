@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { DashboardNavSection } from "@/config/dashboard-nav";
+import { AtlasLogo } from "@/components/ui/AtlasLogo";
 import { DashboardNavList } from "./DashboardNavList";
 
 type DashboardSidebarProps = {
@@ -42,17 +43,28 @@ export function DashboardSidebar({
     >
       <div
         className={cn(
-          "flex h-16 shrink-0 items-center gap-2 border-b border-border px-3",
-          collapsed && "justify-center px-0",
+          "flex shrink-0 items-center gap-2 border-b border-border",
+          collapsed ? "h-auto flex-col px-0 py-2" : "h-16 px-3",
         )}
       >
-        {!collapsed && (
+        {!collapsed ? (
           <Link
             href={brandHref}
-            className="flex min-w-0 flex-1 flex-col rounded-lg px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+            className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 rounded-lg px-2 py-1 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+            aria-label={`${brand}${subtitle ? ` — ${subtitle}` : ""}`}
           >
-            <span className="truncate font-heading text-sm font-semibold text-gold">{brand}</span>
-            {subtitle && <span className="truncate text-[11px] text-muted">{subtitle}</span>}
+            <AtlasLogo height={34} className="max-w-full" decorative />
+            {subtitle && (
+              <span className="truncate pl-0.5 text-[11px] text-muted">{subtitle}</span>
+            )}
+          </Link>
+        ) : (
+          <Link
+            href={brandHref}
+            className="flex h-10 w-10 items-center justify-center rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+            aria-label={brand}
+          >
+            <AtlasLogo height={26} decorative />
           </Link>
         )}
 

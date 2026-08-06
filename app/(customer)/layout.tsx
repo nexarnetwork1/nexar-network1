@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
+import { ATLAS_BRAND, ATLAS_PORTAL_SUBTITLES } from "@/config/atlas-branding";
 import { DashboardShell } from "@/components/dashboard";
 import { customerNav } from "@/config/dashboard-nav";
 import { privateAreaMetadata } from "@/lib/constants/seo";
@@ -21,7 +21,7 @@ export default async function CustomerLayout({
   const profile = await getCurrentProfile();
 
   if (!profile || profile.role !== "customer") {
-    redirect(commerceAuthHref({ auth: "signin", redirect: "/customer" }));
+    redirect(`/login?redirect=/customer`);
   }
 
   const supabase = await createClient();
@@ -35,9 +35,9 @@ export default async function CustomerLayout({
     <CommerceAuthShell>
       <DashboardShell
         sections={customerNav({ pendingInvoices })}
-        brand="Nexar Commerce"
+        brand={ATLAS_BRAND.name}
         brandHref="/customer"
-        subtitle="Customer account"
+        subtitle={ATLAS_PORTAL_SUBTITLES.customer}
         storageKey="customer"
         actions={
           <>

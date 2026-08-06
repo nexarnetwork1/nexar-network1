@@ -63,8 +63,13 @@ export const siteMetadata: Metadata = {
   // every route, so a canonical set at this level would point all ~110 pages
   // at the homepage. Pages declare their own via `canonical()` below.
   icons: {
-    icon: [{ url: "/icon", type: "image/png" }],
-    apple: [{ url: "/apple-icon", type: "image/png" }],
+    icon: [
+      { url: "/brand/atlas/atlas-icon-512.png", type: "image/png", sizes: "512x512" },
+      { url: "/icon", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [
+      { url: "/apple-icon", type: "image/png", sizes: "180x180" },
+    ],
   },
 };
 

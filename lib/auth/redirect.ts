@@ -1,9 +1,14 @@
 import type { UserRole } from "@/types";
 
 const DASHBOARD_PATHS: Record<UserRole, string> = {
-  customer: "/marketplace",
-  merchant: "/merchant",
-  admin: "/admin/dashboard",
+  // All roles enter ATLAS at /dashboard. The workspace layout resolves
+  // the correct module tree per role from ATLAS_ROOT_MODULES.
+  customer: "/dashboard",
+  merchant: "/dashboard",
+  business: "/dashboard",
+  admin: "/dashboard",
+  super_admin: "/dashboard",
+  platform_owner: "/dashboard",
 };
 
 const MAX_REDIRECT_LENGTH = 2048;
@@ -12,7 +17,8 @@ export function getDashboardPath(role: UserRole | string | undefined): string {
   if (role && role in DASHBOARD_PATHS) {
     return DASHBOARD_PATHS[role as UserRole];
   }
-  return "/";
+  // Authenticated users without a known role are incomplete — never dump to Home.
+  return "/auth/complete-profile";
 }
 
 /**

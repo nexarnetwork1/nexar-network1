@@ -17,13 +17,13 @@ export const NAVIGATION_ACTIONS: ActionDef[] = [
   { label: "Open Wallet", href: "/customer/wallet", roles: ["customer"], keywords: ["wallet"] },
   {
     label: "Become a Merchant",
-    href: `${MARKETPLACE_ROUTES.root}?auth=register&role=merchant`,
+    href: "/login?mode=register&role=merchant",
     roles: ["guest", "customer"],
     keywords: ["merchant", "sell", "register"],
   },
   {
     label: "Register Merchant",
-    href: `${MARKETPLACE_ROUTES.root}?auth=register&role=merchant`,
+    href: "/login?mode=register&role=merchant",
     roles: ["guest", "customer"],
     keywords: ["register merchant"],
   },
@@ -41,7 +41,7 @@ export const NAVIGATION_ACTIONS: ActionDef[] = [
   { label: "Open Contact", href: "/#contact", keywords: ["contact"] },
   { label: "Open FAQ", href: `${MARKETPLACE_ROUTES.root}#faq`, keywords: ["faq"] },
   { label: "NXR Market", href: "/market", keywords: ["nxr", "buy nxr", "market"] },
-  { label: "Sign In", href: `${MARKETPLACE_ROUTES.root}?auth=signin`, roles: ["guest"], keywords: ["sign in", "login"] },
+  { label: "Sign In", href: "/login", roles: ["guest"], keywords: ["sign in", "login"] },
   { label: "Privacy Policy", href: "/privacy", keywords: ["privacy"] },
   { label: "Terms of Service", href: "/terms", keywords: ["terms"] },
 ];

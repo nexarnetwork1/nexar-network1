@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getStoreCategories } from "@/modules/catalog/repository";
@@ -9,7 +8,9 @@ import { DashboardSection } from "@/components/dashboard";
 
 export default async function NewProductPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/products/new" }));
+ if (!profile) {
+  redirect("/login?redirect=/merchant/products/new");
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant/products");

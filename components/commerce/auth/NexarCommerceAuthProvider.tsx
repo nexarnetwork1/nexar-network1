@@ -9,10 +9,11 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import type {
-  CommerceAuthMode,
-  CommerceAuthRole,
-} from "@/lib/commerce/commerce-auth-url";
+
+type CommerceAuthMode = "signin" | "register";
+
+type CommerceAuthRole = "customer" | "merchant";
+
 import { safeRedirect } from "@/lib/auth/redirect";
 import { NexarCommerceAuthModal } from "@/components/commerce/auth/NexarCommerceAuthModal";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -68,6 +69,7 @@ export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProvide
   const closeCommerceAuth = useCallback(() => {
     setOpen(false);
     setMessage(null);
+    // Don't navigate anywhere - just close the modal
   }, []);
 
   const handleSuccess = useCallback(

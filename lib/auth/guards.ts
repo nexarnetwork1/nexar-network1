@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Profile, UserRole } from "@/types";
 
 export class AuthorizationError extends Error {
@@ -9,21 +10,18 @@ export class AuthorizationError extends Error {
 }
 
 export async function requireAuthenticatedProfile(
-  roles?: UserRole[]
+  roles?: UserRole[],
 ): Promise<Profile> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
     throw new AuthorizationError("Not authenticated");
   }
 
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await createAdminClient()
     .from("profiles")
     .select("*")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
   if (error || !profile) {
@@ -38,31 +36,53 @@ export async function requireAuthenticatedProfile(
 }
 
 export async function requireStoreOwner(storeId: string): Promise<Profile> {
-  const profile = await requireAuthenticatedProfile(["merchant"]);
+  const profile = await requireAuthenticatedProfile(["merchant", "business"]);
+  const admin = createAdminClient();
 
-  const supabase = await createClient();
-  const { data: store } = await supabase
+  const { data: store } = await admin
     .from("stores")
-    .select("id")
+    .select("id, owner_id, business_id")
     .eq("id", storeId)
-    .eq("owner_id", profile.id)
     .maybeSingle();
 
   if (!store) {
     throw new AuthorizationError("Store access denied");
   }
 
-  return profile;
+  if (store.owner_id === profile.id) {
+    return profile;
+  }
+
+  // Business Hub membership: allow owner/admin/manager of the parent business.
+  if (store.business_id) {
+    const { data: membership } = await admin
+      .from("business_memberships")
+      .select("role")
+      .eq("business_id", store.business_id)
+      .eq("user_id", profile.id)
+      .eq("status", "active")
+      .maybeSingle();
+    if (
+      membership &&
+      ["owner", "admin", "manager"].includes(
+        (membership as { role: string }).role,
+      )
+    ) {
+      return profile;
+    }
+  }
+
+  throw new AuthorizationError("Store access denied");
 }
 
 export async function requireOrderAccess(
   orderId: string,
-  roles: UserRole[]
+  roles: UserRole[],
 ): Promise<{ profile: Profile; order: { customer_id: string; store_id: string } }> {
   const profile = await requireAuthenticatedProfile(roles);
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: order } = await supabase
+  const { data: order } = await admin
     .from("orders")
     .select("customer_id, store_id")
     .eq("id", orderId)
@@ -76,15 +96,36 @@ export async function requireOrderAccess(
     throw new AuthorizationError("Order access denied");
   }
 
-  if (profile.role === "merchant") {
-    const { data: store } = await supabase
+  if (profile.role === "merchant" || profile.role === "business") {
+    const { data: store } = await admin
       .from("stores")
-      .select("id")
+      .select("id, owner_id, business_id")
       .eq("id", order.store_id)
-      .eq("owner_id", profile.id)
       .maybeSingle();
 
     if (!store) {
+      throw new AuthorizationError("Order access denied");
+    }
+
+    const isOwner = store.owner_id === profile.id;
+    let isBusinessMember = false;
+    if (!isOwner && store.business_id) {
+      const { data: membership } = await admin
+        .from("business_memberships")
+        .select("role")
+        .eq("business_id", store.business_id)
+        .eq("user_id", profile.id)
+        .eq("status", "active")
+        .maybeSingle();
+      isBusinessMember = Boolean(
+        membership &&
+          ["owner", "admin", "manager", "staff"].includes(
+            (membership as { role: string }).role,
+          ),
+      );
+    }
+
+    if (!isOwner && !isBusinessMember) {
       throw new AuthorizationError("Order access denied");
     }
   }

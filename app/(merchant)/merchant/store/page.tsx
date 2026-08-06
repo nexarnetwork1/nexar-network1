@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
+
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore, getStoreSettings, getStoreQrCodes } from "@/modules/stores/repository";
 import { getActiveStorePromotion } from "@/modules/promotions/repository";
@@ -10,7 +10,9 @@ import { formatDate } from "@/utils/format";
 
 export default async function MerchantStorePage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/store" }));
+  if (!profile) {
+  redirect("/login?redirect=/merchant/store");
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

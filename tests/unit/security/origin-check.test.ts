@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isSameOriginRequest, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 function requestWith(headers: Record<string, string>): Request {
-  return new Request("https://nexarnetwork.org/api/admin/wallet/logout", {
+  return new Request("https://nexarnetwork.org/api/admin/export/orders", {
     method: "POST",
     headers: { host: "nexarnetwork.org", ...headers },
   });

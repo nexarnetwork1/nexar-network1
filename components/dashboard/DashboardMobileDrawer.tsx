@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { CloseButton } from "@/components/ui/CloseButton";
+import { AtlasLogo } from "@/components/ui/AtlasLogo";
 import type { DashboardNavSection } from "@/config/dashboard-nav";
 import { DashboardNavList } from "./DashboardNavList";
 
@@ -92,17 +93,19 @@ export function DashboardMobileDrawer({
             id="dashboard-mobile-nav"
             role="dialog"
             aria-modal="true"
-            aria-label="Dashboard navigation"
+            aria-label={`${brand} navigation`}
             className="fixed inset-y-0 left-0 z-[80] flex h-dvh w-[min(20rem,86vw)] flex-col border-r border-border bg-background-secondary/90 backdrop-blur-2xl will-change-transform md:hidden"
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", stiffness: 380, damping: 36 }}
           >
-            <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
-              <div className="min-w-0">
-                <p className="truncate font-heading text-sm font-semibold text-gold">{brand}</p>
-                {subtitle && <p className="truncate text-[11px] text-muted">{subtitle}</p>}
+            <div className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-border px-4">
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <AtlasLogo height={30} decorative />
+                {subtitle && (
+                  <p className="truncate pl-0.5 text-[11px] text-muted">{subtitle}</p>
+                )}
               </div>
               <CloseButton ref={closeRef} onClick={onClose} size="md" label="Close navigation" />
             </div>

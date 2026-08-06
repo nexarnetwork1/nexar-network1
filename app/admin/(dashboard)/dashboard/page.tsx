@@ -28,7 +28,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <RealtimeScope userId={session.walletAddress} />
+      <RealtimeScope userId={session.userId} />
 
       <DashboardSection
         as="div"

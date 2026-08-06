@@ -1,5 +1,5 @@
 import { DashboardLoading } from "@/components/dashboard";
 
 export default function MerchantLoading() {
-  return <DashboardLoading variant="page" label="Loading your store" />;
+  return <DashboardLoading variant="branded" label="Loading your workspace" />;
 }

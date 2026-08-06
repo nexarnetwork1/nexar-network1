@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { MarketplaceSubNav } from "@/components/marketplace/MarketplaceSubNav";
-import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 
 export const metadata: Metadata = {
   title: "Nexar Commerce — Enterprise Marketplace",
@@ -8,17 +7,22 @@ export const metadata: Metadata = {
     "Premium enterprise commerce platform powered by the Nexar Network. Live statistics, verified brands, crypto payments, and global merchant infrastructure.",
 };
 
+/**
+ * Public Marketplace layout.
+ * Authentication is handled globally via AppProviders > CommerceAuthShell.
+ * This layout is now a pure public shell with no auth modal.
+ *
+ * Classification: Public Website
+ */
 export default function MarketplaceLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <CommerceAuthShell>
-      <div className="relative min-h-[calc(100vh-var(--nxr-header-offset))]">
-        <MarketplaceSubNav />
-        {children}
-      </div>
-    </CommerceAuthShell>
+    <div className="relative min-h-[calc(100vh-var(--nxr-header-offset))]">
+      <MarketplaceSubNav />
+      {children}
+    </div>
   );
 }

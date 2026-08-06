@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Store, UserRound, Wallet, X } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { usePrivy } from "@privy-io/react-auth";
-import { createClient } from "@/lib/supabase/client";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { markWalletSessionActive } from "@/lib/web3/wallet-session";
 import { useZodForm } from "@/hooks/useZodForm";
@@ -22,10 +22,14 @@ import {
   registerCustomerAction,
   registerMerchantAction,
   resendConfirmationAction,
+  linkOrLoginWalletAction,
 } from "@/modules/auth/actions";
 import { objectToFormData } from "@/utils/form-data";
-import type { CommerceAuthMode, CommerceAuthRole } from "@/lib/commerce/commerce-auth-url";
 import { cn } from "@/lib/utils/cn";
+
+type CommerceAuthMode = "signin" | "register";
+
+type CommerceAuthRole = "customer" | "merchant";
 
 type NexarCommerceAuthModalProps = {
   open: boolean;
@@ -120,7 +124,6 @@ function GoogleConnect({
   redirectTo?: string;
   intent?: CommerceAuthRole;
 }) {
-  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const startedRef = useRef(false);
@@ -132,22 +135,19 @@ function GoogleConnect({
     setError(null);
 
     try {
-      const params = new URLSearchParams();
-      if (redirectTo) params.set("redirect", redirectTo);
-      if (intent) params.set("intent", intent);
-      const suffix = params.toString() ? `?${params.toString()}` : "";
-      const callbackUrl = `${window.location.origin}/auth/callback${suffix}`;
+      const appUrl = (
+        process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin
+      ).replace(/\/$/, "");
+      const callbackUrl = `${appUrl}/auth/callback${
+        redirectTo || intent
+          ? `?${new URLSearchParams({
+              ...(redirectTo ? { redirect: redirectTo } : {}),
+              ...(intent ? { intent } : {}),
+            }).toString()}`
+          : ""
+      }`;
 
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: callbackUrl },
-      });
-
-      if (oauthError) {
-        setError(oauthError.message);
-        startedRef.current = false;
-        setLoading(false);
-      }
+      await signIn("google", { callbackUrl });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed");
       startedRef.current = false;
@@ -172,7 +172,7 @@ function GoogleConnect({
 }
 
 function WalletConnect() {
-  const { login, ready, authenticated } = usePrivy();
+  const { login, ready, authenticated, user } = usePrivy();
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -181,13 +181,28 @@ function WalletConnect() {
       setError("Wallet provider is not configured.");
       return;
     }
-    if (!ready || connecting || authenticated) return;
+    if (!ready || connecting) return;
 
     setConnecting(true);
     setError(null);
     try {
-      await login();
+      if (!authenticated) {
+        await login();
+      }
       markWalletSessionActive();
+      const address =
+        user?.wallet?.address ??
+        (window as unknown as { ethereum?: { selectedAddress?: string } }).ethereum
+          ?.selectedAddress;
+      if (address) {
+        const result = await linkOrLoginWalletAction(address);
+        if (!result.success) {
+          setError(result.error ?? "Wallet link failed");
+        } else if (result.redirectTo) {
+          window.location.href = result.redirectTo;
+          return;
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Wallet connection failed");
     } finally {
@@ -201,7 +216,7 @@ function WalletConnect() {
     <div className="min-w-0 flex-1">
       <button
         type="button"
-        disabled={!isWeb3Configured() || !ready || connecting || authenticated}
+        disabled={!isWeb3Configured() || !ready || connecting}
         onClick={handleWallet}
         className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 text-sm font-medium text-gold transition-all hover:border-gold/40 hover:bg-gold/10 disabled:opacity-60"
       >
@@ -356,12 +371,12 @@ function SignInView({
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold px-4 py-3.5 text-sm font-semibold tracking-wide text-background shadow-[0_0_30px_-10px_rgba(212,175,55,0.55)] transition-all hover:bg-gold-secondary disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
-          {isSubmitting ? "Signing in…" : "Sign in to Commerce"}
+          {isSubmitting ? "Signing in…" : "Sign in to ATLAS"}
         </button>
       </form>
 
       <p className="text-center text-xs text-muted">
-        New to Nexar Commerce?{" "}
+        New to ATLAS?{" "}
         <button type="button" onClick={onSwitchRegister} className="text-gold hover:underline">
           Create an account
         </button>
@@ -457,7 +472,7 @@ function CustomerRegisterView({
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold px-4 py-3.5 text-sm font-semibold text-background hover:bg-gold-secondary disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
-          {isSubmitting ? "Creating account…" : "Create customer account"}
+          {isSubmitting ? "Creating account…" : "Create account"}
         </button>
       </form>
       <p className="text-center text-xs text-muted">
@@ -610,7 +625,7 @@ function MerchantRegisterView({
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold px-4 py-3.5 text-sm font-semibold text-background hover:bg-gold-secondary disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
-          {isSubmitting ? "Creating store…" : "Create merchant account"}
+          {isSubmitting ? "Creating business…" : "Create business account"}
         </button>
       </form>
       <p className="text-center text-xs text-muted">
@@ -679,17 +694,17 @@ export function NexarCommerceAuthModal({
 
           <div className="overflow-y-auto px-6 pb-6 pt-8 sm:px-8 sm:pb-8 sm:pt-9">
             <header className="mb-6 text-center">
-              <p className="text-[10px] tracking-[0.28em] text-gold/80 uppercase">Nexar Commerce</p>
+              <p className="text-[10px] tracking-[0.28em] text-gold/80 uppercase">ATLAS</p>
               <h2
                 id="nxr-commerce-auth-title"
                 className="mt-2 font-heading text-2xl font-semibold tracking-tight text-white"
               >
-                {mode === "signin" ? "Welcome back" : "Join the network"}
+                {mode === "signin" ? "Welcome back" : "Join ATLAS"}
               </h2>
               <p className="mt-2 text-sm text-muted">
                 {mode === "signin"
-                  ? "Sign in to shop, sell, and manage orders."
-                  : "Create your customer or merchant account."}
+                  ? "Access your ATLAS workspace. Manage your business, network, marketplace, payments, and services from one place."
+                  : "Create your account to access the complete business operating system."}
               </p>
             </header>
 

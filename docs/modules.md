@@ -1,6 +1,27 @@
 # Module Documentation
 
-Domain modules live in `modules/`. Each module follows a consistent internal structure.
+Domain modules live in `modules/`. Each module is a capability inside **ATLAS** — see [ATLAS.md](./ATLAS.md).
+
+## ATLAS mapping
+
+| ATLAS module | Code path | Bounded context |
+|--------------|-----------|-----------------|
+| Business | `modules/business-hub/` | `businessHub` |
+| Network | `modules/atlas-network/` | `atlasNetwork` |
+| Pulse | `modules/atlas-pulse/` | `atlasPulse` |
+| Connect | `modules/atlas-connect/` | `atlasConnect` |
+| Marketplace | `modules/atlas-marketplace/` (+ `modules/marketplace/`) | `marketplace` |
+| AI | `modules/atlas-ai/` | `atlasAi` |
+| Apps | `modules/atlas-apps/` | `atlasApps` |
+| Finance | `modules/atlas-finance/` (+ `payments`/`invoices`/`wallet` rails) | `atlasFinance` |
+| Mobile | `modules/atlas-mobile/` | `atlasMobile` |
+| NXR | `modules/atlas-nxr/` (+ `lib/web3` adapters later) | `nxrToken` |
+| Core | `modules/atlas-core/` | `atlasCore` |
+| NEXAR HQ | `modules/atlas-hq/` (+ legacy `app/admin`, `lib/admin`) | `atlasHq` |
+| Wallet | `modules/wallet/` | `wallet` |
+| Finance | `modules/payments/`, `invoices/`, `settlement/` | `payments` |
+
+Root navigation scaffold: `config/atlas-nav.ts`.
 
 ## Module Structure
 
@@ -39,6 +60,7 @@ promotions ─┤
 
 | Module | Responsibility | Key Tables |
 |---|---|---|
+| `business-hub` | ATLAS Business — company aggregate, membership, store linkage | `businesses`, `business_memberships` |
 | `auth` | Login, register, OAuth, profile completion | `profiles` |
 | `users` | User profile CRUD | `profiles` |
 | `stores` | Merchant store management | `stores` |

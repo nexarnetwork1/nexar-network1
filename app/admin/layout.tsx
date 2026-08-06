@@ -4,8 +4,8 @@ import { privateAreaMetadata } from "@/lib/constants/seo";
 
 export const metadata: Metadata = {
   ...privateAreaMetadata,
-  title: "Nexar CMS",
-  description: "Nexar Network Control Center",
+  title: "NEXAR HQ",
+  description: "NEXAR NETWORK — ATLAS internal platform administration",
 };
 
 export default function AdminLayout({

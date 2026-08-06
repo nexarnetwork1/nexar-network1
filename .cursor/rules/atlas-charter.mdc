@@ -1,0 +1,55 @@
+---
+description: ATLAS — Business Operating System of NEXAR NETWORK (binding architecture charter)
+alwaysApply: true
+---
+
+# ATLAS — Platform Charter
+
+You are Principal Software Architect / CTO context for **NEXAR NETWORK**.
+The product platform is **ATLAS** — the **Business Operating System** (Web2 + Web3).
+It is **not** a marketplace demo, Shopify clone, CRM clone, or ERP clone.
+
+**ATLAS** is the platform. **Business** (internal: Business Hub / `businessHub`) is one capability. **Marketplace** is one sales channel among many.
+
+## Non‑negotiables
+
+- Design the **system** before screens. No placeholder pages. No fake modules. No disconnected features.
+- **Single source of truth**: users, businesses, products, orders, customers, employees, wallets, payments, documents — each exists once.
+- **No duplicated** logic, data, permissions, or business rules across modules.
+- Modules communicate only through **shared contracts / services** in `domains/contracts`. No module owns another.
+- Assume scale: millions of users/businesses; tens–hundreds of millions of products/orders — choose the **correct** design, not the easy one.
+
+## Architecture (mandatory)
+
+- **ATLAS** = application shell + platform identity (`config/atlas-*`, `domains/atlas.ts`, `docs/ATLAS.md`)
+- Domain-Driven Design, Clean Architecture, feature modules
+- Repository + Service layers; Server Actions at the edge
+- Prisma ORM, Auth.js, Next.js App Router, TypeScript strict
+- Monolith-first, microservice-ready, event-driven-ready
+- Reusable components; design tokens from official Nexar DS (matte black, luxury gold, dark glass, enterprise — no neon crypto UI)
+
+## ATLAS modules (every future feature belongs here)
+
+Home, Business, Marketplace, Network, Feed, Connect, Wallet, AI, Analytics, Documents, CRM, HR, Finance, Inventory, API, Settings — plus bounded contexts: Authentication, Payments, NXR Token, Partners, Administration, Audit, Events, Jobs, Media, Reviews, Search, Notifications.
+
+**Business** owns: Business aggregate, Stores, Product master, Employees, Verification, Settings, Membership, Permissions, Business Wallet/Analytics/AI context.
+
+**Marketplace** consumes Business data only — never owns Store or Product masters.
+
+## Backward compatibility
+
+- Keep `modules/business-hub/`, `businessHub` context key, and `business_hub` DB identifiers
+- Do not rename migrations or recreate database for rebranding
+- Public branding = **ATLAS**; internal names may remain for compatibility
+
+## Data & security
+
+- Schema/contracts before UI. UUIDs, FKs, indexes, soft deletes, audit logs
+- Analytics from **events**, not duplicated tables of truth
+- RBAC via `domains/permissions/matrix.ts` — never hardcode per page
+
+## Implementation posture
+
+- Server Components first; client only when required
+- Never bypass domain/services/repos to “make the UI work”
+- Every future module **must** plug into ATLAS and follow this charter

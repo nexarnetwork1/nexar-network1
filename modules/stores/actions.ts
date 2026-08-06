@@ -193,7 +193,7 @@ function buildMarketplaceProfile(parsed: z.infer<typeof marketplaceProfileSchema
 export async function updateStoreSettingsAction(
   formData: FormData
 ): Promise<ActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
   if (!store) return { success: false, error: "Store not found" };
 
@@ -232,7 +232,7 @@ export async function updateStoreSettingsAction(
 export async function updateStoreMarketplaceProfileAction(
   formData: FormData
 ): Promise<ActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
   if (!store) return { success: false, error: "Store not found" };
 
@@ -278,7 +278,7 @@ export async function updateStoreMarketplaceProfileAction(
 export async function updateStoreAppearanceAction(
   formData: FormData
 ): Promise<ActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
   if (!store) return { success: false, error: "Store not found" };
 
@@ -347,7 +347,7 @@ export async function updateStoreAppearanceAction(
 }
 
 export async function saveStoreBuilderAction(formData: FormData): Promise<ActionResult> {
-  const profile = await requireRole(["merchant"]);
+  const profile = await requireRole(["merchant", "business"]);
   const store = await getMerchantStore(profile.id);
   if (!store) return { success: false, error: "Store not found" };
 

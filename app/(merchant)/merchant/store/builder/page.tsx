@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore, getStoreSettings } from "@/modules/stores/repository";
@@ -8,7 +7,9 @@ import { StoreBuilder } from "@/components/merchant/StoreBuilder";
 
 export default async function StoreBuilderPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant/store/builder" }));
+  if (!profile) {
+  redirect("/login?redirect=/merchant/store/builder");
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

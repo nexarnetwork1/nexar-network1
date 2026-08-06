@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils/cn";
-import { Logo } from "@/components/ui/Logo";
+import { AtlasLogo } from "@/components/ui/AtlasLogo";
 
 type AuthCardProps = {
   title: string;
@@ -12,17 +12,14 @@ export function AuthCard({ title, subtitle, children, className }: AuthCardProps
   return (
     <div
       className={cn(
-        "nxr-card luxury-border mx-auto w-full max-w-[22rem] p-6 sm:max-w-[24rem] sm:p-7",
+        "nxr-card luxury-border animate-atlas-fade-in mx-auto w-full max-w-[22rem] p-6 sm:max-w-[24rem] sm:p-7",
         className,
       )}
     >
-      <div className="mb-4 flex justify-center">
-        <Logo showText={false} />
+      <div className="mb-5 flex justify-center">
+        <AtlasLogo height={44} priority />
       </div>
-      <p className="text-center text-[10px] font-semibold tracking-[0.22em] text-gold uppercase">
-        Nexar Network
-      </p>
-      <h1 className="mt-2 text-center font-heading text-xl font-bold tracking-tight text-white">
+      <h1 className="text-center font-heading text-xl font-bold tracking-tight text-white">
         {title}
       </h1>
       {subtitle && (

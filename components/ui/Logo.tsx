@@ -1,35 +1,34 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
-import { SITE } from "@/lib/constants/site";
+import { AtlasLogo } from "@/components/ui/AtlasLogo";
 
 type LogoProps = {
   className?: string;
+  /**
+   * @deprecated Official lockup already includes wordmark + byline.
+   * Kept for call-site compatibility; ignored.
+   */
   showText?: boolean;
+  /**
+   * @deprecated ATLAS is the only platform mark. Ignored.
+   */
+  brand?: "atlas" | "nexar";
+  priority?: boolean;
+  /** Image height in pixels. */
+  height?: number;
 };
 
-export function Logo({ className, showText = true }: LogoProps) {
+/**
+ * Platform logo entry — always the official ATLAS lockup.
+ * Prefer `AtlasLogo` for sized/decorative use; `Logo` for nav/footer defaults.
+ */
+export function Logo({
+  className,
+  priority = true,
+  height = 40,
+}: LogoProps) {
   return (
-    <div className={cn("flex items-center gap-3", className)}>
-      <div className="relative flex h-10 w-auto items-center justify-center">
-        <Image
-          src="/images/logo.png"
-          alt="Nexar Network Logo"
-          width={160}
-          height={40}
-          className="h-10 w-auto"
-          priority
-        />
-      </div>
-      {showText && (
-        <div className="flex flex-col leading-none">
-          <span className="font-heading text-sm font-semibold tracking-[0.18em] text-white uppercase">
-            Nexar Network
-          </span>
-          <span className="font-mono text-[10px] tracking-[0.35em] text-gold-secondary/80 uppercase">
-            {SITE.ticker}
-          </span>
-        </div>
-      )}
+    <div className={cn("flex items-center", className)}>
+      <AtlasLogo height={height} priority={priority} />
     </div>
   );
 }

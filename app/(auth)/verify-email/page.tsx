@@ -1,22 +1,25 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { ResendConfirmationForm } from "./ResendConfirmationForm";
 import { Button } from "@/components/ui/Button";
 import { signOutAction } from "@/modules/auth/actions";
 
 export default async function VerifyEmailPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const session = await auth();
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  if (user.email_confirmed_at) {
+  const { data: user } = await createAdminClient()
+    .from("authjs_users")
+    .select("email, emailVerified")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if ((user as { emailVerified?: string | null } | null)?.emailVerified) {
     redirect("/dashboard");
   }
 
@@ -26,12 +29,22 @@ export default async function VerifyEmailPage() {
       subtitle="We sent a confirmation link to your inbox"
     >
       <p className="text-sm text-muted">
-        Confirm <span className="text-white">{user.email}</span> to access your
-        account. Check spam if you don&apos;t see the email within a few minutes.
+        Confirm{" "}
+        <span className="text-white">
+          {(user as { email?: string } | null)?.email ?? session.user.email}
+        </span>{" "}
+        to access your account. Check spam if you don&apos;t see the email within
+        a few minutes.
       </p>
 
       <div className="mt-6">
-        <ResendConfirmationForm email={user.email ?? ""} />
+        <ResendConfirmationForm
+          email={
+            (user as { email?: string } | null)?.email ??
+            session.user.email ??
+            ""
+          }
+        />
       </div>
 
       <form action={signOutAction} className="mt-8">
@@ -42,8 +55,8 @@ export default async function VerifyEmailPage() {
 
       <p className="mt-6 text-center text-sm text-muted">
         Wrong account?{" "}
-        <Link href="/login" className="text-gold hover:text-gold-secondary">
-          Use a different email
+        <Link href="/login" className="text-gold hover:underline">
+          Sign in
         </Link>
       </p>
     </AuthCard>

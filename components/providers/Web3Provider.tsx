@@ -7,7 +7,6 @@ import { WagmiProvider } from "@privy-io/wagmi";
 import { bsc } from "wagmi/chains";
 
 import { config, privyAppId } from "@/lib/web3/config";
-import { TreasuryAdminAutoVerify } from "@/components/web3/TreasuryAdminAutoVerify";
 import { WalletSessionManager } from "@/components/web3/WalletSessionManager";
 
 export function Web3Provider({
@@ -44,7 +43,6 @@ export function Web3Provider({
       >
         <WagmiProvider config={config} reconnectOnMount>
           <WalletSessionManager />
-          <TreasuryAdminAutoVerify />
           {children}
         </WagmiProvider>
       </PrivyProvider>

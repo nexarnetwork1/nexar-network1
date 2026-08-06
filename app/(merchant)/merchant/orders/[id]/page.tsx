@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { PackageOpen } from "lucide-react";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getOrderById } from "@/modules/orders/repository";
@@ -30,7 +29,9 @@ type Props = { params: Promise<{ id: string }> };
 export default async function MerchantOrderDetailPage({ params }: Props) {
   const { id } = await params;
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: `/merchant/orders/${id}` }));
+  if (!profile) {
+  redirect("/login?redirect=" + encodeURIComponent(`/merchant/orders/${id}`));
+}
 
   const store = await getMerchantStore(profile.id);
   if (!store) redirect("/merchant");

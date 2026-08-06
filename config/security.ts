@@ -12,8 +12,19 @@ export const securityConfig = {
   protectedPrefixes: ["/customer", "/merchant", "/admin", "/dashboard", "/profile", "/wallet", "/orders", "/invoices", "/settings", "/treasury", "/security"],
   roleRoutes: {
     customer: ["/customer", "/dashboard", "/profile", "/wallet", "/orders", "/invoices"],
-    merchant: ["/merchant"],
-    admin: ["/admin"],
+    merchant: ["/merchant", "/dashboard"],
+    business: ["/merchant", "/business", "/dashboard"],
+    admin: ["/admin", "/dashboard"],
+    super_admin: ["/admin", "/dashboard", "/settings", "/treasury", "/security"],
+    platform_owner: [
+      "/dashboard",
+      "/admin",
+      "/merchant",
+      "/settings",
+      "/treasury",
+      "/security",
+      "/profile",
+    ],
   },
   headers: {
     contentSecurityPolicy: true,

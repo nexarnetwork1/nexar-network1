@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
-import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 import { captureException } from "@/lib/monitoring/sentry";
+import { ATLAS_ASSETS, ATLAS_BRAND } from "@/config/atlas-branding";
 
+/**
+ * Root error boundary — cannot rely on app chrome / CSS modules.
+ * Inline styles keep ATLAS branding even when the layout tree fails.
+ */
 export default function GlobalError({
   error,
   reset,
@@ -18,42 +21,119 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <body className="flex min-h-screen items-center justify-center bg-[#050505] px-6 text-white">
-        <div className="mx-auto w-full max-w-md rounded-2xl border border-[#1a1a1a] bg-[#101010]/80 p-8 text-center backdrop-blur-2xl">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10">
-            <AlertTriangle className="h-7 w-7 text-red-400" aria-hidden />
-          </div>
-          <h1 className="text-2xl font-semibold text-[#d4af37]">Something went wrong</h1>
-          <p className="mt-3 text-sm leading-relaxed text-[#9a9a9a]">
+      <body
+        style={{
+          margin: 0,
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#050505",
+          color: "#ffffff",
+          fontFamily:
+            "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
+          padding: "24px",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 420,
+            borderRadius: 12,
+            border: "1px solid rgba(212, 175, 55, 0.14)",
+            background: "#1a1a1a",
+            padding: 32,
+            textAlign: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={ATLAS_ASSETS.logoPrimary}
+            alt={`${ATLAS_BRAND.name} by NEXAR NETWORK`}
+            width={180}
+            height={48}
+            style={{ height: 48, width: "auto", margin: "0 auto 20px" }}
+          />
+          <p
+            style={{
+              margin: 0,
+              fontSize: 12,
+              letterSpacing: "0.2em",
+              color: "rgba(212, 175, 55, 0.7)",
+              fontFamily: "ui-monospace, Menlo, Consolas, monospace",
+            }}
+          >
+            ERROR
+          </p>
+          <h1 style={{ margin: "8px 0 0", fontSize: 24, fontWeight: 600, color: "#ffffff" }}>
+            Something went wrong
+          </h1>
+          <p style={{ margin: "12px 0 0", fontSize: 14, lineHeight: 1.6, color: "#7a7a7a" }}>
             A critical error occurred. The issue has been logged. You can retry, reload, or return
             home.
           </p>
           {error.digest && (
-            <p className="mt-2 font-mono text-xs text-[#9a9a9a]/70">Reference: {error.digest}</p>
+            <p
+              style={{
+                margin: "8px 0 0",
+                fontSize: 12,
+                color: "rgba(122, 122, 122, 0.7)",
+                fontFamily: "ui-monospace, Menlo, Consolas, monospace",
+              }}
+            >
+              Reference: {error.digest}
+            </p>
           )}
-          <div className="mt-8 flex flex-col gap-3">
+          <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 12 }}>
             <button
               type="button"
               onClick={reset}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#d4af37] px-6 py-3 text-sm font-medium text-black"
+              style={{
+                height: 44,
+                borderRadius: 10,
+                border: "1px solid rgba(212, 175, 55, 0.5)",
+                background: "#d4af37",
+                color: "#050505",
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: "pointer",
+              }}
             >
-              <RefreshCw className="h-4 w-4" aria-hidden />
               Try again
             </button>
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="rounded-full border border-[#1a1a1a] px-6 py-3 text-sm text-white"
+              style={{
+                height: 44,
+                borderRadius: 10,
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                background: "transparent",
+                color: "#ffffff",
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: "pointer",
+              }}
             >
               Reload page
             </button>
-            <Link
+            <a
               href="/"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-[#1a1a1a] px-6 py-3 text-sm text-white"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: 44,
+                borderRadius: 10,
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                color: "#ffffff",
+                fontWeight: 600,
+                fontSize: 14,
+                textDecoration: "none",
+              }}
             >
-              <Home className="h-4 w-4" aria-hidden />
               Return home
-            </Link>
+            </a>
           </div>
         </div>
       </body>

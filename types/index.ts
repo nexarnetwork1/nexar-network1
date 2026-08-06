@@ -1,4 +1,10 @@
-export type UserRole = "customer" | "merchant" | "admin";
+export type UserRole =
+  | "customer"
+  | "merchant"
+  | "business"
+  | "admin"
+  | "super_admin"
+  | "platform_owner";
 
 export type StoreMode = "marketplace" | "payments_only";
 export type StoreStatus = "pending" | "active" | "suspended";
@@ -132,6 +138,8 @@ export type AuditLog = {
 export type Store = {
   id: string;
   owner_id: string;
+  /** Business Hub parent — nullable only for legacy rows during migration. */
+  business_id: string | null;
   name: string;
   slug: string;
   business_type: string | null;
@@ -255,6 +263,8 @@ export type ProductSpecifications = Record<string, string | number | boolean | n
 export type Product = {
   id: string;
   store_id: string;
+  /** Business Hub tenancy — nullable only for legacy rows during migration. */
+  business_id?: string | null;
   name: string;
   description: string | null;
   price: number;

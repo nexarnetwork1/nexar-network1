@@ -1,9 +1,8 @@
 "use client";
 
-import { CheckCircle2, Copy, ExternalLink, LogOut, Coins, ArrowRightLeft } from "lucide-react";
+import { CheckCircle2, Copy, ExternalLink, LogOut, ArrowRightLeft } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
-import { SuperAdminVerifyButton } from "./SuperAdminVerifyButton";
 import { AddNxrToWalletButton } from "./AddNxrToWalletButton";
 import type { WalletPanelState } from "./useWalletPanel";
 
@@ -23,9 +22,6 @@ export function WalletMenuPanel({ panel, onDisconnect, className }: WalletMenuPa
     networkLabel,
     chainId,
     balances,
-    isTreasuryWallet,
-    isSuperAdmin,
-    setIsSuperAdmin,
     isSwitchingChain,
     copyAddress,
     switchToBsc,
@@ -132,22 +128,6 @@ export function WalletMenuPanel({ panel, onDisconnect, className }: WalletMenuPa
           <ExternalLink size={18} aria-hidden />
           View on BscScan
         </a>
-
-        {isTreasuryWallet && !isSuperAdmin && (
-          <div className="px-2 py-1">
-            <SuperAdminVerifyButton
-              walletAddress={address}
-              onVerified={() => setIsSuperAdmin(true)}
-            />
-          </div>
-        )}
-
-        {isSuperAdmin && (
-          <div className="mx-2 flex items-center gap-2 rounded-2xl border border-gold/20 bg-gold/5 px-4 py-2.5 text-xs text-gold">
-            <Coins size={14} aria-hidden />
-            Super Admin session active
-          </div>
-        )}
 
         <button
           type="button"

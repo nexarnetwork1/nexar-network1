@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getOrderById } from "@/modules/orders/repository";
 import { getInvoicePaymentOptions } from "@/modules/payments/repository";
@@ -31,7 +30,9 @@ export default async function CustomerOrderDetailPage({ params, searchParams }: 
   const { id } = await params;
   const { confirmed } = await searchParams;
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: `/customer/orders/${id}` }));
+  if (!profile) {
+  redirect("/login?redirect=" + encodeURIComponent(`/customer/orders/${id}`));
+}
 
   const order = await getOrderById(id);
   if (!order || order.customer_id !== profile.id) notFound();

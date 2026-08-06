@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { MapPin } from "lucide-react";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { Button } from "@/components/ui/Button";
@@ -12,7 +11,9 @@ import {
 
 export default async function CustomerAddressesPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/addresses" }));
+  if (!profile) {
+  redirect("/login?redirect=/customer/addresses");
+}
 
   return (
     <div className="space-y-6">

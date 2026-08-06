@@ -26,11 +26,6 @@ export function WalletSessionManager() {
     clearingRef.current = true;
     clearWalletSession();
     try {
-      await fetch("/api/admin/wallet/logout", { method: "POST" });
-    } catch {
-      // ignore
-    }
-    try {
       disconnect();
     } catch {
       // ignore

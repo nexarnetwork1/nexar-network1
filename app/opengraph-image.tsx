@@ -1,12 +1,19 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { SITE } from "@/lib/constants/site";
+import { ATLAS_BRAND, ATLAS_ASSETS } from "@/config/atlas-branding";
 import { COLORS } from "@/lib/constants/design";
 
-export const alt = `${SITE.name} — Decentralized Payment Infrastructure`;
+export const alt = `${ATLAS_BRAND.fullName} — ${ATLAS_BRAND.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function Image() {
+export default async function Image() {
+  const logoBytes = await readFile(
+    join(process.cwd(), "public", ATLAS_ASSETS.logoPrimary.replace(/^\//, "")),
+  );
+  const logoSrc = `data:image/png;base64,${logoBytes.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -22,7 +29,6 @@ export default function Image() {
           overflow: "hidden",
         }}
       >
-        {/* Top-right glow orb */}
         <div
           style={{
             position: "absolute",
@@ -34,7 +40,6 @@ export default function Image() {
             background: `radial-gradient(circle, ${COLORS.gold}22 0%, transparent 70%)`,
           }}
         />
-        {/* Bottom-left subtle glow */}
         <div
           style={{
             position: "absolute",
@@ -47,44 +52,32 @@ export default function Image() {
           }}
         />
 
-        {/* Logo lockup using official logo image */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 18,
-            marginBottom: 40,
-          }}
-        >
-          {/* Official logo image */}
+        {/* Official ATLAS lockup — sole platform mark */}
+        <div style={{ display: "flex", marginBottom: 40 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://www.nexarnetwork.org/images/logo.png"
-            alt="Nexar Network Logo"
-            width={160}
-            height={40}
-            style={{
-              height: 56,
-              width: "auto",
-            }}
+            src={logoSrc}
+            alt={ATLAS_BRAND.fullName}
+            width={320}
+            height={80}
+            style={{ height: 72, width: "auto" }}
           />
         </div>
 
-        {/* Main headline */}
         <h1
           style={{
-            fontSize: 68,
+            fontSize: 56,
             fontWeight: 700,
             color: "white",
-            lineHeight: 1.05,
+            lineHeight: 1.1,
             margin: 0,
-            maxWidth: 880,
+            maxWidth: 900,
           }}
         >
-          The infrastructure for{" "}
-          <span style={{ color: COLORS.gold }}>global payments</span>
+          The Business Operating System for{" "}
+          <span style={{ color: COLORS.gold }}>global commerce</span>
         </h1>
 
-        {/* Tagline */}
         <p
           style={{
             fontSize: 22,
@@ -94,10 +87,9 @@ export default function Image() {
             lineHeight: 1.5,
           }}
         >
-          {SITE.tagline}
+          {ATLAS_BRAND.description}
         </p>
 
-        {/* Bottom metadata strip */}
         <div
           style={{
             position: "absolute",
@@ -109,19 +101,10 @@ export default function Image() {
             justifyContent: "space-between",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              gap: 24,
-              color: "#555",
-              fontSize: 15,
-            }}
-          >
-            <span>BNB Smart Chain</span>
+          <div style={{ display: "flex", gap: 24, color: "#555", fontSize: 15 }}>
+            <span>{ATLAS_BRAND.tagline}</span>
             <span>·</span>
-            <span>BEP20</span>
-            <span>·</span>
-            <span>{SITE.maxSupply} Max Supply</span>
+            <span>Web2 + Web3</span>
           </div>
           <span
             style={{
@@ -130,11 +113,10 @@ export default function Image() {
               letterSpacing: "0.1em",
             }}
           >
-            nexar.network
+            {ATLAS_BRAND.byline}
           </span>
         </div>
 
-        {/* Horizontal divider line */}
         <div
           style={{
             position: "absolute",

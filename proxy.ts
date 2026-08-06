@@ -1,32 +1,44 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
 import { authConfig } from "@/config/auth";
 import { applyRateLimit, handleAuthRouting } from "@/lib/middleware";
-import { isSuperAdminRoute, isSuperAdminPublicRoute } from "@/lib/admin/routes";
-import {
-  getSuperAdminSessionFromRequest,
-  parseSuperAdminSessionToken,
-  SUPER_ADMIN_COOKIE,
-} from "@/lib/admin/session";
+import { getProxySession } from "@/lib/auth/proxy-session";
+import { isHqRoute, isHqPublicRoute } from "@/lib/admin/routes";
+import { isPlatformOwnerRole } from "@/modules/atlas-hq/founder";
 
-async function handleSuperAdminRouting(
-  request: NextRequest
-): Promise<NextResponse | null> {
+/**
+ * NEXAR HQ gate — Auth.js session + platform role with HQ access.
+ * Wallet Super Admin cookies are abolished.
+ */
+function handleHqRouting(
+  request: NextRequest,
+  profile: { role?: string } | null,
+  user: { id: string } | null,
+): NextResponse | null {
   const { pathname } = request.nextUrl;
 
-  if (!isSuperAdminRoute(pathname) || isSuperAdminPublicRoute(pathname)) {
+  if (!isHqRoute(pathname) || isHqPublicRoute(pathname)) {
     return null;
   }
 
-  const session = await getSuperAdminSessionFromRequest(request);
-  if (!session) {
-    return new NextResponse("Forbidden — Super Admin wallet session required", {
+  if (!user) {
+    const login = new URL("/admin/login", request.url);
+    login.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(login);
+  }
+
+  const role = profile?.role ?? "";
+  const allowed =
+    isPlatformOwnerRole(role) ||
+    role === "admin" ||
+    role === "super_admin";
+
+  if (!allowed) {
+    return new NextResponse("Forbidden — NEXAR HQ access required", {
       status: 403,
     });
   }
 
-  const { supabaseResponse } = await updateSession(request);
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export async function proxy(request: NextRequest) {
@@ -35,48 +47,42 @@ export async function proxy(request: NextRequest) {
   const rateLimitResponse = applyRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
-  const superAdminResponse = await handleSuperAdminRouting(request);
-  if (superAdminResponse) return superAdminResponse;
+  const { user, profile } = await getProxySession(request);
+
+  const hqResponse = handleHqRouting(
+    request,
+    profile,
+    user ? { id: user.id } : null,
+  );
+  if (hqResponse) return hqResponse;
+
+  const passthrough = NextResponse.next({
+    request: { headers: request.headers },
+  });
 
   if (authConfig.publicAuthRoutes.some((route) => pathname.startsWith(route))) {
-    const { supabaseResponse } = await updateSession(request);
-    return supabaseResponse;
+    return passthrough;
   }
 
   if (authConfig.publicRoutes.some((route) => pathname.startsWith(route))) {
-    const { supabaseResponse } = await updateSession(request);
-    return supabaseResponse;
-  }
-
-  const { user, supabaseResponse, supabase } = await updateSession(request);
-
-  let profile = null;
-  if (user) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("role, profile_completed")
-      .eq("id", user.id)
-      .single();
-    profile = data;
+    return passthrough;
   }
 
   const authResponse = handleAuthRouting(
     request,
     user
-      ? { id: user.id, email_confirmed_at: user.email_confirmed_at }
+      ? {
+          id: user.id,
+          email_confirmed_at: user.emailVerified
+            ? new Date().toISOString()
+            : null,
+        }
       : null,
     profile,
-    supabaseResponse
+    passthrough,
   );
 
-  const response = authResponse ?? supabaseResponse;
-
-  const rawSession = request.cookies.get(SUPER_ADMIN_COOKIE)?.value;
-  if (rawSession && !(await parseSuperAdminSessionToken(rawSession))) {
-    response.cookies.delete(SUPER_ADMIN_COOKIE);
-  }
-
-  return response;
+  return authResponse ?? passthrough;
 }
 
 export const config = {

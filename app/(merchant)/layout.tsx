@@ -4,11 +4,11 @@ import { Clock } from "lucide-react";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { signOutAction } from "@/modules/auth/actions";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { MerchantRealtimeProvider } from "@/components/realtime/MerchantRealtimeProvider";
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { Button } from "@/components/ui/Button";
+import { ATLAS_BRAND, ATLAS_PORTAL_SUBTITLES } from "@/config/atlas-branding";
 import { DashboardShell } from "@/components/dashboard";
 import { merchantNav } from "@/config/dashboard-nav";
 import { privateAreaMetadata } from "@/lib/constants/seo";
@@ -22,8 +22,8 @@ export default async function MerchantLayout({
 }) {
   const profile = await getCurrentProfile();
 
-  if (!profile || profile.role !== "merchant") {
-    redirect(commerceAuthHref({ auth: "signin", redirect: "/merchant" }));
+  if (!profile || (profile.role !== "merchant" && profile.role !== "business")) {
+    redirect(`/login?redirect=/merchant`);
   }
 
   const store = await getMerchantStore(profile.id);
@@ -52,9 +52,9 @@ export default async function MerchantLayout({
     <CommerceAuthShell>
       <DashboardShell
         sections={merchantNav({ paymentsOnly: isPaymentsOnly })}
-        brand="Merchant"
+        brand={ATLAS_BRAND.name}
         brandHref="/merchant"
-        subtitle={store?.name ?? "Nexar Commerce"}
+        subtitle={store?.name ?? ATLAS_PORTAL_SUBTITLES.business}
         storageKey="merchant"
         banner={pendingApprovalBanner}
         actions={

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BellOff } from "lucide-react";
-import { commerceAuthHref } from "@/lib/commerce/commerce-auth-url";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { getUserNotifications, getUnreadNotificationCount } from "@/modules/notifications/repository";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
@@ -10,7 +9,9 @@ import { DashboardEmptyState, DashboardSection } from "@/components/dashboard";
 
 export default async function CustomerNotificationsPage() {
   const profile = await getCurrentProfile();
-  if (!profile) redirect(commerceAuthHref({ auth: "signin", redirect: "/customer/notifications" }));
+  if (!profile) {
+  redirect("/login?redirect=/customer/notifications");
+}
 
   const [notifications, unreadCount] = await Promise.all([
     getUserNotifications(profile.id, 50),

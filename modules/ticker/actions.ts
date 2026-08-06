@@ -51,12 +51,15 @@ export async function createTickerAnnouncementAction(
   if (result.error) return { success: false, error: result.error };
 
   await writeAuditLog({
-    actorId: null,
-    actorRole: "admin",
+    actorId: session.userId,
+    actorRole: session.isPlatformOwner ? "platform_owner" : "admin",
     action: "ticker.created",
     entityType: "ticker_announcement",
     entityId: result.id,
-    metadata: { wallet_address: session.walletAddress },
+    metadata: {
+      hq_role: session.staffRole,
+      is_platform_owner: session.isPlatformOwner,
+    },
   });
 
   revalidateTickerPaths();
@@ -92,12 +95,15 @@ export async function updateTickerAnnouncementAction(
   if (result.error) return { success: false, error: result.error };
 
   await writeAuditLog({
-    actorId: null,
-    actorRole: "admin",
+    actorId: session.userId,
+    actorRole: session.isPlatformOwner ? "platform_owner" : "admin",
     action: "ticker.updated",
     entityType: "ticker_announcement",
     entityId: id,
-    metadata: { wallet_address: session.walletAddress },
+    metadata: {
+      hq_role: session.staffRole,
+      is_platform_owner: session.isPlatformOwner,
+    },
   });
 
   revalidateTickerPaths();
@@ -110,12 +116,15 @@ export async function deleteTickerAnnouncementAction(id: string): Promise<Action
   if (result.error) return { success: false, error: result.error };
 
   await writeAuditLog({
-    actorId: null,
-    actorRole: "admin",
+    actorId: session.userId,
+    actorRole: session.isPlatformOwner ? "platform_owner" : "admin",
     action: "ticker.deleted",
     entityType: "ticker_announcement",
     entityId: id,
-    metadata: { wallet_address: session.walletAddress },
+    metadata: {
+      hq_role: session.staffRole,
+      is_platform_owner: session.isPlatformOwner,
+    },
   });
 
   revalidateTickerPaths();
@@ -131,12 +140,15 @@ export async function toggleTickerAnnouncementAction(
   if (result.error) return { success: false, error: result.error };
 
   await writeAuditLog({
-    actorId: null,
-    actorRole: "admin",
+    actorId: session.userId,
+    actorRole: session.isPlatformOwner ? "platform_owner" : "admin",
     action: isEnabled ? "ticker.enabled" : "ticker.disabled",
     entityType: "ticker_announcement",
     entityId: id,
-    metadata: { wallet_address: session.walletAddress },
+    metadata: {
+      hq_role: session.staffRole,
+      is_platform_owner: session.isPlatformOwner,
+    },
   });
 
   revalidateTickerPaths();
@@ -156,11 +168,15 @@ export async function reorderTickerAnnouncementsAction(
   if (result.error) return { success: false, error: result.error };
 
   await writeAuditLog({
-    actorId: null,
-    actorRole: "admin",
+    actorId: session.userId,
+    actorRole: session.isPlatformOwner ? "platform_owner" : "admin",
     action: "ticker.reordered",
     entityType: "ticker_announcement",
-    metadata: { wallet_address: session.walletAddress, ordered_ids: orderedIds },
+    metadata: {
+      hq_role: session.staffRole,
+      is_platform_owner: session.isPlatformOwner,
+      ordered_ids: orderedIds,
+    },
   });
 
   revalidateTickerPaths();

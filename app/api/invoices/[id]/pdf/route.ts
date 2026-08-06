@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { createClient } from "@/lib/supabase/server";
 import { generateInvoicePdfBuffer } from "@/modules/invoices/pdf";
 import { getInvoiceById } from "@/modules/invoices/repository";
@@ -11,15 +12,13 @@ type Props = {
 export async function GET(_request: Request, { params }: Props) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
+    const session = await auth();
+    if (!session?.user?.id) {
       return apiError("Unauthorized", 401, "UNAUTHORIZED");
     }
+    const user = { id: session.user.id };
+
+    const supabase = await createClient();
 
     const invoice = await getInvoiceById(id);
     if (!invoice) {
