@@ -1,0 +1,13 @@
+
+ RUN  v3.2.7 /home/mahmoud/Projects/nexar-network
+
+ ✓ tests/unit/security/redirect.test.ts (7 tests) 38ms
+ ✓ tests/unit/security/cron-auth.test.ts (4 tests) 301ms
+ ✓ tests/integration/auth/validators.test.ts (5 tests) 73ms
+ ✓ tests/integration/auth/authorization.test.ts (3 tests) 52ms
+
+ Test Files  4 passed (4)
+      Tests  19 passed (19)
+   Start at  17:05:19
+   Duration  11.05s (transform 4.75s, setup 1.13s, collect 6.41s, tests 466ms, environment 4ms, prepare 6.62s)
+

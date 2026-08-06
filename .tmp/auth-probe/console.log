@@ -1,0 +1,224 @@
+AUTH PROBE CONFIG
+{
+  "SUPABASE_URL": "https://zwzigpxricdlhqqiiqfr.supabase.co",
+  "APP_URL": "http://localhost:3000",
+  "LOCAL": "http://127.0.0.1:3000",
+  "anonPrefix": "sb_publishable_gkSB2sYms",
+  "hasService": true
+}
+LOCAL_HEALTH {
+  status: 200,
+  body: '{"status":"degraded","checks":{"app":"ok","supabase":"ok","payments":"warn","email":"warn","stripe":"warn","monitoring":"warn"},"timestamp":"2026-08-03T14:08:57.486Z"}'
+}
+
+======== 1. Email signup ========
+{
+  "pass": false,
+  "httpStatus": 429,
+  "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/signup",
+  "responseBody": {
+    "code": 429,
+    "error_code": "over_email_send_rate_limit",
+    "msg": "email rate limit exceeded"
+  },
+  "supabaseErrorCode": "over_email_send_rate_limit",
+  "browserConsoleError": null,
+  "serverLog": null
+}
+
+======== 2. Email verification email delivery ========
+{
+  "pass": false,
+  "httpStatus": 200,
+  "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/resend",
+  "responseBody": {},
+  "supabaseErrorCode": null,
+  "browserConsoleError": null,
+  "serverLog": null,
+  "authSettingsSelected": {
+    "disable_signup": false,
+    "mailer_autoconfirm": false,
+    "external_email": true
+  },
+  "signupEvidence": {
+    "httpStatus": 429,
+    "supabaseErrorCode": "over_email_send_rate_limit",
+    "responseBody": {
+      "code": 429,
+      "error_code": "over_email_send_rate_limit",
+      "msg": "email rate limit exceeded"
+    },
+    "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/signup"
+  }
+}
+
+======== 3. Email confirmation callback ========
+{
+  "pass": false,
+  "httpStatus": 403,
+  "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/verify",
+  "responseBody": {
+    "code": 403,
+    "error_code": "otp_expired",
+    "msg": "Email link is invalid or has expired"
+  },
+  "supabaseErrorCode": "otp_expired",
+  "browserConsoleError": null,
+  "serverLog": null,
+  "redirectLocation": "http://localhost:3000/marketplace?auth=signin&message=auth_callback_failed",
+  "generate": {
+    "createUser": {
+      "httpStatus": 200,
+      "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/admin/users",
+      "requestMethod": "POST",
+      "responseBody": {
+        "id": "4f077434-afc9-4537-9b14-28062762679e",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "auth-probe-confirm-8d2c5fd4@example.com",
+        "phone": "",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "full_name": "Confirm Probe",
+          "role": "customer"
+        },
+        "identities": [
+          {
+            "identity_id": "22d9e292-f6fe-462e-8bdc-237d2ffc9a69",
+            "id": "4f077434-afc9-4537-9b14-28062762679e",
+            "user_id": "4f077434-afc9-4537-9b14-28062762679e",
+            "identity_data": {
+              "email": "auth-probe-confirm-8d2c5fd4@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "4f077434-afc9-4537-9b14-28062762679e"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-03T14:08:31.070110034Z",
+            "created_at": "2026-08-03T14:08:31.070205Z",
+            "updated_at": "2026-08-03T14:08:31.070205Z",
+            "email": "auth-probe-confirm-8d2c5fd4@example.com"
+          }
+        ],
+        "created_at": "2026-08-03T14:08:31.064948Z",
+        "updated_at": "2026-08-03T14:08:31.071645Z",
+        "is_anonymous": false
+      },
+      "supabaseErrorCode": null,
+      "location": null
+    },
+    "generateLink": {
+      "httpStatus": 200,
+      "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/admin/generate_link",
+      "requestMethod": "POST",
+      "responseBody": {
+        "id": "4f077434-afc9-4537-9b14-28062762679e",
+        "aud": "authenticated",
+        "role": "authenticated",
+        "email": "auth-probe-confirm-8d2c5fd4@example.com",
+        "phone": "",
+        "confirmation_sent_at": "2026-08-03T14:08:31.432295505Z",
+        "app_metadata": {
+          "provider": "email",
+          "providers": [
+            "email"
+          ]
+        },
+        "user_metadata": {
+          "full_name": "Confirm Probe",
+          "role": "customer"
+        },
+        "identities": [
+          {
+            "identity_id": "22d9e292-f6fe-462e-8bdc-237d2ffc9a69",
+            "id": "4f077434-afc9-4537-9b14-28062762679e",
+            "user_id": "4f077434-afc9-4537-9b14-28062762679e",
+            "identity_data": {
+              "email": "auth-probe-confirm-8d2c5fd4@example.com",
+              "email_verified": false,
+              "phone_verified": false,
+              "sub": "4f077434-afc9-4537-9b14-28062762679e"
+            },
+            "provider": "email",
+            "last_sign_in_at": "2026-08-03T14:08:31.07011Z",
+            "created_at": "2026-08-03T14:08:31.070205Z",
+            "updated_at": "2026-08-03T14:08:31.070205Z",
+            "email": "auth-probe-confirm-8d2c5fd4@example.com"
+          }
+        ],
+        "created_at": "2026-08-03T14:08:31.064948Z",
+        "updated_at": "2026-08-03T14:08:31.434026Z",
+        "is_anonymous": false,
+        "action_link": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/verify?token=43d6c158a96487b51b65fdabbf294de45f435a16c96d40e302460341&type=signup&redirect_to=https://nexarnetwork.org",
+        "email_otp": "72183505",
+        "hashed_token": "43d6c158a96487b51b65fdabbf294de45f435a16c96d40e302460341",
+        "verification_type": "signup",
+        "redirect_to": "https://nexarnetwork.org"
+      },
+      "supabaseErrorCode": null,
+      "location": null
+    },
+    "actionLink": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/verify?token=43d6c158a96487b51b65fdabbf294de45f435a16c96d40e302460341&type=signup&redirect_to=https://nexarnetwork.org",
+    "actionLinkFollow": {
+      "httpStatus": 303,
+      "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/verify?token=43d6c158a96487b51b65fdabbf294de45f435a16c96d40e302460341&type=signup&redirect_to=https://nexarnetwork.org",
+      "location": "https://nexarnetwork.org#access_token=eyJhbGciOiJFUzI1NiIsImtpZCI6IjJmNTM5ZjFlLWU2NjEtNDU5MS04ZTkyLTE2M2QxNWIyOTRiMSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3p3emlncHhyaWNkbGhxcWlpcWZyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0ZjA3NzQzNC1hZmM5LTQ1MzctOWIxNC0yODA2Mjc2MjY3OWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1NzY5NzExLCJpYXQiOjE3ODU3NjYxMTEsImVtYWlsIjoiYXV0aC1wcm9iZS1jb25maXJtLThkMmM1ZmQ0QGV4YW1wbGUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZnVsbF9uYW1lIjoiQ29uZmlybSBQcm9iZSIsInJvbGUiOiJjdXN0b21lciJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6Im90cCIsInRpbWVzdGFtcCI6MTc4NTc2NjExMX1dLCJzZXNzaW9uX2lkIjoiNmM3OTU5YjEtMDRjNS00ODU3LWFlMTktZDk1MGY4ZWU0ZTJlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.DenROuagOjoahbn9fqKdTtm0gQZdKbgYNA1xDxOkgJUoQQz7-7d6KV_2UNwAzWeWLblWT-PuUqKPF_WxTd1cdg&expires_at=1785769711&expires_in=3600&refresh_token=t3sw6mje7mzf&sb=&token_type=bearer&type=signup",
+      "responseBody": "<a href=\"https://nexarnetwork.org#access_token=eyJhbGciOiJFUzI1NiIsImtpZCI6IjJmNTM5ZjFlLWU2NjEtNDU5MS04ZTkyLTE2M2QxNWIyOTRiMSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3p3emlncHhyaWNkbGhxcWlpcWZyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0ZjA3NzQzNC1hZmM5LTQ1MzctOWIxNC0yODA2Mjc2MjY3OWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1NzY5NzExLCJpYXQiOjE3ODU3NjYxMTEsImVtYWlsIjoiYXV0aC1wcm9iZS1jb25maXJtLThkMmM1ZmQ0QGV4YW1wbGUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZnVsbF9uYW1lIjoiQ29uZmlybSBQcm9iZSIsInJvbGUiOiJjdXN0b21lciJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6Im90cCIsInRpbWVzdGFtcCI6MTc4NTc2NjExMX1dLCJzZXNzaW9uX2lkIjoiNmM3OTU5YjEtMDRjNS00ODU3LWFlMTktZDk1MGY4ZWU0ZTJlIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.DenROuagOjoahbn9fqKdTtm0gQZdKbgYNA1xDxOkgJUoQQz7-7d6KV_2UNwAzWeWLblWT-PuUqKPF_WxTd1cdg&amp;expires_at=1785769711&amp;expires_in=3600&amp;refresh_token=t3sw6mje7mzf&amp;sb=&amp;token_type=bearer&amp;type=signup\">See Other</a>.\n\n"
+    }
+  },
+  "invalidCodeProbe": {
+    "httpStatus": 307,
+    "requestUrl": "http://127.0.0.1:3000/auth/callback?code=invalid-probe-code",
+    "location": "http://localhost:3000/marketplace?auth=signin&message=auth_callback_failed",
+    "responseBody": ""
+  },
+  "signupUserId": null
+}
+
+======== 4. Email login ========
+{
+  "pass": false,
+  "httpStatus": 400,
+  "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/token?grant_type=password",
+  "responseBody": {
+    "code": 400,
+    "error_code": "invalid_credentials",
+    "msg": "Invalid login credentials"
+  },
+  "supabaseErrorCode": "invalid_credentials",
+  "browserConsoleError": null,
+  "serverLog": null
+}
+
+======== 5. Google OAuth login ========
+{
+  "pass": true,
+  "httpStatus": 302,
+  "requestUrl": "https://zwzigpxricdlhqqiiqfr.supabase.co/auth/v1/authorize?provider=google&redirect_to=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback",
+  "responseBody": "<a href=\"https://accounts.google.com/o/oauth2/v2/auth?client_id=833392908-2plausd8lkvfenfc2jia51bcdvjr4gle.apps.googleusercontent.com&amp;redirect_to=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback&amp;redirect_uri=https%3A%2F%2Fzwzigpxricdlhqqiiqfr.supabase.co%2Fauth%2Fv1%2Fcallback&amp;response_type=code&amp;scope=email+profile&amp;state=5adc6fc4-8f0a-4a01-82e8-43e76819e8d5\">Found</a>.\n\n",
+  "supabaseErrorCode": null,
+  "browserConsoleError": null,
+  "serverLog": null,
+  "location": "https://accounts.google.com/o/oauth2/v2/auth?client_id=833392908-2plausd8lkvfenfc2jia51bcdvjr4gle.apps.googleusercontent.com&redirect_to=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback&redirect_uri=https%3A%2F%2Fzwzigpxricdlhqqiiqfr.supabase.co%2Fauth%2Fv1%2Fcallback&response_type=code&scope=email+profile&state=5adc6fc4-8f0a-4a01-82e8-43e76819e8d5",
+  "note": "Initiation only — Google consent UI is interactive"
+}
+PROBE_FATAL TypeError: fetch failed
+    at node:internal/deps/undici/undici:14976:13
+    at async test6_walletLogin (file:///home/mahmoud/Projects/nexar-network/scripts/auth-flow-probe.mjs:326:23)
+    at async main (file:///home/mahmoud/Projects/nexar-network/scripts/auth-flow-probe.mjs:470:3) {
+  [cause]: HeadersTimeoutError: Headers Timeout Error
+      at FastTimer.onParserTimeout [as _onTimeout] (node:internal/deps/undici/undici:6391:32)
+      at Timeout.onTick [as _onTimeout] (node:internal/deps/undici/undici:2354:17)
+      at listOnTimeout (node:internal/timers:581:17)
+      at process.processTimers (node:internal/timers:519:7) {
+    code: 'UND_ERR_HEADERS_TIMEOUT',
+    [Symbol(undici.error.UND_ERR)]: true,
+    [Symbol(undici.error.UND_ERR_HEADERS_TIMEOUT)]: true
+  }
+}
+
