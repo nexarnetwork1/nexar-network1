@@ -38,7 +38,7 @@ export function EcosystemSection() {
           <SectionHeading
             eyebrow="Ecosystem"
             title="Connected modules, unified network"
-            description="Seven integrated modules forming a complete payment infrastructure — from wallet to sovereign chain."
+            description="Twelve integrated modules forming a complete business operating system — powered by ATLAS on Nexar Network."
             align="center"
           />
         </Reveal>
@@ -64,7 +64,7 @@ export function EcosystemSection() {
                     className={cn(
                       "absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border transition-all duration-500",
                       isActive
-                        ? "border-gold/40 bg-gold/15 shadow-[0_0_30px_-5px_rgba(255,209,92,0.4)]"
+                        ? "border-gold/40 bg-gold/15 shadow-[0_0_30px_-5px_rgba(212,175,55,0.35)]"
                         : "border-border bg-card/60 hover:border-gold/20",
                     )}
                     style={{ left: `${x}%`, top: `${y}%` }}
@@ -75,16 +75,14 @@ export function EcosystemSection() {
                 );
               })}
 
-              <div className="absolute inset-0 flex items-center justify-center">
-                <motion.div
-                  key={activeId}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center"
-                >
-                  <activeModule.icon className="mx-auto h-8 w-8 text-gold" />
-                  <p className="mt-2 font-heading text-lg font-semibold">{activeModule.title}</p>
-                </motion.div>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-center">
+                  <p className="font-heading text-xl font-semibold text-gold tracking-wide">ATLAS</p>
+                  <p className="mt-0.5 text-[10px] tracking-[0.2em] text-muted uppercase">Nexar Network</p>
+                  <p className="mt-2 text-xs text-muted max-w-[8rem] mx-auto leading-snug">
+                    {activeModule.title}
+                  </p>
+                </div>
               </div>
 
               {ECOSYSTEM_MODULES.map((mod, i) => {
@@ -101,7 +99,7 @@ export function EcosystemSection() {
                       y1="50%"
                       x2={`${50 + 42 * Math.cos(angle)}%`}
                       y2={`${50 + 42 * Math.sin(angle)}%`}
-                      stroke="rgba(255,209,92,0.3)"
+                      stroke="rgba(212,175,55,0.3)"
                       strokeWidth="1"
                     />
                   </svg>

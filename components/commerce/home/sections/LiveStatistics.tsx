@@ -56,7 +56,7 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className="luxury-border rounded-2xl bg-card/60 px-5 py-5 backdrop-blur-md transition-shadow hover:shadow-[0_12px_40px_-20px_rgba(255,209,92,0.35)]"
+      className="luxury-border rounded-2xl bg-card/60 px-5 py-5 backdrop-blur-md transition-shadow hover:shadow-[0_12px_40px_-20px_rgba(212,175,55,0.35)]"
     >
       <p className="text-[10px] tracking-[0.22em] text-muted uppercase">{label}</p>
       <p className="mt-3 font-mono text-2xl font-medium text-white sm:text-3xl">

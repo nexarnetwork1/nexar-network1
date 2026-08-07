@@ -30,7 +30,7 @@ export function CommerceHero({ initialMetrics }: CommerceHeroProps) {
     <section className="relative overflow-hidden pt-10 pb-16 sm:pt-14 sm:pb-20 lg:pb-24">
       {/* Soft boutique lighting over the hero products area */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(255,209,92,0.07)_0%,transparent_70%)]" />
+        <div className="absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.07)_0%,transparent_70%)]" />
       </div>
 
       <Container className="relative z-10">

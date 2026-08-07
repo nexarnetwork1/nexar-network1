@@ -8,8 +8,8 @@ export type TokenAllocation = {
 
 /** Gold-scale chart palette — no brown/bronze tones. */
 export const TOKENOMICS: TokenAllocation[] = [
-  { title: "Liquidity", value: 150_000_000, percent: 30, color: "#FFD15C" },
-  { title: "Ecosystem", value: 100_000_000, percent: 20, color: "#FFE082" },
+  { title: "Liquidity", value: 150_000_000, percent: 30, color: "#D4AF37" },
+  { title: "Ecosystem", value: 100_000_000, percent: 20, color: "#F4D27A" },
   { title: "Presale", value: 100_000_000, percent: 20, color: "#E6BC52" },
   { title: "Marketing", value: 50_000_000, percent: 10, color: "#CCAA48" },
   {

@@ -8,7 +8,7 @@ import {
 } from "react";
 import { cn } from "@/lib/utils/cn";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "outline" | "danger";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "outline" | "danger" | "success";
 type ButtonSize = "sm" | "md" | "lg";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -20,15 +20,17 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gold text-on-gold border border-gold/30 hover:bg-gold-hover hover:border-gold-hover/40",
+    "nxr-btn-primary hover:bg-gold-hover border border-gold/35 text-on-gold shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]",
   secondary:
-    "bg-surface-2 text-foreground border border-border hover:bg-surface-3 hover:border-border-default",
+    "bg-surface-2 text-foreground border border-border hover:bg-[#171717] hover:border-border-default",
   outline:
     "bg-transparent text-foreground border border-border hover:border-gold/30 hover:text-gold",
   ghost:
     "bg-transparent text-muted hover:text-foreground hover:bg-white/[0.04] border border-transparent",
   danger:
     "bg-danger text-white border border-danger/40 hover:bg-danger/90",
+  success:
+    "bg-success text-white border border-success/40 hover:brightness-110",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -86,7 +88,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:pointer-events-none disabled:opacity-50",
           variantStyles[variant],
           sizeStyles[size],
-          glow && "ring-1 ring-gold/15",
+          glow && variant === "primary" && "hover:shadow-[0_0_28px_-6px_rgba(212,175,55,0.45)]",
           className,
         )}
         onMouseMove={handleMouseMove}

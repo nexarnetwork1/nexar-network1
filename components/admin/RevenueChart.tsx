@@ -18,7 +18,7 @@ type RevenueChartProps = {
 };
 
 // Matches --nxr-gold and --nxr-gold-secondary; recharts needs literal colours.
-const REVENUE_FILL = "#FFD15C";
+const REVENUE_FILL = "#D4AF37";
 const FEES_FILL = "#9A8534";
 
 export function RevenueChart({ data }: RevenueChartProps) {

@@ -22,9 +22,9 @@ export function WalletMenu({ panel, className }: WalletMenuProps) {
         className={cn(
           "inline-flex items-center gap-2 rounded-full border border-gold/30",
           "bg-gradient-to-r from-surface-1/90 to-surface-2/90 px-5 py-2.5",
-          "text-sm font-semibold text-white shadow-[0_0_25px_rgba(255,209,92,0.12)]",
+          "text-sm font-semibold text-white shadow-[0_0_25px_rgba(212,175,55,0.12)]",
           "backdrop-blur-xl transition-all duration-300 hover:border-gold",
-          "hover:shadow-[0_0_35px_rgba(255,209,92,0.22)]",
+          "hover:shadow-[0_0_35px_rgba(212,175,55,0.22)]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         )}
       >
@@ -38,7 +38,7 @@ export function WalletMenu({ panel, className }: WalletMenuProps) {
         anchor="bottom end"
         className={cn(
           "absolute right-0 z-50 mt-3 w-[22rem] origin-top-right overflow-hidden rounded-3xl",
-          "border border-gold/20 bg-chrome/80 p-0 shadow-[0_0_40px_rgba(255,209,92,0.15)]",
+          "border border-gold/20 bg-chrome/80 p-0 shadow-[0_0_40px_rgba(212,175,55,0.15)]",
           "backdrop-blur-2xl focus:outline-none",
           "transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
           "data-[open]:scale-100 data-[open]:opacity-100",

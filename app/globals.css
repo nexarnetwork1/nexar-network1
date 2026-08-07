@@ -3,7 +3,7 @@
 /* ─── Canvas (page backdrop — changes in light mode) ─────────────────────── */
 :root {
   --nxr-canvas-primary: #050505;
-  --nxr-canvas-secondary: #080808;
+  --nxr-canvas-secondary: #090909;
 }
 
 html[data-theme="light"] {
@@ -29,31 +29,32 @@ html[data-theme="dark"],
 
 /* ─── Fixed brand + semantic colors (identical in light & dark) ─────────── */
 :root {
-  --nxr-chrome: #0c0c0c;
-  --nxr-bg-surface: #101010;
-  --nxr-bg-card: #111111;
-  --nxr-bg-card-elevated: #141414;
-  --nxr-bg-card-hover: #181818;
-  --nxr-bg-card-active: #202020;
+  --nxr-chrome: #090909;
+  --nxr-bg-surface: #090909;
+  --nxr-bg-card: #101010;
+  --nxr-bg-card-elevated: #121212;
+  --nxr-bg-card-hover: #171717;
+  --nxr-bg-card-active: #1c1c1c;
   --nxr-bg-input: rgba(255, 255, 255, 0.04);
 
   --nxr-text-primary: #ffffff;
-  --nxr-text-secondary: #d5d5d5;
-  --nxr-text-muted: #9a9a9a;
+  --nxr-text-secondary: #b8b8b8;
+  --nxr-text-muted: #777777;
   --nxr-text-on-gold: #050505;
 
-  --nxr-border-subtle: rgba(255, 255, 255, 0.08);
-  --nxr-border-default: rgba(255, 255, 255, 0.1);
-  --nxr-border-strong: rgba(255, 255, 255, 0.14);
-  --nxr-border-hover: rgba(255, 209, 92, 0.25);
+  --nxr-border-subtle: rgba(255, 255, 255, 0.06);
+  --nxr-border-default: rgba(255, 255, 255, 0.08);
+  --nxr-border-strong: rgba(255, 255, 255, 0.12);
+  --nxr-border-hover: rgba(212, 175, 55, 0.28);
 
-  --nxr-gold: #ffd15c;
-  --nxr-gold-hover: #ffe082;
-  --nxr-gold-soft: rgba(255, 209, 92, 0.15);
+  --nxr-gold: #d4af37;
+  --nxr-gold-hover: #f4d27a;
+  --nxr-gold-soft: rgba(212, 175, 55, 0.14);
 
-  --nxr-success: #22c55e;
-  --nxr-danger: #ef4444;
+  --nxr-success: #00c853;
+  --nxr-danger: #e74c3c;
   --nxr-warning: #f59e0b;
+  --nxr-info: #2ea8ff;
 
   --nxr-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.24), 0 8px 24px -8px rgba(0, 0, 0, 0.48);
   --nxr-shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.28), 0 16px 40px -12px rgba(0, 0, 0, 0.55);
@@ -124,6 +125,7 @@ html[data-theme="dark"],
   --color-success: var(--nxr-success);
   --color-danger: var(--nxr-danger);
   --color-warning: var(--nxr-warning);
+  --color-info: var(--nxr-info);
 
   --radius-sm: var(--nxr-radius-sm);
   --radius-md: var(--nxr-radius-md);
@@ -266,8 +268,31 @@ html[data-theme="dark"],
   .nxr-card-interactive:hover {
     border-color: var(--nxr-border-hover);
     background-color: var(--nxr-bg-card-hover);
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: var(--nxr-shadow-card-hover);
+  }
+
+  .nxr-btn-primary {
+    background: linear-gradient(180deg, var(--nxr-gold-hover) 0%, var(--nxr-gold) 100%);
+    color: var(--nxr-text-on-gold);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: var(--nxr-radius-button);
+    transition:
+      box-shadow var(--nxr-duration-fast) var(--nxr-ease-out),
+      filter var(--nxr-duration-fast) var(--nxr-ease-out),
+      transform var(--nxr-duration-fast) var(--nxr-ease-out);
+  }
+
+  .nxr-btn-primary:hover {
+    box-shadow: 0 0 28px -6px rgba(212, 175, 55, 0.45);
+    filter: brightness(1.04);
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--nxr-gold-hover) 0%, var(--nxr-gold) 55%, #c9a227 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .nxr-input {
@@ -514,7 +539,7 @@ html[data-theme="dark"],
   }
 
   .border-gold\/30 {
-    border-color: rgba(255, 209, 92, 0.28);
+    border-color: rgba(212, 175, 55, 0.28);
   }
 
   .bg-white\/5 {
@@ -532,7 +557,7 @@ html[data-theme="dark"],
   }
 
   .bg-gold\/20 {
-    background-color: rgba(255, 209, 92, 0.18);
+    background-color: rgba(212, 175, 55, 0.16);
   }
 
   .hover\:bg-gold-secondary:hover,

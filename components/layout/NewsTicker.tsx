@@ -58,7 +58,7 @@ function PresaleTickerMessage() {
 
 export function NewsTicker({ announcements = [] }: NewsTickerProps) {
   return (
-    <div className="fixed top-[var(--nxr-nav-height)] left-0 z-20 w-full border-y border-gold/20 bg-black/90 backdrop-blur-md">
+    <div className="fixed top-[var(--nxr-nav-height)] left-0 z-20 w-full border-y border-border bg-chrome/95 backdrop-blur-md">
       <Marquee
         speed={35}
         gradient={false}
@@ -94,9 +94,19 @@ export function NewsTicker({ announcements = [] }: NewsTickerProps) {
 
           <PresaleTickerMessage />
 
-          <span className="whitespace-nowrap font-semibold text-gold">
-            🎉 Launch Offer – Limited Time · 50% OFF for all new merchants during the first 3 months · Now $10 instead of $20 · Limited-time offer · Paid in supported cryptocurrencies only · Marketplace Coming Soon
-          </span>
+          <Link
+            href="/atlas"
+            className="flex items-center gap-2 whitespace-nowrap font-semibold text-gold hover:underline"
+          >
+            <Image
+              src="/brand/atlas/atlas-icon-512.png"
+              alt=""
+              width={18}
+              height={18}
+              className="rounded-sm"
+            />
+            ATLAS Operating System is now available — One Account · One Workspace · One Ecosystem
+          </Link>
 
           {announcements.map((item) => (
             <span

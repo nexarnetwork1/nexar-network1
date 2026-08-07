@@ -18,7 +18,7 @@ gsap.registerPlugin(ScrollTrigger);
 const STATS = [
   { label: "Max Supply", value: MAX_SUPPLY / 1_000_000, suffix: "M" },
   { label: "Decimals", value: SITE.decimals, suffix: "" },
-  { label: "Ecosystem Modules", value: 7, suffix: "" },
+  { label: "Ecosystem Modules", value: 12, suffix: "" },
   { label: "Mint Status", value: 0, suffix: "", display: "Disabled" },
 ];
 

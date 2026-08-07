@@ -37,7 +37,7 @@ function EarthMesh({ idle }: { idle: boolean }) {
       <mesh scale={1.018}>
         <sphereGeometry args={[2.15, 48, 48]} />
         <meshBasicMaterial
-          color="#FFD15C"
+          color="#D4AF37"
           transparent
           opacity={0.07}
           side={THREE.BackSide}
@@ -54,8 +54,8 @@ function EarthScene({ idle }: { idle: boolean }) {
     <>
       <ambientLight intensity={0.12} />
       <directionalLight position={[6, 3, 5]} intensity={1.15} color="#e8ecf1" />
-      <pointLight position={[-5, -2, 3]} intensity={0.55} color="#FFD15C" />
-      <pointLight position={[4, -3, -2]} intensity={0.3} color="#FFE082" />
+      <pointLight position={[-5, -2, 3]} intensity={0.55} color="#D4AF37" />
+      <pointLight position={[4, -3, -2]} intensity={0.3} color="#F4D27A" />
       <Suspense fallback={null}>
         <EarthMesh idle={idle} />
       </Suspense>

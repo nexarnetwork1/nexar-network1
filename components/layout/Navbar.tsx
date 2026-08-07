@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Menu } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/constants/navigation";
 import { cn } from "@/lib/utils/cn";
@@ -11,6 +13,7 @@ import { NavLink } from "@/components/layout/NavLink";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/ui/Logo";
 import { MobileMenu } from "./MobileMenu";
+import { ATLAS_ASSETS } from "@/config/atlas-branding";
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -25,9 +28,35 @@ export function Navbar() {
         )}
       >
         <Container className="flex h-full items-center justify-between gap-6">
-          <NavLink href="/" aria-label="Nexar Network home" className="relative z-10 shrink-0">
-            <Logo />
-          </NavLink>
+          <div className="relative z-10 flex shrink-0 items-center gap-2 sm:gap-3">
+            <NavLink href="/" aria-label="Nexar Network home">
+              <Logo />
+            </NavLink>
+            <span
+              className="hidden h-5 w-px bg-border sm:block"
+              aria-hidden="true"
+            />
+            <Link
+              href="/atlas"
+              aria-label="ATLAS Business Operating System"
+              className="hidden sm:flex items-center gap-2 rounded-[var(--nxr-radius-lg)] border border-border px-2 py-1.5 transition-colors duration-150 hover:border-gold/30 hover:bg-white/[0.03]"
+            >
+              <div className="relative h-7 w-7 overflow-hidden rounded-md border border-gold/20">
+                <Image
+                  src={ATLAS_ASSETS.icon512}
+                  alt=""
+                  fill
+                  className="object-contain p-0.5"
+                />
+              </div>
+              <span className="hidden lg:flex flex-col leading-none">
+                <span className="text-[10px] font-semibold tracking-[0.12em] text-foreground uppercase">
+                  ATLAS
+                </span>
+                <span className="text-[9px] text-muted">Business OS</span>
+              </span>
+            </Link>
+          </div>
 
           <nav
             aria-label="Primary navigation"

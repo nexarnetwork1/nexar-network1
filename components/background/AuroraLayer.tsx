@@ -10,7 +10,7 @@ export function AuroraLayer() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <motion.div
         aria-hidden="true"
-        className="absolute -top-[30%] -left-[20%] h-[70vh] w-[70vw] rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.14)_0%,transparent_70%)] blur-3xl"
+        className="absolute -top-[30%] -left-[20%] h-[70vh] w-[70vw] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.14)_0%,transparent_70%)] blur-3xl"
         animate={
           reducedMotion
             ? undefined
@@ -47,7 +47,7 @@ export function AuroraLayer() {
       />
       <motion.div
         aria-hidden="true"
-        className="absolute bottom-[-20%] left-[25%] h-[50vh] w-[50vw] rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.06)_0%,transparent_72%)] blur-3xl"
+        className="absolute bottom-[-20%] left-[25%] h-[50vh] w-[50vw] rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.06)_0%,transparent_72%)] blur-3xl"
         animate={
           reducedMotion
             ? undefined
@@ -63,7 +63,7 @@ export function AuroraLayer() {
           delay: 4,
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,209,92,0.05),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.05),transparent_55%)]" />
     </div>
   );
 }

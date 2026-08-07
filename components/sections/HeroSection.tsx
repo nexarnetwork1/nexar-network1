@@ -63,19 +63,31 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-10 inline-flex items-center gap-3 rounded-[0.625rem] border border-border bg-card px-4 py-2"
+              className="mb-6 flex flex-col items-start gap-2 sm:mb-8"
             >
-              <span className="relative flex h-2 w-2">
-                <StatusDot color="gold" size="sm" />
-              </span>
-              <span className="text-[11px] tracking-[0.18em] text-muted uppercase">
-                {SITE.blockchain}
-              </span>
-              <span className="h-3 w-px bg-gold/25" />
-              <span className="inline-flex items-center gap-1.5 text-[11px] text-gold">
-                <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.5} />
-                Verified Contract
-              </span>
+              <div className="inline-flex items-center gap-3 rounded-[0.625rem] border border-border bg-card px-4 py-2">
+                <span className="relative flex h-2 w-2">
+                  <StatusDot color="gold" size="sm" />
+                </span>
+                <span className="text-[11px] tracking-[0.16em] text-gold uppercase font-semibold">
+                  BOT Chain
+                </span>
+                <span className="text-[11px] text-muted">Multi-Chain Infrastructure</span>
+              </div>
+
+              <div className="inline-flex items-center gap-3 rounded-[0.625rem] border border-border bg-card px-4 py-2">
+                <span className="relative flex h-2 w-2">
+                  <StatusDot color="gold" size="sm" />
+                </span>
+                <span className="text-[11px] tracking-[0.18em] text-muted uppercase">
+                  {SITE.blockchain}
+                </span>
+                <span className="h-3 w-px bg-gold/25" />
+                <span className="inline-flex items-center gap-1.5 text-[11px] text-gold">
+                  <ShieldCheck className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  Verified Contract
+                </span>
+              </div>
             </motion.div>
 
             <h1
@@ -102,8 +114,11 @@ export function HeroSection() {
               transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-lg text-base sm:text-lg leading-7 sm:leading-8 text-muted"
             >
-              {SITE.tagline} Sovereign blockchain payment rails — starting on
-              BNB Smart Chain, evolving into Nexar Chain.
+              {SITE.tagline} Powered by{" "}
+              <Link href="/atlas" className="text-gold hover:underline">
+                ATLAS
+              </Link>
+              {" "}— sovereign payment rails on BNB Smart Chain, evolving into Nexar Chain.
             </motion.p>
 
             <motion.div
@@ -138,7 +153,7 @@ export function HeroSection() {
             style={{ y: vizY }}
             className="relative mx-auto aspect-square w-full max-w-[400px] sm:max-w-[520px] lg:max-w-none order-1 lg:order-2"
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.04)_0%,transparent_70%)] blur-2xl" />
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.04)_0%,transparent_70%)] blur-2xl" />
             <BlockchainVisualization />
           </motion.div>
         </div>

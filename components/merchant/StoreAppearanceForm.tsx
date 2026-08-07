@@ -77,10 +77,10 @@ export function StoreAppearanceForm({ store, settings }: Props) {
             <input
               type="color"
               name="primaryColor"
-              defaultValue={profile.primary_color ?? "#FFD15C"}
+              defaultValue={profile.primary_color ?? "#D4AF37"}
               className="h-10 w-12 cursor-pointer rounded border border-border bg-transparent"
             />
-            <Input name="primaryColorText" defaultValue={profile.primary_color ?? "#FFD15C"} className="flex-1" />
+            <Input name="primaryColorText" defaultValue={profile.primary_color ?? "#D4AF37"} className="flex-1" />
           </div>
         </div>
         <div>

@@ -25,7 +25,7 @@ export function Web3Provider({
         config={{
           appearance: {
             theme: "dark",
-            accentColor: "#FFD15C",
+            accentColor: "#D4AF37",
             showWalletLoginFirst: true,
             walletList: [
               "metamask",

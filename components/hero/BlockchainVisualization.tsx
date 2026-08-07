@@ -10,19 +10,52 @@ type Node = {
   y: number;
   radius: number;
   label: string;
+  sublabel?: string;
   connections: number[];
 };
 
-const NODES: Node[] = [
-  { x: 0.5, y: 0.5, radius: 28, label: "NXR", connections: [1, 2, 3, 4, 5] },
-  { x: 0.15, y: 0.25, radius: 10, label: "BSC", connections: [0] },
-  { x: 0.85, y: 0.2, radius: 10, label: "Pay", connections: [0] },
-  { x: 0.9, y: 0.75, radius: 10, label: "Bridge", connections: [0] },
-  { x: 0.1, y: 0.7, radius: 10, label: "Wallet", connections: [0] },
-  { x: 0.5, y: 0.08, radius: 8, label: "API", connections: [0] },
-  { x: 0.25, y: 0.88, radius: 8, label: "DEX", connections: [0] },
-  { x: 0.75, y: 0.88, radius: 8, label: "Chain", connections: [0] },
-];
+const ORBIT_LABELS = [
+  "Wallet",
+  "Pay",
+  "Commerce",
+  "Market",
+  "Explorer",
+  "Bridge",
+  "AI",
+  "Merchant",
+  "Customer",
+  "Treasury",
+  "Analytics",
+  "BOT",
+] as const;
+
+function buildNodes(): Node[] {
+  const center: Node = {
+    x: 0.5,
+    y: 0.5,
+    radius: 30,
+    label: "ATLAS",
+    sublabel: "NXR",
+    connections: [],
+  };
+
+  const orbit: Node[] = ORBIT_LABELS.map((label, i) => {
+    const angle = (i / ORBIT_LABELS.length) * 2 * Math.PI - Math.PI / 2;
+    const radiusPct = 0.38;
+    return {
+      x: 0.5 + radiusPct * Math.cos(angle),
+      y: 0.5 + radiusPct * Math.sin(angle),
+      radius: label.length > 6 ? 9 : 10,
+      label,
+      connections: [0],
+    };
+  });
+
+  center.connections = orbit.map((_, i) => i + 1);
+  return [center, ...orbit];
+}
+
+const NODES = buildNodes();
 
 export function BlockchainVisualization() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -94,6 +127,7 @@ export function BlockchainVisualization() {
           y: node.y * h + offsetY * (i === 0 ? 0 : 1),
           radius: node.radius + (i === 0 ? pulse : 0),
           label: node.label,
+          sublabel: node.sublabel,
         };
       });
 
@@ -116,9 +150,7 @@ export function BlockchainVisualization() {
           ctx.stroke();
 
           const packetProgress =
-            (Math.sin(timeRef.current * 2 + node.connections.indexOf(targetIdx)) +
-              1) /
-            2;
+            (Math.sin(timeRef.current * 2 + node.connections.indexOf(targetIdx)) + 1) / 2;
           const px = from.x + (to.x - from.x) * packetProgress;
           const py = from.y + (to.y - from.y) * packetProgress;
           ctx.beginPath();
@@ -130,40 +162,32 @@ export function BlockchainVisualization() {
 
       positions.forEach((pos, i) => {
         const isCenter = i === 0;
-        const glow = ctx.createRadialGradient(
-          pos.x,
-          pos.y,
-          0,
-          pos.x,
-          pos.y,
-          pos.radius * 2,
-        );
-        glow.addColorStop(
-          0,
-          isCenter ? `${COLORS.gold}4d` : `${COLORS.gold}1f`,
-        );
+        const glow = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, pos.radius * 2);
+        glow.addColorStop(0, isCenter ? `${COLORS.gold}4d` : `${COLORS.gold}1f`);
         glow.addColorStop(1, "transparent");
         ctx.fillStyle = glow;
-        ctx.fillRect(
-          pos.x - pos.radius * 2,
-          pos.y - pos.radius * 2,
-          pos.radius * 4,
-          pos.radius * 4,
-        );
+        ctx.fillRect(pos.x - pos.radius * 2, pos.y - pos.radius * 2, pos.radius * 4, pos.radius * 4);
 
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, pos.radius, 0, Math.PI * 2);
-        ctx.fillStyle = isCenter ? `${COLORS.gold}26` : "rgba(16,16,16,0.8)";
+        ctx.fillStyle = isCenter ? `${COLORS.gold}26` : "rgba(16,16,16,0.85)";
         ctx.fill();
         ctx.strokeStyle = isCenter ? `${COLORS.gold}99` : `${COLORS.gold}40`;
         ctx.lineWidth = isCenter ? 1.5 : 1;
         ctx.stroke();
 
         ctx.fillStyle = isCenter ? COLORS.goldSecondary : COLORS.muted;
-        ctx.font = `${isCenter ? 11 : 9}px var(--font-space-grotesk)`;
+        ctx.font = `${isCenter ? 10 : 8}px var(--font-space-grotesk)`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(pos.label, pos.x, pos.y);
+        if (isCenter && pos.sublabel) {
+          ctx.fillText(pos.label, pos.x, pos.y - 5);
+          ctx.font = "7px var(--font-space-grotesk)";
+          ctx.fillStyle = COLORS.gold;
+          ctx.fillText(pos.sublabel, pos.x, pos.y + 7);
+        } else {
+          ctx.fillText(pos.label, pos.x, pos.y);
+        }
       });
 
       frame = requestAnimationFrame(draw);
@@ -188,7 +212,7 @@ export function BlockchainVisualization() {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1.2, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.06)_0%,transparent_65%)]" />
+      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.06)_0%,transparent_65%)]" />
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 rounded-full border border-gold/10" />
       <div
