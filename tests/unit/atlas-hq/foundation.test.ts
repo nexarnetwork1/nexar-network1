@@ -114,6 +114,6 @@ describe("NEXAR HQ roles & website contracts", () => {
 
   it("routes Platform Owner into ATLAS dashboard not marketplace", () => {
     expect(getDashboardPath("platform_owner")).toContain("/dashboard");
-    expect(getDashboardPath("customer")).toBe("/marketplace");
+    expect(getDashboardPath("customer")).toBe("/dashboard");
   });
 });

@@ -19,9 +19,8 @@ export async function GET(request: Request) {
     );
   }
 
-  // Redirect to the ATLAS workspace after successful verification.
-  // The dashboard layout re-checks emailVerified and routes accordingly.
+  // Redirect to sign-in after verification — user must log in to create a session.
   return NextResponse.redirect(
-    `${origin}${result.redirectTo ?? "/dashboard"}`,
+    `${origin}${result.redirectTo ?? "/login?message=confirm_email"}`,
   );
 }

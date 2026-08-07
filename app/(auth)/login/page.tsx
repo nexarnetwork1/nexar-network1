@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/auth";
-import { getDashboardPath } from "@/lib/auth/redirect";
+import { safeRedirect } from "@/lib/auth/redirect";
+import { mapAuthJsError } from "@/lib/auth/oauth-errors";
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { AtlasIdentityPage } from "@/components/atlas/identity/AtlasIdentityModal";
 import { privateAreaMetadata } from "@/lib/constants/seo";
@@ -22,10 +23,12 @@ export default async function LoginPage({ searchParams }: Props) {
 
   if (session?.user?.id) {
     const dest = sp.redirect ?? sp.next;
-    redirect(dest && dest.startsWith("/") ? dest : getDashboardPath(undefined));
+    redirect(safeRedirect(dest));
   }
 
   const initialMode = sp.mode === "register" ? "register" : "signin";
+  const authError = mapAuthJsError(sp.error);
+  const message = authError ?? sp.message ?? null;
 
   return (
     <Suspense>
@@ -33,7 +36,7 @@ export default async function LoginPage({ searchParams }: Props) {
         <AtlasIdentityPage
           initialMode={initialMode}
           redirect={sp.redirect ?? "/atlas"}
-          message={sp.message ?? null}
+          message={message}
         />
       </CommerceAuthShell>
     </Suspense>

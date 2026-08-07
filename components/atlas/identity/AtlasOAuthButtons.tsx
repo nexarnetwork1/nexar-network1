@@ -104,7 +104,7 @@ export function AtlasOAuthButtons({
           ?.selectedAddress;
       if (address) {
         onWalletAddress?.(address);
-        const result = await linkOrLoginWalletAction(address);
+        const result = await linkOrLoginWalletAction(address, redirectTo ?? "/atlas");
         if (!result.success) {
           setError(result.error ?? "Wallet link failed");
         } else if (result.redirectTo) {

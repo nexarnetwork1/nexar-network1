@@ -55,7 +55,7 @@ export function AtlasRegisterForm({
       onSuccess("/login?message=confirm_email");
       return;
     }
-    onSuccess(result.redirectTo ?? redirect ?? "/dashboard");
+    onSuccess(result.redirectTo ?? redirect ?? "/atlas");
   }
 
   return (

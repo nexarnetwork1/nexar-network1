@@ -4,11 +4,11 @@ export const authConfig = {
   // All roles land at /dashboard. getDashboardPath() is the canonical source of
   // truth; this map is kept for reference and any legacy consumers.
   redirectAfterLogin: {
-    customer: "/dashboard",
-    merchant: "/dashboard",
-    business: "/dashboard",
-    admin: "/dashboard",
-    super_admin: "/dashboard",
+    customer: "/atlas",
+    merchant: "/atlas",
+    business: "/atlas",
+    admin: "/atlas",
+    super_admin: "/atlas",
   },
   profileCompletionRoute: "/auth/complete-profile",
   authRoutes: [

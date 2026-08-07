@@ -68,7 +68,7 @@ export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProvide
   const handleSuccess = useCallback(
     (destination: string) => {
       closeCommerceAuth();
-      router.push(safeRedirect(destination, "/dashboard"));
+      router.push(safeRedirect(destination));
       router.refresh();
     },
     [closeCommerceAuth, router],

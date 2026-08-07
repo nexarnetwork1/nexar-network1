@@ -43,7 +43,7 @@ export function AtlasSignInForm({
   async function onSubmit(data: LoginInput) {
     setServerError(null);
     const formData = objectToFormData(data);
-    formData.set("redirect", redirect ?? "/dashboard");
+    formData.set("redirect", redirect ?? "/atlas");
     const rememberMe = (document.getElementById("atlas-identity-remember") as HTMLInputElement)
       ?.checked;
     formData.set("rememberMe", rememberMe ? "true" : "false");
@@ -54,7 +54,7 @@ export function AtlasSignInForm({
       setResendEmail(data.email);
       return;
     }
-    onSuccess(result.redirectTo ?? redirect ?? "/dashboard");
+    onSuccess(result.redirectTo ?? redirect ?? "/atlas");
   }
 
   return (
@@ -80,6 +80,12 @@ export function AtlasSignInForm({
         <AtlasIdentityMessage tone="error">
           Social sign-in could not be completed. Try again or use email and password.
         </AtlasIdentityMessage>
+      ) : null}
+      {message &&
+      message !== "confirm_email" &&
+      message !== "password_reset" &&
+      message !== "auth_callback_failed" ? (
+        <AtlasIdentityMessage tone="error">{message}</AtlasIdentityMessage>
       ) : null}
 
       <AtlasOAuthButtons redirectTo={redirect ?? undefined} layout="stack" />

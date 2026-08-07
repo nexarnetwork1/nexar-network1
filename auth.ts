@@ -116,6 +116,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientSecret:
               process.env.AUTH_GOOGLE_SECRET ?? process.env.GOOGLE_CLIENT_SECRET!,
             allowDangerousEmailAccountLinking: true,
+            authorization: {
+              params: {
+                prompt: "select_account",
+              },
+            },
           }),
         ]
       : []),

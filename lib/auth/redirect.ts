@@ -1,5 +1,8 @@
 import type { UserRole } from "@/types";
 
+/** Default destination after sign-in when no explicit redirect is provided. */
+export const DEFAULT_POST_LOGIN = "/atlas";
+
 const DASHBOARD_PATHS: Record<UserRole, string> = {
   // All roles enter ATLAS at /dashboard. The workspace layout resolves
   // the correct module tree per role from ATLAS_ROOT_MODULES.
@@ -79,6 +82,17 @@ export function isValidRedirect(path: string): boolean {
 }
 
 /** Returns `path` when it is a safe internal destination, otherwise `fallback`. */
-export function safeRedirect(path: string | null | undefined, fallback = "/"): string {
+export function safeRedirect(
+  path: string | null | undefined,
+  fallback = DEFAULT_POST_LOGIN,
+): string {
   return path && isValidRedirect(path) ? path : fallback;
+}
+
+/** Resolves post-login destination — honors requested path, never forces marketplace. */
+export function resolvePostLoginRedirect(
+  path: string | null | undefined,
+  fallback: string = DEFAULT_POST_LOGIN,
+): string {
+  return safeRedirect(path, fallback);
 }

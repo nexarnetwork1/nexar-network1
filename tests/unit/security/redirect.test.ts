@@ -44,8 +44,8 @@ describe("safeRedirect", () => {
   });
 
   it("falls back for unsafe or missing paths", () => {
-    expect(safeRedirect("//evil.com", "/marketplace")).toBe("/marketplace");
-    expect(safeRedirect(null, "/marketplace")).toBe("/marketplace");
-    expect(safeRedirect(undefined)).toBe("/");
+    expect(safeRedirect("//evil.com", "/atlas")).toBe("/atlas");
+    expect(safeRedirect(null, "/atlas")).toBe("/atlas");
+    expect(safeRedirect(undefined)).toBe("/atlas");
   });
 });

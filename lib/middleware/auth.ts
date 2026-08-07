@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
+import { getDashboardPath, isValidRedirect, DEFAULT_POST_LOGIN } from "@/lib/auth/redirect";
 import { authConfig } from "@/config";
 import { hasRoleAccess, isProtectedRoute } from "./authorization";
 
@@ -83,7 +83,7 @@ export function handleAuthRouting(
       const destination =
         redirectParam && isValidRedirect(redirectParam)
           ? redirectParam
-          : getDashboardPath(profile.role);
+          : DEFAULT_POST_LOGIN;
       return NextResponse.redirect(new URL(destination, request.url));
     }
 

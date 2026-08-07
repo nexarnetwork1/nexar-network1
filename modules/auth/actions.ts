@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcrypt";
 import { auth } from "@/auth";
 import { tryCreateAdminClient, createAdminClient } from "@/lib/supabase/admin";
-import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
+import { getDashboardPath, isValidRedirect, resolvePostLoginRedirect, DEFAULT_POST_LOGIN } from "@/lib/auth/redirect";
 import {
   createDatabaseSession,
   destroyDatabaseSession,
@@ -187,10 +187,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
   }
 
   const redirectParam = formData.get("redirect") as string | null;
-  const redirectTo =
-    redirectParam && isValidRedirect(redirectParam)
-      ? redirectParam
-      : getDashboardPath(profile.role);
+  const redirectTo = resolvePostLoginRedirect(redirectParam);
 
   return { success: true, redirectTo };
 }
@@ -433,7 +430,7 @@ export async function completeProfileAction(
     }
   }
 
-  return { success: true, redirectTo: getDashboardPath(role) };
+  return { success: true, redirectTo: resolvePostLoginRedirect(undefined, DEFAULT_POST_LOGIN) };
 }
 
 export async function signOutAction(): Promise<void> {
@@ -638,6 +635,7 @@ export async function changeWalletAction(
 
 export async function linkOrLoginWalletAction(
   walletAddress: string,
+  redirectAfter?: string | null,
 ): Promise<ActionResult> {
   const wallet = walletAddress.toLowerCase();
   if (!/^0x[a-f0-9]{40}$/.test(wallet)) {
@@ -665,7 +663,10 @@ export async function linkOrLoginWalletAction(
     if (!linked.profile_completed) {
       return { success: true, redirectTo: "/auth/complete-profile" };
     }
-    return { success: true, redirectTo: getDashboardPath(linked.role) };
+    return {
+      success: true,
+      redirectTo: resolvePostLoginRedirect(redirectAfter),
+    };
   }
 
   if (!session?.user?.id) {
@@ -757,5 +758,5 @@ export async function verifyEmailTokenAction(
     })
     .eq("email", normalized);
   if (error) return { success: false, error: error.message };
-  return { success: true, redirectTo: "/dashboard" };
+  return { success: true, redirectTo: "/login?message=confirm_email" };
 }

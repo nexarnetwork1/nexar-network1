@@ -93,7 +93,7 @@ export function AtlasIdentityPage({
   const [mode, setMode] = useState<AtlasIdentityMode>(initialMode);
 
   const handleSuccess = (destination: string) => {
-    router.push(safeRedirect(destination, "/dashboard"));
+    router.push(safeRedirect(destination));
     router.refresh();
   };
 
