@@ -1,6 +1,6 @@
 # Middleware
 
-Next.js edge middleware entry point lives at the project root: `middleware.ts`.
+Next.js edge proxy entry point lives at the project root: `proxy.ts`.
 
 Modular helpers are organized in `lib/middleware/`:
 

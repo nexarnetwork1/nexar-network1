@@ -1,6 +1,6 @@
 /**
  * Middleware helpers — re-exported from lib/middleware for a stable import path.
- * The Next.js edge entry point remains at /middleware.ts.
+ * The Next.js edge entry point remains at /proxy.ts.
  */
 export {
   applyRateLimit,
