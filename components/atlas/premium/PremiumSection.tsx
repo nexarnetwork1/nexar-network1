@@ -14,9 +14,9 @@ export function PremiumSection({
   padding = "lg",
 }: PremiumSectionProps) {
   const variants = {
-    default: "bg-[#0a0a0b]",
-    gradient: "bg-gradient-to-br from-[#0a0a0b] via-[#0f0f12] to-[#0a0a0b]",
-    dark: "bg-[#050505]",
+    default: "bg-background-secondary",
+    gradient: "bg-gradient-to-br from-background-secondary via-background to-background-secondary",
+    dark: "bg-background",
     gold: "bg-gradient-to-br from-gold/5 via-transparent to-gold/5",
   };
 

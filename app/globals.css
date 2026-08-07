@@ -1,234 +1,369 @@
 @import "tailwindcss";
 
+/* ─── Semantic tokens (dark default) ─────────────────────────────────────── */
+:root {
+  --nxr-bg-primary: #000000;
+  --nxr-bg-secondary: #0a0a0a;
+  --nxr-bg-surface: #0a0a0a;
+  --nxr-bg-card: #111111;
+  --nxr-bg-card-elevated: #161616;
+  --nxr-bg-input: rgba(255, 255, 255, 0.04);
+
+  --nxr-text-primary: #ffffff;
+  --nxr-text-secondary: #a0a4b0;
+  --nxr-text-muted: #6b7080;
+  --nxr-text-on-gold: #000000;
+
+  --nxr-border-subtle: rgba(255, 255, 255, 0.08);
+  --nxr-border-default: rgba(255, 255, 255, 0.12);
+  --nxr-border-strong: rgba(255, 255, 255, 0.16);
+
+  --nxr-gold: #c9a962;
+  --nxr-gold-light: #d4b878;
+  --nxr-gold-dark: #a88a4a;
+  --nxr-gold-muted: rgba(201, 169, 98, 0.12);
+
+  --nxr-shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.55);
+  --nxr-radius-sm: 0.375rem;
+  --nxr-radius-md: 0.625rem;
+  --nxr-radius-lg: 0.75rem;
+  --nxr-radius-xl: 1rem;
+
+  --nxr-nav-height: 4rem;
+  --nxr-ticker-height: 2.5rem;
+  --nxr-header-offset: calc(var(--nxr-nav-height) + var(--nxr-ticker-height));
+  --atlas-app-bar-height: 3.25rem;
+
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --nxr-bg-primary: #ffffff;
+  --nxr-bg-secondary: #f7f7f8;
+  --nxr-bg-surface: #f0f0f2;
+  --nxr-bg-card: #ffffff;
+  --nxr-bg-card-elevated: #fafafa;
+  --nxr-bg-input: rgba(0, 0, 0, 0.03);
+
+  --nxr-text-primary: #0a0a0a;
+  --nxr-text-secondary: #3d4250;
+  --nxr-text-muted: #6b7080;
+  --nxr-text-on-gold: #000000;
+
+  --nxr-border-subtle: rgba(0, 0, 0, 0.08);
+  --nxr-border-default: rgba(0, 0, 0, 0.12);
+  --nxr-border-strong: rgba(0, 0, 0, 0.16);
+
+  --nxr-shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.12);
+
+  color-scheme: light;
+}
+
 @theme {
-  /* Premium Enterprise Color Palette */
   --color-black: #000000;
-  --color-dark-navy: #0a0e1a;
-  --color-graphite: #1a1d24;
-  --color-charcoal: #2d313a;
   --color-white: #ffffff;
-  --color-gold: #c9a962;
-  --color-gold-light: #d4b878;
-  --color-gold-dark: #a88a4a;
-  
-  /* Surface Colors */
-  --color-surface-0: #000000;
-  --color-surface-1: #0a0e1a;
-  --color-surface-2: #1a1d24;
-  --color-surface-3: #2d313a;
-  
-  /* Text Colors */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a0a4b0;
-  --color-text-tertiary: #6b7080;
-  
-  /* Border Colors */
-  --color-border-subtle: rgba(255, 255, 255, 0.08);
-  --color-border-default: rgba(255, 255, 255, 0.12);
-  --color-border-strong: rgba(255, 255, 255, 0.16);
-  
-  /* Layout Variables */
+
+  --color-background: var(--nxr-bg-primary);
+  --color-background-secondary: var(--nxr-bg-secondary);
+  --color-surface: var(--nxr-bg-surface);
+  --color-card: var(--nxr-bg-card);
+  --color-card-elevated: var(--nxr-bg-card-elevated);
+  --color-foreground: var(--nxr-text-primary);
+
+  --color-surface-0: var(--nxr-bg-primary);
+  --color-surface-1: var(--nxr-bg-secondary);
+  --color-surface-2: var(--nxr-bg-card);
+  --color-surface-3: var(--nxr-bg-card-elevated);
+
+  --color-gold: var(--nxr-gold);
+  --color-gold-light: var(--nxr-gold-light);
+  --color-gold-dark: var(--nxr-gold-dark);
+  --color-gold-secondary: var(--nxr-gold-light);
+  --color-gold-accent: var(--nxr-gold-light);
+
+  --color-text-primary: var(--nxr-text-primary);
+  --color-text-secondary: var(--nxr-text-secondary);
+  --color-text-tertiary: var(--nxr-text-muted);
+  --color-muted: var(--nxr-text-muted);
+
+  --color-border: var(--nxr-border-subtle);
+  --color-border-subtle: var(--nxr-border-subtle);
+  --color-border-default: var(--nxr-border-default);
+  --color-border-strong: var(--nxr-border-strong);
+
+  --radius-sm: var(--nxr-radius-sm);
+  --radius-md: var(--nxr-radius-md);
+  --radius-lg: var(--nxr-radius-lg);
+  --radius-xl: var(--nxr-radius-xl);
+
   --nxr-nav-height: 4rem;
   --nxr-ticker-height: 2.5rem;
   --atlas-app-bar-height: 3.25rem;
 }
 
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--nxr-bg-primary);
+    color: var(--nxr-text-primary);
+  }
+
+  ::selection {
+    background-color: rgba(201, 169, 98, 0.28);
+    color: var(--nxr-text-primary);
+  }
+}
+
 @layer components {
-  /* Premium Button Styles */
+  .font-heading {
+    font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .section-padding {
+    padding-block: clamp(3.5rem, 8vw, 5rem);
+    padding-inline: 1.5rem;
+  }
+
   .btn-primary {
     padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    background-color: var(--color-gold);
-    color: black;
+    border-radius: var(--nxr-radius-md);
+    background-color: var(--nxr-gold);
+    color: var(--nxr-text-on-gold);
     font-weight: 600;
-    transition: all 0.2s;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
   }
-  
+
   .btn-primary:hover {
-    background-color: var(--color-gold-light);
+    background-color: var(--nxr-gold-light);
   }
-  
+
   .btn-secondary {
     padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    background-color: var(--color-surface-2);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: white;
+    border-radius: var(--nxr-radius-md);
+    background-color: var(--nxr-bg-card);
+    border: 1px solid var(--nxr-border-default);
+    color: var(--nxr-text-primary);
     font-weight: 600;
-    transition: all 0.2s;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
   }
-  
+
   .btn-secondary:hover {
-    background-color: var(--color-surface-3);
+    background-color: var(--nxr-bg-card-elevated);
   }
-  
+
   .btn-ghost {
     padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    color: var(--color-text-secondary);
-    transition: all 0.2s;
+    border-radius: var(--nxr-radius-md);
+    color: var(--nxr-text-secondary);
+    transition: color 0.2s ease, background-color 0.2s ease;
   }
-  
+
   .btn-ghost:hover {
-    color: white;
-    background-color: var(--color-surface-1);
+    color: var(--nxr-text-primary);
+    background-color: var(--nxr-bg-secondary);
   }
-  
-  /* Premium Section Styles */
+
   .section {
     padding: 5rem 1.5rem;
   }
-  
+
   .section-narrow {
     max-width: 56rem;
     margin: 0 auto;
   }
-  
+
   .section-wide {
     max-width: 72rem;
     margin: 0 auto;
   }
-  
-  /* Premium Typography */
+
   .heading-xl {
     font-size: 3rem;
     line-height: 1;
     font-weight: 700;
     letter-spacing: -0.025em;
   }
-  
+
   @media (min-width: 1024px) {
     .heading-xl {
       font-size: 3.75rem;
     }
   }
-  
+
   .heading-lg {
     font-size: 2.25rem;
     line-height: 1;
     font-weight: 700;
     letter-spacing: -0.025em;
   }
-  
+
   @media (min-width: 1024px) {
     .heading-lg {
       font-size: 3rem;
     }
   }
-  
+
   .heading-md {
     font-size: 1.5rem;
     line-height: 1;
     font-weight: 700;
     letter-spacing: -0.025em;
   }
-  
+
   @media (min-width: 1024px) {
     .heading-md {
       font-size: 1.875rem;
     }
   }
-  
+
   .heading-sm {
     font-size: 1.25rem;
     font-weight: 600;
   }
-  
+
   .text-body {
     font-size: 1.125rem;
     line-height: 1.75;
-    color: var(--color-text-secondary);
+    color: var(--nxr-text-secondary);
   }
-  
-  .text-muted {
-    color: var(--color-text-tertiary);
+
+  .luxury-border {
+    border: 1px solid var(--nxr-border-subtle);
+  }
+
+  .nxr-card {
+    border-radius: var(--nxr-radius-lg);
+    border: 1px solid var(--nxr-border-subtle);
+    background-color: color-mix(in srgb, var(--nxr-bg-card) 92%, transparent);
+    box-shadow: var(--nxr-shadow-soft);
+  }
+
+  .nxr-card-interactive {
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .nxr-card-interactive:hover {
+    border-color: color-mix(in srgb, var(--nxr-gold) 28%, var(--nxr-border-subtle));
+    background-color: var(--nxr-bg-card-elevated);
   }
 }
 
 @layer utilities {
   .text-gold {
-    color: var(--color-gold);
+    color: var(--nxr-gold);
   }
-  
+
   .bg-surface-0 {
-    background-color: var(--color-surface-0);
+    background-color: var(--nxr-bg-primary);
   }
-  
+
   .bg-surface-1 {
-    background-color: var(--color-surface-1);
+    background-color: var(--nxr-bg-secondary);
   }
-  
+
   .bg-surface-2 {
-    background-color: var(--color-surface-2);
+    background-color: var(--nxr-bg-card);
   }
-  
+
   .bg-surface-3 {
-    background-color: var(--color-surface-3);
+    background-color: var(--nxr-bg-card-elevated);
   }
-  
+
   .bg-gold {
-    background-color: var(--color-gold);
+    background-color: var(--nxr-gold);
   }
-  
+
   .text-text-primary {
-    color: var(--color-text-primary);
+    color: var(--nxr-text-primary);
   }
-  
+
   .text-text-secondary {
-    color: var(--color-text-secondary);
+    color: var(--nxr-text-secondary);
   }
-  
+
   .text-text-tertiary {
-    color: var(--color-text-tertiary);
+    color: var(--nxr-text-muted);
   }
-  
-  /* Add support for existing design system classes */
-  .bg-black {
-    background-color: #000000;
+
+  .text-foreground {
+    color: var(--nxr-text-primary);
   }
-  
-  .bg-gold-secondary {
-    background-color: var(--color-gold-light);
-  }
-  
-  .text-white {
-    color: #ffffff;
-  }
-  
-  .border-white\/10 {
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .border-white\/20 {
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-  
-  .border-gold\/30 {
-    border-color: rgba(201, 169, 98, 0.3);
-  }
-  
-  .bg-white\/5 {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-  
-  .bg-white\/10 {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .bg-gold\/10 {
-    background-color: rgba(201, 169, 98, 0.1);
-  }
-  
-  .bg-gold\/20 {
-    background-color: rgba(201, 169, 98, 0.2);
-  }
-  
+
   .text-muted {
-    color: #a0a4b0;
+    color: var(--nxr-text-muted);
   }
-  
-  /* Layout Utilities */
+
+  .bg-background {
+    background-color: var(--nxr-bg-primary);
+  }
+
+  .bg-card {
+    background-color: var(--nxr-bg-card);
+  }
+
+  .border-border {
+    border-color: var(--nxr-border-subtle);
+  }
+
+  .border-white\/10 {
+    border-color: var(--nxr-border-subtle);
+  }
+
+  .border-white\/20 {
+    border-color: var(--nxr-border-default);
+  }
+
+  .border-gold\/30 {
+    border-color: color-mix(in srgb, var(--nxr-gold) 30%, transparent);
+  }
+
+  .bg-white\/5 {
+    background-color: color-mix(in srgb, var(--nxr-text-primary) 5%, transparent);
+  }
+
+  .bg-white\/10 {
+    background-color: color-mix(in srgb, var(--nxr-text-primary) 8%, transparent);
+  }
+
+  .bg-gold\/10 {
+    background-color: var(--nxr-gold-muted);
+  }
+
+  .bg-gold\/20 {
+    background-color: color-mix(in srgb, var(--nxr-gold) 18%, transparent);
+  }
+
+  .bg-gold\/15 {
+    background-color: color-mix(in srgb, var(--nxr-gold) 14%, transparent);
+  }
+
   .nav-offset {
-    padding-top: calc(var(--nxr-nav-height) + var(--nxr-ticker-height));
+    padding-top: var(--nxr-header-offset);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
   }
 }

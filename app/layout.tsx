@@ -16,6 +16,7 @@ import {
   productSchema,
   siteMetadata,
 } from "@/lib/constants/seo";
+import { THEME_STORAGE_KEY } from "@/lib/theme/constants";
 import "./globals.css";
 
 const inter = localFont({
@@ -45,8 +46,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+  colorScheme: "light dark",
   width: "device-width",
   initialScale: 1,
 };
@@ -63,14 +67,19 @@ export default async function RootLayout({
       lang="en"
       className={`${inter.variable} ${sora.variable} ${spaceGrotesk.variable} h-full scroll-smooth`}
     >
-      <body className="relative min-h-full bg-background font-sans text-white antialiased">
+      <body className="relative min-h-full bg-background font-sans text-foreground antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var s=localStorage.getItem(k);var t=s==="light"||s==="dark"||s==="system"?s:"system";var d=t==="system"?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":t;document.documentElement.setAttribute("data-theme",d);document.documentElement.classList.toggle("dark",d==="dark");document.documentElement.classList.toggle("light",d==="light");document.documentElement.style.colorScheme=d;}catch(e){}})();`,
+          }}
+        />
         <Toaster
           position="bottom-center"
           richColors
           theme="dark"
           toastOptions={{
             classNames: {
-              toast: "nxr-card border-border text-white",
+              toast: "nxr-card border-border text-foreground",
             },
             duration: 4200,
           }}
@@ -109,7 +118,7 @@ export default async function RootLayout({
 
           <div
             id="main-content"
-            className="relative z-10 flex min-h-screen flex-col nav-offset bg-black"
+            className="relative z-10 flex min-h-screen flex-col nav-offset bg-background"
           >
             {children}
           </div>

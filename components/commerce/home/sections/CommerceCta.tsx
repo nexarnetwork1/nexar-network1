@@ -45,7 +45,7 @@ export function CommerceCta() {
               <CommerceAuthTrigger
                 mode="register"
                 role="merchant"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold px-7 text-sm font-medium tracking-wide text-background shadow-[0_0_30px_-8px_rgba(212,175,55,0.55)] transition-all hover:bg-gold-secondary"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold px-7 text-sm font-medium tracking-wide text-background transition-colors hover:bg-gold-secondary"
               >
                 Create merchant account
                 <ArrowUpRight className="h-4 w-4" />

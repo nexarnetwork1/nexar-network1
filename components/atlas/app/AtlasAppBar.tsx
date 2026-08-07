@@ -12,6 +12,7 @@ import Image from "next/image";
 import { ATLAS_BRAND } from "@/config/atlas-branding";
 import { ATLAS_APP_BAR_ITEMS } from "@/config/atlas-app-nav";
 import { getAtlasAppNavIcon } from "@/components/atlas/app/atlas-app-nav-icons";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export function AtlasAppBar() {
   const pathname = usePathname();
@@ -28,7 +29,7 @@ export function AtlasAppBar() {
   };
 
   return (
-    <div className="sticky top-0 z-20 border-b border-white/10 bg-[#050505]/95 backdrop-blur-xl atlas-app-bar">
+    <div className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur-xl atlas-app-bar">
       <div className="flex h-[var(--atlas-app-bar-height)] items-center justify-between gap-3 px-4 lg:px-6">
         <div className="flex items-center gap-3 min-w-0">
           <Link href="/atlas" className="flex items-center gap-2 shrink-0">
@@ -40,7 +41,7 @@ export function AtlasAppBar() {
                 className="object-contain p-1"
               />
             </div>
-            <span className="hidden sm:block text-sm font-semibold tracking-wide text-white">
+            <span className="hidden sm:block text-sm font-semibold tracking-wide text-foreground">
               {ATLAS_BRAND.name}
             </span>
           </Link>
@@ -70,7 +71,7 @@ export function AtlasAppBar() {
                   key={item.id}
                   type="button"
                   onClick={() => handleAuthAction(item.href)}
-                  className="hidden sm:flex p-2 rounded-lg text-muted hover:text-white hover:bg-white/5 transition-colors"
+                  className="hidden sm:flex p-2 rounded-lg text-muted hover:text-foreground hover:bg-foreground/5 transition-colors"
                   title={item.label}
                 >
                   <Icon className="h-5 w-5" />
@@ -84,7 +85,7 @@ export function AtlasAppBar() {
                 href={item.href}
                 className={cn(
                   "hidden sm:flex p-2 rounded-lg transition-colors relative",
-                  isActive ? "text-gold bg-gold/10" : "text-muted hover:text-white hover:bg-white/5",
+                  isActive ? "text-gold bg-gold/10" : "text-muted hover:text-foreground hover:bg-foreground/5",
                 )}
                 title={item.appBarTitle ?? item.label}
               >
@@ -92,6 +93,8 @@ export function AtlasAppBar() {
               </Link>
             );
           })}
+
+          <ThemeToggle compact className="hidden lg:inline-flex" />
 
           <div className="hidden sm:block">
             <ConnectWalletButton variant="ghost" size="sm" className="h-9 px-2" />

@@ -29,7 +29,7 @@ export function AtlasIdentityCard({
   return (
     <div
       className={cn(
-        "relative w-full max-w-[22rem] overflow-hidden rounded-[1.25rem] border border-gold/20 bg-[#070708]/95 p-5 shadow-[0_0_60px_-20px_rgba(212,175,55,0.4)] backdrop-blur-xl sm:max-w-[24rem] sm:p-6",
+        "relative w-full max-w-[22rem] overflow-hidden rounded-[1.25rem] border border-gold/20 bg-card/95 p-5 shadow-[var(--nxr-shadow-soft)] backdrop-blur-xl sm:max-w-[24rem] sm:p-6",
         className,
       )}
     >
@@ -42,7 +42,7 @@ export function AtlasIdentityCard({
         <p className="text-[10px] font-semibold tracking-[0.28em] text-gold uppercase">
           {ATLAS_BRAND.name}
         </p>
-        <h1 className="mt-2 font-heading text-xl font-semibold tracking-tight text-white">
+        <h1 className="mt-2 font-heading text-xl font-semibold tracking-tight text-foreground">
           {mode === "signin" ? "Welcome back" : "Create your identity"}
         </h1>
         <p className="mt-1.5 text-xs leading-relaxed text-muted">
@@ -52,7 +52,7 @@ export function AtlasIdentityCard({
         </p>
       </header>
 
-      <div className="mb-4 flex rounded-full border border-white/10 bg-black/40 p-1">
+      <div className="mb-4 flex rounded-full border border-border bg-background/60 p-1">
         {(["signin", "register"] as const).map((tab) => (
           <button
             key={tab}
@@ -61,8 +61,8 @@ export function AtlasIdentityCard({
             className={cn(
               "flex-1 rounded-full py-2 text-xs font-semibold tracking-wide transition-all",
               mode === tab
-                ? "bg-gold/15 text-gold shadow-[inset_0_0_0_1px_rgba(212,175,55,0.35)]"
-                : "text-muted hover:text-white",
+                ? "bg-gold/15 text-gold"
+                : "text-muted hover:text-foreground",
             )}
           >
             {tab === "signin" ? "Sign In" : "Register"}

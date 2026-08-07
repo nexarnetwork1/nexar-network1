@@ -13,7 +13,7 @@ export function AuthCard({ title, subtitle, children, className }: AuthCardProps
   return (
     <div
       className={cn(
-        "relative mx-auto w-full max-w-[22rem] overflow-hidden rounded-[1.25rem] border border-gold/20 bg-[#070708]/95 p-5 shadow-[0_0_60px_-20px_rgba(212,175,55,0.4)] backdrop-blur-xl sm:max-w-[24rem] sm:p-6",
+        "relative mx-auto w-full max-w-[22rem] overflow-hidden rounded-[1.25rem] border border-gold/20 bg-card/95 p-5 shadow-[var(--nxr-shadow-soft)] backdrop-blur-xl sm:max-w-[24rem] sm:p-6",
         className,
       )}
     >
@@ -21,7 +21,7 @@ export function AuthCard({ title, subtitle, children, className }: AuthCardProps
       <div className="mb-5 flex justify-center">
         <AtlasLogo height={40} priority />
       </div>
-      <h1 className="text-center font-heading text-xl font-bold tracking-tight text-white">
+      <h1 className="text-center font-heading text-xl font-bold tracking-tight text-foreground">
         {title}
       </h1>
       {subtitle && (

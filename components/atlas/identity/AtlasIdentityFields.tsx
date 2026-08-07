@@ -17,9 +17,9 @@ export function AtlasIdentityField({
       <input
         id={id}
         className={cn(
-          "w-full rounded-xl border bg-black/50 px-4 py-2.5 text-sm text-white outline-none transition-colors",
+          "w-full rounded-xl border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors",
           "placeholder:text-muted/60 focus:border-gold/40 focus:ring-2 focus:ring-gold/15",
-          error ? "border-red-500/50" : "border-white/10",
+          error ? "border-red-500/50" : "border-border",
         )}
         {...props}
       />

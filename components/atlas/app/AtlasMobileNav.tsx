@@ -27,7 +27,7 @@ export function AtlasMobileNav() {
   return (
     <>
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#050505]/98 backdrop-blur-xl border-t border-white/10"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-xl border-t border-border"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-label="ATLAS mobile navigation"
       >
@@ -80,7 +80,7 @@ export function AtlasMobileNav() {
                   href={item.href}
                   className="flex flex-col items-center justify-center flex-1 min-w-0 -mt-3"
                 >
-                  <div className="h-11 w-11 rounded-full bg-gold border-[3px] border-[#050505] flex items-center justify-center shadow-lg shadow-gold/20">
+                  <div className="h-11 w-11 rounded-full bg-gold border-[3px] border-background flex items-center justify-center">
                     <Icon className="h-5 w-5 text-background" />
                   </div>
                   <span className="text-[10px] mt-1 text-gold font-medium">{item.label}</span>

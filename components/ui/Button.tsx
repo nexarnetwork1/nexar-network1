@@ -21,13 +21,13 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 /** Boutique rectangles — soft radius, not Web3 pills. */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gold text-background border border-gold/50 shadow-[0_8px_28px_-12px_rgba(212,175,55,0.4)] hover:bg-gold-accent hover:shadow-[0_10px_32px_-12px_rgba(212,175,55,0.5)]",
+    "bg-gold text-background border border-gold/40 hover:bg-gold-secondary",
   secondary:
-    "bg-transparent text-gold border border-gold/45 hover:bg-gold hover:text-background",
+    "bg-transparent text-gold border border-gold/35 hover:bg-gold/10 hover:text-gold",
   outline:
-    "bg-transparent text-white border border-white/15 hover:border-gold/50 hover:text-gold-accent",
+    "bg-transparent text-foreground border border-border hover:border-gold/40 hover:text-gold",
   ghost:
-    "bg-transparent text-muted hover:text-white hover:bg-white/[0.04] border border-transparent",
+    "bg-transparent text-muted hover:text-foreground hover:bg-foreground/[0.04] border border-transparent",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -85,7 +85,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:pointer-events-none disabled:opacity-50",
           variantStyles[variant],
           sizeStyles[size],
-          glow && "shadow-[0_8px_28px_-12px_rgba(212,175,55,0.45)]",
+          glow && "ring-1 ring-gold/20",
           className,
         )}
         onMouseMove={handleMouseMove}
