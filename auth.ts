@@ -103,8 +103,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    signIn: "/marketplace",
-    error: "/marketplace",
+    signIn: "/login",
+    error: "/login",
     verifyRequest: "/verify-email",
     newUser: "/auth/complete-profile",
   },
@@ -131,6 +131,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       : []),
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      try {
+        const target = new URL(url);
+        if (target.origin === baseUrl) return url;
+      } catch {
+        // Malformed URL — fall through to ATLAS callback.
+      }
+      return `${baseUrl}/auth/callback`;
+    },
     async signIn({ user, account }) {
       if (
         (account?.provider === "google" || account?.provider === "github") &&

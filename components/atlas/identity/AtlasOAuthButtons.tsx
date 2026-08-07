@@ -74,9 +74,8 @@ export function AtlasOAuthButtons({
         /\/$/,
         "",
       );
-      const callbackUrl = `${appUrl}/auth/callback${
-        redirectTo ? `?${new URLSearchParams({ redirect: redirectTo }).toString()}` : ""
-      }`;
+      const destination = redirectTo ?? "/atlas";
+      const callbackUrl = `${appUrl}/auth/callback?${new URLSearchParams({ redirect: destination }).toString()}`;
       await signIn(provider, { callbackUrl });
     } catch (err) {
       setError(err instanceof Error ? err.message : `${provider} sign-in failed`);

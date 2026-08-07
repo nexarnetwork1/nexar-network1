@@ -32,7 +32,7 @@ export default async function LoginPage({ searchParams }: Props) {
       <CommerceAuthShell>
         <AtlasIdentityPage
           initialMode={initialMode}
-          redirect={sp.redirect ?? null}
+          redirect={sp.redirect ?? "/atlas"}
           message={sp.message ?? null}
         />
       </CommerceAuthShell>

@@ -838,54 +838,50 @@ releasing team allocations according to the official vesting schedule.
 <div className="space-y-6">
 
 <div className="luxury-border rounded-2xl bg-card/60 p-6">
-<h3 className="text-gold font-semibold mb-3">Phase 1 — Foundation</h3>
+<h3 className="text-gold font-semibold mb-3">Foundation</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
-<li>Website Launch</li>
-<li>Whitepaper Publication</li>
-<li>Smart Contract Deployment</li>
-<li>Contract Verification</li>
-<li>Community Building</li>
-<li>Presale Preparation</li>
+<li>Nexar Network Website & Brand</li>
+<li>Official Whitepaper</li>
+<li>Dual-Chain NXR Presale (BNB Smart Chain & BOT Chain)</li>
+<li>Smart Contract Deployment & Verification</li>
+<li>Community & Partner Network</li>
 </ul>
 </div>
 
 <div className="luxury-border rounded-2xl bg-card/60 p-6">
-<h3 className="text-gold font-semibold mb-3">Phase 2 — Growth</h3>
+<h3 className="text-gold font-semibold mb-3">ATLAS Business Operating System</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
-<li>Presale Launch</li>
-<li>Marketing Campaigns</li>
-<li>Strategic Partnerships</li>
-<li>DEX Listings</li>
-<li>Ecosystem Development</li>
-<li>Marketplace Beta</li>
-<li>Merchant Registration</li>
+<li>Unified Identity — Email, Google, GitHub & Wallet</li>
+<li>Social Feed, Posts, Comments & Activity</li>
+<li>Network Profiles, Companies & Connections</li>
+<li>Jobs, Events & Global Search</li>
+<li>Messaging & Notifications</li>
+<li>Marketplace, Cart, Checkout & Wishlist</li>
+<li>Business Hub — Stores, Products, Orders, Invoices</li>
+<li>AI Assist Across Feed, Messages & Commerce</li>
+<li>NEXAR HQ Platform Administration</li>
 </ul>
 </div>
 
 <div className="luxury-border rounded-2xl bg-card/60 p-6">
-<h3 className="text-gold font-semibold mb-3">Phase 3 — Expansion</h3>
+<h3 className="text-gold font-semibold mb-3">Commerce & Finance</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
-<li>Nexar Wallet</li>
-<li>Nexar Pay</li>
-<li>Explorer</li>
-<li>Bridge</li>
-<li>Developer APIs</li>
-<li>Public Marketplace</li>
-<li>Merchant Dashboard</li>
-<li>Customer Dashboard</li>
-<li>Product Listings</li>
-<li>Order Management</li>
+<li>Merchant & Customer Portals</li>
+<li>Invoices & Order Management</li>
+<li>Treasury & Platform Analytics</li>
+<li>Expanded Payment Rails</li>
+<li>Strategic Partnerships & Listings</li>
 </ul>
 </div>
 
 <div className="luxury-border rounded-2xl bg-card/60 p-6">
-<h3 className="text-gold font-semibold mb-3">Phase 4 — Nexar Chain</h3>
+<h3 className="text-gold font-semibold mb-3">Network Expansion</h3>
 <ul className="list-disc pl-6 space-y-2 text-muted">
-<li>Validator Network</li>
-<li>Testnet</li>
-<li>Mainnet</li>
-<li>Global Adoption</li>
-<li>Marketplace Expansion</li>
+<li>Developer APIs & SDK</li>
+<li>Advanced Search & Discovery at Scale</li>
+<li>Global Adoption Programs</li>
+<li>Ecosystem Grants & Partnerships</li>
+<li>Cross-Chain Infrastructure</li>
 </ul>
 </div>
 

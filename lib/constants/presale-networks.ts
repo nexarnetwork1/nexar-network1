@@ -89,6 +89,14 @@ export function getPresaleNetwork(id: PresaleNetworkId = DEFAULT_PRESALE_NETWORK
   return PRESALE_NETWORKS[id];
 }
 
+/** Resolve presale network from an EVM chain id (BSC or BOT). */
+export function getPresaleNetworkByChainId(chainId: number): PresaleNetworkConfig | null {
+  for (const network of PRESALE_NETWORK_LIST) {
+    if (network.chainId === chainId) return network;
+  }
+  return null;
+}
+
 export function getExplorerAddressUrl(
   network: PresaleNetworkConfig,
   address: string,

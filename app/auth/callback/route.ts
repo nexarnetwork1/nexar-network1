@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { getDashboardPath, isValidRedirect } from "@/lib/auth/redirect";
+import { isValidRedirect } from "@/lib/auth/redirect";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { enforceSingleSession, trackUserSession } from "@/modules/auth/session";
 
@@ -58,7 +58,5 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}${redirect}`);
   }
 
-  return NextResponse.redirect(
-    `${origin}${getDashboardPath((profile as { role: string }).role)}`,
-  );
+  return NextResponse.redirect(`${origin}/atlas`);
 }
