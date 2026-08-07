@@ -4,10 +4,13 @@ import { useAccount } from "wagmi";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { usePresaleTransactions } from "@/lib/web3/hooks/usePresaleTransactions";
+import { usePresaleNetworkContext } from "@/components/providers/PresaleNetworkProvider";
+import { getExplorerTxUrl } from "@/lib/constants/presale-networks";
 import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 
 export function PresaleTransactionHistory() {
   const { address } = useAccount();
+  const { network } = usePresaleNetworkContext();
   const { transactions, isLoading } = usePresaleTransactions(address);
 
   return (
@@ -19,7 +22,9 @@ export function PresaleTransactionHistory() {
       )}
 
       {address && isLoading && (
-        <p className="mt-3 text-sm text-muted">Loading events from BSC…</p>
+        <p className="mt-3 text-sm text-muted">
+          Loading events from {network.shortName}…
+        </p>
       )}
 
       {address && !isLoading && transactions.length === 0 && (
@@ -58,11 +63,11 @@ export function PresaleTransactionHistory() {
                 </p>
               </div>
               <Link
-                href={`https://bscscan.com/tx/${tx.txHash}`}
+                href={getExplorerTxUrl(network, tx.txHash)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gold hover:underline"
-                aria-label="View on BscScan"
+                aria-label={`View on ${network.explorerName}`}
               >
                 <ExternalLink className="h-3.5 w-3.5" />
               </Link>

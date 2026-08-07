@@ -26,6 +26,7 @@ import {
 } from "@/modules/auth/actions";
 import { objectToFormData } from "@/utils/form-data";
 import { cn } from "@/lib/utils/cn";
+import { AtlasLogo } from "@/components/ui/AtlasLogo";
 
 type CommerceAuthMode = "signin" | "register";
 
@@ -294,7 +295,7 @@ function SignInView({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 12 }}
       transition={{ duration: 0.22 }}
-      className="space-y-5"
+      className="space-y-4"
     >
       {message === "confirm_email" ? (
         <p className="rounded-xl border border-gold/30 bg-gold/5 px-4 py-3 text-xs leading-relaxed text-gold-secondary">
@@ -657,7 +658,7 @@ export function NexarCommerceAuthModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-x-0 bottom-0 top-[var(--nxr-header-offset)] z-[130] flex items-center justify-center p-4 sm:p-6"
+          className="fixed inset-0 z-[130] flex items-center justify-center p-4 sm:p-6"
           role="presentation"
           onClick={onClose}
         >
@@ -673,11 +674,11 @@ export function NexarCommerceAuthModal({
           role="dialog"
           aria-modal="true"
           aria-labelledby="nxr-commerce-auth-title"
-          initial={{ opacity: 0, scale: 0.94, y: 20 }}
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.94, y: 20 }}
+          exit={{ opacity: 0, scale: 0.96, y: 12 }}
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="relative flex max-h-[min(720px,calc(100dvh-var(--nxr-header-offset)-2rem))] w-full max-w-lg flex-col overflow-hidden rounded-[1.75rem] border border-gold/20 bg-[#070708]/90 shadow-[0_0_100px_-20px_rgba(212,175,55,0.5)] backdrop-blur-2xl"
+          className="relative flex max-h-[min(520px,calc(100dvh-2rem))] w-full max-w-md flex-col overflow-hidden rounded-[1.5rem] border border-gold/20 bg-[#070708]/90 shadow-[0_0_80px_-20px_rgba(212,175,55,0.45)] backdrop-blur-2xl"
           data-scroll-lock-scrollable
           onClick={(e) => e.stopPropagation()}
         >
@@ -687,28 +688,30 @@ export function NexarCommerceAuthModal({
             type="button"
             aria-label="Close authentication"
             onClick={onClose}
-            className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-black/60 text-muted transition-colors hover:border-gold/35 hover:text-white"
+            className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-black/60 text-muted transition-colors hover:border-gold/35 hover:text-white"
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
 
-          <div className="overflow-y-auto px-6 pb-6 pt-8 sm:px-8 sm:pb-8 sm:pt-9">
-            <header className="mb-6 text-center">
-              <p className="text-[10px] tracking-[0.28em] text-gold/80 uppercase">ATLAS</p>
+          <div className="overflow-y-auto px-5 pb-5 pt-6 sm:px-6 sm:pb-6 sm:pt-7">
+            <header className="mb-4 text-center">
+              <div className="mb-3 flex justify-center">
+                <AtlasLogo height={36} priority />
+              </div>
               <h2
                 id="nxr-commerce-auth-title"
-                className="mt-2 font-heading text-2xl font-semibold tracking-tight text-white"
+                className="font-heading text-xl font-semibold tracking-tight text-white"
               >
                 {mode === "signin" ? "Welcome back" : "Join ATLAS"}
               </h2>
-              <p className="mt-2 text-sm text-muted">
+              <p className="mt-1.5 text-xs leading-relaxed text-muted">
                 {mode === "signin"
-                  ? "Access your ATLAS workspace. Manage your business, network, marketplace, payments, and services from one place."
-                  : "Create your account to access the complete business operating system."}
+                  ? "Sign in to your ATLAS workspace."
+                  : "Create your account to access ATLAS."}
               </p>
             </header>
 
-            <div className="mb-6 flex rounded-full border border-border/60 bg-black/40 p-1">
+            <div className="mb-4 flex rounded-full border border-border/60 bg-black/40 p-1">
               {(["signin", "register"] as const).map((tab) => (
                 <button
                   key={tab}
@@ -741,7 +744,7 @@ export function NexarCommerceAuthModal({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <div className="mb-5 grid grid-cols-2 gap-2">
+                  <div className="mb-4 grid grid-cols-2 gap-2">
                     {(
                       [
                         { id: "customer" as const, label: "Customer", icon: UserRound },

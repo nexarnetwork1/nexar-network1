@@ -1,14 +1,16 @@
-import { bsc } from "wagmi/chains";
+import { getPresaleNetwork } from "@/lib/constants/presale-networks";
+
+const bscNetwork = getPresaleNetwork("bsc");
 
 export const NXR_WATCH_ASSET = {
   type: "ERC20" as const,
   options: {
-    address: "0xc37c9eeAB826e5bcB4ed2b798123915Cd596c909",
+    address: bscNetwork.contracts.token,
     symbol: "NXR",
     decimals: 18,
     image: "https://www.nexarnetwork.org/logo.png",
   },
-  chainId: bsc.id,
+  chainId: bscNetwork.chainId,
   tokenName: "Nexar Network",
 } as const;
 
@@ -28,10 +30,14 @@ export async function addNxrToWallet(provider: EthereumProvider): Promise<void> 
       params: [
         {
           chainId: `0x${NXR_WATCH_ASSET.chainId.toString(16)}`,
-          chainName: "BNB Smart Chain",
-          nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
-          rpcUrls: ["https://bsc-dataseed.binance.org"],
-          blockExplorerUrls: ["https://bscscan.com"],
+          chainName: bscNetwork.name,
+          nativeCurrency: {
+            name: bscNetwork.nativeSymbol,
+            symbol: bscNetwork.nativeSymbol,
+            decimals: 18,
+          },
+          rpcUrls: [bscNetwork.rpcUrl],
+          blockExplorerUrls: [bscNetwork.explorerUrl],
         },
       ],
     });

@@ -26,7 +26,7 @@ export function Navbar() {
         )}
       >
         <Container className="flex items-center justify-between gap-4 sm:gap-6">
-          <NavLink href="/" aria-label="ATLAS home" className="relative z-10 shrink-0">
+          <NavLink href="/" aria-label="Nexar Network home" className="relative z-10 shrink-0">
             <Logo />
           </NavLink>
 

@@ -4,9 +4,7 @@ import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider } from "@privy-io/wagmi";
-import { bsc } from "wagmi/chains";
-
-import { config, privyAppId } from "@/lib/web3/config";
+import { config, privyAppId, bsc, botChain } from "@/lib/web3/config";
 import { WalletSessionManager } from "@/components/web3/WalletSessionManager";
 
 export function Web3Provider({
@@ -38,7 +36,7 @@ export function Web3Provider({
           },
           loginMethods: ["wallet"],
           defaultChain: bsc,
-          supportedChains: [bsc],
+          supportedChains: [bsc, botChain],
         }}
       >
         <WagmiProvider config={config} reconnectOnMount>

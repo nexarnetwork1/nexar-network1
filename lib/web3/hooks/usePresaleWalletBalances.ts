@@ -1,22 +1,38 @@
 "use client";
 
 import { useBalance } from "wagmi";
-import { bsc } from "wagmi/chains";
 import { formatUnits } from "viem";
+import { usePresaleNetworkContext } from "@/components/providers/PresaleNetworkProvider";
 
-export function usePresaleWalletBalances(address?: `0x${string}`, usdtBalanceWei?: bigint, usdtDecimals = 18) {
-  const { data: bnbBalance, refetch: refetchBnb } = useBalance({
+export function usePresaleWalletBalances(
+  address?: `0x${string}`,
+  usdtBalanceWei?: bigint,
+  usdtDecimals = 18,
+) {
+  const { network } = usePresaleNetworkContext();
+  const chainId = network.chainId;
+
+  const { data: nativeBalance, refetch: refetchNative } = useBalance({
     address,
-    chainId: bsc.id,
+    chainId,
   });
 
   return {
-    bnbBalance: bnbBalance?.value,
-    bnbBalanceFormatted: bnbBalance ? formatUnits(bnbBalance.value, 18) : "0",
+    nativeBalance: nativeBalance?.value,
+    nativeBalanceFormatted: nativeBalance
+      ? formatUnits(nativeBalance.value, 18)
+      : "0",
+    nativeSymbol: network.nativeSymbol,
+    bnbBalance: nativeBalance?.value,
+    bnbBalanceFormatted: nativeBalance
+      ? formatUnits(nativeBalance.value, 18)
+      : "0",
     usdtBalance: usdtBalanceWei,
-    usdtBalanceFormatted: usdtBalanceWei ? formatUnits(usdtBalanceWei, usdtDecimals) : "0",
+    usdtBalanceFormatted: usdtBalanceWei
+      ? formatUnits(usdtBalanceWei, usdtDecimals)
+      : "0",
     refetchBalances: () => {
-      void refetchBnb();
+      void refetchNative();
     },
   };
 }

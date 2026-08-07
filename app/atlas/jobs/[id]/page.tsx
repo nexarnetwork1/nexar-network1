@@ -31,7 +31,7 @@ export default async function AtlasJobDetailPage({
             {job.business && (
               <p className="text-muted flex items-center gap-1.5 mt-1">
                 <Building2 className="h-4 w-4" />
-                {job.business.name}
+                {job.business.display_name}
               </p>
             )}
           </div>

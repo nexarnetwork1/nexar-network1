@@ -42,7 +42,7 @@ export default async function AtlasJobsPage() {
                 {job.business && (
                   <p className="text-sm text-muted flex items-center gap-1.5 mt-1">
                     <Building2 className="h-3.5 w-3.5" />
-                    {job.business.name}
+                    {job.business.display_name}
                   </p>
                 )}
                 {job.body && <p className="text-sm text-white/80 mt-2 line-clamp-2">{job.body}</p>}

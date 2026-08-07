@@ -365,7 +365,8 @@ export async function getNetworkPosts(input: {
       ),
       business:businesses!atlas_network_posts_business_id_fkey (
         id,
-        name,
+        display_name,
+        legal_name,
         logo_url,
         slug
       )
@@ -504,7 +505,7 @@ export async function getNetworkPostById(
         id, display_name, avatar_url, verified, subject_type, slug
       ),
       business:businesses!atlas_network_posts_business_id_fkey (
-        id, name, logo_url, slug
+        id, display_name, legal_name, logo_url, slug
       )
     `)
     .eq("id", postId)

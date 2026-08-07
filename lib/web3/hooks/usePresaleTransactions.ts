@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { createPublicClient, http, formatUnits } from "viem";
-import { bsc } from "viem/chains";
-import { CONTRACTS } from "@/lib/constants/site";
 import { subscribePresaleRefresh } from "@/lib/web3/presale-refresh";
+import { usePresaleNetworkContext } from "@/components/providers/PresaleNetworkProvider";
 
 export type PresaleTransaction = {
   id: string;
@@ -18,6 +17,7 @@ export type PresaleTransaction = {
 };
 
 export function usePresaleTransactions(wallet?: `0x${string}`) {
+  const { network } = usePresaleNetworkContext();
   const [transactions, setTransactions] = useState<PresaleTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshNonce, setRefreshNonce] = useState(0);
@@ -27,7 +27,7 @@ export function usePresaleTransactions(wallet?: `0x${string}`) {
       subscribePresaleRefresh(() => {
         setRefreshNonce((n) => n + 1);
       }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -35,14 +35,20 @@ export function usePresaleTransactions(wallet?: `0x${string}`) {
 
     let cancelled = false;
 
-    const client = createPublicClient({ chain: bsc, transport: http() });
-    const presale = CONTRACTS.presale as `0x${string}`;
+    const client = createPublicClient({
+      chain: network.wagmiChain,
+      transport: http(network.rpcUrl),
+    });
+    const presale = network.contracts.presale;
 
     async function load() {
       setIsLoading(true);
       try {
         const currentBlock = await client.getBlockNumber();
-        const fromBlock = currentBlock > BigInt(5_000_000) ? currentBlock - BigInt(5_000_000) : BigInt(0);
+        const fromBlock =
+          currentBlock > BigInt(5_000_000)
+            ? currentBlock - BigInt(5_000_000)
+            : BigInt(0);
 
         const [bnbLogs, usdtLogs, claimLogs] = await Promise.all([
           client.getLogs({
@@ -96,13 +102,15 @@ export function usePresaleTransactions(wallet?: `0x${string}`) {
           ...usdtLogs.map((l) => l.blockNumber),
           ...claimLogs.map((l) => l.blockNumber),
         ];
-        const uniqueBlocks = [...new Set(blockNumbers.map(String))].map((s) => BigInt(s));
+        const uniqueBlocks = [...new Set(blockNumbers.map(String))].map((s) =>
+          BigInt(s),
+        );
         const blockTimestamps = new Map<string, number>();
         await Promise.all(
           uniqueBlocks.slice(0, 50).map(async (bn) => {
             const block = await client.getBlock({ blockNumber: bn });
             blockTimestamps.set(bn.toString(), Number(block.timestamp));
-          })
+          }),
         );
 
         const txs: PresaleTransaction[] = [
@@ -148,7 +156,10 @@ export function usePresaleTransactions(wallet?: `0x${string}`) {
     return () => {
       cancelled = true;
     };
-  }, [wallet, refreshNonce]);
+  }, [wallet, refreshNonce, network]);
 
-  return { transactions: wallet ? transactions : [], isLoading: Boolean(wallet) && isLoading };
+  return {
+    transactions: wallet ? transactions : [],
+    isLoading: Boolean(wallet) && isLoading,
+  };
 }

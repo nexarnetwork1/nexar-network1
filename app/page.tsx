@@ -5,6 +5,7 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { WhyNexarSection } from "@/components/sections/WhyNexarSection";
 import { TokenomicsSection } from "@/components/sections/TokenomicsSection";
 import { EcosystemSection } from "@/components/sections/EcosystemSection";
+import { TrustedPartnersSection } from "@/components/sections/TrustedPartnersSection";
 import { RoadmapSection } from "@/components/sections/RoadmapSection";
 import { SecuritySection } from "@/components/sections/SecuritySection";
 import { FounderSection } from "@/components/sections/FounderSection";
@@ -23,6 +24,7 @@ export default function HomePage() {
       <WhyNexarSection />
       <TokenomicsSection />
       <EcosystemSection />
+      <TrustedPartnersSection />
       <RoadmapSection />
       <SecuritySection />
       <FounderSection />

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SECURITY_ITEMS } from "@/lib/data/security";
-import { CONTRACTS } from "@/lib/constants/site";
+import { MultiChainContractsCard } from "@/components/sections/MultiChainContractsCard";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -42,42 +42,7 @@ export function SecuritySection() {
         </div>
 
         <Reveal className="mt-12">
-          <div className="luxury-border rounded-2xl bg-card/30 p-8 backdrop-blur-xl">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div>
-                <p className="text-[10px] tracking-[0.2em] text-muted uppercase">
-                  Token Contract
-                </p>
-                <a
-                  href={`https://bscscan.com/address/${CONTRACTS.token}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-className="mt-2 block break-all font-mono text-[11px] leading-5 text-gold transition-colors hover:text-gold-secondary"
-                >
-                  {CONTRACTS.token}
-                </a>
-              </div>
-              <div>
-                <p className="text-[10px] tracking-[0.2em] text-muted uppercase">
-                  Presale Contract
-                </p>
-                <a
-                  href={`https://bscscan.com/address/${CONTRACTS.presale}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-className="mt-2 block break-all font-mono text-[11px] leading-5 text-gold transition-colors hover:text-gold-secondary"
-                >
-                  {CONTRACTS.presale}
-                </a>
-              </div>
-              <div>
-                <p className="text-[10px] tracking-[0.2em] text-muted uppercase">
-                  Verification
-                </p>
-                <p className="mt-2 text-sm text-emerald-400">Source Verified on BscScan</p>
-              </div>
-            </div>
-          </div>
+          <MultiChainContractsCard />
         </Reveal>
       </Container>
     </section>

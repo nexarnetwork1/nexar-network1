@@ -16,5 +16,5 @@ export default async function AtlasPage() {
     viewerProfileId,
   });
 
-  return <SocialFeed posts={posts} />;
+  return <SocialFeed posts={posts} initialHasMore={posts.length >= 20} />;
 }

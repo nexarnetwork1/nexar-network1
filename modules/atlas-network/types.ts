@@ -3,6 +3,8 @@
  * Business Social Network (not social media clone).
  */
 
+import type { Business } from "@/modules/business-hub/types";
+
 export type NetworkProfileSubjectType =
   | "user"
   | "business"
@@ -311,12 +313,10 @@ export type NetworkFeedPost = NetworkPost & {
     NetworkProfile,
     "id" | "display_name" | "avatar_url" | "verified" | "subject_type" | "slug"
   > | null;
-  business?: {
-    id: string;
-    name: string;
-    logo_url: string | null;
-    slug: string;
-  } | null;
+  business?: Pick<
+    Business,
+    "id" | "display_name" | "legal_name" | "logo_url" | "slug"
+  > | null;
   media?: NetworkPostMedia[];
   poll?: NetworkPoll & { options: NetworkPollOption[] };
   event?: NetworkEvent | null;

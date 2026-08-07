@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Gift } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PresalePanel } from "@/components/web3/PresalePanel";
+import { PresaleNetworkProvider } from "@/components/providers/PresaleNetworkProvider";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -25,7 +26,9 @@ export function ClaimNxrModal({ open, onClose }: ClaimNxrModalProps) {
         data-scroll-lock-scrollable
         onClick={(e) => e.stopPropagation()}
       >
-        <PresalePanel />
+        <PresaleNetworkProvider>
+          <PresalePanel />
+        </PresaleNetworkProvider>
       </div>
     </div>
   );

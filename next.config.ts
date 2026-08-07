@@ -36,7 +36,8 @@ https://bsc-dataseed.binance.org \
 https://bsc-dataseed1.binance.org \
 https://bsc-dataseed2.binance.org \
 https://bsc-dataseed3.binance.org \
-https://bsc-dataseed4.binance.org \
+https://rpc.botchain.ai \
+https://scan.botchain.ai \
 https://auth.privy.io \
 https://*.privy.io \
 https://privy.io \

@@ -2,32 +2,39 @@
 
 import { useMemo, useEffect, useState } from "react";
 import { useAccount, useBlock, useReadContracts } from "wagmi";
-import { bsc } from "wagmi/chains";
 import { formatUnits, parseUnits } from "viem";
-import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI, CHAINLINK_AGGREGATOR_ABI, ERC20_ABI } from "@/lib/web3/abi";
 import { nxrFromBnb, nxrFromUsdt } from "@/lib/web3/presale-math";
+import { usePresaleNetworkContext } from "@/components/providers/PresaleNetworkProvider";
+import type { PresaleNetworkConfig } from "@/lib/constants/presale-networks";
 
 export type PresaleStatus = "upcoming" | "live" | "sold_out" | "ended" | "loading" | "error";
 
-const presaleAddress = CONTRACTS.presale as `0x${string}`;
-const chainId = bsc.id;
-
-const baseContracts = [
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "totalSold" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "HARD_CAP" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "MIN_PURCHASE" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "MAX_PURCHASE" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "presaleStart" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "presaleEnd" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "usdtToken" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "PRICE_NUMERATOR" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "PRICE_DENOMINATOR" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "bnbPriceFeed" as const, chainId },
-  { address: presaleAddress, abi: PRESALE_ABI, functionName: "totalClaimed" as const, chainId },
-] as const;
+function buildBaseContracts(network: PresaleNetworkConfig) {
+  const presaleAddress = network.contracts.presale;
+  const chainId = network.chainId;
+  return [
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "totalSold" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "HARD_CAP" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "MIN_PURCHASE" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "MAX_PURCHASE" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "presaleStart" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "presaleEnd" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "usdtToken" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "PRICE_NUMERATOR" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "PRICE_DENOMINATOR" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "bnbPriceFeed" as const, chainId },
+    { address: presaleAddress, abi: PRESALE_ABI, functionName: "totalClaimed" as const, chainId },
+  ] as const;
+}
 
 export function usePresaleData() {
+  const { network, networkId } = usePresaleNetworkContext();
+  const presaleAddress = network.contracts.presale;
+  const chainId = network.chainId;
+
+  const baseContracts = useMemo(() => buildBaseContracts(network), [network]);
+
   const { address, isConnected, chainId: walletChainId } = useAccount();
   const { data: block } = useBlock({
     chainId,
@@ -51,7 +58,7 @@ export function usePresaleData() {
     if (!isBaseLoading && !isBaseError) return;
     const id = window.setTimeout(() => setLoadTimedOut(true), 10_000);
     return () => window.clearTimeout(id);
-  }, [isBaseLoading, isBaseError]);
+  }, [isBaseLoading, isBaseError, networkId]);
 
   const bnbPriceFeed = baseData?.[9]?.result as `0x${string}` | undefined;
   const usdtToken = baseData?.[6]?.result as `0x${string}` | undefined;
@@ -115,7 +122,7 @@ export function usePresaleData() {
               : []),
           ]
         : [],
-    [address, usdtToken]
+    [address, usdtToken, presaleAddress, chainId],
   );
 
   const {
@@ -198,13 +205,20 @@ export function usePresaleData() {
       ? Number(
           formatUnits(
             nxrFromBnb(parseUnits("1", 18), bnbUsdPrice, priceNumerator, priceDenominator),
-            18
-          )
+            18,
+          ),
         )
       : 0;
 
+  const fundsRaisedUsdt =
+    nxrPerUsdt > 0 ? soldAmount / nxrPerUsdt : 0;
+
   return {
+    network,
+    networkId,
     presaleAddress,
+    tokenAddress: network.contracts.token,
+    chainId,
     isConnected,
     isCorrectChain: walletChainId === chainId,
     isLoading: isBaseLoading || (Boolean(address) && isUserLoading),
@@ -236,6 +250,7 @@ export function usePresaleData() {
     countdownSeconds,
     nxrPerUsdt,
     nxrPerBnb,
+    fundsRaisedUsdt,
     claimableAmount: claimable ? Number(formatUnits(claimable, 18)) : 0,
     purchasedAmount: purchased ? Number(formatUnits(purchased, 18)) : 0,
     claimedAmount: claimed ? Number(formatUnits(claimed, 18)) : 0,

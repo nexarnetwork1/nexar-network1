@@ -9,12 +9,10 @@ import {
   useChainId,
   useSwitchChain,
 } from "wagmi";
-import { bsc } from "wagmi/chains";
 import { formatUnits } from "viem";
 import { AlertCircle, CheckCircle2, ExternalLink } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/Button";
-import { CONTRACTS } from "@/lib/constants/site";
 import { PRESALE_ABI, ERC20_ABI } from "@/lib/web3/abi";
 import { usePresaleData } from "@/lib/web3/hooks/usePresaleData";
 import { usePresaleWalletBalances } from "@/lib/web3/hooks/usePresaleWalletBalances";
@@ -30,6 +28,8 @@ import { CurrencyLogo } from "@/components/payments/CurrencyLogo";
 import { cn } from "@/lib/utils/cn";
 import { notifyPresaleRefresh } from "@/lib/web3/presale-refresh";
 import { markWalletSessionActive } from "@/lib/web3/wallet-session";
+import { getExplorerTxUrl } from "@/lib/constants/presale-networks";
+import { requestPresaleNetworkSwitch } from "@/lib/web3/switch-presale-network";
 
 type PresalePanelProps = {
   compact?: boolean;
@@ -42,7 +42,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { login } = usePrivy();
-  const { switchChain } = useSwitchChain();
+  const { switchChainAsync } = useSwitchChain();
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
@@ -94,8 +94,11 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
     address: presale.usdtToken,
     abi: ERC20_ABI,
     functionName: "allowance",
-    args: address && presale.usdtToken ? [address, CONTRACTS.presale as `0x${string}`] : undefined,
-    chainId: bsc.id,
+    args:
+      address && presale.usdtToken
+        ? [address, presale.presaleAddress]
+        : undefined,
+    chainId: presale.chainId,
     query: { enabled: Boolean(address && presale.usdtToken) },
   });
 
@@ -109,11 +112,11 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       void refetchAllowance().then(() => {
         reset();
         writeContract({
-          address: CONTRACTS.presale as `0x${string}`,
+          address: presale.presaleAddress,
           abi: PRESALE_ABI,
           functionName: "buyWithUsdt",
           args: [usdtAmountWei],
-          chainId: bsc.id,
+          chainId: presale.chainId,
         });
         setStep("buy");
       });
@@ -138,7 +141,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
     hardCap: presale.hardCap ?? BigInt(0),
     isLive: presale.canBuy,
     isConnected,
-    isCorrectChain: chainId === bsc.id,
+    isCorrectChain: chainId === presale.chainId,
   });
 
   function ensureWallet(): boolean {
@@ -154,8 +157,10 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       })();
       return false;
     }
-    if (chainId !== bsc.id) {
-      switchChain({ chainId: bsc.id });
+    if (chainId !== presale.chainId) {
+      void requestPresaleNetworkSwitch(switchChainAsync, presale.network).catch(() => {
+        /* wallet surfaces rejection */
+      });
       return false;
     }
     return true;
@@ -166,11 +171,11 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
     if (hasAllowance) {
       setStep("buy");
       writeContract({
-        address: CONTRACTS.presale as `0x${string}`,
+        address: presale.presaleAddress,
         abi: PRESALE_ABI,
         functionName: "buyWithUsdt",
         args: [usdtAmountWei],
-        chainId: bsc.id,
+        chainId: presale.chainId,
       });
       return;
     }
@@ -179,8 +184,8 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       address: presale.usdtToken,
       abi: ERC20_ABI,
       functionName: "approve",
-      args: [CONTRACTS.presale as `0x${string}`, usdtAmountWei],
-      chainId: bsc.id,
+      args: [presale.presaleAddress, usdtAmountWei],
+      chainId: presale.chainId,
     });
   }
 
@@ -189,10 +194,10 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
     if ((presale.claimable ?? BigInt(0)) <= BigInt(0)) return;
     setStep("claim");
     writeContract({
-      address: CONTRACTS.presale as `0x${string}`,
+      address: presale.presaleAddress,
       abi: PRESALE_ABI,
       functionName: "claim",
-      chainId: bsc.id,
+      chainId: presale.chainId,
     });
   }
 
@@ -226,9 +231,12 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
   }
 
   return (
-    <div className={cn("luxury-border rounded-3xl bg-card/60 p-6 backdrop-blur-md", className)}>
+    <div className={cn("luxury-border rounded-3xl bg-card/40 p-6 backdrop-blur-md", className)}>
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="font-heading text-xl font-semibold">NXR Presale</h2>
+        <div>
+          <h2 className="font-heading text-xl font-semibold">NXR Presale</h2>
+          <p className="mt-1 text-xs text-muted">{presale.network.name}</p>
+        </div>
         <span
           className={cn(
             "rounded-full px-3 py-1 text-xs font-medium",
@@ -447,7 +455,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
           {step === "claim" ? "Claim successful!" : "Purchase successful!"}
           {txHash && (
             <a
-              href={`https://bscscan.com/tx/${txHash}`}
+              href={getExplorerTxUrl(presale.network, txHash)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 underline"

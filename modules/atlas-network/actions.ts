@@ -11,6 +11,7 @@ import {
   createPostMediaRecords,
   createPostRecord,
   getPersonProfileByUserId,
+  getNetworkPosts,
   registerForEventRecord,
   toggleReactionRecord,
   votePollRecord,
@@ -289,4 +290,27 @@ export async function uploadNetworkMediaAction(formData: FormData) {
   else if (file.type.startsWith("video/")) mediaType = "video";
 
   return { url: data.publicUrl, mediaType };
+}
+
+/** Paginated feed read — reuses repository; no mutation of existing create/update logic. */
+export async function fetchNetworkFeedAction(input: {
+  offset: number;
+  limit?: number;
+}) {
+  const session = await auth();
+  let viewerProfileId: string | undefined;
+  if (session?.user?.id) {
+    const person = await getPersonProfileByUserId(session.user.id);
+    viewerProfileId = person?.network_profile_id;
+  }
+
+  const limit = input.limit ?? 20;
+  const posts = await getNetworkPosts({
+    limit,
+    offset: input.offset,
+    includeComments: true,
+    viewerProfileId,
+  });
+
+  return { posts, hasMore: posts.length === limit };
 }
