@@ -68,9 +68,11 @@ export default function PresalePage() {
             <ConnectWalletButton size="md" />
           </div>
 
-          <div className="mt-10 grid gap-10 xl:grid-cols-2">
+          <div className="mt-10 grid gap-8 xl:grid-cols-2">
             {PRESALE_NETWORK_LIST.map((network) => (
-              <PresaleNetworkColumn key={network.id} network={network} />
+              <div key={network.id} className="nxr-card p-6 lg:p-8">
+                <PresaleNetworkColumn network={network} />
+              </div>
             ))}
           </div>
         </div>

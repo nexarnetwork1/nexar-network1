@@ -1,12 +1,14 @@
 "use client";
 
+import type { ComponentType, ReactNode } from "react";
 import Link from "next/link";
-import { Building2, Users, Calendar, Flame, MapPin } from "lucide-react";
+import { Building2, Users, Calendar, Flame, MapPin, Activity } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import type { NetworkEvent } from "@/modules/atlas-network/types";
 import { FollowButton } from "@/components/atlas/app/network/FollowButton";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils/cn";
 
 interface AtlasRightSidebarProps {
   trendingBusinesses: Array<{
@@ -35,6 +37,33 @@ interface AtlasRightSidebarProps {
   upcomingEvents?: NetworkEvent[];
 }
 
+function Panel({
+  title,
+  icon: Icon,
+  action,
+  children,
+  className,
+}: {
+  title: string;
+  icon: ComponentType<{ className?: string }>;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn("nxr-card p-4", className)}>
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Icon className="h-4 w-4 text-gold shrink-0" />
+          <h3 className="text-sm font-semibold truncate">{title}</h3>
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
 export function AtlasRightSidebar({
   trendingBusinesses,
   suggestedProfiles,
@@ -53,39 +82,45 @@ export function AtlasRightSidebar({
   };
 
   return (
-    <aside className="p-4 space-y-6">
+    <aside className="p-4 space-y-4">
+      <div className="flex items-center gap-2 px-1 pb-1">
+        <Activity className="h-4 w-4 text-gold" />
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+          Activity
+        </h2>
+      </div>
+
       {session && (
-        <div className="p-4 rounded-xl border border-white/10 bg-white/5">
-          <Link href="/dashboard/business" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center">
+        <Panel title="Your Company" icon={Building2}>
+          <Link
+            href="/dashboard/business"
+            className="flex items-center gap-3 rounded-[var(--nxr-radius-lg)] p-2 -m-2 hover:bg-white/[0.04] transition-colors duration-150"
+          >
+            <div className="h-10 w-10 rounded-lg bg-gold/10 border border-gold/30 flex items-center justify-center shrink-0">
               <Building2 className="h-5 w-5 text-gold" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">My Company</p>
-              <p className="text-xs text-muted">Business dashboard</p>
+              <p className="text-sm font-medium truncate">Business Dashboard</p>
+              <p className="text-xs text-muted">Commerce · Analytics · Settings</p>
             </div>
           </Link>
-        </div>
+        </Panel>
       )}
 
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Flame className="h-4 w-4 text-gold" />
-          <h3 className="text-sm font-semibold">Trending Companies</h3>
-        </div>
-        <div className="space-y-2">
+      <Panel title="Trending Companies" icon={Flame}>
+        <div className="space-y-1">
           {trendingBusinesses.length > 0 ? (
             trendingBusinesses.map((business) => (
               <Link
                 key={business.id}
                 href={`/atlas/network/${business.networkSlug ?? `${business.slug}-network`}`}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+                className="flex items-center gap-3 p-2 rounded-[var(--nxr-radius-lg)] hover:bg-white/[0.04] transition-colors duration-150"
               >
                 {business.logo_url ? (
-                  <img src={business.logo_url} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                  <img src={business.logo_url} alt="" className="h-10 w-10 rounded-lg object-cover shrink-0" />
                 ) : (
-                  <div className="h-10 w-10 rounded-lg bg-gold/10 flex items-center justify-center">
-                    <Building2 className="h-5 w-5 text-gold/30" />
+                  <div className="h-10 w-10 rounded-lg bg-gold/10 flex items-center justify-center shrink-0">
+                    <Building2 className="h-5 w-5 text-gold/40" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -95,106 +130,87 @@ export function AtlasRightSidebar({
               </Link>
             ))
           ) : (
-            <p className="text-sm text-muted text-center py-4">No trending companies yet</p>
+            <p className="text-sm text-muted text-center py-3">No trending companies yet</p>
           )}
         </div>
-      </div>
+      </Panel>
 
       {suggestedCompanies.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Building2 className="h-4 w-4 text-gold" />
-            <h3 className="text-sm font-semibold">Suggested Companies</h3>
-          </div>
-          <div className="space-y-2">
+        <Panel title="Suggested Connections" icon={Building2}>
+          <div className="space-y-1">
             {suggestedCompanies.map((company) => (
-              <div key={company.id} className="flex items-center gap-3 p-2 rounded-lg">
+              <div key={company.id} className="flex items-center gap-3 p-2 rounded-[var(--nxr-radius-lg)]">
                 <Link href={`/atlas/network/${company.slug}`} className="shrink-0">
                   <div className="h-10 w-10 rounded-lg bg-gold/10 overflow-hidden flex items-center justify-center">
                     {company.avatar_url ? (
                       <img src={company.avatar_url} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      <Building2 className="h-5 w-5 text-gold/30" />
+                      <Building2 className="h-5 w-5 text-gold/40" />
                     )}
                   </div>
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/atlas/network/${company.slug}`}
-                    className="text-sm font-medium truncate block hover:text-gold"
+                    className="text-sm font-medium truncate block hover:text-gold transition-colors duration-150"
                   >
                     {company.display_name}
                   </Link>
                 </div>
-                <FollowButton
-                  targetId={company.id}
-                  session={!!session}
-                  onAuth={onAuth}
-                  size="sm"
-                />
+                <FollowButton targetId={company.id} session={!!session} onAuth={onAuth} size="sm" />
               </div>
             ))}
           </div>
-        </div>
+        </Panel>
       )}
 
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Users className="h-4 w-4 text-gold" />
-          <h3 className="text-sm font-semibold">People to Follow</h3>
-        </div>
+      <Panel title="People to Follow" icon={Users}>
         {suggestedProfiles.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1">
             {suggestedProfiles.map((profile) => (
-              <div key={profile.id} className="flex items-center gap-3 p-2 rounded-lg">
+              <div key={profile.id} className="flex items-center gap-3 p-2 rounded-[var(--nxr-radius-lg)]">
                 <Link href={`/atlas/network/${profile.slug}`} className="shrink-0">
                   <div className="h-10 w-10 rounded-full bg-gold/10 flex items-center justify-center overflow-hidden">
                     {profile.avatar_url ? (
                       <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      <Users className="h-5 w-5 text-gold/30" />
+                      <Users className="h-5 w-5 text-gold/40" />
                     )}
                   </div>
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/atlas/network/${profile.slug}`}
-                    className="text-sm font-medium truncate block hover:text-gold"
+                    className="text-sm font-medium truncate block hover:text-gold transition-colors duration-150"
                   >
                     {profile.display_name}
                   </Link>
                 </div>
-                <FollowButton
-                  targetId={profile.id}
-                  session={!!session}
-                  onAuth={onAuth}
-                  size="sm"
-                />
+                <FollowButton targetId={profile.id} session={!!session} onAuth={onAuth} size="sm" />
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted text-center py-4">No suggestions yet</p>
+          <p className="text-sm text-muted text-center py-3">No suggestions yet</p>
         )}
-      </div>
+      </Panel>
 
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gold" />
-            <h3 className="text-sm font-semibold">Upcoming Events</h3>
-          </div>
-          <Link href="/atlas/events" className="text-xs text-gold hover:underline">
+      <Panel
+        title="Upcoming Events"
+        icon={Calendar}
+        action={
+          <Link href="/atlas/events" className="text-xs text-gold hover:underline shrink-0">
             View all
           </Link>
-        </div>
+        }
+      >
         {upcomingEvents.length > 0 ? (
           <div className="space-y-2">
             {upcomingEvents.slice(0, 3).map((event) => (
               <Link
                 key={event.id}
                 href={`/atlas/events/${event.id}`}
-                className="block p-3 rounded-xl border border-white/10 bg-white/5 hover:border-gold/20 transition-colors"
+                className="block p-3 rounded-[var(--nxr-radius-lg)] border border-border bg-white/[0.02] hover:border-gold/20 transition-colors duration-150"
               >
                 <p className="text-sm font-medium line-clamp-1">{event.title}</p>
                 <p className="text-xs text-muted mt-1">
@@ -202,7 +218,7 @@ export function AtlasRightSidebar({
                 </p>
                 {event.location && (
                   <p className="text-xs text-muted flex items-center gap-1 mt-1">
-                    <MapPin className="h-3 w-3" />
+                    <MapPin className="h-3 w-3 shrink-0" />
                     {event.is_online ? "Online" : event.location}
                   </p>
                 )}
@@ -210,14 +226,14 @@ export function AtlasRightSidebar({
             ))}
           </div>
         ) : (
-          <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-center">
+          <div className="text-center py-2">
             <p className="text-sm text-muted">No upcoming events</p>
             <Link href="/atlas/events" className="inline-block mt-2 text-sm text-gold hover:underline">
               Browse Events
             </Link>
           </div>
         )}
-      </div>
+      </Panel>
     </aside>
   );
 }

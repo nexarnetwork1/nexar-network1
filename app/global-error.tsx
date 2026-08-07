@@ -40,8 +40,8 @@ export default function GlobalError({
             width: "100%",
             maxWidth: 420,
             borderRadius: 12,
-            border: "1px solid rgba(212, 175, 55, 0.14)",
-            background: "#141a23",
+            border: "1px solid rgba(255, 209, 92, 0.14)",
+            background: "#111111",
             padding: 32,
             textAlign: "center",
           }}
@@ -59,7 +59,7 @@ export default function GlobalError({
               margin: 0,
               fontSize: 12,
               letterSpacing: "0.2em",
-              color: "rgba(212, 175, 55, 0.7)",
+              color: "rgba(255, 209, 92, 0.7)",
               fontFamily: "ui-monospace, Menlo, Consolas, monospace",
             }}
           >
@@ -91,8 +91,8 @@ export default function GlobalError({
               style={{
                 height: 44,
                 borderRadius: 10,
-                border: "1px solid rgba(212, 175, 55, 0.5)",
-                background: "#d4af37",
+                border: "1px solid rgba(255, 209, 92, 0.5)",
+                background: "#FFD15C",
                 color: "#050608",
                 fontWeight: 600,
                 fontSize: 14,

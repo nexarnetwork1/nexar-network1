@@ -18,7 +18,12 @@ export type AtlasAppNavIcon =
   | "settings"
   | "plus"
   | "user"
-  | "grid";
+  | "grid"
+  | "wallet"
+  | "creditCard"
+  | "package"
+  | "shoppingCart"
+  | "sparkles";
 
 export type AtlasAppNavItem = {
   id: string;
@@ -41,7 +46,7 @@ export const ATLAS_APP_NAV_ITEMS: readonly AtlasAppNavItem[] = [
   { id: "feed", label: "Home Feed", href: "/atlas", icon: "home" },
   {
     id: "business",
-    label: "My Company",
+    label: "Companies",
     href: "/atlas/business",
     icon: "building2",
     requiresAuth: true,
@@ -62,6 +67,47 @@ export const ATLAS_APP_NAV_ITEMS: readonly AtlasAppNavItem[] = [
   },
   { id: "network", label: "Network", href: "/atlas/network", icon: "users", appBar: true, appBarTitle: "Friends" },
   { id: "search", label: "Search", href: "/atlas/search", icon: "search", mobileMore: true },
+];
+
+/** Business & commerce shortcuts — existing dashboard routes only. */
+export const ATLAS_APP_WORKSPACE_ITEMS: readonly AtlasAppNavItem[] = [
+  {
+    id: "commerce",
+    label: "Commerce",
+    href: "/dashboard/business",
+    icon: "layoutDashboard",
+    requiresAuth: true,
+  },
+  {
+    id: "products",
+    label: "Products",
+    href: "/dashboard/business/products",
+    icon: "package",
+    requiresAuth: true,
+  },
+  {
+    id: "orders",
+    label: "Orders",
+    href: "/dashboard/business/orders",
+    icon: "shoppingCart",
+    requiresAuth: true,
+  },
+  {
+    id: "wallet",
+    label: "Wallet",
+    href: "/dashboard/finance/wallet",
+    icon: "wallet",
+    requiresAuth: true,
+    mobileMore: true,
+  },
+  {
+    id: "payments",
+    label: "Payments",
+    href: "/dashboard/finance",
+    icon: "creditCard",
+    requiresAuth: true,
+    mobileMore: true,
+  },
 ];
 
 /** Business workspace shortcuts (authenticated sidebar section). */
@@ -103,7 +149,7 @@ export const ATLAS_APP_MOBILE_MORE: readonly AtlasAppNavItem[] = [
   { id: "profile", label: "Profile", href: "/atlas/profile", icon: "user", requiresAuth: true },
   {
     id: "business",
-    label: "My Company",
+    label: "Companies",
     href: "/atlas/business",
     icon: "building2",
     requiresAuth: true,

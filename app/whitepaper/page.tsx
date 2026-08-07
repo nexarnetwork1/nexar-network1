@@ -98,7 +98,7 @@ export default function WhitepaperPage() {
         <div className="grid gap-12 lg:grid-cols-[280px_1fr]">
           {/* Sticky Sidebar - Desktop */}
           <aside className="hidden lg:block">
-            <div className="sticky top-28 space-y-6">
+            <div className="sticky top-28 space-y-6 nxr-card p-5">
               {/* Search */}
               <div>
                 <p className="mb-3 text-xs font-medium tracking-[0.24em] text-gold uppercase">
@@ -111,7 +111,7 @@ export default function WhitepaperPage() {
                     placeholder="Search sections..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background/80 pl-9 pr-4 py-2.5 text-sm text-white outline-none focus:border-gold/40"
+                    className="nxr-input w-full pl-9 pr-4 py-2.5"
                   />
                 </div>
               </div>
@@ -129,7 +129,7 @@ export default function WhitepaperPage() {
                       className={`block text-sm py-1.5 px-2 rounded-lg transition-colors ${
                         activeSection === section.id
                           ? "bg-gold/10 text-gold"
-                          : "text-muted hover:text-white hover:bg-white/5"
+                          : "text-muted hover:text-foreground hover:bg-white/5"
                       }`}
                     >
                       {section.title}
@@ -173,7 +173,7 @@ export default function WhitepaperPage() {
               <a
                 href="/whitepaper.pdf"
                 download="Nexar-Network-Whitepaper.pdf"
-                className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-gold-secondary"
+                className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-medium text-on-gold transition-colors hover:bg-gold-hover"
               >
                 <Download className="h-4 w-4" />
                 Download Whitepaper

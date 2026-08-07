@@ -24,7 +24,7 @@ export function MouseGlowLayer() {
       className="pointer-events-none fixed top-0 left-0 z-[2] h-[500px] w-[500px] rounded-full opacity-40 transition-transform duration-150 ease-out will-change-transform"
       style={{
         background:
-          "radial-gradient(circle, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.03) 35%, transparent 70%)",
+          "radial-gradient(circle, rgba(255,209,92,0.08) 0%, rgba(255,209,92,0.03) 35%, transparent 70%)",
       }}
     />
   );

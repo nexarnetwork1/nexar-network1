@@ -25,10 +25,10 @@ type Arc = {
   speed: number;
 };
 
-const GOLD = "rgba(212, 175, 55, 0.95)";
-const GOLD_DIM = "rgba(212, 175, 55, 0.22)";
-const OCEAN = "#0b0e13";
-const OCEAN_LIGHT = "#122238";
+const GOLD = "rgba(255, 209, 92, 0.95)";
+const GOLD_DIM = "rgba(255, 209, 92, 0.22)";
+const OCEAN = "#080808";
+const OCEAN_LIGHT = "#141414";
 
 /** Lightweight land mask — approximate continents without external textures. */
 function isLandmass(lat: number, lng: number): boolean {
@@ -189,7 +189,7 @@ export function GlobeCanvas({
 
       const atmosphere = ctx.createRadialGradient(cx, cy, r * 0.85, cx, cy, r * 1.45);
       atmosphere.addColorStop(0, "rgba(80, 140, 220, 0.12)");
-      atmosphere.addColorStop(0.55, "rgba(212, 175, 55, 0.06)");
+      atmosphere.addColorStop(0.55, "rgba(255, 209, 92, 0.06)");
       atmosphere.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = atmosphere;
       ctx.beginPath();
@@ -237,8 +237,8 @@ export function GlobeCanvas({
         if (!pt?.visible) continue;
 
         const glow = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, compact ? 10 : 14);
-        glow.addColorStop(0, "rgba(212, 175, 55, 0.55)");
-        glow.addColorStop(1, "rgba(212, 175, 55, 0)");
+        glow.addColorStop(0, "rgba(255, 209, 92, 0.55)");
+        glow.addColorStop(1, "rgba(255, 209, 92, 0)");
         ctx.fillStyle = glow;
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, compact ? 10 : 14, 0, Math.PI * 2);
@@ -260,7 +260,7 @@ export function GlobeCanvas({
         const my = (from.y + to.y) / 2 - 36;
         const t = arc.progress;
 
-        ctx.strokeStyle = `rgba(212, 175, 55, ${0.55 * (1 - Math.abs(t - 0.5))})`;
+        ctx.strokeStyle = `rgba(255, 209, 92, ${0.55 * (1 - Math.abs(t - 0.5))})`;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(from.x, from.y);
@@ -282,7 +282,7 @@ export function GlobeCanvas({
         if (!pt?.visible) continue;
         const radius = 4 + pulse.progress * (compact ? 18 : 28);
         const alpha = 0.7 * (1 - pulse.progress);
-        ctx.strokeStyle = `rgba(212, 175, 55, ${alpha})`;
+        ctx.strokeStyle = `rgba(255, 209, 92, ${alpha})`;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
@@ -303,7 +303,7 @@ export function GlobeCanvas({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-surface-1/90 via-chrome/70 to-background/80 shadow-[0_0_80px_-20px_rgba(212,175,55,0.25)] ${className ?? ""}`}
+      className={`relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-surface-1/90 via-chrome/70 to-background/80 shadow-[0_0_80px_-20px_rgba(255,209,92,0.25)] ${className ?? ""}`}
     >
       <canvas
         ref={canvasRef}

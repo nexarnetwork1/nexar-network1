@@ -1,10 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils/cn";
 import { AtlasLeftSidebar } from "./AtlasLeftSidebar";
 import { AtlasRightSidebar } from "./AtlasRightSidebar";
 import { AtlasMobileNav } from "./AtlasMobileNav";
 import { AtlasAppBar } from "./AtlasAppBar";
+import { AtlasWorkspaceProvider, useAtlasWorkspace } from "./AtlasWorkspaceContext";
 import type { NetworkEvent } from "@/modules/atlas-network/types";
 
 type AtlasAppShellProps = {
@@ -36,7 +38,7 @@ type AtlasAppShellProps = {
   hideRightSidebar?: boolean;
 };
 
-export function AtlasAppShell({
+function AtlasAppShellInner({
   children,
   trendingBusinesses = [],
   upcomingEvents = [],
@@ -44,25 +46,42 @@ export function AtlasAppShell({
   suggestedCompanies = [],
   hideRightSidebar = false,
 }: AtlasAppShellProps) {
+  const { sidebarCollapsed } = useAtlasWorkspace();
+  const leftWidth = sidebarCollapsed ? "lg:ml-[4.5rem]" : "lg:ml-64";
+  const rightMargin = hideRightSidebar ? "" : "xl:mr-80";
+
   return (
     <div className="min-h-screen bg-canvas text-foreground pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
       <AtlasAppBar />
 
-      <div className="flex">
-        <aside className="hidden lg:block w-64 shrink-0 fixed left-0 top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0 border-r border-border overflow-y-auto z-10 bg-chrome">
-          <AtlasLeftSidebar />
+      <div className="flex border-t border-border/50">
+        <aside
+          className={cn(
+            "hidden lg:block shrink-0 fixed left-0 z-10 border-r border-border overflow-y-auto bg-chrome transition-[width] duration-200 ease-out",
+            "top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0",
+            sidebarCollapsed ? "w-[4.5rem]" : "w-64",
+          )}
+        >
+          <AtlasLeftSidebar collapsed={sidebarCollapsed} />
         </aside>
 
         <main
-          className={`flex-1 min-h-[calc(100vh-var(--nxr-nav-height)-var(--nxr-ticker-height)-var(--atlas-app-bar-height))] w-full ${
-            hideRightSidebar ? "lg:ml-64" : "lg:ml-64 xl:mr-80"
-          }`}
+          className={cn(
+            "atlas-workspace-main flex-1 w-full min-h-[calc(100vh-var(--nxr-nav-height)-var(--nxr-ticker-height)-var(--atlas-app-bar-height))]",
+            leftWidth,
+            rightMargin,
+          )}
         >
           {children}
         </main>
 
         {!hideRightSidebar && (
-          <aside className="hidden xl:block w-80 shrink-0 fixed right-0 top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0 border-l border-border overflow-y-auto z-10 bg-chrome">
+          <aside
+            className={cn(
+              "hidden xl:block w-80 shrink-0 fixed right-0 z-10 border-l border-border overflow-y-auto bg-chrome",
+              "top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0",
+            )}
+          >
             <AtlasRightSidebar
               trendingBusinesses={trendingBusinesses}
               suggestedProfiles={suggestedProfiles}
@@ -75,5 +94,13 @@ export function AtlasAppShell({
 
       <AtlasMobileNav />
     </div>
+  );
+}
+
+export function AtlasAppShell(props: AtlasAppShellProps) {
+  return (
+    <AtlasWorkspaceProvider>
+      <AtlasAppShellInner {...props} />
+    </AtlasWorkspaceProvider>
   );
 }

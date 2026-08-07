@@ -44,7 +44,7 @@ export function MarketplaceGrid({ products }: MarketplaceGridProps) {
 
   if (products.length === 0) {
     return (
-      <div className="p-12 rounded-xl border border-white/10 bg-white/5 text-center">
+      <div className="p-12 nxr-card text-center">
         <Store className="h-12 w-12 text-muted mx-auto mb-4" />
         <p className="text-muted mb-2">No products available yet</p>
         <p className="text-sm text-muted">Check back soon for new listings!</p>
@@ -71,7 +71,7 @@ function ProductCard({ product, isLiked, onLike, onInteraction }: { product: any
   return (
     <Link
       href={`/marketplace/products/${product.slug || product.id}`}
-      className="group block rounded-xl border border-white/10 bg-white/5 hover:border-gold/30 hover:bg-white/10 transition-all overflow-hidden"
+      className="group block nxr-card nxr-card-interactive overflow-hidden"
     >
       {/* Product Image */}
       <div className="aspect-square bg-gradient-to-br from-gold/10 to-gold/5 flex items-center justify-center relative">

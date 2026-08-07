@@ -64,7 +64,7 @@ export function EcosystemSection() {
                     className={cn(
                       "absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border transition-all duration-500",
                       isActive
-                        ? "border-gold/40 bg-gold/15 shadow-[0_0_30px_-5px_rgba(212,175,55,0.4)]"
+                        ? "border-gold/40 bg-gold/15 shadow-[0_0_30px_-5px_rgba(255,209,92,0.4)]"
                         : "border-border bg-card/60 hover:border-gold/20",
                     )}
                     style={{ left: `${x}%`, top: `${y}%` }}
@@ -101,7 +101,7 @@ export function EcosystemSection() {
                       y1="50%"
                       x2={`${50 + 42 * Math.cos(angle)}%`}
                       y2={`${50 + 42 * Math.sin(angle)}%`}
-                      stroke="rgba(212,175,55,0.3)"
+                      stroke="rgba(255,209,92,0.3)"
                       strokeWidth="1"
                     />
                   </svg>

@@ -10,6 +10,8 @@ export const ATLAS_BRAND = {
   byline: "by NEXAR NETWORK",
   /** Platform category — Business Operating System. */
   tagline: "Business Operating System",
+  /** Short OS label for workspace chrome. */
+  osLabel: "ATLAS OS",
   /** Full public descriptor for metadata and docs. */
   fullName: "ATLAS by NEXAR NETWORK",
   description:

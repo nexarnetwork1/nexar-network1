@@ -50,7 +50,7 @@ export function PresaleNetworkSelector({ className }: PresaleNetworkSelectorProp
               className={cn(
                 "group flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-300",
                 selected
-                  ? "border-gold/40 bg-gold/10 shadow-[0_0_24px_rgba(212,175,55,0.08)]"
+                  ? "border-gold/40 bg-gold/10 shadow-[0_0_24px_rgba(255,209,92,0.08)]"
                   : "border-border bg-background/40 hover:border-gold/20 hover:bg-white/[0.03]",
               )}
             >

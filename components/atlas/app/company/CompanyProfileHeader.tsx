@@ -56,8 +56,8 @@ export function CompanyProfileHeader({
   const walletAddress = data.walletAddress ?? null;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-      <div className="relative h-32 sm:h-40 md:h-48 bg-gradient-to-br from-gold/20 to-white/5">
+    <div className="nxr-card overflow-hidden">
+      <div className="relative h-32 sm:h-40 md:h-48 bg-gradient-to-br from-gold/15 to-transparent">
         {profile.cover_url ? (
           <img src={profile.cover_url} alt="" className="h-full w-full object-cover" />
         ) : null}

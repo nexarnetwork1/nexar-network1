@@ -108,7 +108,7 @@ export function SocialFeed({ posts: initialPosts, initialHasMore = true }: Socia
           )}
         </>
       ) : (
-        <div className="p-8 rounded-xl border border-white/10 bg-white/5 text-center">
+        <div className="p-8 nxr-card text-center">
           <p className="text-muted mb-2">No posts yet</p>
           <p className="text-sm text-muted mb-4">
             Be the first to share something with the ATLAS community.
@@ -130,7 +130,7 @@ function ComposerPrompt({ session, onAuth }: { session: boolean; onAuth: () => v
     return (
       <Link
         href="/atlas/create-post"
-        className="block p-4 rounded-xl border border-white/10 bg-white/5 hover:border-gold/20 transition-colors"
+        className="block p-4 nxr-card nxr-card-interactive"
       >
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-gold/10 border border-gold/20" />
@@ -149,7 +149,7 @@ function ComposerPrompt({ session, onAuth }: { session: boolean; onAuth: () => v
     <button
       type="button"
       onClick={onAuth}
-      className="w-full p-4 rounded-xl border border-white/10 bg-white/5 hover:border-gold/20 transition-colors text-left"
+      className="w-full p-4 nxr-card nxr-card-interactive text-left"
     >
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-full bg-gold/10 border border-gold/20" />

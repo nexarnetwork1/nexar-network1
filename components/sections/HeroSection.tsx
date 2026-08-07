@@ -138,7 +138,7 @@ export function HeroSection() {
             style={{ y: vizY }}
             className="relative mx-auto aspect-square w-full max-w-[400px] sm:max-w-[520px] lg:max-w-none order-1 lg:order-2"
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.04)_0%,transparent_70%)] blur-2xl" />
+            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.04)_0%,transparent_70%)] blur-2xl" />
             <BlockchainVisualization />
           </motion.div>
         </div>

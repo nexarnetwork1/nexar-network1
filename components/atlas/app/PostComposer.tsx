@@ -274,8 +274,8 @@ export function PostComposer({
       <div
         {...getRootProps()}
         className={cn(
-          "rounded-xl border bg-white/5 p-4 space-y-4 transition-colors",
-          isDragActive ? "border-gold/50 bg-gold/5" : "border-white/10",
+          "nxr-card p-4 space-y-4 transition-colors duration-150",
+          isDragActive ? "border-gold/50 bg-gold/5" : "",
         )}
       >
         <input {...getInputProps()} />

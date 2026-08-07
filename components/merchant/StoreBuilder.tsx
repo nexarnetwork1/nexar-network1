@@ -37,7 +37,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   const [preview, setPreview] = useState({
-    primaryColor: profile.primary_color ?? branding?.primary_color ?? "#D4AF37",
+    primaryColor: profile.primary_color ?? branding?.primary_color ?? "#FFD15C",
     secondaryColor: profile.secondary_color ?? branding?.secondary_color ?? "#1a1a1a",
     borderRadius: profile.border_radius ?? "1rem",
     buttonStyle: profile.button_style ?? "rounded",

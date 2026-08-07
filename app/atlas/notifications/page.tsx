@@ -28,7 +28,7 @@ function NotificationRow({
   href: string | null;
 }) {
   const shellClass =
-    "block p-4 rounded-xl border border-white/10 bg-white/5 hover:border-gold/20 transition-colors";
+    "block p-4 nxr-card nxr-card-interactive";
 
   const content = (
     <>
@@ -132,7 +132,7 @@ export default async function AtlasNotificationsPage() {
           )}
 
           {notifications.length === 0 && (
-            <div className="p-8 rounded-xl border border-white/10 bg-white/5 text-center">
+            <div className="p-8 nxr-card text-center">
               <p className="text-muted">No notifications yet.</p>
               <div className="flex flex-wrap justify-center gap-3 mt-4 text-sm">
                 <Link href="/atlas/jobs" className="text-gold hover:underline">

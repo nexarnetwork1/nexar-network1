@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, User } from "lucide-react";
+import { Search, User, Sparkles } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils/cn";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
@@ -12,6 +12,7 @@ import Image from "next/image";
 import { ATLAS_BRAND } from "@/config/atlas-branding";
 import { ATLAS_APP_BAR_ITEMS } from "@/config/atlas-app-nav";
 import { getAtlasAppNavIcon } from "@/components/atlas/app/atlas-app-nav-icons";
+import { openAtlasAssistant } from "@/components/atlas/app/AtlasWorkspaceContext";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export function AtlasAppBar() {
@@ -41,9 +42,14 @@ export function AtlasAppBar() {
                 className="object-contain p-1"
               />
             </div>
-            <span className="hidden sm:block text-sm font-semibold tracking-wide text-foreground">
-              {ATLAS_BRAND.name}
-            </span>
+            <div className="hidden sm:flex flex-col min-w-0">
+              <span className="text-sm font-semibold tracking-wide text-foreground leading-tight">
+                {ATLAS_BRAND.osLabel}
+              </span>
+              <span className="text-[10px] text-muted tracking-wide truncate">
+                {ATLAS_BRAND.tagline}
+              </span>
+            </div>
           </Link>
 
           <div className="hidden md:flex flex-1 max-w-md ml-4">
@@ -93,6 +99,16 @@ export function AtlasAppBar() {
               </Link>
             );
           })}
+
+          <button
+            type="button"
+            onClick={openAtlasAssistant}
+            className="hidden sm:flex p-2 rounded-lg text-muted hover:text-gold hover:bg-gold/10 transition-colors duration-150"
+            title="AI Assistant"
+            aria-label="Open AI Assistant"
+          >
+            <Sparkles className="h-5 w-5" />
+          </button>
 
           <ThemeToggle compact className="hidden lg:inline-flex" />
 

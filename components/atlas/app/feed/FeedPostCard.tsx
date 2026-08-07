@@ -133,7 +133,7 @@ export function FeedPostCard({ post, session, onAuth, onUpdate }: FeedPostCardPr
   return (
     <article
       id={`post-${post.id}`}
-      className="p-4 rounded-xl border border-white/10 bg-white/5 hover:border-white/15 transition-colors scroll-mt-24"
+      className="nxr-card p-5 scroll-mt-24 transition-[border-color,background-color] duration-150 hover:border-gold/20"
     >
       <div className="flex items-start justify-between mb-3 gap-2">
         <div className="flex items-center gap-3 min-w-0">

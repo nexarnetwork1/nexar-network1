@@ -43,10 +43,10 @@ export function MessagingInterface({ conversations }: MessagingInterfaceProps) {
       <div
         className={`${
           selectedConversation ? "hidden md:flex" : "flex"
-        } w-full md:w-80 md:shrink-0 border-r border-white/10 flex-col min-h-0`}
+        } w-full md:w-80 md:shrink-0 border-r border-border flex-col min-h-0 bg-chrome`}
       >
         {/* Header */}
-        <div className="p-4 border-b border-white/10">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-bold">Messages</h1>
             <button className="p-2 rounded-lg hover:bg-white/5 transition-colors">
@@ -60,13 +60,13 @@ export function MessagingInterface({ conversations }: MessagingInterfaceProps) {
               placeholder="Search messages..."
               onFocus={() => router.push("/atlas/search?type=messages")}
               readOnly
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-muted focus:outline-none focus:border-gold/50 transition-colors text-sm cursor-pointer"
+              className="w-full nxr-input pl-10 cursor-pointer"
             />
           </div>
         </div>
 
         <nav
-          className="px-4 pb-3 flex flex-wrap gap-2 border-b border-white/10"
+          className="px-4 pb-3 flex flex-wrap gap-2 border-b border-border"
           aria-label="ATLAS ecosystem"
         >
           {ATLAS_ECOSYSTEM_LINKS.filter((link) => link.href !== "/atlas/messages").map((link) => (
@@ -87,8 +87,8 @@ export function MessagingInterface({ conversations }: MessagingInterfaceProps) {
               <button
                 key={conversation.id}
                 onClick={() => setSelectedConversation(conversation)}
-                className={`w-full p-4 border-b border-white/10 hover:bg-white/5 transition-colors text-left ${
-                  selectedConversation?.id === conversation.id ? "bg-white/5" : ""
+                className={`w-full p-4 border-b border-border hover:bg-white/[0.04] transition-colors duration-150 text-left ${
+                  selectedConversation?.id === conversation.id ? "bg-white/[0.04]" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ export function MessagingInterface({ conversations }: MessagingInterfaceProps) {
         {selectedConversation ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between gap-2">
+            <div className="p-4 border-b border-border flex items-center justify-between gap-2">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   type="button"
@@ -173,7 +173,7 @@ export function MessagingInterface({ conversations }: MessagingInterfaceProps) {
                 </span>
               </div>
               <div className="flex justify-start">
-                <div className="max-w-xs lg:max-w-md p-3 rounded-2xl rounded-tl-none bg-white/10">
+                <div className="max-w-xs lg:max-w-md p-3 rounded-2xl rounded-tl-none bg-surface-2 border border-border">
                   <p className="text-sm">Hello! How can I help you today?</p>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export function MessagingInterface({ conversations }: MessagingInterfaceProps) {
             </div>
 
             {/* Message Input */}
-            <div className="p-4 border-t border-white/10 space-y-2">
+            <div className="p-4 border-t border-border space-y-2">
               <div className="flex items-center gap-2">
                 <button className="p-2 rounded-lg hover:bg-white/5 transition-colors">
                   <Paperclip className="h-5 w-5 text-muted" />
@@ -195,7 +195,7 @@ export function MessagingInterface({ conversations }: MessagingInterfaceProps) {
                   value={messageDraft}
                   onChange={(e) => setMessageDraft(e.target.value)}
                   placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-muted focus:outline-none focus:border-gold/50 transition-colors"
+                  className="flex-1 nxr-input"
                 />
                 <button className="p-2 rounded-lg bg-gold/10 border border-gold/30 text-gold hover:bg-gold/20 transition-colors">
                   <Send className="h-5 w-5" />
