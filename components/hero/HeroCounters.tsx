@@ -27,7 +27,7 @@ export function HeroCounters() {
 
   const presaleDisplay = (() => {
     if (isLoading) return <span className="opacity-40">…</span>;
-    if (status === "upcoming") return <span className="text-amber-400">Upcoming</span>;
+    if (status === "upcoming") return <span className="text-gold">Upcoming</span>;
     if (status === "sold_out") return <span className="text-red-400">Sold Out</span>;
     if (status === "ended") return <span>Ended</span>;
     if (soldAmount > 0) {

@@ -85,8 +85,8 @@ export function PresaleNetworkSelector({ className }: PresaleNetworkSelectorProp
       </div>
 
       {wrongNetwork ? (
-        <div className="flex flex-col gap-2 rounded-xl border border-amber-500/25 bg-amber-500/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-2 text-sm text-amber-200/90">
+        <div className="flex flex-col gap-2 rounded-xl border border-gold/30 bg-gold-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2 text-sm text-text-secondary">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <span>
               Wallet is on a different network. Switch to{" "}

@@ -47,7 +47,7 @@ export function AtlasSidebar() {
   const modules = getActiveAtlasModules();
 
   return (
-    <aside className="hidden lg:block w-64 border-r border-white/10 bg-[#0a0a0b]/50 p-4 h-[calc(100vh-64px)] sticky top-16 overflow-y-auto">
+    <aside className="hidden lg:block w-64 border-r border-border bg-chrome/80 p-4 h-[calc(100vh-64px)] sticky top-16 overflow-y-auto">
       <div className="space-y-6">
         {/* Overview Section */}
         <div>
@@ -136,17 +136,15 @@ function SidebarLink({
     <Link
       href={href}
       className={cn(
-        "flex items-start gap-3 px-3 py-2.5 rounded-lg transition-colors group",
-        active
-          ? "bg-gold/10 text-gold"
-          : "text-white/70 hover:text-white hover:bg-white/5"
+        "nxr-nav-link items-start gap-3 py-2.5 group",
+        active && "nxr-nav-link-active",
       )}
     >
-      <Icon className={cn("h-5 w-5 shrink-0 mt-0.5", active ? "text-gold" : "text-white/50 group-hover:text-white")} />
+      <Icon className={cn("h-5 w-5 shrink-0 mt-0.5", active ? "text-gold" : "text-muted group-hover:text-foreground")} />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium">{label}</p>
         {description && (
-          <p className="text-xs text-white/50 line-clamp-1 mt-0.5">{description}</p>
+          <p className="text-xs text-muted line-clamp-1 mt-0.5">{description}</p>
         )}
       </div>
     </Link>

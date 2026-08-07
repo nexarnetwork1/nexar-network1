@@ -22,14 +22,14 @@ export function CommerceStoreCard({ store, index = 0 }: CommerceStoreCardProps) 
       className="nxr-card nxr-card-interactive group overflow-hidden"
     >
       <Link href={MARKETPLACE_ROUTES.store(store.slug)} className="block">
-        <div className="relative h-36 overflow-hidden bg-[#121212]">
+        <div className="relative h-36 overflow-hidden bg-surface-1">
           <CommerceImage
             src={store.banner_url}
             alt={`${store.name} banner`}
             className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]"
             fallback={store.name.slice(0, 1)}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-chrome via-chrome/40 to-transparent" />
           <div className="absolute bottom-3 left-3 flex items-center gap-2">
             <div className="h-12 w-12 overflow-hidden rounded-lg border border-border bg-surface">
               <CommerceImage
@@ -57,21 +57,21 @@ export function CommerceStoreCard({ store, index = 0 }: CommerceStoreCardProps) 
 
         <div className="space-y-4 p-5">
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-lg bg-[#121212] px-2 py-2">
+            <div className="rounded-lg bg-surface-1 px-2 py-2">
               <div className="flex items-center justify-center gap-1 text-gold">
                 <Star className="h-3.5 w-3.5" />
                 <span className="font-mono text-sm">{store.rating ?? 0}</span>
               </div>
               <p className="mt-0.5 text-[10px] tracking-wide text-muted uppercase">Rating</p>
             </div>
-            <div className="rounded-lg bg-[#121212] px-2 py-2">
+            <div className="rounded-lg bg-surface-1 px-2 py-2">
               <div className="flex items-center justify-center gap-1 text-white">
                 <Users className="h-3.5 w-3.5 text-gold" />
                 <span className="font-mono text-sm">{store.follower_count ?? 0}</span>
               </div>
               <p className="mt-0.5 text-[10px] tracking-wide text-muted uppercase">Followers</p>
             </div>
-            <div className="rounded-lg bg-[#121212] px-2 py-2">
+            <div className="rounded-lg bg-surface-1 px-2 py-2">
               <div className="flex items-center justify-center gap-1 text-white">
                 <Package className="h-3.5 w-3.5 text-gold" />
                 <span className="font-mono text-sm">{store.product_count ?? 0}</span>

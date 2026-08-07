@@ -39,7 +39,7 @@ export function EmojiPicker({ onSelect, className }: EmojiPickerProps) {
         <Smile className="h-4 w-4" />
       </button>
       {open && (
-        <div className="absolute bottom-full left-0 z-20 mb-2 w-56 rounded-xl border border-white/10 bg-[#0a0a0a] p-2 shadow-xl">
+        <div className="absolute bottom-full left-0 z-20 mb-2 w-56 rounded-xl border border-white/10 bg-surface-2 p-2 shadow-xl">
           <div className="grid grid-cols-6 gap-1">
             {EMOJIS.map((emoji) => (
               <button

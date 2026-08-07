@@ -31,11 +31,11 @@ export default async function MerchantLayout({
 
   const pendingApprovalBanner =
     store?.status === "pending" ? (
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gold/30 bg-gold-soft px-5 py-4">
         <div className="flex items-start gap-3">
-          <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" aria-hidden />
+          <Clock className="mt-0.5 h-5 w-5 shrink-0 text-gold" aria-hidden />
           <div>
-            <p className="text-sm font-medium text-amber-200">Your store is awaiting approval</p>
+            <p className="text-sm font-medium text-text-secondary">Your store is awaiting approval</p>
             <p className="mt-1 text-xs text-muted">
               {store.name} is under review. You can prepare your catalog while our team verifies
               your storefront.

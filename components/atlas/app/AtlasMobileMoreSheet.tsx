@@ -30,7 +30,7 @@ export function AtlasMobileMoreSheet({ open, onClose }: AtlasMobileMoreSheetProp
         aria-label="Close menu"
         onClick={onClose}
       />
-      <div className="absolute bottom-0 left-0 right-0 rounded-t-2xl border border-white/10 bg-[#050505] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="absolute bottom-0 left-0 right-0 rounded-t-2xl border border-white/10 bg-chrome p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold">Explore ATLAS</h2>
           <button

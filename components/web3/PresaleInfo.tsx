@@ -19,7 +19,7 @@ function formatDate(timestamp: bigint | undefined): string {
 }
 
 const STATUS_LABELS = {
-  upcoming: { label: "Upcoming", color: "text-amber-400" },
+  upcoming: { label: "Upcoming", color: "text-gold" },
   live: { label: "Live", color: "text-emerald-400" },
   sold_out: { label: "Sold Out", color: "text-red-400" },
   ended: { label: "Ended", color: "text-muted" },

@@ -54,12 +54,9 @@ export function DashboardNavList({
                     aria-current={active ? "page" : undefined}
                     title={collapsed ? item.label : undefined}
                     className={cn(
-                      "group flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      "nxr-nav-link w-full min-h-11",
                       collapsed && "justify-center px-0",
-                      active
-                        ? "bg-gold/12 font-medium text-gold"
-                        : "text-muted hover:bg-white/5 hover:text-white",
+                      active && "nxr-nav-link-active font-medium",
                     )}
                   >
                     {Icon && (
@@ -72,7 +69,7 @@ export function DashboardNavList({
                     {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
 
                     {!collapsed && item.badge ? (
-                      <span className="shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-bold text-background">
+                      <span className="shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[10px] font-semibold text-on-gold">
                         {item.badge}
                       </span>
                     ) : null}

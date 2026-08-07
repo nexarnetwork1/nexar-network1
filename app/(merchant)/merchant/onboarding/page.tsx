@@ -37,9 +37,9 @@ export default async function MerchantOnboardingPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <DashboardCard className="border-amber-500/30 bg-amber-500/5 p-6 text-center sm:p-8">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10">
-          <Clock className="h-7 w-7 text-amber-400" aria-hidden />
+      <DashboardCard className="border-gold/30 bg-gold-soft p-6 text-center sm:p-8">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gold-soft">
+          <Clock className="h-7 w-7 text-gold" aria-hidden />
         </div>
         <h1 className="font-heading text-2xl font-semibold text-white">
           Your store is awaiting approval
@@ -49,7 +49,7 @@ export default async function MerchantOnboardingPage() {
           Our team is reviewing <strong className="text-gold">{store.name}</strong> before it goes live on
           the marketplace.
         </p>
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-background/40 px-4 py-2 text-xs capitalize text-amber-300">
+        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-background/40 px-4 py-2 text-xs capitalize text-gold">
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
           Status: {store.status.replace("_", " ")}
         </div>

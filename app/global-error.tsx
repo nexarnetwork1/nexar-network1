@@ -28,7 +28,7 @@ export default function GlobalError({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#050505",
+          background: "#050608",
           color: "#ffffff",
           fontFamily:
             "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
@@ -41,7 +41,7 @@ export default function GlobalError({
             maxWidth: 420,
             borderRadius: 12,
             border: "1px solid rgba(212, 175, 55, 0.14)",
-            background: "#1a1a1a",
+            background: "#141a23",
             padding: 32,
             textAlign: "center",
           }}
@@ -68,7 +68,7 @@ export default function GlobalError({
           <h1 style={{ margin: "8px 0 0", fontSize: 24, fontWeight: 600, color: "#ffffff" }}>
             Something went wrong
           </h1>
-          <p style={{ margin: "12px 0 0", fontSize: 14, lineHeight: 1.6, color: "#7a7a7a" }}>
+          <p style={{ margin: "12px 0 0", fontSize: 14, lineHeight: 1.6, color: "#8b949e" }}>
             A critical error occurred. The issue has been logged. You can retry, reload, or return
             home.
           </p>
@@ -93,7 +93,7 @@ export default function GlobalError({
                 borderRadius: 10,
                 border: "1px solid rgba(212, 175, 55, 0.5)",
                 background: "#d4af37",
-                color: "#050505",
+                color: "#050608",
                 fontWeight: 600,
                 fontSize: 14,
                 cursor: "pointer",

@@ -29,7 +29,7 @@ export function AtlasIdentityCard({
   return (
     <div
       className={cn(
-        "relative w-full max-w-[22rem] overflow-hidden rounded-[1.25rem] border border-gold/20 bg-card/95 p-5 shadow-[var(--nxr-shadow-soft)] backdrop-blur-xl sm:max-w-[24rem] sm:p-6",
+        "relative w-full max-w-[22rem] overflow-hidden rounded-[var(--nxr-radius-xl)] border border-border bg-card/95 p-6 shadow-[var(--nxr-shadow-modal)] backdrop-blur-xl sm:max-w-[24rem]",
         className,
       )}
     >

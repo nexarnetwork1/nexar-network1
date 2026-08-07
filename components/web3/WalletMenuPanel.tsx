@@ -46,17 +46,17 @@ export function WalletMenuPanel({ panel, onDisconnect, className }: WalletMenuPa
             <div className="flex items-center gap-2">
               <p className="truncate font-medium text-white">{meta.label}</p>
               {isConnected && (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden />
               )}
             </div>
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-emerald-400">
+            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-success">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-40" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-40" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
               </span>
               Connected
             </p>
-            <p className="mt-2 break-all font-mono text-[11px] leading-relaxed text-gray-300">
+            <p className="mt-2 break-all font-mono text-[11px] leading-relaxed text-text-secondary">
               {address}
             </p>
           </div>
@@ -64,13 +64,13 @@ export function WalletMenuPanel({ panel, onDisconnect, className }: WalletMenuPa
       </div>
 
       {!onBsc && (
-        <div className="border-b border-amber-500/20 bg-amber-500/5 px-4 py-3">
-          <p className="text-xs text-amber-200/90">Wrong network — switch to BNB Smart Chain to use Nexar features.</p>
+        <div className="border-b border-gold/30 bg-gold-soft px-4 py-3">
+          <p className="text-xs text-text-secondary">Wrong network — switch to BNB Smart Chain to use Nexar features.</p>
           <button
             type="button"
             onClick={switchToBsc}
             disabled={isSwitchingChain}
-            className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm font-medium text-amber-100 transition hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 disabled:opacity-60"
+            className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold/30 bg-gold-soft px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40 disabled:opacity-60"
           >
             <ArrowRightLeft className="h-4 w-4 shrink-0" aria-hidden />
             {isSwitchingChain ? "Switching…" : "Switch to BNB Smart Chain"}
@@ -87,9 +87,9 @@ export function WalletMenuPanel({ panel, onDisconnect, className }: WalletMenuPa
 
         <div className="grid grid-cols-3 gap-2">
           {[
-            { code: "BNB", value: balances.bnb, accent: "text-amber-300" },
+            { code: "BNB", value: balances.bnb, accent: "text-gold" },
             { code: "NXR", value: balances.nxr, accent: "text-gold" },
-            { code: "USDT", value: balances.usdt, accent: "text-emerald-400" },
+            { code: "USDT", value: balances.usdt, accent: "text-success" },
           ].map((item) => (
             <div
               key={item.code}

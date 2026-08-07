@@ -93,7 +93,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           <motion.button
             type="button"
             aria-label="Close menu"
-            className="fixed inset-0 z-[70] bg-background/70 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] nxr-modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -105,7 +105,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
-            className="fixed top-0 right-0 z-[80] flex h-[100dvh] w-full max-w-sm min-h-0 flex-col border-l border-border bg-surface/95 backdrop-blur-2xl"
+            className="fixed top-0 right-0 z-[80] flex h-[100dvh] w-full max-w-sm min-h-0 flex-col border-l border-border bg-chrome/98 backdrop-blur-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}

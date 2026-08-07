@@ -92,7 +92,7 @@ export function AiAssistMenu({
             aria-label="Close AI menu"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute left-0 top-full mt-1 z-40 min-w-[200px] max-h-64 overflow-y-auto rounded-xl border border-white/10 bg-[#0a0a0a] shadow-xl py-1">
+          <div className="absolute left-0 top-full mt-1 z-40 min-w-[200px] max-h-64 overflow-y-auto rounded-xl border border-white/10 bg-surface-2 shadow-xl py-1">
             {actions.map((action) => (
               <button
                 key={action}

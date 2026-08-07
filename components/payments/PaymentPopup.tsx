@@ -62,11 +62,11 @@ const STATUS_LABELS: Record<DisplayStatus, string> = {
 
 const STATUS_COLORS: Record<DisplayStatus, string> = {
   pending: "text-zinc-400",
-  waiting: "text-amber-400",
-  confirmed: "text-sky-400",
-  completed: "text-emerald-400",
-  expired: "text-red-400",
-  cancelled: "text-red-400",
+  waiting: "text-gold",
+  confirmed: "text-gold",
+  completed: "text-success",
+  expired: "text-danger",
+  cancelled: "text-danger",
 };
 
 export function PaymentPopup({
@@ -220,7 +220,7 @@ export function PaymentPopup({
           {session.status === "waiting" && (
             <div className="flex justify-between">
               <dt className="text-muted">Expires in</dt>
-              <dd className="font-mono text-amber-400">{countdown}</dd>
+              <dd className="font-mono text-gold">{countdown}</dd>
             </div>
           )}
         </dl>

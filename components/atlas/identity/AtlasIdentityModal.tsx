@@ -46,7 +46,7 @@ export function AtlasIdentityModal({
         >
           <motion.div
             aria-hidden
-            className="absolute inset-0 bg-black/75 backdrop-blur-md"
+            className="absolute inset-0 nxr-modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

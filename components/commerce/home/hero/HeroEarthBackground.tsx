@@ -64,7 +64,7 @@ function EarthScene({ idle }: { idle: boolean }) {
   return (
     <>
       <ambientLight intensity={0.12} />
-      <directionalLight position={[6, 3, 5]} intensity={1.15} color="#fff8eb" />
+      <directionalLight position={[6, 3, 5]} intensity={1.15} color="#e8ecf1" />
       <pointLight position={[-5, -2, 3]} intensity={0.55} color="#d4af37" />
       <pointLight position={[4, -3, -2]} intensity={0.3} color="#c9a227" />
       <Suspense fallback={null}>

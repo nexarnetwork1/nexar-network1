@@ -69,7 +69,7 @@ export default async function AdminUsersPage() {
                     {user.profile_completed ? (
                       <span className="text-emerald-400">Complete</span>
                     ) : (
-                      <span className="text-amber-400">Incomplete</span>
+                      <span className="text-gold">Incomplete</span>
                     )}
                   </DashboardTableCell>
                   <DashboardTableCell align="right">

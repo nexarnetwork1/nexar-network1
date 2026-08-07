@@ -425,9 +425,9 @@ export default function MarketPage() {
           </div>
 
           {/* Warning */}
-          <div className="mt-12 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-6 py-4">
-            <p className="text-sm text-amber-200/80">
-              <strong className="text-amber-400">Important:</strong> Only trade {SITE.ticker} on verified exchanges using the official contract address above. Always verify the contract address before making any transactions.
+          <div className="mt-12 rounded-2xl border border-gold/30 bg-gold-soft px-6 py-4">
+            <p className="text-sm text-text-secondary">
+              <strong className="text-gold">Important:</strong> Only trade {SITE.ticker} on verified exchanges using the official contract address above. Always verify the contract address before making any transactions.
             </p>
           </div>
         </div>

@@ -242,7 +242,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
           className={cn(
             "rounded-full px-3 py-1 text-xs font-medium",
             presale.status === "live" && "bg-emerald-500/15 text-emerald-400",
-            presale.status === "upcoming" && "bg-amber-500/15 text-amber-400",
+            presale.status === "upcoming" && "bg-gold-soft text-gold",
             presale.status === "sold_out" && "bg-red-500/15 text-red-400",
             presale.status === "ended" && "bg-muted/20 text-muted",
             presale.status === "error" && "bg-muted/20 text-muted"
@@ -292,10 +292,10 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       )}
 
       {statusMessage && (
-        <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden />
+        <div className="mb-4 flex items-start gap-2 rounded-xl border border-gold/30 bg-gold-soft px-4 py-3">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-gold" aria-hidden />
           <div className="flex-1">
-            <p className="text-sm text-amber-200/90">{statusMessage}</p>
+            <p className="text-sm text-text-secondary">{statusMessage}</p>
             {presale.status === "error" && (
               <button
                 type="button"

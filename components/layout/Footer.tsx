@@ -35,7 +35,7 @@ const SOCIAL_ICONS = [
 
 export function Footer() {
   return (
-    <footer id="contact" className="relative scroll-mt-[var(--nxr-header-offset)] border-t border-white/[0.06] bg-[#0a0a0a]">
+    <footer id="contact" className="relative scroll-mt-[var(--nxr-header-offset)] border-t border-border bg-chrome">
       <Container className="py-14 sm:py-18 lg:py-24">
         <div className="grid gap-10 sm:gap-14 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>

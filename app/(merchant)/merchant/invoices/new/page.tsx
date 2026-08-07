@@ -17,7 +17,7 @@ export default async function NewPaymentRequestPage() {
     return (
       <div className="space-y-6">
         <DashboardSection as="div" level="h1" title="New payment request" />
-        <p className="text-amber-400">
+        <p className="text-gold">
           Your store must be active before creating payment requests.
         </p>
       </div>

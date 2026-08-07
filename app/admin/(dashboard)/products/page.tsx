@@ -71,7 +71,7 @@ export default async function AdminProductsPage() {
                     <DashboardTableCell hideBelow="md" wrap>
                       {store?.name ?? "—"}
                       {store?.status !== "active" && (
-                        <span className="ml-2 text-xs text-amber-400">({store?.status})</span>
+                        <span className="ml-2 text-xs text-gold">({store?.status})</span>
                       )}
                     </DashboardTableCell>
                     <DashboardTableCell>

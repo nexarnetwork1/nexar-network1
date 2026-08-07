@@ -41,14 +41,14 @@ export function RevenueChart({ data }: RevenueChartProps) {
     <div className="h-72 nxr-card p-4">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" />
-          <XAxis dataKey="month" stroke="#9a9a9a" fontSize={12} />
-          <YAxis stroke="#9a9a9a" fontSize={12} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1a2230" />
+          <XAxis dataKey="month" stroke="#8b949e" fontSize={12} />
+          <YAxis stroke="#8b949e" fontSize={12} />
           <Tooltip
             cursor={{ fill: "rgba(255,255,255,0.04)" }}
             contentStyle={{
-              backgroundColor: "#0b0b0b",
-              border: "1px solid #1a1a1a",
+              backgroundColor: "#141a23",
+              border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: "12px",
               color: "#ffffff",
             }}

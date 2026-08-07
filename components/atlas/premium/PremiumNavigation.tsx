@@ -26,7 +26,7 @@ export function PremiumNavigation() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-white/10 bg-[#050505]/80 backdrop-blur-2xl">
+      <header className="nxr-navbar fixed top-0 left-0 right-0 z-50 h-20">
         <div className="flex h-full items-center justify-between px-6 lg:px-8">
           {/* Logo */}
           <Link href="/atlas" className="flex items-center gap-4">
@@ -102,7 +102,7 @@ export function PremiumNavigation() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 top-20 z-50 bg-[#050505]">
+        <div className="nxr-modal-backdrop lg:hidden fixed inset-0 top-20 z-50 bg-chrome">
           <div className="flex flex-col p-6 space-y-6">
             <button
               type="button"

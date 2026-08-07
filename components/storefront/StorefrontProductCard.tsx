@@ -25,7 +25,7 @@ export function StorefrontProductCard({ product, index = 0 }: StorefrontProductC
       className="nxr-card nxr-card-interactive group overflow-hidden"
     >
       <Link href={href}>
-        <div className="relative aspect-[4/3] overflow-hidden bg-[#121212]">
+        <div className="relative aspect-[4/3] overflow-hidden bg-surface-1">
           {product.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -14,7 +14,7 @@ export function AtlasNavbar() {
   const { openCommerceAuth } = useCommerceAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/10 bg-[#0a0a0b]/95 backdrop-blur-xl">
+    <header className="nxr-navbar fixed top-0 left-0 right-0 z-50">
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
         {/* Logo */}
         <Link href="/atlas" className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export function AtlasNavbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 top-16 z-50 bg-[#0a0a0b]">
+        <div className="nxr-modal-backdrop lg:hidden fixed inset-0 top-16 z-50 bg-chrome">
           <div className="flex flex-col p-4 space-y-4">
             <button
               type="button"
@@ -105,7 +105,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="px-4 py-2 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors font-medium"
+      className="nxr-nav-link text-sm font-medium"
     >
       {children}
     </Link>
@@ -125,7 +125,7 @@ function MobileNavLink({
     <Link
       href={href}
       onClick={onClick}
-      className="px-4 py-3 rounded-lg text-base text-white/70 hover:text-white hover:bg-white/5 transition-colors font-medium"
+      className="nxr-nav-link text-base font-medium"
     >
       {children}
     </Link>

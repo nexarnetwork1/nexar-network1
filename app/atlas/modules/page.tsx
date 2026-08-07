@@ -133,13 +133,13 @@ function ModuleCard({
   capabilities: readonly string[];
 }) {
   const statusColors = {
-    active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    foundation: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    planned: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    active: "bg-success/10 text-success border-success/20",
+    foundation: "bg-surface-1 text-text-secondary border-border",
+    planned: "bg-surface-1 text-muted border-border",
   };
 
   const content = (
-    <div className="p-6 rounded-xl border border-white/10 bg-white/5 hover:border-gold/30 hover:bg-white/10 transition-all group">
+    <div className="nxr-card nxr-card-interactive p-6 group">
       <div className="flex items-start gap-4 mb-4">
         {Icon && (
           <div className="h-12 w-12 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">

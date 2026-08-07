@@ -60,10 +60,10 @@ export default async function MerchantProductsPage() {
           <>
             Manage your catalog for {store.name}
             {store.status !== "active" && (
-              <span className="ml-2 text-amber-400">(store pending approval)</span>
+              <span className="ml-2 text-gold">(store pending approval)</span>
             )}
             {lowStockCount > 0 && (
-              <span className="ml-2 text-amber-400">({lowStockCount} low stock)</span>
+              <span className="ml-2 text-gold">({lowStockCount} low stock)</span>
             )}
           </>
         }
@@ -137,7 +137,7 @@ export default async function MerchantProductsPage() {
                         product.inventory.quantity_on_hand -
                           product.inventory.reserved_quantity <=
                           product.inventory.low_stock_threshold
-                          ? "text-amber-400"
+                          ? "text-gold"
                           : ""
                       }
                     >

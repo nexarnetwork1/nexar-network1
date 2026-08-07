@@ -32,7 +32,7 @@ export function CommerceProductCard({
       className="nxr-card nxr-card-interactive group overflow-hidden"
     >
       <Link href={MARKETPLACE_ROUTES.product(product.slug || product.id)}>
-        <div className="relative aspect-[4/3] overflow-hidden bg-[#121212]">
+        <div className="relative aspect-[4/3] overflow-hidden bg-surface-1">
           <CommerceImage
             src={product.image_url}
             alt={product.name}

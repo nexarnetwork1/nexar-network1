@@ -27,7 +27,7 @@ type Arc = {
 
 const GOLD = "rgba(212, 175, 55, 0.95)";
 const GOLD_DIM = "rgba(212, 175, 55, 0.22)";
-const OCEAN = "#0a1628";
+const OCEAN = "#0b0e13";
 const OCEAN_LIGHT = "#122238";
 
 /** Lightweight land mask — approximate continents without external textures. */
@@ -199,7 +199,7 @@ export function GlobeCanvas({
       const ocean = ctx.createRadialGradient(cx - r * 0.2, cy - r * 0.25, r * 0.05, cx, cy, r);
       ocean.addColorStop(0, OCEAN_LIGHT);
       ocean.addColorStop(0.65, OCEAN);
-      ocean.addColorStop(1, "#040810");
+      ocean.addColorStop(1, "#050608");
       ctx.fillStyle = ocean;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -303,7 +303,7 @@ export function GlobeCanvas({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-[#050a14]/90 via-[#0a1424]/70 to-background/80 shadow-[0_0_80px_-20px_rgba(212,175,55,0.25)] ${className ?? ""}`}
+      className={`relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-surface-1/90 via-chrome/70 to-background/80 shadow-[0_0_80px_-20px_rgba(212,175,55,0.25)] ${className ?? ""}`}
     >
       <canvas
         ref={canvasRef}

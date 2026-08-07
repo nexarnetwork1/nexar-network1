@@ -83,7 +83,7 @@ export function WalletMobileSheet({ open, onClose, panel }: WalletMobileSheetPro
             role="dialog"
             aria-modal="true"
             aria-label="Wallet"
-            className="fixed inset-x-0 bottom-0 z-[90] flex max-h-[min(92dvh,640px)] flex-col overflow-hidden rounded-t-[1.75rem] border border-gold/20 bg-[#0B0B0B]/95 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl will-change-transform"
+            className="fixed inset-x-0 bottom-0 z-[90] flex max-h-[min(92dvh,640px)] flex-col overflow-hidden rounded-t-[1.75rem] border border-gold/20 bg-chrome/95 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl will-change-transform"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}

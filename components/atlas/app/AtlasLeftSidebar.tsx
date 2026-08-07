@@ -22,7 +22,7 @@ export function AtlasLeftSidebar() {
       {session ? (
         <Link
           href="/atlas/create-post"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gold border border-gold/30 text-background font-medium hover:bg-gold-secondary transition-colors"
+          className="flex items-center gap-3 px-4 py-3 rounded-[var(--nxr-radius-lg)] bg-gold border border-gold/30 text-on-gold font-medium hover:bg-gold-hover transition-colors duration-150"
         >
           <Plus className="h-5 w-5" />
           <span>Create Post</span>
@@ -37,7 +37,7 @@ export function AtlasLeftSidebar() {
               message: "Sign in to create a post",
             })
           }
-          className="flex w-full items-center gap-3 px-4 py-3 rounded-xl bg-gold border border-gold/30 text-background font-medium hover:bg-gold-secondary transition-colors"
+          className="flex w-full items-center gap-3 px-4 py-3 rounded-[var(--nxr-radius-lg)] bg-gold border border-gold/30 text-on-gold font-medium hover:bg-gold-hover transition-colors duration-150"
         >
           <Plus className="h-5 w-5" />
           <span>Create Post</span>
@@ -60,7 +60,7 @@ export function AtlasLeftSidebar() {
                     redirect: item.href,
                   })
                 }
-                className="flex w-full items-center gap-3 px-4 py-3 rounded-lg text-muted hover:bg-white/5 hover:text-white transition-colors"
+                className="nxr-nav-link w-full"
               >
                 <Icon className="h-5 w-5" />
                 <span className="font-medium">{item.label}</span>
@@ -72,10 +72,7 @@ export function AtlasLeftSidebar() {
             <Link
               key={item.id}
               href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                isActive ? "bg-white/10 text-white" : "text-muted hover:bg-white/5 hover:text-white",
-              )}
+              className={cn("nxr-nav-link w-full", isActive && "nxr-nav-link-active font-medium")}
             >
               <Icon className="h-5 w-5" />
               <span className="font-medium">{item.label}</span>
@@ -97,10 +94,7 @@ export function AtlasLeftSidebar() {
                 <Link
                   key={item.id}
                   href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                    isActive ? "bg-white/10 text-white" : "text-muted hover:bg-white/5 hover:text-white",
-                  )}
+                  className={cn("nxr-nav-link w-full", isActive && "nxr-nav-link-active font-medium")}
                 >
                   <Icon className="h-5 w-5" />
                   <span className="font-medium">{item.label}</span>

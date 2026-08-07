@@ -235,7 +235,7 @@ export function TickerManagement({ initialAnnouncements }: Props) {
                         isCurrentlyActive(item)
                           ? "bg-emerald-500/15 text-emerald-400"
                           : item.is_enabled
-                            ? "bg-amber-500/15 text-amber-400"
+                            ? "bg-gold-soft text-gold"
                             : "bg-white/5 text-muted"
                       }`}
                     >

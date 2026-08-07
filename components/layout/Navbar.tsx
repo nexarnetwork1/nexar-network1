@@ -20,13 +20,11 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-30 transition-all duration-400",
-          scrolled
-            ? "border-b border-border bg-chrome/92 py-3 backdrop-blur-xl"
-            : "border-b border-transparent bg-chrome/55 py-4 backdrop-blur-md",
+          "nxr-navbar fixed inset-x-0 top-0 z-30 transition-[background,box-shadow] duration-200 ease-out",
+          scrolled && "shadow-[0_1px_0_rgba(255,255,255,0.06)]",
         )}
       >
-        <Container className="flex items-center justify-between gap-4 sm:gap-6">
+        <Container className="flex h-full items-center justify-between gap-6">
           <NavLink href="/" aria-label="Nexar Network home" className="relative z-10 shrink-0">
             <Logo />
           </NavLink>
@@ -39,9 +37,9 @@ export function Navbar() {
               <NavLink
                 key={item.href}
                 href={item.href}
-                className="group relative rounded-md px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="nxr-nav-link group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40 focus-visible:ring-offset-2 focus-visible:ring-offset-chrome"
               >
-                <span className="text-[13px] font-medium tracking-[0.04em] text-foreground/75 transition-colors duration-300 group-hover:text-foreground">
+                <span className="text-small font-medium text-foreground/80 transition-colors duration-150 group-hover:text-foreground">
                   {item.label}
                 </span>
               </NavLink>
@@ -58,7 +56,7 @@ export function Navbar() {
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
               onClick={() => setMobileOpen(true)}
-              className="flex h-11 w-11 items-center justify-center rounded-[0.625rem] border border-border text-foreground transition-colors hover:border-gold/40 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-[var(--nxr-radius-button)] border border-border text-foreground transition-colors duration-150 hover:border-gold/30 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40 lg:hidden"
             >
               <Menu className="h-4 w-4" aria-hidden="true" />
             </button>

@@ -112,7 +112,7 @@ export function PostMenu({ postId, session, onAuth, onSavedChange }: PostMenuPro
         <MoreHorizontal className="h-4 w-4 text-muted" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-20 mt-1 min-w-[160px] rounded-xl border border-white/10 bg-[#0a0a0a] py-1 shadow-xl">
+        <div className="absolute right-0 top-full z-20 mt-1 min-w-[160px] rounded-xl border border-white/10 bg-surface-2 py-1 shadow-xl">
           {items.map(({ icon: Icon, label, action, danger }) => (
             <button
               key={label}

@@ -312,7 +312,7 @@ export function NexarAssistant() {
             onClick={() => setOpen(true)}
             className={cn(
               "fixed bottom-6 right-6 z-[125] flex h-14 w-14 items-center justify-center rounded-full",
-              "border border-gold/35 bg-gradient-to-br from-gold via-gold-secondary to-amber-600",
+              "border border-gold/35 bg-gradient-to-br from-gold via-gold-secondary to-gold-hover",
               "text-background shadow-[0_8px_32px_-4px_rgba(212,175,55,0.55)]",
               "transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             )}
@@ -350,7 +350,7 @@ export function NexarAssistant() {
               exit={panelExit}
               transition={panelTransition}
               className={cn(
-                "fixed z-[125] flex flex-col border-border/80 bg-[#0a0a0c]/95 shadow-2xl shadow-black/50 backdrop-blur-2xl",
+                "fixed z-[125] flex flex-col border-border/80 bg-chrome/95 shadow-2xl shadow-black/50 backdrop-blur-2xl",
                 isMobile
                   ? "inset-x-0 bottom-0 top-auto max-h-[min(90vh,640px)] rounded-t-2xl border-t"
                   : "inset-y-0 right-0 w-full max-w-[min(100vw,24rem)] border-l",

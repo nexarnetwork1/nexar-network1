@@ -13,7 +13,7 @@ export function AtlasTopNav() {
   const { data: session } = useSession();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/10 bg-[#050505]/95 backdrop-blur-xl">
+    <header className="nxr-navbar fixed top-0 left-0 right-0 z-50">
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
         {/* Left: Logo */}
         <div className="flex items-center gap-4">
@@ -39,7 +39,7 @@ export function AtlasTopNav() {
             <input
               type="text"
               placeholder="Search ATLAS..."
-              className="w-full h-10 pl-10 pr-4 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-muted focus:outline-none focus:border-gold/50 focus:bg-white/10 transition-all"
+              className="nxr-input w-full h-10 pl-10 pr-4"
             />
           </div>
         </div>

@@ -103,7 +103,7 @@ export function PostMediaGallery({ media, className }: PostMediaGalleryProps) {
               download
               className="flex items-center gap-3 p-4 hover:bg-white/10 transition-colors"
             >
-              <FileText className="h-8 w-8 text-orange-400 shrink-0" />
+              <FileText className="h-8 w-8 text-gold shrink-0" />
               <span className="text-sm truncate flex-1">{fileName}</span>
               <Download className="h-4 w-4 text-muted shrink-0" />
             </a>

@@ -2,7 +2,7 @@ import type { SystemHealthSnapshot } from "@/lib/monitoring/system-health";
 
 const STATUS_COLORS = {
   ok: "text-emerald-400",
-  warn: "text-amber-400",
+  warn: "text-gold",
   error: "text-red-400",
 };
 

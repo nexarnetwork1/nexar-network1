@@ -8,7 +8,7 @@ import {
 } from "react";
 import { cn } from "@/lib/utils/cn";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "outline";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "outline" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -18,22 +18,23 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   glow?: boolean;
 };
 
-/** Boutique rectangles — soft radius, not Web3 pills. */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gold text-on-gold border border-gold/40 hover:bg-gold-accent",
+    "bg-gold text-on-gold border border-gold/30 hover:bg-gold-hover hover:border-gold-hover/40",
   secondary:
-    "bg-transparent text-gold border border-gold/35 hover:bg-gold/10 hover:text-gold",
+    "bg-surface-2 text-foreground border border-border hover:bg-surface-3 hover:border-border-default",
   outline:
-    "bg-transparent text-foreground border border-border hover:border-gold/40 hover:text-gold",
+    "bg-transparent text-foreground border border-border hover:border-gold/30 hover:text-gold",
   ghost:
     "bg-transparent text-muted hover:text-foreground hover:bg-white/[0.04] border border-transparent",
+  danger:
+    "bg-danger text-white border border-danger/40 hover:bg-danger/90",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "h-9 px-4 text-xs font-semibold tracking-[0.06em]",
-  md: "h-11 px-6 text-sm font-semibold tracking-[0.04em]",
-  lg: "h-12 px-8 text-sm font-semibold tracking-[0.06em]",
+  sm: "h-9 px-4 text-xs font-medium",
+  md: "h-11 px-5 text-sm font-medium",
+  lg: "h-12 px-6 text-sm font-medium",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -80,21 +81,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={setRefs}
         className={cn(
-          "group relative inline-flex items-center justify-center overflow-hidden rounded-[0.625rem] transition-all duration-150 ease-out active:scale-[0.98]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/45 focus-visible:ring-offset-2 focus-visible:ring-offset-chrome",
+          "group relative inline-flex items-center justify-center overflow-hidden rounded-[var(--nxr-radius-button)] transition-all duration-150 ease-out active:scale-[0.98]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40 focus-visible:ring-offset-2 focus-visible:ring-offset-chrome",
           "disabled:pointer-events-none disabled:opacity-50",
           variantStyles[variant],
           sizeStyles[size],
-          glow && "ring-1 ring-gold/20",
+          glow && "ring-1 ring-gold/15",
           className,
         )}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
-        <span className="relative z-10 inline-flex items-center gap-2 uppercase">
-          {children}
-        </span>
+        <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
       </button>
     );
   },

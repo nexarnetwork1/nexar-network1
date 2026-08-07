@@ -73,7 +73,7 @@ export function ReactionPicker({
       </button>
 
       {open && session && (
-        <div className="absolute bottom-full left-0 z-20 mb-1 flex gap-1 rounded-full border border-white/10 bg-[#0a0a0a] px-2 py-1.5 shadow-xl">
+        <div className="absolute bottom-full left-0 z-20 mb-1 flex gap-1 rounded-full border border-white/10 bg-surface-2 px-2 py-1.5 shadow-xl">
           {REACTION_OPTIONS.map((r) => (
             <button
               key={r.type}

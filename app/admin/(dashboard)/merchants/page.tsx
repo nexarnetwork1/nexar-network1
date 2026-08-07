@@ -50,7 +50,7 @@ export default async function AdminMerchantsPage() {
           <>
             {stores.length} stores
             {pendingCount > 0 && (
-              <span className="ml-2 text-amber-400">· {pendingCount} awaiting approval</span>
+              <span className="ml-2 text-gold">· {pendingCount} awaiting approval</span>
             )}
           </>
         }
@@ -103,7 +103,7 @@ export default async function AdminMerchantsPage() {
                     <span
                       className={
                         store.status === "pending"
-                          ? "text-amber-400"
+                          ? "text-gold"
                           : store.status === "active"
                             ? "text-emerald-400"
                             : "text-red-400"

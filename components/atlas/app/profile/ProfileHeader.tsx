@@ -43,7 +43,7 @@ export function ProfileHeader({ profile, session, onAuth }: ProfileHeaderProps) 
 
       <div className="px-4 sm:px-6 pb-6">
         <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-10 sm:-mt-12">
-          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border-4 border-[#050505] bg-gold/10 overflow-hidden shrink-0">
+          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full border-4 border-canvas bg-gold/10 overflow-hidden shrink-0">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
             ) : (

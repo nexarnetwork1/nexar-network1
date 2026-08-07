@@ -400,7 +400,7 @@ function ProductPostPreview({
       className="block mb-3 rounded-xl border border-white/10 bg-white/5 hover:border-gold/30 overflow-hidden transition-colors"
     >
       <div className="flex gap-0 sm:gap-0">
-        <div className="w-28 sm:w-32 shrink-0 aspect-square bg-[#121212] flex items-center justify-center">
+        <div className="w-28 sm:w-32 shrink-0 aspect-square bg-surface-1 flex items-center justify-center">
           {imageUrl ? (
             <img src={imageUrl} alt="" className="h-full w-full object-cover" />
           ) : (

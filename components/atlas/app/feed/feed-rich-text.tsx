@@ -13,7 +13,7 @@ export function renderRichText(text: string): ReactNode[] {
     }
     if (part.startsWith("@")) {
       return (
-        <span key={i} className="text-blue-400 hover:underline cursor-pointer">
+        <span key={i} className="text-gold hover:underline cursor-pointer">
           {part}
         </span>
       );

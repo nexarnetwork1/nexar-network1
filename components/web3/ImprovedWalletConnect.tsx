@@ -159,7 +159,7 @@ export function ImprovedWalletConnect() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-[#0a0e1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-surface-2 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
           {/* Chain Selection */}
           <div className="p-4 border-b border-white/10">
             <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">

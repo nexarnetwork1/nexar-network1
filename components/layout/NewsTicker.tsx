@@ -19,7 +19,7 @@ function PresaleTickerMessage() {
 
   if (status === "upcoming") {
     return (
-      <Link href="/presale" className="text-amber-400 font-semibold hover:underline">
+      <Link href="/presale" className="text-gold font-semibold hover:underline">
         NXR Presale opens soon — view countdown
       </Link>
     );

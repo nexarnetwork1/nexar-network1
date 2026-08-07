@@ -263,7 +263,7 @@ export function PostComposer({
             className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold/40"
           >
             {VISIBILITY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-[#0a0a0a]">
+              <option key={opt.value} value={opt.value} className="bg-surface-2">
                 {opt.label}
               </option>
             ))}
@@ -343,7 +343,7 @@ export function PostComposer({
             <span
               className={cn(
                 "text-xs tabular-nums",
-                charOver ? "text-red-400" : charCount > POST_BODY_MAX * 0.9 ? "text-amber-400" : "text-muted",
+                charOver ? "text-red-400" : charCount > POST_BODY_MAX * 0.9 ? "text-gold" : "text-muted",
               )}
             >
               {charCount.toLocaleString()} / {POST_BODY_MAX.toLocaleString()}
@@ -366,7 +366,7 @@ export function PostComposer({
                   <video src={item.url} controls className="w-full max-h-48" />
                 ) : (
                   <div className="flex items-center gap-3 p-4 bg-white/5 min-h-[80px]">
-                    <FileText className="h-8 w-8 text-orange-400 shrink-0" />
+                    <FileText className="h-8 w-8 text-gold shrink-0" />
                     <span className="text-sm truncate">{item.name ?? "Document"}</span>
                   </div>
                 )}
@@ -444,7 +444,7 @@ export function PostComposer({
             }}
             className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg hover:bg-white/5 text-muted text-sm"
           >
-            <ImageIcon className="h-4 w-4 text-blue-400" />
+            <ImageIcon className="h-4 w-4 text-gold" />
             <span className="hidden xs:inline">Photo</span>
           </button>
           <button
@@ -466,7 +466,7 @@ export function PostComposer({
             onClick={() => setPostType(postType === "poll" ? "text" : "poll")}
             className={cn(
               "flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm",
-              postType === "poll" ? "bg-purple-500/10 text-purple-300" : "hover:bg-white/5 text-muted",
+              postType === "poll" ? "bg-gold-soft text-gold" : "hover:bg-white/5 text-muted",
             )}
           >
             <BarChart3 className="h-4 w-4" />
@@ -483,7 +483,7 @@ export function PostComposer({
             }}
             className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg hover:bg-white/5 text-muted text-sm"
           >
-            <FileText className="h-4 w-4 text-orange-400" />
+            <FileText className="h-4 w-4 text-gold" />
             <span className="hidden xs:inline">Document</span>
           </button>
           <button

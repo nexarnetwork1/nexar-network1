@@ -22,16 +22,16 @@ export function PremiumModuleCard({
   className,
 }: PremiumModuleCardProps) {
   const statusColors = {
-    active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    beta: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    new: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    active: "bg-success/10 text-success border-success/20",
+    beta: "bg-gold-soft text-gold border-gold/30",
+    new: "bg-gold-soft text-gold border-gold/30",
   };
 
   return (
     <Link
       href={href}
       className={cn(
-        "group block p-8 rounded-3xl border border-white/10 bg-white/5 hover:border-gold/30 hover:bg-white/10 transition-all duration-300",
+        "group block nxr-card nxr-card-interactive p-8",
         className
       )}
     >
