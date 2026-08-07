@@ -121,6 +121,12 @@ export type MarketplaceListing = {
   deleted_at: string | null;
 };
 
+/** Listing enriched with commerce product master fields for ATLAS UI links. */
+export type EnrichedMarketplaceListing = MarketplaceListing & {
+  product_slug?: string | null;
+  product_image_url?: string | null;
+};
+
 export type MarketplaceOffer = {
   id: string;
   storefront_id: string;

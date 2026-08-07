@@ -4,14 +4,22 @@ import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
-import { applyToJobAction } from "@/modules/atlas-network/actions";
+import {
+  applyToJobAction,
+} from "@/modules/atlas-network/actions";
 import { toast } from "sonner";
 
-export function JobApplyForm({ postId }: { postId: string }) {
+export function JobApplyForm({
+  postId,
+  initialApplied = false,
+}: {
+  postId: string;
+  initialApplied?: boolean;
+}) {
   const { data: session } = useSession();
   const { openCommerceAuth } = useCommerceAuth();
   const [message, setMessage] = useState("");
-  const [applied, setApplied] = useState(false);
+  const [applied, setApplied] = useState(initialApplied);
   const [pending, startTransition] = useTransition();
 
   if (!session) {
@@ -36,9 +44,12 @@ export function JobApplyForm({ postId }: { postId: string }) {
 
   if (applied) {
     return (
-      <div className="p-6 rounded-xl border border-gold/30 bg-gold/5 text-center">
+      <div className="p-6 rounded-xl border border-gold/30 bg-gold/5 text-center space-y-2">
         <p className="text-gold font-medium">Application submitted</p>
-        <p className="text-sm text-muted mt-1">The company will review your application.</p>
+        <p className="text-sm text-muted">Track status in My Applications.</p>
+        <a href="/atlas/jobs/applications" className="text-sm text-gold hover:underline">
+          View applications →
+        </a>
       </div>
     );
   }

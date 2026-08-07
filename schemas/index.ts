@@ -1,10 +1,12 @@
 export {
   loginSchema,
   customerRegisterSchema,
+  atlasRegisterFormSchema,
   merchantRegisterSchema,
   completeProfileSchema,
   type LoginInput,
   type CustomerRegisterInput,
+  type AtlasRegisterFormInput,
   type MerchantRegisterInput,
   type CompleteProfileInput,
 } from "@/modules/auth/validators";

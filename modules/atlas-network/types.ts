@@ -325,3 +325,40 @@ export type NetworkFeedPost = NetworkPost & {
   })[];
   user_reacted?: boolean;
 };
+
+export type NetworkProfileData = {
+  location?: string;
+  website?: string;
+  walletAddress?: string;
+  languages?: string[];
+  socialLinks?: Array<{ platform: string; url: string }>;
+};
+
+export type NetworkProfileView = NetworkProfile & {
+  person?: NetworkPersonProfile | null;
+  company?: NetworkCompanyProfile | null;
+  business?: import("@/modules/business-hub/types").Business | null;
+  connection_count?: number;
+  is_following?: boolean;
+  connection_status?: NetworkConnectionStatus | null;
+  pending_connection_id?: string | null;
+  is_owner?: boolean;
+  is_incoming_pending?: boolean;
+  analytics?: CompanyAnalyticsSummary;
+};
+
+export type NetworkSearchResult = {
+  profiles: NetworkProfile[];
+  posts: NetworkFeedPost[];
+};
+
+export type CompanyAnalyticsSummary = {
+  followers: number;
+  employees: number;
+  products: number;
+  services: number;
+  orders: number;
+  posts: number;
+  engagement: number;
+  views: number;
+};

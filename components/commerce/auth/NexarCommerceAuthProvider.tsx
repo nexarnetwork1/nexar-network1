@@ -9,26 +9,23 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-
-type CommerceAuthMode = "signin" | "register";
-
-type CommerceAuthRole = "customer" | "merchant";
-
 import { safeRedirect } from "@/lib/auth/redirect";
-import { NexarCommerceAuthModal } from "@/components/commerce/auth/NexarCommerceAuthModal";
-import { useScrollLock } from "@/hooks/useScrollLock";
+import {
+  AtlasIdentityModal,
+} from "@/components/atlas/identity/AtlasIdentityModal";
+import type { AtlasIdentityMode } from "@/components/atlas/identity/AtlasIdentityCard";
 
 type OpenCommerceAuthOptions = {
-  mode?: CommerceAuthMode;
-  role?: CommerceAuthRole;
+  mode?: AtlasIdentityMode;
+  /** @deprecated Role selection removed — unified ATLAS identity only. */
+  role?: "customer" | "merchant";
   redirect?: string;
   message?: string;
 };
 
 type CommerceAuthContextValue = {
   open: boolean;
-  mode: CommerceAuthMode;
-  role: CommerceAuthRole;
+  mode: AtlasIdentityMode;
   redirect: string | null;
   message: string | null;
   openCommerceAuth: (options?: OpenCommerceAuthOptions) => void;
@@ -52,15 +49,12 @@ type NexarCommerceAuthProviderProps = {
 export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProviderProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<CommerceAuthMode>("signin");
-  const [role, setRole] = useState<CommerceAuthRole>("customer");
+  const [mode, setMode] = useState<AtlasIdentityMode>("signin");
   const [redirect, setRedirect] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const openCommerceAuth = useCallback((options?: OpenCommerceAuthOptions) => {
-    const nextMode = options?.mode ?? "signin";
-    setMode(nextMode);
-    setRole(options?.role ?? "customer");
+    setMode(options?.mode ?? "signin");
     setRedirect(options?.redirect ?? null);
     setMessage(options?.message ?? null);
     setOpen(true);
@@ -69,15 +63,12 @@ export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProvide
   const closeCommerceAuth = useCallback(() => {
     setOpen(false);
     setMessage(null);
-    // Don't navigate anywhere - just close the modal
   }, []);
 
   const handleSuccess = useCallback(
     (destination: string) => {
       closeCommerceAuth();
-      // Last line of defence before navigating: the server already validates
-      // its own redirectTo, but the modal can fall back to a URL-supplied value.
-      router.push(safeRedirect(destination, "/marketplace"));
+      router.push(safeRedirect(destination, "/dashboard"));
       router.refresh();
     },
     [closeCommerceAuth, router],
@@ -87,29 +78,24 @@ export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProvide
     () => ({
       open,
       mode,
-      role,
       redirect,
       message,
       openCommerceAuth,
       closeCommerceAuth,
     }),
-    [open, mode, role, redirect, message, openCommerceAuth, closeCommerceAuth],
+    [open, mode, redirect, message, openCommerceAuth, closeCommerceAuth],
   );
-
-  useScrollLock(open);
 
   return (
     <CommerceAuthContext.Provider value={value}>
       {children}
-      <NexarCommerceAuthModal
+      <AtlasIdentityModal
         open={open}
         mode={mode}
-        role={role}
         redirect={redirect}
         message={message}
         onClose={closeCommerceAuth}
         onModeChange={setMode}
-        onRoleChange={setRole}
         onSuccess={handleSuccess}
       />
     </CommerceAuthContext.Provider>
@@ -118,8 +104,9 @@ export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProvide
 
 type CommerceAuthTriggerProps = {
   children: ReactNode;
-  mode?: CommerceAuthMode;
-  role?: CommerceAuthRole;
+  mode?: AtlasIdentityMode;
+  /** @deprecated Ignored — unified identity only. */
+  role?: "customer" | "merchant";
   redirect?: string;
   className?: string;
   onClick?: () => void;
@@ -128,7 +115,6 @@ type CommerceAuthTriggerProps = {
 export function CommerceAuthTrigger({
   children,
   mode = "signin",
-  role,
   redirect,
   className,
   onClick,
@@ -141,7 +127,7 @@ export function CommerceAuthTrigger({
       className={className}
       onClick={() => {
         onClick?.();
-        openCommerceAuth({ mode, role, redirect });
+        openCommerceAuth({ mode, redirect });
       }}
     >
       {children}

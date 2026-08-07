@@ -20,6 +20,18 @@ export async function MarketplaceSubNav() {
     <div className="border-b border-border/60 bg-surface/30 backdrop-blur-md">
       <Container className="flex flex-wrap items-center gap-2 py-3 text-sm">
         <Link
+          href="/atlas"
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-muted transition-colors hover:bg-white/5 hover:text-white"
+        >
+          ATLAS Feed
+        </Link>
+        <Link
+          href="/atlas/marketplace"
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-muted transition-colors hover:bg-white/5 hover:text-white"
+        >
+          ATLAS Marketplace
+        </Link>
+        <Link
           href={MARKETPLACE_ROUTES.root}
           className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-muted transition-colors hover:bg-white/5 hover:text-white"
         >

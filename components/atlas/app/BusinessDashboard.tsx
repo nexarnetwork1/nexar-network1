@@ -3,8 +3,7 @@
 import { Building2, Users, Store, Package, BarChart3, Settings, Plus, TrendingUp, DollarSign, FileText, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { PremiumAuthModal } from "@/components/premium/PremiumAuthModal";
-import { useState } from "react";
+import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 
 interface Business {
   id: string;
@@ -21,11 +20,14 @@ interface BusinessDashboardProps {
 
 export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
   const { data: session } = useSession();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { openCommerceAuth } = useCommerceAuth();
 
   const handleInteraction = () => {
     if (!session) {
-      setShowAuthModal(true);
+      openCommerceAuth({
+        mode: "signin",
+        redirect: "/atlas/business",
+      });
     }
   };
 
@@ -55,13 +57,13 @@ export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
           <h1 className="text-2xl font-bold">My Business</h1>
           <p className="text-muted">Manage your company operations</p>
         </div>
-        <button
-          onClick={handleInteraction}
+        <Link
+          href="/dashboard/business/onboarding"
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold border border-gold/30 text-background font-medium hover:bg-gold-secondary transition-colors"
         >
           <Plus className="h-4 w-4" />
           Create Business
-        </button>
+        </Link>
       </div>
 
       {/* Stats */}
@@ -91,7 +93,7 @@ export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
             {businesses.map((business) => (
               <Link
                 key={business.id}
-                href={`/business/${business.slug}`}
+                href="/dashboard/business"
                 className="flex items-center gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:border-gold/30 hover:bg-white/10 transition-all"
               >
                 {business.logo_url ? (
@@ -117,12 +119,12 @@ export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
           <Building2 className="h-12 w-12 text-muted mx-auto mb-4" />
           <p className="text-muted mb-2">No businesses yet</p>
           <p className="text-sm text-muted mb-4">Create your first business to get started</p>
-          <button
-            onClick={handleInteraction}
-            className="px-6 py-3 rounded-lg bg-gold border border-gold/30 text-background font-medium hover:bg-gold-secondary transition-colors"
+          <Link
+            href="/dashboard/business/onboarding"
+            className="inline-flex px-6 py-3 rounded-lg bg-gold border border-gold/30 text-background font-medium hover:bg-gold-secondary transition-colors"
           >
             Create Business
-          </button>
+          </Link>
         </div>
       )}
 
@@ -149,10 +151,6 @@ export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
           })}
         </div>
       </div>
-
-      {showAuthModal && (
-        <PremiumAuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
-      )}
     </div>
   );
 }

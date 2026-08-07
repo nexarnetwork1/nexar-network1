@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { Building2, Users, Calendar, Flame, MapPin } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import type { NetworkEvent } from "@/modules/atlas-network/types";
+import { FollowButton } from "@/components/atlas/app/network/FollowButton";
 import { format } from "date-fns";
 
 interface AtlasRightSidebarProps {
@@ -11,15 +13,24 @@ interface AtlasRightSidebarProps {
     id: string;
     name: string;
     slug: string;
+    networkSlug?: string;
     logo_url?: string | null;
     industry?: string | null;
   }>;
   suggestedProfiles: Array<{
     id: string;
+    slug: string;
     display_name: string;
     avatar_url?: string | null;
     verified?: boolean;
     subject_type?: string;
+  }>;
+  suggestedCompanies?: Array<{
+    id: string;
+    slug: string;
+    display_name: string;
+    avatar_url?: string | null;
+    verified?: boolean;
   }>;
   upcomingEvents?: NetworkEvent[];
 }
@@ -27,9 +38,19 @@ interface AtlasRightSidebarProps {
 export function AtlasRightSidebar({
   trendingBusinesses,
   suggestedProfiles,
+  suggestedCompanies = [],
   upcomingEvents = [],
 }: AtlasRightSidebarProps) {
   const { data: session } = useSession();
+  const { openCommerceAuth } = useCommerceAuth();
+
+  const onAuth = () => {
+    openCommerceAuth({
+      mode: "signin",
+      redirect: "/atlas",
+      message: "Sign in to follow on ATLAS",
+    });
+  };
 
   return (
     <aside className="p-4 space-y-6">
@@ -57,7 +78,7 @@ export function AtlasRightSidebar({
             trendingBusinesses.map((business) => (
               <Link
                 key={business.id}
-                href={`/store/${business.slug}`}
+                href={`/atlas/network/${business.networkSlug ?? `${business.slug}-network`}`}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
               >
                 {business.logo_url ? (
@@ -79,6 +100,44 @@ export function AtlasRightSidebar({
         </div>
       </div>
 
+      {suggestedCompanies.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Building2 className="h-4 w-4 text-gold" />
+            <h3 className="text-sm font-semibold">Suggested Companies</h3>
+          </div>
+          <div className="space-y-2">
+            {suggestedCompanies.map((company) => (
+              <div key={company.id} className="flex items-center gap-3 p-2 rounded-lg">
+                <Link href={`/atlas/network/${company.slug}`} className="shrink-0">
+                  <div className="h-10 w-10 rounded-lg bg-gold/10 overflow-hidden flex items-center justify-center">
+                    {company.avatar_url ? (
+                      <img src={company.avatar_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <Building2 className="h-5 w-5 text-gold/30" />
+                    )}
+                  </div>
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/atlas/network/${company.slug}`}
+                    className="text-sm font-medium truncate block hover:text-gold"
+                  >
+                    {company.display_name}
+                  </Link>
+                </div>
+                <FollowButton
+                  targetId={company.id}
+                  session={!!session}
+                  onAuth={onAuth}
+                  size="sm"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Users className="h-4 w-4 text-gold" />
@@ -88,16 +147,29 @@ export function AtlasRightSidebar({
           <div className="space-y-2">
             {suggestedProfiles.map((profile) => (
               <div key={profile.id} className="flex items-center gap-3 p-2 rounded-lg">
-                <div className="h-10 w-10 rounded-full bg-gold/10 flex items-center justify-center overflow-hidden">
-                  {profile.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <Users className="h-5 w-5 text-gold/30" />
-                  )}
-                </div>
+                <Link href={`/atlas/network/${profile.slug}`} className="shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-gold/10 flex items-center justify-center overflow-hidden">
+                    {profile.avatar_url ? (
+                      <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <Users className="h-5 w-5 text-gold/30" />
+                    )}
+                  </div>
+                </Link>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{profile.display_name}</p>
+                  <Link
+                    href={`/atlas/network/${profile.slug}`}
+                    className="text-sm font-medium truncate block hover:text-gold"
+                  >
+                    {profile.display_name}
+                  </Link>
                 </div>
+                <FollowButton
+                  targetId={profile.id}
+                  session={!!session}
+                  onAuth={onAuth}
+                  size="sm"
+                />
               </div>
             ))}
           </div>

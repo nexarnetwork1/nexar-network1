@@ -253,3 +253,117 @@ export async function getActiveBusinesses(input: {
   if (error) throw new Error(error.message);
   return (data as Business[]) ?? [];
 }
+
+export type BusinessMemberWithProfile = {
+  id: string;
+  business_id: string;
+  user_id: string;
+  role: BusinessMemberRole;
+  status: string;
+  display_name: string;
+  avatar_url: string | null;
+  headline: string | null;
+  network_slug: string | null;
+  network_profile_id: string | null;
+};
+
+export async function listBusinessMembers(
+  businessId: string,
+): Promise<BusinessMemberWithProfile[]> {
+  const { data: memberships, error } = await db()
+    .from("business_memberships")
+    .select("*")
+    .eq("business_id", businessId)
+    .eq("status", "active")
+    .order("created_at", { ascending: true });
+  if (error || !memberships?.length) return [];
+
+  const userIds = (memberships as BusinessMembership[]).map((m) => m.user_id);
+
+  const [{ data: profiles }, { data: personProfiles }] = await Promise.all([
+    db().from("profiles").select("id, full_name, avatar_url").in("id", userIds),
+    db()
+      .from("atlas_network_person_profiles")
+      .select("user_id, network_profile_id")
+      .in("user_id", userIds),
+  ]);
+
+  const profileMap = new Map(
+    ((profiles ?? []) as Array<{ id: string; full_name: string | null; avatar_url: string | null }>).map(
+      (p) => [p.id, p],
+    ),
+  );
+  const personMap = new Map(
+    ((personProfiles ?? []) as Array<{ user_id: string; network_profile_id: string }>).map(
+      (p) => [p.user_id, p.network_profile_id],
+    ),
+  );
+
+  const networkProfileIds = [...personMap.values()].filter(Boolean);
+  let networkMap = new Map<string, { slug: string; headline: string | null; avatar_url: string | null; display_name: string }>();
+  if (networkProfileIds.length > 0) {
+    const { data: networkProfiles } = await db()
+      .from("atlas_network_profiles")
+      .select("id, slug, headline, avatar_url, display_name")
+      .in("id", networkProfileIds);
+    networkMap = new Map(
+      ((networkProfiles ?? []) as Array<{ id: string; slug: string; headline: string | null; avatar_url: string | null; display_name: string }>).map(
+        (p) => [p.id, p],
+      ),
+    );
+  }
+
+  return (memberships as BusinessMembership[]).map((m) => {
+    const userProfile = profileMap.get(m.user_id);
+    const networkProfileId = personMap.get(m.user_id) ?? null;
+    const networkProfile = networkProfileId ? networkMap.get(networkProfileId) : null;
+    return {
+      id: m.id,
+      business_id: m.business_id,
+      user_id: m.user_id,
+      role: m.role,
+      status: m.status,
+      display_name: networkProfile?.display_name ?? userProfile?.full_name ?? "Team member",
+      avatar_url: networkProfile?.avatar_url ?? userProfile?.avatar_url ?? null,
+      headline: networkProfile?.headline ?? null,
+      network_slug: networkProfile?.slug ?? null,
+      network_profile_id: networkProfileId,
+    };
+  });
+}
+
+export async function countBusinessProducts(businessId: string): Promise<number> {
+  const { count } = await db()
+    .from("products")
+    .select("*", { count: "exact", head: true })
+    .eq("business_id", businessId)
+    .eq("is_active", true);
+  return count ?? 0;
+}
+
+export async function countBusinessOrders(businessId: string): Promise<number> {
+  const { data: stores } = await db()
+    .from("stores")
+    .select("id")
+    .eq("business_id", businessId);
+  const storeIds = ((stores ?? []) as Array<{ id: string }>).map((s) => s.id);
+  if (storeIds.length === 0) return 0;
+  const { count } = await db()
+    .from("orders")
+    .select("*", { count: "exact", head: true })
+    .in("store_id", storeIds);
+  return count ?? 0;
+}
+
+export async function countBusinessAnalyticsViews(businessId: string): Promise<number> {
+  const { data } = await db()
+    .from("atlas_core_analytics_facts")
+    .select("metric_value")
+    .eq("business_id", businessId)
+    .in("metric_key", ["view", "page_view", "profile_view"]);
+  if (!data?.length) return 0;
+  return (data as Array<{ metric_value: number }>).reduce(
+    (sum, row) => sum + Number(row.metric_value ?? 0),
+    0,
+  );
+}

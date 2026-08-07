@@ -200,9 +200,10 @@ export async function registerCustomerAction(
 ): Promise<ActionResult> {
   const parsed = customerRegisterSchema.safeParse({
     fullName: formData.get("fullName"),
+    username: formData.get("username"),
     email: formData.get("email"),
     password: formData.get("password"),
-    walletAddress: formData.get("walletAddress"),
+    walletAddress: formData.get("walletAddress") || undefined,
   });
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
@@ -225,7 +226,7 @@ export async function registerCustomerAction(
   const { error: userError } = await admin.from("authjs_users").insert({
     id: userId,
     email,
-    name: parsed.data.fullName,
+    name: parsed.data.username,
     password: passwordHash,
     emailVerified: null,
   });
@@ -235,7 +236,7 @@ export async function registerCustomerAction(
     id: userId,
     email,
     full_name: parsed.data.fullName,
-    wallet_address: parsed.data.walletAddress.toLowerCase(),
+    wallet_address: parsed.data.walletAddress?.toLowerCase() ?? null,
     role: "customer",
     profile_completed: true,
   });

@@ -13,16 +13,25 @@ type AtlasAppShellProps = {
     id: string;
     name: string;
     slug: string;
+    networkSlug?: string;
     logo_url?: string | null;
     industry?: string | null;
   }>;
   upcomingEvents?: NetworkEvent[];
   suggestedProfiles?: Array<{
     id: string;
+    slug: string;
     display_name: string;
     avatar_url?: string | null;
     verified?: boolean;
     subject_type?: string;
+  }>;
+  suggestedCompanies?: Array<{
+    id: string;
+    slug: string;
+    display_name: string;
+    avatar_url?: string | null;
+    verified?: boolean;
   }>;
   hideRightSidebar?: boolean;
 };
@@ -32,6 +41,7 @@ export function AtlasAppShell({
   trendingBusinesses = [],
   upcomingEvents = [],
   suggestedProfiles = [],
+  suggestedCompanies = [],
   hideRightSidebar = false,
 }: AtlasAppShellProps) {
   return (
@@ -56,6 +66,7 @@ export function AtlasAppShell({
             <AtlasRightSidebar
               trendingBusinesses={trendingBusinesses}
               suggestedProfiles={suggestedProfiles}
+              suggestedCompanies={suggestedCompanies}
               upcomingEvents={upcomingEvents}
             />
           </aside>

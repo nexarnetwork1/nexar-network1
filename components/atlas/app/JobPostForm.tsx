@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 import { createAtlasJobPostAction } from "@/modules/atlas-network/actions";
+import { AiAssistMenu } from "@/components/atlas/ai/AiAssistMenu";
+import { JOB_CATEGORIES, type JobCategoryId } from "@/lib/atlas/job-categories";
 import { toast } from "sonner";
 
 export function JobPostForm() {
@@ -20,6 +22,7 @@ export function JobPostForm() {
     "full_time" | "part_time" | "contract" | "internship" | "remote"
   >("full_time");
   const [salaryRange, setSalaryRange] = useState("");
+  const [category, setCategory] = useState<JobCategoryId>("engineering");
 
   if (!session) {
     return (
@@ -55,6 +58,18 @@ export function JobPostForm() {
           placeholder="Role description, requirements, benefits..."
           className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40 resize-none"
         />
+        <AiAssistMenu
+          surface="job"
+          text={body || jobTitle}
+          context={{ jobTitle }}
+          onApply={(content, action) => {
+            if (action === "required_skills" || action === "responsibilities" || action === "interview_questions") {
+              setBody((b) => `${b.trim()}\n\n${content}`.trim());
+            } else {
+              setBody(content);
+            }
+          }}
+        />
         <div className="grid sm:grid-cols-2 gap-3">
           <input
             value={location}
@@ -82,6 +97,17 @@ export function JobPostForm() {
           placeholder="Salary range (optional)"
           className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
         />
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as JobCategoryId)}
+          className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
+        >
+          {JOB_CATEGORIES.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.label}
+            </option>
+          ))}
+        </select>
         <button
           type="button"
           disabled={pending || !jobTitle.trim() || !body.trim()}
@@ -95,6 +121,7 @@ export function JobPostForm() {
                   location: location.trim() || undefined,
                   employmentType,
                   salaryRange: salaryRange.trim() || undefined,
+                  category,
                 });
                 toast.success("Job posted");
                 router.push(`/atlas/jobs/${result.postId}`);

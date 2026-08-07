@@ -296,7 +296,13 @@ export interface AtlasAiPort {
     prompt: string;
     agentSlug?: string;
     context?: Record<string, unknown>;
-  }): Promise<{ taskId: string; executionId: string; stubOutput: string }>;
+  }): Promise<{
+    taskId: string;
+    executionId: string;
+    output: string;
+    stubOutput: string;
+    mode?: "openai" | "demo";
+  }>;
   semanticSearch(input: {
     workspaceId: string;
     query: string;

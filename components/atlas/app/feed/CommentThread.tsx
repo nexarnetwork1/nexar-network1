@@ -5,6 +5,7 @@ import { Loader2, Send, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/cn";
 import { addPostCommentAction } from "@/modules/atlas-network/actions";
+import { AiAssistMenu } from "@/components/atlas/ai/AiAssistMenu";
 import { EmojiPicker } from "./EmojiPicker";
 import {
   buildCommentTree,
@@ -37,6 +38,7 @@ function CommentItem({
   setReplyText,
   pending,
   onSubmitReply,
+  threadText,
 }: {
   comment: CommentNode;
   depth: number;
@@ -49,6 +51,7 @@ function CommentItem({
   setReplyText: (v: string) => void;
   pending: boolean;
   onSubmitReply: (parentId: string) => void;
+  threadText: string;
 }) {
   const [showAllReplies, setShowAllReplies] = useState(false);
   const replies = comment.replies;
@@ -88,25 +91,34 @@ function CommentItem({
       </div>
 
       {replyToId === comment.id && session && (
-        <div className="flex gap-2 mb-2 ml-10">
-          <input
-            value={replyText}
-            onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Write a reply..."
-            className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
-            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && onSubmitReply(comment.id)}
+        <div className="flex flex-col gap-2 mb-2 ml-10">
+          <div className="flex gap-2">
+            <input
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder="Write a reply..."
+              className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
+              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && onSubmitReply(comment.id)}
+            />
+            <EmojiPicker onSelect={(emoji) => setReplyText(replyText + emoji)} />
+            <button
+              type="button"
+              disabled={pending || !replyText.trim()}
+              onClick={() => onSubmitReply(comment.id)}
+              className="p-2 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 disabled:opacity-50"
+            >
+              {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            </button>
+          </div>
+          <AiAssistMenu
+            surface="comment"
+            text={replyText || comment.body}
+            context={{
+              parentComment: comment.body,
+              thread: threadText,
+            }}
+            onApply={(content) => setReplyText(content)}
           />
-          <EmojiPicker
-            onSelect={(emoji) => setReplyText(replyText + emoji)}
-          />
-          <button
-            type="button"
-            disabled={pending || !replyText.trim()}
-            onClick={() => onSubmitReply(comment.id)}
-            className="p-2 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 disabled:opacity-50"
-          >
-            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </button>
         </div>
       )}
 
@@ -124,6 +136,7 @@ function CommentItem({
           setReplyText={setReplyText}
           pending={pending}
           onSubmitReply={onSubmitReply}
+          threadText={threadText}
         />
       ))}
 
@@ -155,6 +168,7 @@ export function CommentThread({
 
   const comments = post.comments ?? [];
   const tree = buildCommentTree(comments);
+  const threadText = comments.map((c) => c.body).join("\n");
 
   const appendComment = (
     body: string,
@@ -219,28 +233,39 @@ export function CommentThread({
           setReplyText={setReplyText}
           pending={pending}
           onSubmitReply={handleSubmitReply}
+          threadText={threadText}
         />
       ))}
 
-      <div className="flex gap-2 pt-2">
-        <input
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder={session ? "Write a comment..." : "Sign in to comment"}
-          readOnly={!session}
-          onClick={() => !session && onAuth()}
-          className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
-          onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleComment()}
-        />
-        {session && <EmojiPicker onSelect={(emoji) => setComment(comment + emoji)} />}
-        <button
-          type="button"
-          disabled={pending || !comment.trim() || !session}
-          onClick={handleComment}
-          className="p-2 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 disabled:opacity-50"
-        >
-          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        </button>
+      <div className="flex flex-col gap-2 pt-2">
+        <div className="flex gap-2">
+          <input
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder={session ? "Write a comment..." : "Sign in to comment"}
+            readOnly={!session}
+            onClick={() => !session && onAuth()}
+            className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleComment()}
+          />
+          {session && <EmojiPicker onSelect={(emoji) => setComment(comment + emoji)} />}
+          <button
+            type="button"
+            disabled={pending || !comment.trim() || !session}
+            onClick={handleComment}
+            className="p-2 rounded-lg bg-gold/10 text-gold hover:bg-gold/20 disabled:opacity-50"
+          >
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </button>
+        </div>
+        {session && (
+          <AiAssistMenu
+            surface="comment"
+            text={comment || threadText}
+            context={{ thread: threadText, postTitle: post.title }}
+            onApply={(content) => setComment(content)}
+          />
+        )}
       </div>
     </div>
   );

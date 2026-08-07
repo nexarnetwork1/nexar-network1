@@ -1,10 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { ShoppingCart, Heart, Store } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { PremiumAuthModal } from "@/components/premium/PremiumAuthModal";
-import { useState } from "react";
+import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
 
 interface MarketplaceGridProps {
   products: any[];
@@ -12,18 +12,23 @@ interface MarketplaceGridProps {
 
 export function MarketplaceGrid({ products }: MarketplaceGridProps) {
   const { data: session } = useSession();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { openCommerceAuth } = useCommerceAuth();
   const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
 
+  const promptAuth = () => {
+    openCommerceAuth({
+      mode: "signin",
+      redirect: "/atlas/marketplace",
+    });
+  };
+
   const handleInteraction = () => {
-    if (!session) {
-      setShowAuthModal(true);
-    }
+    if (!session) promptAuth();
   };
 
   const handleLike = (productId: string) => {
     if (!session) {
-      setShowAuthModal(true);
+      promptAuth();
       return;
     }
     setLikedProducts((prev) => {
@@ -58,9 +63,6 @@ export function MarketplaceGrid({ products }: MarketplaceGridProps) {
           onInteraction={handleInteraction}
         />
       ))}
-      {showAuthModal && (
-        <PremiumAuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
-      )}
     </div>
   );
 }
@@ -95,7 +97,11 @@ function ProductCard({ product, isLiked, onLike, onInteraction }: { product: any
 
       {/* Product Info */}
       <div className="p-4">
-        <p className="text-xs text-muted mb-1">{product.store?.name || "Store"}</p>
+        <p className="text-xs text-muted mb-1">
+          {typeof product.store === "string"
+            ? product.store
+            : product.store?.name || "Store"}
+        </p>
         <h3 className="font-semibold mb-2 line-clamp-2 group-hover:text-gold transition-colors">
           {product.name}
         </h3>

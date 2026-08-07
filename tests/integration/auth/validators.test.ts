@@ -25,9 +25,20 @@ describe("auth validators", () => {
   it("validates customer registration wallet", () => {
     const result = customerRegisterSchema.safeParse({
       fullName: "Jane Doe",
+      username: "janedoe",
       email: "jane@example.com",
       password: "password123",
       walletAddress: "0x1234567890123456789012345678901234567890",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("allows optional wallet on customer registration", () => {
+    const result = customerRegisterSchema.safeParse({
+      fullName: "Jane Doe",
+      username: "janedoe",
+      email: "jane@example.com",
+      password: "password123",
     });
     expect(result.success).toBe(true);
   });

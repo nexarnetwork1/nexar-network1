@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
-import { MessageSquare, Share2, Bookmark, Megaphone } from "lucide-react";
+import { MessageSquare, Share2, Bookmark, Megaphone, Package, Briefcase, Calendar, Globe, MapPin } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils/cn";
@@ -21,6 +21,10 @@ import {
   toggleSavedPost,
 } from "./feed-utils";
 import { renderRichText } from "./feed-rich-text";
+import { listingProductHref } from "@/lib/atlas/marketplace-links";
+import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
+import { jobCategoryLabel } from "@/lib/atlas/job-categories";
+import { jobMeta, isJobOpen } from "@/lib/atlas/job-utils";
 
 type FeedPostCardProps = {
   post: NetworkFeedPost;
@@ -176,6 +180,24 @@ export function FeedPostCard({ post, session, onAuth, onUpdate }: FeedPostCardPr
                   </span>
                 </>
               )}
+              {post.post_type === "job" && (
+                <>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-0.5 text-gold">
+                    <Briefcase className="h-3 w-3" />
+                    Job
+                  </span>
+                </>
+              )}
+              {post.post_type === "event" && (
+                <>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-0.5 text-gold">
+                    <Calendar className="h-3 w-3" />
+                    Event
+                  </span>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -194,15 +216,12 @@ export function FeedPostCard({ post, session, onAuth, onUpdate }: FeedPostCardPr
         </p>
       )}
 
-      {post.post_type === "job" && post.metadata && (
-        <div className="mb-3 p-3 rounded-lg bg-gold/5 border border-gold/20 text-sm space-y-1">
-          {(post.metadata as Record<string, string>).location && (
-            <p>📍 {(post.metadata as Record<string, string>).location}</p>
-          )}
-          <Link href={`/atlas/jobs/${post.id}`} className="text-gold hover:underline text-sm font-medium">
-            View job →
-          </Link>
-        </div>
+      {post.post_type === "job" && (
+        <JobPostPreview post={post} />
+      )}
+
+      {post.post_type === "product" && post.metadata && (
+        <ProductPostPreview metadata={post.metadata as Record<string, unknown>} title={post.title} />
       )}
 
       {post.event && (
@@ -211,8 +230,22 @@ export function FeedPostCard({ post, session, onAuth, onUpdate }: FeedPostCardPr
           className="block mb-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-gold/20 transition-colors"
         >
           <p className="font-medium">{post.event.title}</p>
-          <p className="text-xs text-muted mt-1">
-            {new Date(post.event.starts_at).toLocaleString()}
+          <p className="text-xs text-muted mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {new Date(post.event.starts_at).toLocaleString()}
+            </span>
+            {post.event.is_online ? (
+              <span className="inline-flex items-center gap-1 text-gold">
+                <Globe className="h-3 w-3" />
+                Online
+              </span>
+            ) : post.event.location ? (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {post.event.location}
+              </span>
+            ) : null}
           </p>
         </Link>
       )}
@@ -300,5 +333,90 @@ export function FeedPostCard({ post, session, onAuth, onUpdate }: FeedPostCardPr
         />
       )}
     </article>
+  );
+}
+
+function JobPostPreview({ post }: { post: NetworkFeedPost }) {
+  const meta = jobMeta(post);
+  const open = isJobOpen(post);
+  return (
+    <Link
+      href={`/atlas/jobs/${post.id}`}
+      className="block mb-3 rounded-xl border border-white/10 bg-white/5 hover:border-gold/30 overflow-hidden transition-colors"
+    >
+      <div className="p-3 flex gap-3">
+        <div className="h-10 w-10 rounded-lg bg-gold/10 flex items-center justify-center shrink-0">
+          <Briefcase className="h-5 w-5 text-gold" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <p className="font-medium text-sm line-clamp-2">{post.title ?? "Open Role"}</p>
+            <span
+              className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded ${
+                open ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-muted"
+              }`}
+            >
+              {open ? "Hiring" : "Closed"}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-1.5 text-xs text-muted">
+            {meta.location && <span>{meta.location}</span>}
+            {meta.employment_type && (
+              <span className="capitalize">{meta.employment_type.replace("_", " ")}</span>
+            )}
+            {meta.category && <span className="text-gold">{jobCategoryLabel(meta.category)}</span>}
+          </div>
+          <p className="text-xs text-gold mt-2">View job →</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function ProductPostPreview({
+  metadata,
+  title,
+}: {
+  metadata: Record<string, unknown>;
+  title?: string | null;
+}) {
+  const productSlug =
+    typeof metadata.productSlug === "string" ? metadata.productSlug : null;
+  const listingSlug = typeof metadata.listingSlug === "string" ? metadata.listingSlug : null;
+  const productId = typeof metadata.productId === "string" ? metadata.productId : null;
+  const handle = productSlug ?? listingSlug ?? productId ?? "";
+  const href = handle
+    ? listingProductHref({ product_slug: productSlug, slug: listingSlug ?? handle, id: handle })
+    : MARKETPLACE_ROUTES.root;
+  const imageUrl = typeof metadata.imageUrl === "string" ? metadata.imageUrl : null;
+  const price = typeof metadata.price === "number" ? metadata.price : null;
+  const currency = typeof metadata.currency === "string" ? metadata.currency : "USD";
+  const displayTitle =
+    title ?? (typeof metadata.title === "string" ? metadata.title : "View product");
+
+  return (
+    <Link
+      href={href}
+      className="block mb-3 rounded-xl border border-white/10 bg-white/5 hover:border-gold/30 overflow-hidden transition-colors"
+    >
+      <div className="flex gap-0 sm:gap-0">
+        <div className="w-28 sm:w-32 shrink-0 aspect-square bg-[#121212] flex items-center justify-center">
+          {imageUrl ? (
+            <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <Package className="h-8 w-8 text-gold/40" />
+          )}
+        </div>
+        <div className="p-3 min-w-0 flex flex-col justify-center">
+          <p className="font-medium text-sm line-clamp-2">{displayTitle}</p>
+          {price != null && (
+            <p className="text-gold text-sm mt-1">
+              {currency} {price.toLocaleString()}
+            </p>
+          )}
+          <p className="text-xs text-muted mt-2">View in Marketplace →</p>
+        </div>
+      </div>
+    </Link>
   );
 }

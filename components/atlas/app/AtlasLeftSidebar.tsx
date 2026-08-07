@@ -2,40 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home,
-  Building2,
-  Store,
-  Briefcase,
-  MessageSquare,
-  Bell,
-  Users,
-  Calendar,
-  LayoutDashboard,
-  BarChart3,
-  Settings,
-  Plus,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useSession } from "next-auth/react";
 import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
-
-const navItems = [
-  { icon: Home, label: "Home Feed", href: "/atlas" },
-  { icon: Building2, label: "My Company", href: "/atlas/business", requiresAuth: true },
-  { icon: Store, label: "Marketplace", href: "/atlas/marketplace" },
-  { icon: Briefcase, label: "Jobs", href: "/atlas/jobs" },
-  { icon: MessageSquare, label: "Messages", href: "/atlas/messages" },
-  { icon: Bell, label: "Notifications", href: "/atlas/notifications", requiresAuth: true },
-  { icon: Users, label: "Network", href: "/atlas/network" },
-  { icon: Calendar, label: "Events", href: "/atlas/events" },
-];
-
-const businessItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/business" },
-  { icon: BarChart3, label: "Analytics", href: "/dashboard/business/analytics" },
-  { icon: Settings, label: "Settings", href: "/dashboard/business/profile" },
-];
+import {
+  ATLAS_APP_NAV_ITEMS,
+  ATLAS_APP_BUSINESS_ITEMS,
+} from "@/config/atlas-app-nav";
+import { getAtlasAppNavIcon } from "@/components/atlas/app/atlas-app-nav-icons";
 
 export function AtlasLeftSidebar() {
   const pathname = usePathname();
@@ -70,14 +45,14 @@ export function AtlasLeftSidebar() {
       )}
 
       <div className="space-y-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
+        {ATLAS_APP_NAV_ITEMS.map((item) => {
+          const Icon = getAtlasAppNavIcon(item.icon);
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           if (item.requiresAuth && !session) {
             return (
               <button
-                key={item.href}
+                key={item.id}
                 type="button"
                 onClick={() =>
                   openCommerceAuth({
@@ -95,7 +70,7 @@ export function AtlasLeftSidebar() {
 
           return (
             <Link
-              key={item.href}
+              key={item.id}
               href={item.href}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
@@ -115,12 +90,12 @@ export function AtlasLeftSidebar() {
             <p className="text-xs font-semibold text-muted uppercase tracking-wider">Business</p>
           </div>
           <div className="space-y-1">
-            {businessItems.map((item) => {
-              const Icon = item.icon;
+            {ATLAS_APP_BUSINESS_ITEMS.map((item) => {
+              const Icon = getAtlasAppNavIcon(item.icon);
               const isActive = pathname === item.href;
               return (
                 <Link
-                  key={item.href}
+                  key={item.id}
                   href={item.href}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",

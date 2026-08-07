@@ -62,6 +62,8 @@ export {
 
 export { registerAtlasAiEventHandlers } from "./events";
 
+export { contextualAssistAction } from "./actions";
+
 export {
   ensureWorkspaceSchema,
   createConversationSchema,

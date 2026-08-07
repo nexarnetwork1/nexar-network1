@@ -1,24 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Search, Users, MessageSquare, Bell, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Search, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils/cn";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
 import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { NetworkSearchBar } from "@/components/atlas/app/network/NetworkSearchBar";
 import Image from "next/image";
 import { ATLAS_BRAND } from "@/config/atlas-branding";
-
-const appLinks = [
-  { href: "/atlas/network", icon: Users, label: "Network", title: "Friends" },
-  { href: "/atlas/messages", icon: MessageSquare, label: "Messages" },
-  { href: "/atlas/notifications", icon: Bell, label: "Notifications", auth: true },
-  { href: "/atlas/profile", icon: User, label: "Profile", auth: true },
-];
+import { ATLAS_APP_BAR_ITEMS } from "@/config/atlas-app-nav";
+import { getAtlasAppNavIcon } from "@/components/atlas/app/atlas-app-nav-icons";
 
 export function AtlasAppBar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const { openCommerceAuth } = useCommerceAuth();
 
@@ -49,35 +46,28 @@ export function AtlasAppBar() {
           </Link>
 
           <div className="hidden md:flex flex-1 max-w-md ml-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
-              <input
-                type="search"
-                placeholder="Search ATLAS..."
-                aria-label="Search ATLAS"
-                className="w-full h-9 pl-9 pr-4 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-muted focus:outline-none focus:border-gold/40 transition-colors"
-              />
-            </div>
+            <NetworkSearchBar compact />
           </div>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2">
           <button
             type="button"
+            onClick={() => router.push("/atlas/search")}
             className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
             aria-label="Search"
           >
             <Search className="h-5 w-5 text-muted" />
           </button>
 
-          {appLinks.map((item) => {
-            const Icon = item.icon;
+          {ATLAS_APP_BAR_ITEMS.map((item) => {
+            const Icon = getAtlasAppNavIcon(item.icon);
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
-            if (item.auth && !session) {
+            if (item.requiresAuth && !session) {
               return (
                 <button
-                  key={item.href}
+                  key={item.id}
                   type="button"
                   onClick={() => handleAuthAction(item.href)}
                   className="hidden sm:flex p-2 rounded-lg text-muted hover:text-white hover:bg-white/5 transition-colors"
@@ -90,13 +80,13 @@ export function AtlasAppBar() {
 
             return (
               <Link
-                key={item.href}
+                key={item.id}
                 href={item.href}
                 className={cn(
                   "hidden sm:flex p-2 rounded-lg transition-colors relative",
                   isActive ? "text-gold bg-gold/10" : "text-muted hover:text-white hover:bg-white/5",
                 )}
-                title={item.title ?? item.label}
+                title={item.appBarTitle ?? item.label}
               >
                 <Icon className="h-5 w-5" />
               </Link>

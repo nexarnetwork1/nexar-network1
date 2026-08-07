@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { Calendar, MapPin, Globe } from "lucide-react";
 import { format } from "date-fns";
-import { getEventById } from "@/modules/atlas-network/repository";
+import {
+  getEventById,
+  getPersonProfileByUserId,
+  hasUserRegisteredForEvent,
+} from "@/modules/atlas-network/repository";
 import { EventRegisterForm } from "@/components/atlas/app/EventRegisterForm";
 
 export default async function AtlasEventDetailPage({
@@ -16,6 +21,17 @@ export default async function AtlasEventDetailPage({
 
   const registrations =
     (event.metadata.registrations as Array<{ profile_id: string }>) ?? [];
+  const meetingUrl =
+    typeof event.metadata.meeting_url === "string" ? event.metadata.meeting_url : null;
+
+  const session = await auth();
+  let alreadyRegistered = false;
+  if (session?.user?.id) {
+    const person = await getPersonProfileByUserId(session.user.id);
+    if (person) {
+      alreadyRegistered = await hasUserRegisteredForEvent(id, person.network_profile_id);
+    }
+  }
 
   return (
     <div className="max-w-2xl mx-auto py-6 px-4 space-y-6">
@@ -31,7 +47,12 @@ export default async function AtlasEventDetailPage({
           <div>
             <h1 className="text-2xl font-bold">{event.title}</h1>
             {event.profile && (
-              <p className="text-sm text-muted mt-1">Hosted by {event.profile.display_name}</p>
+              <Link
+                href={`/atlas/network/${event.profile.slug}`}
+                className="text-sm text-muted mt-1 hover:text-gold"
+              >
+                Hosted by {event.profile.display_name}
+              </Link>
             )}
           </div>
         </div>
@@ -60,7 +81,11 @@ export default async function AtlasEventDetailPage({
         )}
       </article>
 
-      <EventRegisterForm eventId={event.id} />
+      <EventRegisterForm
+        eventId={event.id}
+        initialRegistered={alreadyRegistered}
+        meetingUrl={meetingUrl}
+      />
     </div>
   );
 }

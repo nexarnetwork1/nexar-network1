@@ -40,6 +40,7 @@ export const createPostSchema = z.object({
     .enum(["public", "followers", "connections", "private", "organization_only"])
     .optional(),
   businessId: z.string().uuid().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const followTargetSchema = z.object({
@@ -94,6 +95,7 @@ export const createEventSchema = z.object({
   location: z.string().max(500).optional(),
   isOnline: z.boolean().optional(),
   businessId: z.string().uuid().optional(),
+  meetingUrl: z.string().url().optional(),
 });
 
 export const createJobPostSchema = createPostSchema.extend({
@@ -104,6 +106,19 @@ export const createJobPostSchema = createPostSchema.extend({
     .enum(["full_time", "part_time", "contract", "internship", "remote"])
     .optional(),
   salaryRange: z.string().max(100).optional(),
+  category: z
+    .enum([
+      "engineering",
+      "design",
+      "marketing",
+      "sales",
+      "operations",
+      "finance",
+      "hr",
+      "other",
+    ])
+    .optional(),
+  isFeatured: z.boolean().optional(),
 });
 
 export const applyToJobSchema = z.object({
@@ -121,6 +136,119 @@ export const postMediaSchema = z.object({
   thumbnailUrl: z.string().url().optional(),
 });
 
+const profileSkillSchema = z.object({
+  name: z.string().min(1).max(120),
+  level: z.string().max(50).optional(),
+});
+
+const profileExperienceSchema = z.object({
+  title: z.string().min(1).max(200),
+  company: z.string().max(200).optional(),
+  startDate: z.string().max(40).optional(),
+  endDate: z.string().max(40).optional(),
+  description: z.string().max(2000).optional(),
+});
+
+const profileEducationSchema = z.object({
+  school: z.string().min(1).max(200),
+  degree: z.string().max(200).optional(),
+  field: z.string().max(200).optional(),
+  year: z.string().max(20).optional(),
+});
+
+const profileCertificateSchema = z.object({
+  name: z.string().min(1).max(200),
+  issuer: z.string().max(200).optional(),
+  year: z.string().max(20).optional(),
+});
+
+const socialLinkSchema = z.object({
+  platform: z.string().min(1).max(50),
+  url: z.string().url(),
+});
+
+export const updatePersonProfileSchema = z.object({
+  displayName: z.string().min(2).max(120).optional(),
+  headline: z.string().max(200).optional().nullable(),
+  bio: z.string().max(2000).optional().nullable(),
+  avatarUrl: z.string().url().optional().nullable(),
+  coverUrl: z.string().url().optional().nullable(),
+  privacy: z
+    .enum(["public", "followers", "connections", "private", "organization_only"])
+    .optional(),
+  location: z.string().max(200).optional().nullable(),
+  website: z.string().url().optional().nullable(),
+  walletAddress: z.string().max(100).optional().nullable(),
+  languages: z.array(z.string().max(50)).max(20).optional(),
+  socialLinks: z.array(socialLinkSchema).max(10).optional(),
+  skills: z.array(profileSkillSchema).max(50).optional(),
+  experience: z.array(profileExperienceSchema).max(30).optional(),
+  education: z.array(profileEducationSchema).max(20).optional(),
+  certificates: z.array(profileCertificateSchema).max(20).optional(),
+});
+
+export const updateJobApplicationStatusSchema = z.object({
+  postId: z.string().uuid(),
+  applicantProfileId: z.string().uuid(),
+  status: z.enum(["pending", "reviewed", "interview_invited", "accepted", "rejected"]),
+});
+
+export const setEventReminderSchema = z.object({
+  eventId: z.string().uuid(),
+});
+
+export const searchJobsSchema = z.object({
+  query: z.string().optional(),
+  employmentType: z
+    .enum(["full_time", "part_time", "contract", "internship", "remote"])
+    .optional(),
+  category: z
+    .enum([
+      "engineering",
+      "design",
+      "marketing",
+      "sales",
+      "operations",
+      "finance",
+      "hr",
+      "other",
+    ])
+    .optional(),
+  filter: z.enum(["featured", "latest", "recommended", "open"]).optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+});
+
+export const searchEventsSchema = z.object({
+  query: z.string().optional(),
+  onlineOnly: z.boolean().optional(),
+  physicalOnly: z.boolean().optional(),
+  upcomingOnly: z.boolean().optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+});
+
+export const searchNetworkSchema = z.object({
+  query: z.string().min(1).max(200),
+  type: z
+    .enum([
+      "all",
+      "people",
+      "companies",
+      "posts",
+      "products",
+      "stores",
+      "jobs",
+      "events",
+      "messages",
+    ])
+    .optional(),
+  limit: z.number().int().min(1).max(50).optional(),
+  offset: z.number().int().min(0).optional(),
+});
+
+export const connectionIdSchema = z.object({
+  connectionId: z.string().uuid(),
+});
+
 export type CreatePersonProfileInput = z.infer<typeof createPersonProfileSchema>;
 export type CreatePostInput = z.infer<typeof createPostSchema>;
 export type FollowTargetInput = z.infer<typeof followTargetSchema>;
@@ -133,4 +261,9 @@ export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type CreateJobPostInput = z.infer<typeof createJobPostSchema>;
 export type ApplyToJobInput = z.infer<typeof applyToJobSchema>;
 export type RegisterForEventInput = z.infer<typeof registerForEventSchema>;
+export type UpdateJobApplicationStatusInput = z.infer<typeof updateJobApplicationStatusSchema>;
+export type SearchJobsInput = z.infer<typeof searchJobsSchema>;
+export type SearchEventsInput = z.infer<typeof searchEventsSchema>;
 export type PostMediaInput = z.infer<typeof postMediaSchema>;
+export type UpdatePersonProfileInput = z.infer<typeof updatePersonProfileSchema>;
+export type SearchNetworkInput = z.infer<typeof searchNetworkSchema>;

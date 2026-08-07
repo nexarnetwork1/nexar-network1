@@ -3,6 +3,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   EnsureStorefrontInput,
+  EnrichedMarketplaceListing,
   MarketplaceAdvertisement,
   MarketplaceCheckout,
   MarketplaceCollection,
@@ -36,6 +37,18 @@ export async function getStorefrontById(
     .from("atlas_marketplace_storefronts")
     .select("*")
     .eq("id", storefrontId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  return (data as MarketplaceStorefront | null) ?? null;
+}
+
+export async function getStorefrontBySlug(
+  slug: string,
+): Promise<MarketplaceStorefront | null> {
+  const { data } = await db()
+    .from("atlas_marketplace_storefronts")
+    .select("*")
+    .eq("slug", slug)
     .is("deleted_at", null)
     .maybeSingle();
   return (data as MarketplaceStorefront | null) ?? null;
@@ -194,6 +207,52 @@ export async function createOrUpdateListing(
     .eq("id", input.storefrontId);
 
   return data as MarketplaceListing;
+}
+
+/** Join listing rows with commerce `products` slugs/images for correct marketplace URLs. */
+export async function enrichListingsWithProducts(
+  listings: MarketplaceListing[],
+): Promise<EnrichedMarketplaceListing[]> {
+  const productIds = listings
+    .map((l) => l.product_id)
+    .filter((id): id is string => Boolean(id));
+  if (productIds.length === 0) return listings;
+
+  const { data } = await db()
+    .from("products")
+    .select("id, slug, image_url")
+    .in("id", productIds);
+
+  const byId = new Map(
+    ((data ?? []) as Array<{ id: string; slug: string | null; image_url: string | null }>).map(
+      (p) => [p.id, p],
+    ),
+  );
+
+  return listings.map((listing) => {
+    const product = listing.product_id ? byId.get(listing.product_id) : undefined;
+    return {
+      ...listing,
+      product_slug: product?.slug ?? null,
+      product_image_url: product?.image_url ?? null,
+    };
+  });
+}
+
+export async function searchStorefronts(input: {
+  query: string;
+  limit?: number;
+}): Promise<MarketplaceStorefront[]> {
+  const q = input.query.trim();
+  if (!q) return [];
+  const { data } = await db()
+    .from("atlas_marketplace_storefronts")
+    .select("*")
+    .eq("is_published", true)
+    .is("deleted_at", null)
+    .or(`display_name.ilike.%${q}%,slug.ilike.%${q}%,tagline.ilike.%${q}%`)
+    .limit(input.limit ?? 20);
+  return (data as MarketplaceStorefront[]) ?? [];
 }
 
 export async function searchListings(input: {

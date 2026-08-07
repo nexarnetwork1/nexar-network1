@@ -2,6 +2,14 @@ import { z } from "zod";
 
 const walletRegex = /^0x[a-fA-F0-9]{40}$/;
 
+const optionalWalletAddress = z
+  .union([
+    z.literal(""),
+    z.string().regex(walletRegex, "Invalid BSC wallet address (must be 0x + 40 hex chars)"),
+  ])
+  .optional()
+  .transform((value) => (value ? value : undefined));
+
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -9,15 +17,28 @@ export const loginSchema = z.object({
 
 export const customerRegisterSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100),
+  username: z
+    .string()
+    .min(2, "Username must be at least 2 characters")
+    .max(30, "Username too long")
+    .regex(/^[a-zA-Z0-9_-]+$/, "Username may only contain letters, numbers, _ and -"),
   email: z.string().email("Invalid email address"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(72, "Password too long"),
-  walletAddress: z
-    .string()
-    .regex(walletRegex, "Invalid BSC wallet address (must be 0x + 40 hex chars)"),
+  walletAddress: optionalWalletAddress,
 });
+
+/** Client form schema — adds confirm password; submits via customerRegisterSchema fields. */
+export const atlasRegisterFormSchema = customerRegisterSchema
+  .extend({
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const merchantRegisterSchema = z.object({
   merchantName: z.string().min(2, "Merchant name required").max(100),
@@ -60,6 +81,7 @@ export const completeProfileSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CustomerRegisterInput = z.infer<typeof customerRegisterSchema>;
+export type AtlasRegisterFormInput = z.infer<typeof atlasRegisterFormSchema>;
 export type MerchantRegisterInput = z.infer<typeof merchantRegisterSchema>;
 export type CompleteProfileInput = z.infer<typeof completeProfileSchema>;
 

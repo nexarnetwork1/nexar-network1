@@ -19,6 +19,7 @@ export function EventCreateForm() {
   const [endsAt, setEndsAt] = useState("");
   const [location, setLocation] = useState("");
   const [isOnline, setIsOnline] = useState(false);
+  const [meetingUrl, setMeetingUrl] = useState("");
 
   if (!session) {
     return (
@@ -91,6 +92,14 @@ export function EventCreateForm() {
             className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
           />
         )}
+        {isOnline && (
+          <input
+            value={meetingUrl}
+            onChange={(e) => setMeetingUrl(e.target.value)}
+            placeholder="Meeting URL (Zoom, Meet, etc.)"
+            className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-gold/40"
+          />
+        )}
         <button
           type="button"
           disabled={pending || !title.trim() || !startsAt}
@@ -104,6 +113,7 @@ export function EventCreateForm() {
                   endsAt: endsAt ? new Date(endsAt).toISOString() : undefined,
                   location: isOnline ? undefined : location.trim() || undefined,
                   isOnline,
+                  meetingUrl: isOnline && meetingUrl.trim() ? meetingUrl.trim() : undefined,
                 });
                 toast.success("Event created");
                 router.push(`/atlas/events/${result.eventId}`);

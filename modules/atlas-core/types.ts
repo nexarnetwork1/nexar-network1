@@ -165,6 +165,36 @@ export const NOTIFICATION_HUB_EVENTS: Record<
     body: "You received NXR rewards.",
     channels: ["in_app", "push"],
   },
+  "network.job_posted": {
+    title: "New job posted",
+    body: "A company you follow posted a new role.",
+    channels: ["in_app"],
+  },
+  "network.job_applied": {
+    title: "New job application",
+    body: "Someone applied to your job posting.",
+    channels: ["in_app", "email"],
+  },
+  "network.job_application_updated": {
+    title: "Application update",
+    body: "Your job application status was updated.",
+    channels: ["in_app", "push"],
+  },
+  "network.interview_invited": {
+    title: "Interview invite",
+    body: "You have been invited to interview for a role.",
+    channels: ["in_app", "push", "email"],
+  },
+  "network.event_registered": {
+    title: "Event registration confirmed",
+    body: "You are registered for an upcoming event.",
+    channels: ["in_app", "email"],
+  },
+  "network.event_reminder": {
+    title: "Event reminder",
+    body: "An event you registered for is starting soon.",
+    channels: ["in_app", "push"],
+  },
 };
 
 export const SEARCH_INDEX_EVENTS: Record<
@@ -175,6 +205,8 @@ export const SEARCH_INDEX_EVENTS: Record<
   "product.created": { entityType: "product", titleFrom: "name" },
   "business.created": { entityType: "business", titleFrom: "displayName" },
   "network.post_created": { entityType: "post", titleFrom: "title" },
+  "network.job_posted": { entityType: "job", titleFrom: "title" },
+  "network.event_registered": { entityType: "event", titleFrom: "title" },
   "apps.application_installed": { entityType: "app", titleFrom: "slug" },
 };
 

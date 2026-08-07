@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fetchGlobalActivityAction } from "@/modules/atlas-network/actions";
+import { ActivityItem } from "@/components/atlas/activity/ActivityItem";
 import { PremiumSection } from "@/components/atlas/premium/PremiumSection";
 import { PremiumStats } from "@/components/atlas/premium/PremiumStats";
 import {
@@ -12,7 +15,6 @@ import {
   Search,
   Sparkles,
 } from "lucide-react";
-import Link from "next/link";
 
 const CATEGORY_ROUTES: Record<string, string> = {
   Companies: "/atlas/network",
@@ -25,6 +27,7 @@ const CATEGORY_ROUTES: Record<string, string> = {
 
 export default async function AtlasNetworkPage() {
   const supabase = createAdminClient();
+  const { activities: recentActivities } = await fetchGlobalActivityAction({ limit: 12 });
 
   // Fetch real network profiles
   const { data: profiles } = await supabase
@@ -130,10 +133,13 @@ export default async function AtlasNetworkPage() {
             <h2 className="text-3xl font-bold">Featured Profiles</h2>
             <p className="text-muted">Active businesses and professionals on the network</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-white hover:bg-white/5">
+          <Link
+            href="/atlas/search"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-white hover:bg-white/5"
+          >
             <Search className="h-4 w-4" />
             Search
-          </button>
+          </Link>
         </div>
 
         {profiles && profiles.length > 0 ? (
@@ -153,10 +159,16 @@ export default async function AtlasNetworkPage() {
       <PremiumSection variant="dark" padding="xl">
         <div className="text-center space-y-4 mb-8">
           <h2 className="text-3xl font-bold">Network Activity</h2>
-          <p className="text-muted">Latest updates from the ATLAS business community</p>
+          <p className="text-muted">Latest business activity across ATLAS</p>
         </div>
 
-        {posts && posts.length > 0 ? (
+        {recentActivities.length > 0 ? (
+          <div className="max-w-3xl mx-auto space-y-2">
+            {recentActivities.map((activity) => (
+              <ActivityItem key={activity.id} activity={activity} />
+            ))}
+          </div>
+        ) : posts && posts.length > 0 ? (
           <div className="max-w-3xl mx-auto space-y-4">
             {posts.map((post: any) => (
               <PostCard key={post.id} post={post} />
@@ -164,7 +176,10 @@ export default async function AtlasNetworkPage() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted">No posts yet. Start the conversation!</p>
+            <p className="text-muted">No activity yet. Start the conversation!</p>
+            <Link href="/atlas/create-post" className="inline-block mt-4 text-gold hover:underline text-sm">
+              Create a post
+            </Link>
           </div>
         )}
       </PremiumSection>

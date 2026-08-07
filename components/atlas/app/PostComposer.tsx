@@ -13,7 +13,10 @@ import {
   X,
   Plus,
   Upload,
+  Briefcase,
+  Calendar,
 } from "lucide-react";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils/cn";
 import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
@@ -25,6 +28,7 @@ import {
 import { toast } from "sonner";
 import { AutoResizeTextarea } from "./feed/AutoResizeTextarea";
 import { EmojiPicker } from "./feed/EmojiPicker";
+import { AiAssistMenu } from "@/components/atlas/ai/AiAssistMenu";
 import {
   POST_BODY_MAX,
   VISIBILITY_OPTIONS,
@@ -291,6 +295,36 @@ export function PostComposer({
           className="w-full bg-transparent border-b border-white/10 pb-2 text-lg font-medium placeholder:text-muted focus:outline-none focus:border-gold/40"
         />
 
+        <div className="flex flex-wrap items-center gap-2">
+          <AiAssistMenu
+            surface="post"
+            text={body || title}
+            context={{ title, postType }}
+            onApply={(content, action) => {
+              if (action === "generate_title") {
+                setTitle(content.split("\n")[0]?.trim() ?? content);
+              } else if (action === "continue_writing") {
+                setBody((b) => `${b}${b ? "\n\n" : ""}${content}`);
+              } else if (action === "generate_hashtags") {
+                setBody((b) => `${b.trim()}\n\n${content}`.trim());
+              } else {
+                setBody(content);
+              }
+            }}
+            disabled={!session}
+          />
+          {(postType === "announcement" || media.length > 0) && (
+            <AiAssistMenu
+              surface="marketplace"
+              text={body || title}
+              context={{ productName: title || body.slice(0, 80) }}
+              onApply={(content) => setBody(content)}
+              disabled={!session}
+              label="Product AI"
+            />
+          )}
+        </div>
+
         <div className="relative">
           <AutoResizeTextarea
             placeholder={
@@ -463,6 +497,20 @@ export function PostComposer({
             <Megaphone className="h-4 w-4" />
             <span className="hidden xs:inline">Announcement</span>
           </button>
+          <Link
+            href="/atlas/jobs/new"
+            className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg hover:bg-white/5 text-muted text-sm"
+          >
+            <Briefcase className="h-4 w-4 text-gold" />
+            <span className="hidden xs:inline">Job</span>
+          </Link>
+          <Link
+            href="/atlas/events/new"
+            className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg hover:bg-white/5 text-muted text-sm"
+          >
+            <Calendar className="h-4 w-4 text-gold" />
+            <span className="hidden xs:inline">Event</span>
+          </Link>
         </div>
 
         <div className="flex flex-wrap justify-end gap-2 pt-2">

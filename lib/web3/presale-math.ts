@@ -52,9 +52,13 @@ export function validatePurchase(params: {
   isLive: boolean;
   isConnected: boolean;
   isCorrectChain: boolean;
+  chainName?: string;
 }): BuyValidationResult {
   if (!params.isConnected) return { valid: false, error: "Connect your wallet to purchase" };
-  if (!params.isCorrectChain) return { valid: false, error: "Switch to BNB Smart Chain" };
+  if (!params.isCorrectChain) {
+    const network = params.chainName ?? "the correct network";
+    return { valid: false, error: `Switch to ${network}` };
+  }
   if (!params.isLive) return { valid: false, error: "Presale is not active" };
   if (params.nxrAmount === BigInt(0)) return { valid: false, error: "Enter a valid amount" };
   if (params.nxrAmount < params.minPurchase) {

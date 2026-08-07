@@ -20,36 +20,23 @@ function CommerceAuthOpener() {
     const modeParam = searchParams.get("mode");
     const authParam = searchParams.get("auth");
 
-    // Only open modal if explicitly requested via auth parameter
     if (!authParam && !modeParam) {
       handledRef.current = key;
       return;
     }
 
     const mode =
-      modeParam === "register"
-        ? "register"
-        : authParam === "signin"
-          ? "signin"
-          : null;
+      modeParam === "register" ? "register" : authParam === "signin" ? "signin" : null;
 
     if (!mode) {
       handledRef.current = key;
       return;
     }
 
-    const roleParam = searchParams.get("role");
-
-    const role =
-      roleParam === "customer" || roleParam === "merchant"
-        ? roleParam
-        : undefined;
-
     handledRef.current = key;
 
     openCommerceAuth({
       mode,
-      role,
       redirect: searchParams.get("redirect") ?? undefined,
       message: searchParams.get("message") ?? undefined,
     });

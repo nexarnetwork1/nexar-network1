@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { Adapter } from "next-auth/adapters";
 import { SupabaseAuthjsAdapter } from "@/lib/auth/authjs-adapter";
@@ -43,6 +44,41 @@ const googleConfigured =
   Boolean(process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID) &&
   Boolean(process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET);
 
+const githubConfigured =
+  Boolean(process.env.AUTH_GITHUB_ID || process.env.GITHUB_CLIENT_ID) &&
+  Boolean(process.env.AUTH_GITHUB_SECRET || process.env.GITHUB_CLIENT_SECRET);
+
+async function ensureOAuthProfile(user: {
+  id?: string;
+  email?: string | null;
+  name?: string | null;
+}) {
+  if (!user.email || !user.id) return;
+  const admin = createAdminClient();
+  const { data: existing } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!existing) {
+    await admin.from("profiles").insert({
+      id: user.id,
+      email: user.email,
+      full_name: user.name,
+      role: "customer",
+      profile_completed: false,
+    });
+  }
+  await admin
+    .from("authjs_users")
+    .update({
+      emailVerified: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", user.id)
+    .is("emailVerified", null);
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
@@ -83,33 +119,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }),
         ]
       : []),
+    ...(githubConfigured
+      ? [
+          GitHub({
+            clientId: process.env.AUTH_GITHUB_ID ?? process.env.GITHUB_CLIENT_ID!,
+            clientSecret:
+              process.env.AUTH_GITHUB_SECRET ?? process.env.GITHUB_CLIENT_SECRET!,
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "google" && user.email && user.id) {
-        const admin = createAdminClient();
-        const { data: existing } = await admin
-          .from("profiles")
-          .select("id")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (!existing) {
-          await admin.from("profiles").insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.name,
-            role: "customer",
-            profile_completed: false,
-          });
-        }
-        await admin
-          .from("authjs_users")
-          .update({
-            emailVerified: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", user.id)
-          .is("emailVerified", null);
+      if (
+        (account?.provider === "google" || account?.provider === "github") &&
+        user.email &&
+        user.id
+      ) {
+        await ensureOAuthProfile(user);
       }
       return true;
     },

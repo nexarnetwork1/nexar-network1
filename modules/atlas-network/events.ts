@@ -66,4 +66,45 @@ export function registerAtlasNetworkEventHandlers(): void {
       /* non-fatal */
     }
   });
+
+  onDomainEvent("product.published", async (event) => {
+    const businessId = event.businessId;
+    if (!businessId) return;
+    try {
+      const productId = String(event.payload.productId ?? event.payload.id ?? "");
+      if (!productId) return;
+
+      const { getListingByProductId, enrichListingsWithProducts } = await import(
+        "@/modules/atlas-marketplace/repository"
+      );
+      const { publishProductNetworkPost } = await import("./service");
+
+      let listing = await getListingByProductId(productId);
+      if (listing) {
+        [listing] = await enrichListingsWithProducts([listing]);
+      }
+
+      await publishProductNetworkPost({
+        businessId,
+        actorUserId: event.actorId,
+        productId,
+        listingId: listing?.id ?? null,
+        productSlug:
+          (listing as { product_slug?: string | null } | undefined)?.product_slug ??
+          (typeof event.payload.slug === "string" ? event.payload.slug : null),
+        title: String(event.payload.name ?? event.payload.title ?? listing?.title ?? "Product"),
+        summary:
+          typeof event.payload.description === "string"
+            ? event.payload.description.slice(0, 500)
+            : listing?.summary,
+        price: Number(event.payload.price ?? listing?.price ?? 0) || null,
+        currency: String(event.payload.currency ?? listing?.currency ?? "USD"),
+        imageUrl:
+          (listing as { product_image_url?: string | null } | undefined)?.product_image_url ??
+          (typeof event.payload.imageUrl === "string" ? event.payload.imageUrl : null),
+      });
+    } catch {
+      /* non-fatal */
+    }
+  });
 }

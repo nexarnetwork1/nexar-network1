@@ -208,7 +208,8 @@ export async function sendAiMessage(input: {
 export async function runCapability(input: RunCapabilityInput): Promise<{
   taskId: string;
   executionId: string;
-  stubOutput: string;
+  output: string;
+  mode: "openai" | "demo";
 }> {
   runCapabilitySchema.parse(input);
   const preferredRole = input.agentSlug
@@ -223,7 +224,7 @@ export async function runCapability(input: RunCapabilityInput): Promise<{
     capability: input.capability,
     agentId: agent?.id,
     createdBy: input.userId,
-    result: { status: "stub" },
+    result: { status: "running" },
   });
 
   await emit("ai.task_created", {
@@ -238,11 +239,37 @@ export async function runCapability(input: RunCapabilityInput): Promise<{
     input: { capability: input.capability, prompt: input.prompt, context: input.context },
   });
 
-  const stubOutput = renderCapabilityStub(input.capability, input.prompt, input.context);
-  await updateExecutionStatus(execution.id, "succeeded", { stubOutput });
+  let output: string;
+  let mode: "openai" | "demo" = "demo";
+
+  const assistAction = input.context?.assistAction as string | undefined;
+  if (assistAction) {
+    const { generateAssistCompletion } = await import("./llm");
+    const result = await generateAssistCompletion({
+      action: assistAction as import("./prompts-contextual").AiAssistAction,
+      text: input.prompt,
+      context: input.context,
+    });
+    output = result.content;
+    mode = result.mode;
+  } else {
+    const { generateAssistCompletion } = await import("./llm");
+    const result = await generateAssistCompletion({
+      action: "generate_post",
+      text: input.prompt,
+      context: { capability: input.capability, ...input.context },
+    });
+    output =
+      result.mode === "openai"
+        ? result.content
+        : renderCapabilityStub(input.capability, input.prompt, input.context);
+    mode = result.mode;
+  }
+
+  await updateExecutionStatus(execution.id, "succeeded", { output, mode });
   await adjustCredits(input.workspaceId, -1, `capability:${input.capability}`, execution.id);
 
-  return { taskId: task.id, executionId: execution.id, stubOutput };
+  return { taskId: task.id, executionId: execution.id, output, mode };
 }
 
 function renderCapabilityStub(
@@ -537,7 +564,7 @@ export function createAtlasAiPort(): AtlasAiPort {
       return startConversation(input);
     },
     async runCapability(input) {
-      return runCapability({
+      const result = await runCapability({
         workspaceId: input.workspaceId,
         capability: input.capability as AiCapability,
         userId: input.userId,
@@ -545,6 +572,7 @@ export function createAtlasAiPort(): AtlasAiPort {
         agentSlug: input.agentSlug,
         context: input.context,
       });
+      return { ...result, stubOutput: result.output };
     },
     async semanticSearch(input) {
       return semanticSearch(input);

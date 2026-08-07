@@ -12,13 +12,20 @@ import {
   createPageRecord,
   createPersonProfileRecord,
   createPostRecord,
+  decrementFollowerCount,
+  decrementFollowingCount,
+  deleteFollowRecord,
   getCompanyProfileByBusinessId,
+  getConnectionById,
   getNetworkProfileByBusinessId,
   getNetworkProfileById,
   getPersonProfileByUserId,
   incrementFollowerCount,
+  incrementFollowingCount,
   resolveUniqueNetworkSlug,
   updateConnectionStatus,
+  updateNetworkProfileRecord,
+  updatePersonProfileRecord,
   addTimelineEntry,
 } from "./repository";
 import type {
@@ -30,6 +37,7 @@ import type {
   CreatePersonProfileInput,
   CreatePostInput,
   FollowTargetInput,
+  UpdatePersonProfileInput,
 } from "./validators";
 
 async function emit(
@@ -170,6 +178,7 @@ export async function followTarget(
 
   if (input.targetType === "profile") {
     await incrementFollowerCount(input.targetId);
+    await incrementFollowingCount(followerProfileId);
   }
 
   await createActivityRecord({
@@ -184,6 +193,81 @@ export async function followTarget(
     businessId: null,
     payload: { followerProfileId, ...input },
   });
+}
+
+export async function unfollowTarget(
+  followerProfileId: string,
+  actorUserId: string,
+  input: FollowTargetInput,
+): Promise<void> {
+  await deleteFollowRecord({
+    followerProfileId,
+    targetType: input.targetType,
+    targetId: input.targetId,
+  });
+
+  if (input.targetType === "profile") {
+    await decrementFollowerCount(input.targetId);
+    await decrementFollowingCount(followerProfileId);
+  }
+
+  await emit("network.follow_removed", {
+    actorId: actorUserId,
+    businessId: null,
+    payload: { followerProfileId, ...input },
+  });
+}
+
+export async function updatePersonNetworkProfile(
+  userId: string,
+  networkProfileId: string,
+  input: UpdatePersonProfileInput,
+): Promise<NetworkProfile> {
+  const existing = await getNetworkProfileById(networkProfileId);
+  if (!existing || existing.owner_user_id !== userId) {
+    throw new Error("Not authorized to update this profile");
+  }
+
+  const profileData = {
+    ...(existing.profile_data ?? {}),
+    ...(input.location !== undefined ? { location: input.location } : {}),
+    ...(input.website !== undefined ? { website: input.website } : {}),
+    ...(input.walletAddress !== undefined ? { walletAddress: input.walletAddress } : {}),
+    ...(input.languages !== undefined ? { languages: input.languages } : {}),
+    ...(input.socialLinks !== undefined ? { socialLinks: input.socialLinks } : {}),
+  };
+
+  const profile = await updateNetworkProfileRecord(networkProfileId, {
+    ...(input.displayName !== undefined ? { display_name: input.displayName } : {}),
+    ...(input.headline !== undefined ? { headline: input.headline } : {}),
+    ...(input.bio !== undefined ? { bio: input.bio } : {}),
+    ...(input.avatarUrl !== undefined ? { avatar_url: input.avatarUrl } : {}),
+    ...(input.coverUrl !== undefined ? { cover_url: input.coverUrl } : {}),
+    ...(input.privacy !== undefined ? { privacy: input.privacy } : {}),
+    profile_data: profileData,
+  });
+
+  if (
+    input.skills !== undefined ||
+    input.experience !== undefined ||
+    input.education !== undefined ||
+    input.certificates !== undefined
+  ) {
+    await updatePersonProfileRecord(userId, {
+      ...(input.skills !== undefined ? { skills: input.skills } : {}),
+      ...(input.experience !== undefined ? { experience: input.experience } : {}),
+      ...(input.education !== undefined ? { education: input.education } : {}),
+      ...(input.certificates !== undefined ? { certificates: input.certificates } : {}),
+    });
+  }
+
+  await emit("network.profile_updated", {
+    actorId: userId,
+    businessId: existing.business_id,
+    payload: { profileId: networkProfileId },
+  });
+
+  return profile;
 }
 
 export async function requestConnection(
@@ -223,6 +307,38 @@ export async function acceptConnection(
   });
 }
 
+export async function declineConnection(
+  connectionId: string,
+  actorUserId: string,
+  recipientProfileId: string,
+): Promise<void> {
+  const connection = await getConnectionById(connectionId);
+  if (!connection || connection.recipient_profile_id !== recipientProfileId) {
+    throw new Error("Connection not found");
+  }
+  await updateConnectionStatus(connectionId, "declined");
+  await emit("network.connection_declined", {
+    actorId: actorUserId,
+    businessId: null,
+    payload: { connectionId },
+  });
+}
+
+export async function removeConnection(
+  connectionId: string,
+  actorProfileId: string,
+): Promise<void> {
+  const connection = await getConnectionById(connectionId);
+  if (
+    !connection ||
+    (connection.requester_profile_id !== actorProfileId &&
+      connection.recipient_profile_id !== actorProfileId)
+  ) {
+    throw new Error("Connection not found");
+  }
+  await updateConnectionStatus(connectionId, "revoked");
+}
+
 export async function createNetworkPost(
   authorProfileId: string,
   actorUserId: string,
@@ -235,6 +351,7 @@ export async function createNetworkPost(
     title: input.title,
     body: input.body,
     visibility: input.visibility,
+    metadata: input.metadata,
     publish: true,
   });
 
@@ -299,6 +416,56 @@ export async function recordBusinessActivity(input: {
     actorId: input.actorUserId,
     businessId: input.businessId,
     payload: { activityType: input.activityType, activityId: activity.id },
+  });
+}
+
+/** Auto-publish a product announcement post when catalog publishes a product. */
+export async function publishProductNetworkPost(input: {
+  businessId: string;
+  actorUserId: string | null;
+  productId: string;
+  listingId?: string | null;
+  productSlug?: string | null;
+  title: string;
+  summary?: string | null;
+  price?: number | null;
+  currency?: string;
+  imageUrl?: string | null;
+}): Promise<string | null> {
+  const companyProfile = await getCompanyProfileByBusinessId(input.businessId);
+  const networkProfile = await getNetworkProfileByBusinessId(input.businessId);
+  const profileId = companyProfile?.network_profile_id ?? networkProfile?.id;
+  if (!profileId) return null;
+
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const admin = createAdminClient();
+  const { data: existing } = await admin
+    .from("atlas_network_posts")
+    .select("id")
+    .eq("business_id", input.businessId)
+    .eq("post_type", "product")
+    .contains("metadata", { productId: input.productId })
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (existing) return (existing as { id: string }).id;
+
+  const actorUserId = input.actorUserId ?? networkProfile?.owner_user_id ?? "";
+  if (!actorUserId) return null;
+
+  return createNetworkPost(profileId, actorUserId, {
+    postType: "product",
+    businessId: input.businessId,
+    title: input.title,
+    body: input.summary ?? undefined,
+    visibility: "public",
+    metadata: {
+      productId: input.productId,
+      listingId: input.listingId ?? null,
+      productSlug: input.productSlug ?? null,
+      price: input.price ?? null,
+      currency: input.currency ?? "USD",
+      imageUrl: input.imageUrl ?? null,
+    },
   });
 }
 

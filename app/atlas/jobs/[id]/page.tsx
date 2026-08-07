@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { MapPin, Building2, Briefcase } from "lucide-react";
-import { getNetworkPostById } from "@/modules/atlas-network/repository";
+import {
+  getNetworkPostById,
+  getPersonProfileByUserId,
+  hasUserAppliedToJob,
+} from "@/modules/atlas-network/repository";
 import { JobApplyForm } from "@/components/atlas/app/JobApplyForm";
+import { jobCategoryLabel } from "@/lib/atlas/job-categories";
+import { jobMeta, isJobOpen } from "@/lib/atlas/job-utils";
 
 export default async function AtlasJobDetailPage({
   params,
@@ -13,7 +20,15 @@ export default async function AtlasJobDetailPage({
   const job = await getNetworkPostById(id);
   if (!job || job.post_type !== "job") notFound();
 
-  const meta = (job.metadata ?? {}) as Record<string, string>;
+  const meta = jobMeta(job);
+  const session = await auth();
+  let alreadyApplied = false;
+  if (session?.user?.id) {
+    const person = await getPersonProfileByUserId(session.user.id);
+    if (person) {
+      alreadyApplied = await hasUserAppliedToJob(id, person.network_profile_id);
+    }
+  }
 
   return (
     <div className="max-w-2xl mx-auto py-6 px-4 space-y-6">
@@ -26,13 +41,27 @@ export default async function AtlasJobDetailPage({
           <div className="h-12 w-12 rounded-xl bg-gold/10 flex items-center justify-center">
             <Briefcase className="h-6 w-6 text-gold" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">{job.title ?? "Open Role"}</h1>
+          <div className="flex-1">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <h1 className="text-2xl font-bold">{job.title ?? "Open Role"}</h1>
+              <span
+                className={`text-xs px-2 py-1 rounded ${
+                  isJobOpen(job)
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : "bg-white/5 text-muted"
+                }`}
+              >
+                {isJobOpen(job) ? "Hiring" : "Closed"}
+              </span>
+            </div>
             {job.business && (
-              <p className="text-muted flex items-center gap-1.5 mt-1">
+              <Link
+                href={`/atlas/network/${job.business.slug}`}
+                className="text-muted flex items-center gap-1.5 mt-1 hover:text-gold"
+              >
                 <Building2 className="h-4 w-4" />
                 {job.business.display_name}
-              </p>
+              </Link>
             )}
           </div>
         </div>
@@ -49,6 +78,11 @@ export default async function AtlasJobDetailPage({
               {meta.employment_type.replace("_", " ")}
             </span>
           )}
+          {meta.category && (
+            <span className="px-2 py-1 rounded-lg bg-gold/10 text-gold">
+              {jobCategoryLabel(meta.category)}
+            </span>
+          )}
           {meta.salary_range && <span>{meta.salary_range}</span>}
         </div>
 
@@ -59,7 +93,7 @@ export default async function AtlasJobDetailPage({
         )}
       </article>
 
-      <JobApplyForm postId={job.id} />
+      <JobApplyForm postId={job.id} initialApplied={alreadyApplied} />
     </div>
   );
 }

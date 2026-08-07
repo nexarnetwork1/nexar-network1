@@ -13,6 +13,7 @@ const PRIVATE_PATHS = [
   "/customer",
   "/merchant",
   "/dashboard",
+  "/atlas",
   "/orders",
   "/invoices",
   "/settings",

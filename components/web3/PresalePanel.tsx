@@ -142,6 +142,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
     isLive: presale.canBuy,
     isConnected,
     isCorrectChain: chainId === presale.chainId,
+    chainName: presale.network.name,
   });
 
   function ensureWallet(): boolean {
