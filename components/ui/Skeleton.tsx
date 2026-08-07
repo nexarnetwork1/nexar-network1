@@ -9,7 +9,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-[var(--nxr-radius-sm)] bg-white/[0.07]",
+        "animate-pulse rounded-[var(--nxr-radius-sm)] bg-white/[0.06]",
         className,
       )}
       aria-hidden

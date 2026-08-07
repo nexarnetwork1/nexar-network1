@@ -16,11 +16,7 @@ export function AtlasIdentityField({
       </span>
       <input
         id={id}
-        className={cn(
-          "w-full rounded-xl border bg-background/60 px-4 py-2.5 text-sm text-foreground outline-none transition-colors",
-          "placeholder:text-muted/60 focus:border-gold/40 focus:ring-2 focus:ring-gold/15",
-          error ? "border-red-500/50" : "border-border",
-        )}
+        className={cn("w-full nxr-input", error && "border-red-500/50")}
         {...props}
       />
       {error ? <span className="text-xs text-red-400">{error}</span> : null}

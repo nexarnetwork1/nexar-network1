@@ -1,19 +1,29 @@
 export const COLORS = {
-  background: "#000000",
-  backgroundSecondary: "#0A0A0A",
-  surface: "#0A0A0A",
-  card: "#111111",
-  cardElevated: "#161616",
+  canvas: "#050816",
+  canvasSecondary: "#0B1120",
+  chrome: "#0B1120",
+  surface: "#111827",
+  card: "#111827",
+  cardElevated: "#161E2E",
+  cardAlt: "#1A2235",
   border: "rgba(255, 255, 255, 0.08)",
-  borderHover: "rgba(201, 169, 98, 0.28)",
-  gold: "#C9A962",
-  goldSecondary: "#D4B878",
-  goldAccent: "#D4B878",
+  borderHover: "rgba(212, 175, 55, 0.22)",
+  gold: "#D4AF37",
+  goldSecondary: "#C9A227",
+  goldAccent: "#F5D76E",
   white: "#FFFFFF",
-  textSecondary: "#A0A4B0",
-  muted: "#6B7080",
-  error: "#FF5B5B",
-  success: "#37C978",
+  textPrimary: "#FFFFFF",
+  textSecondary: "#C9D1D9",
+  muted: "#94A3B8",
+  onGold: "#0B1120",
+  error: "#EF4444",
+  success: "#10B981",
+  warning: "#F59E0B",
+} as const;
+
+export const CANVAS_LIGHT = {
+  primary: "#EEF2F7",
+  secondary: "#E2E8F0",
 } as const;
 
 export const FONTS = {

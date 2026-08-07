@@ -67,7 +67,7 @@ export default async function RootLayout({
       lang="en"
       className={`${inter.variable} ${sora.variable} ${spaceGrotesk.variable} h-full scroll-smooth`}
     >
-      <body className="relative min-h-full bg-background font-sans text-foreground antialiased">
+      <body className="relative min-h-full bg-canvas font-sans text-foreground antialiased">
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var s=localStorage.getItem(k);var t=s==="light"||s==="dark"||s==="system"?s:"system";var d=t==="system"?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":t;document.documentElement.setAttribute("data-theme",d);document.documentElement.classList.toggle("dark",d==="dark");document.documentElement.classList.toggle("light",d==="light");document.documentElement.style.colorScheme=d;}catch(e){}})();`,
@@ -118,7 +118,7 @@ export default async function RootLayout({
 
           <div
             id="main-content"
-            className="relative z-10 flex min-h-screen flex-col nav-offset bg-background"
+            className="relative z-10 flex min-h-screen flex-col nav-offset bg-canvas"
           >
             {children}
           </div>

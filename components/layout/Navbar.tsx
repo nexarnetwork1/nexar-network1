@@ -22,8 +22,8 @@ export function Navbar() {
         className={cn(
           "fixed inset-x-0 top-0 z-30 transition-all duration-400",
           scrolled
-            ? "border-b border-border bg-background/92 py-3 backdrop-blur-xl"
-            : "border-b border-transparent bg-background/55 py-4 backdrop-blur-md",
+            ? "border-b border-border bg-chrome/92 py-3 backdrop-blur-xl"
+            : "border-b border-transparent bg-chrome/55 py-4 backdrop-blur-md",
         )}
       >
         <Container className="flex items-center justify-between gap-4 sm:gap-6">

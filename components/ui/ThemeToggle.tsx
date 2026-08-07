@@ -24,7 +24,7 @@ export function ThemeToggle({ className, compact = false }: ThemeToggleProps) {
       role="group"
       aria-label="Theme"
       className={cn(
-        "inline-flex items-center rounded-[0.625rem] border border-border bg-surface/80 p-0.5",
+        "inline-flex items-center rounded-[0.625rem] border border-border bg-chrome/90 p-0.5",
         className,
       )}
     >
@@ -39,11 +39,11 @@ export function ThemeToggle({ className, compact = false }: ThemeToggleProps) {
             aria-pressed={active}
             title={label}
             className={cn(
-              "inline-flex items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40",
+              "inline-flex items-center justify-center rounded-md transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40",
               compact ? "h-8 w-8" : "h-9 w-9",
               active
                 ? "bg-gold/15 text-gold"
-                : "text-muted hover:text-foreground hover:bg-foreground/5",
+                : "text-muted hover:text-foreground hover:bg-white/[0.04]",
             )}
           >
             <Icon className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} aria-hidden />

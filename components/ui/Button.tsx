@@ -21,13 +21,13 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 /** Boutique rectangles — soft radius, not Web3 pills. */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gold text-background border border-gold/40 hover:bg-gold-secondary",
+    "bg-gold text-on-gold border border-gold/40 hover:bg-gold-accent",
   secondary:
     "bg-transparent text-gold border border-gold/35 hover:bg-gold/10 hover:text-gold",
   outline:
     "bg-transparent text-foreground border border-border hover:border-gold/40 hover:text-gold",
   ghost:
-    "bg-transparent text-muted hover:text-foreground hover:bg-foreground/[0.04] border border-transparent",
+    "bg-transparent text-muted hover:text-foreground hover:bg-white/[0.04] border border-transparent",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -80,8 +80,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={setRefs}
         className={cn(
-          "group relative inline-flex items-center justify-center overflow-hidden rounded-[0.625rem] transition-all duration-300 ease-out active:scale-[0.98]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "group relative inline-flex items-center justify-center overflow-hidden rounded-[0.625rem] transition-all duration-150 ease-out active:scale-[0.98]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/45 focus-visible:ring-offset-2 focus-visible:ring-offset-chrome",
           "disabled:pointer-events-none disabled:opacity-50",
           variantStyles[variant],
           sizeStyles[size],

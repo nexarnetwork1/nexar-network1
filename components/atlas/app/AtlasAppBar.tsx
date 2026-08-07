@@ -29,7 +29,7 @@ export function AtlasAppBar() {
   };
 
   return (
-    <div className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur-xl atlas-app-bar">
+    <div className="sticky top-0 z-20 border-b border-border bg-chrome/95 backdrop-blur-xl atlas-app-bar">
       <div className="flex h-[var(--atlas-app-bar-height)] items-center justify-between gap-3 px-4 lg:px-6">
         <div className="flex items-center gap-3 min-w-0">
           <Link href="/atlas" className="flex items-center gap-2 shrink-0">
@@ -110,7 +110,7 @@ export function AtlasAppBar() {
                   message: "Sign in to ATLAS",
                 })
               }
-              className="hidden sm:inline-flex px-3 py-1.5 rounded-lg bg-gold text-background text-sm font-medium hover:bg-gold-secondary transition-colors"
+              className="hidden sm:inline-flex px-3 py-1.5 rounded-lg bg-gold text-on-gold text-sm font-medium hover:bg-gold-accent transition-colors duration-150"
             >
               Sign In
             </button>

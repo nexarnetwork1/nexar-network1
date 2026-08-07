@@ -138,7 +138,7 @@ export function AtlasSignInForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold px-4 py-3 text-sm font-semibold tracking-wide text-background transition-colors hover:bg-gold-secondary disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold px-4 py-3 text-sm font-semibold tracking-wide text-on-gold transition-colors hover:bg-gold-accent disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
           {isSubmitting ? "Signing in…" : "Sign In"}

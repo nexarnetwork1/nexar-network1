@@ -52,7 +52,7 @@ export function AtlasIdentityCard({
         </p>
       </header>
 
-      <div className="mb-4 flex rounded-full border border-border bg-background/60 p-1">
+      <div className="mb-4 flex rounded-full border border-border bg-surface-2/80 p-1">
         {(["signin", "register"] as const).map((tab) => (
           <button
             key={tab}

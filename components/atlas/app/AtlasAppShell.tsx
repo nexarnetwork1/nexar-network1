@@ -45,11 +45,11 @@ export function AtlasAppShell({
   hideRightSidebar = false,
 }: AtlasAppShellProps) {
   return (
-    <div className="min-h-screen bg-background text-foreground pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
+    <div className="min-h-screen bg-canvas text-foreground pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
       <AtlasAppBar />
 
       <div className="flex">
-        <aside className="hidden lg:block w-64 shrink-0 fixed left-0 top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0 border-r border-border overflow-y-auto z-10 bg-background">
+        <aside className="hidden lg:block w-64 shrink-0 fixed left-0 top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0 border-r border-border overflow-y-auto z-10 bg-chrome">
           <AtlasLeftSidebar />
         </aside>
 
@@ -62,7 +62,7 @@ export function AtlasAppShell({
         </main>
 
         {!hideRightSidebar && (
-          <aside className="hidden xl:block w-80 shrink-0 fixed right-0 top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0 border-l border-border overflow-y-auto z-10 bg-background">
+          <aside className="hidden xl:block w-80 shrink-0 fixed right-0 top-[calc(var(--nxr-nav-height)+var(--nxr-ticker-height)+var(--atlas-app-bar-height))] bottom-0 border-l border-border overflow-y-auto z-10 bg-chrome">
             <AtlasRightSidebar
               trendingBusinesses={trendingBusinesses}
               suggestedProfiles={suggestedProfiles}

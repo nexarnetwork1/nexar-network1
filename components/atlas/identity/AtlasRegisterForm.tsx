@@ -139,7 +139,7 @@ export function AtlasRegisterForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold px-4 py-3 text-sm font-semibold text-background hover:bg-gold-secondary disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gold/35 bg-gold px-4 py-3 text-sm font-semibold text-on-gold hover:bg-gold-accent disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
           {isSubmitting ? "Creating account…" : "Create Account"}

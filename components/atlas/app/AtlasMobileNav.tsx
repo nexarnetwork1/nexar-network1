@@ -27,7 +27,7 @@ export function AtlasMobileNav() {
   return (
     <>
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-xl border-t border-border"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-chrome/98 backdrop-blur-xl border-t border-border"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-label="ATLAS mobile navigation"
       >
