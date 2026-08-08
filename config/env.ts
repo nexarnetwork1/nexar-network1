@@ -1,6 +1,17 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+/**
+ * Next.js sets NODE_ENV=production during `next build` (compile/static phase).
+ * Runtime production secrets are enforced when the deployed app actually runs,
+ * not while collecting page data during compilation.
+ */
+function requiresRuntimeProductionSecrets(): boolean {
+  if (process.env.NODE_ENV !== "production") return false;
+  if (process.env.NEXT_PHASE === "phase-production-build") return false;
+  return true;
+}
+
 export const env = createEnv({
   server: {
     NODE_ENV: z
@@ -11,7 +22,7 @@ export const env = createEnv({
       .min(1)
       .optional()
       .refine(
-        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        (val) => !requiresRuntimeProductionSecrets() || Boolean(val),
         "SUPABASE_SERVICE_ROLE_KEY is required in production",
       ),
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
@@ -26,7 +37,7 @@ export const env = createEnv({
       .min(1)
       .optional()
       .refine(
-        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        (val) => !requiresRuntimeProductionSecrets() || Boolean(val),
         "CRON_SECRET is required in production",
       ),
     SUPER_ADMIN_SESSION_SECRET: z.string().min(32).optional(),
@@ -35,7 +46,7 @@ export const env = createEnv({
       .min(32)
       .optional()
       .refine(
-        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        (val) => !requiresRuntimeProductionSecrets() || Boolean(val),
         "AUTH_SECRET is required in production (min 32 characters)",
       ),
     AUTH_URL: z.string().url().optional(),
@@ -53,7 +64,7 @@ export const env = createEnv({
       .url()
       .optional()
       .refine(
-        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        (val) => !requiresRuntimeProductionSecrets() || Boolean(val),
         "UPSTASH_REDIS_REST_URL is required in production",
       ),
     UPSTASH_REDIS_REST_TOKEN: z
@@ -61,7 +72,7 @@ export const env = createEnv({
       .min(1)
       .optional()
       .refine(
-        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        (val) => !requiresRuntimeProductionSecrets() || Boolean(val),
         "UPSTASH_REDIS_REST_TOKEN is required in production",
       ),
     BOOTSTRAP_TOKEN: z.string().min(32).optional(),
@@ -152,7 +163,7 @@ export const env = createEnv({
 export type AppEnvironment = typeof env.NODE_ENV;
 
 export function isProduction(): boolean {
-  return env.NODE_ENV === "production";
+  return env.NODE_ENV === "production" && requiresRuntimeProductionSecrets();
 }
 
 export function isDevelopment(): boolean {

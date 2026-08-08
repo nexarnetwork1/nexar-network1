@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { canonical } from "@/lib/constants/seo";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { UserEntrySection } from "@/components/sections/UserEntrySection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { WhyNexarSection } from "@/components/sections/WhyNexarSection";
 import { TokenomicsSection } from "@/components/sections/TokenomicsSection";
@@ -20,6 +21,7 @@ export default function HomePage() {
   return (
     <main className="relative flex flex-1 flex-col">
       <HeroSection />
+      <UserEntrySection />
       <AboutSection />
       <WhyNexarSection />
       <TokenomicsSection />
