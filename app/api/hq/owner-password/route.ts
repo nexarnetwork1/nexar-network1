@@ -14,7 +14,7 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+  if (!assertSameOrigin(request, { strict: true })) return crossOriginForbiddenResponse();
 
   const session = await auth();
   if (!session?.user?.id) {

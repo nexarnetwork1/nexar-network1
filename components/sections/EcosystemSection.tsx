@@ -9,7 +9,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils/cn";
 
 const STATUS_STYLES = {
-  live: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  live: "bg-success/10 text-success border-success/30",
   building: "bg-gold/10 text-gold border-gold/20",
   planned: "bg-white/5 text-muted border-border",
 };

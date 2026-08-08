@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -15,7 +15,7 @@ export default async function ProfilePage() {
     redirect("/login?redirect=/profile");
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name, email, role, wallet_address, created_at")

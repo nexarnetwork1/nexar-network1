@@ -68,7 +68,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:text-gold"
       aria-label={label}
     >
-      {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
     </button>
   );
 }
@@ -361,7 +361,7 @@ export default function MarketPage() {
             </div>
             <div className="luxury-border rounded-2xl bg-card/60 p-6 backdrop-blur-xl">
               <p className="text-xs tracking-wide text-muted uppercase">Contract</p>
-              <p className="mt-2 font-heading text-2xl font-semibold text-emerald-400">
+              <p className="mt-2 font-heading text-2xl font-semibold text-success">
                 Verified
               </p>
             </div>
@@ -400,7 +400,7 @@ export default function MarketPage() {
                       <span className="text-3xl">{exchange.icon}</span>
                       <div className="flex-1">
                         <p className="font-heading text-lg font-semibold">{exchange.name}</p>
-                        <p className="text-xs text-emerald-400">{exchange.status}</p>
+                        <p className="text-xs text-success">{exchange.status}</p>
                       </div>
                       <ExternalLink className="h-4 w-4 text-muted" />
                     </div>

@@ -180,7 +180,7 @@ export function ComprehensivePlatformSettingsForm({ settings, latestFees }: Prop
       </SettingsGroup>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
-      {success && <p className="text-sm text-emerald-400">Settings saved</p>}
+      {success && <p className="text-sm text-success">Settings saved</p>}
 
       <Button type="submit" size="sm" disabled={saving}>
         {saving ? "Saving…" : "Save platform settings"}

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type BrandRecord = {
   id: string;
@@ -11,7 +11,7 @@ export type BrandRecord = {
 };
 
 export async function listApprovedBrands(limit = 50): Promise<BrandRecord[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("brands")
     .select("id, store_id, name, slug, logo_url, status, approved_at")
@@ -23,7 +23,7 @@ export async function listApprovedBrands(limit = 50): Promise<BrandRecord[]> {
 }
 
 export async function approveBrand(brandId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("approve_brand", { p_brand_id: brandId });
   if (error) return { success: false, error: error.message };
   const result = data as { success?: boolean; error?: string };

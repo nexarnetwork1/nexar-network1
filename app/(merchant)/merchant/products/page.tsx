@@ -145,7 +145,7 @@ export default async function MerchantProductsPage() {
                     </span>
                   </DashboardTableCell>
                   <DashboardTableCell hideBelow="md">
-                    <span className={product.is_active ? "text-emerald-400" : "text-muted"}>
+                    <span className={product.is_active ? "text-success" : "text-muted"}>
                       {product.is_active ? "Active" : "Inactive"}
                     </span>
                   </DashboardTableCell>

@@ -15,10 +15,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="space-y-2">
         {label && (
-          <label
-            htmlFor={textareaId}
-            className="block text-xs font-medium uppercase tracking-[0.14em] text-muted"
-          >
+          <label htmlFor={textareaId} className="nxr-label">
             {label}
           </label>
         )}
@@ -27,12 +24,12 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={textareaId}
           className={cn(
             "nxr-input w-full min-h-[100px] resize-y",
-            error && "border-danger/60 focus:border-danger focus:shadow-[0_0_0_3px_rgba(231,76,60,0.15)]",
+            error && "border-danger/60 focus:border-danger focus:shadow-[0_0_0_3px_rgba(239,68,68,0.15)]",
             className,
           )}
           {...props}
         />
-        {error && <p className="text-xs text-error">{error}</p>}
+        {error && <p className="text-xs text-danger">{error}</p>}
       </div>
     );
   },

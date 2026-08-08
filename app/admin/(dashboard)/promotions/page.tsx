@@ -75,7 +75,7 @@ export default async function AdminPromotionsPage() {
                     </DashboardTableCell>
                     <DashboardTableCell>
                       {p.is_active ? (
-                        <span className="text-emerald-400">Yes</span>
+                        <span className="text-success">Yes</span>
                       ) : (
                         <span className="text-muted">No</span>
                       )}

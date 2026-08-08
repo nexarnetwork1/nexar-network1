@@ -4,17 +4,9 @@ type SkeletonProps = {
   className?: string;
 };
 
-/** Soft pulse block for branded skeleton loaders. */
+/** Shimmer skeleton — uses global nxr-skeleton token animation. */
 export function Skeleton({ className }: SkeletonProps) {
-  return (
-    <div
-      className={cn(
-        "animate-pulse rounded-[var(--nxr-radius-sm)] bg-white/[0.06]",
-        className,
-      )}
-      aria-hidden
-    />
-  );
+  return <div className={cn("nxr-skeleton", className)} aria-hidden />;
 }
 
 type SkeletonTextProps = {

@@ -31,7 +31,7 @@ export function CurrencySelectField({
 
   return (
     <div className={containerClassName}>
-      {label && <label className="text-xs text-zinc-400">{label}</label>}
+      {label && <label className="nxr-label">{label}</label>}
       <div className={cn("flex items-center gap-2", label && "mt-1")}>
         {showLogo && displayCode && (!includeEmpty || displayCode) && (
           <CurrencyLogo code={displayCode} size={20} showLabel={false} />
@@ -39,10 +39,7 @@ export function CurrencySelectField({
         <select
           {...selectProps}
           defaultValue={defaultValue}
-          className={cn(
-            "flex-1 rounded-lg border border-border bg-surface/60 px-3 py-2 text-sm",
-            className
-          )}
+          className={cn("nxr-input flex-1 py-2", className)}
         >
           {includeEmpty && <option value="">{emptyLabel}</option>}
           {BRANDED_CURRENCIES.map((code) => {

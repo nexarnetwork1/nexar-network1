@@ -102,7 +102,7 @@ export function ConnectButton({
         disabled={pending || !connectionId}
         onClick={handleRemove}
         className={cn(
-          "inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm hover:bg-emerald-500/15 disabled:opacity-60",
+          "inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-success/30 bg-success/10 text-success text-sm hover:bg-success/15 disabled:opacity-60",
           className,
         )}
       >

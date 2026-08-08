@@ -323,6 +323,25 @@ export async function addPostCommentAction(input: {
     parentId: parsed.parentId,
   });
 
+  const post = await getNetworkPostById(parsed.postId);
+  const authorProfile = post?.author_profile_id
+    ? await getNetworkProfileById(post.author_profile_id)
+    : null;
+
+  if (authorProfile?.owner_user_id) {
+    await emitAndNotify({
+      name: "network.comment_created",
+      actorId: (await auth())?.user?.id ?? null,
+      businessId: post?.business_id ?? null,
+      userId: authorProfile.owner_user_id,
+      payload: {
+        postId: parsed.postId,
+        body: "Someone commented on your post.",
+        parentId: parsed.parentId ?? null,
+      },
+    });
+  }
+
   revalidateAtlas();
   return { success: true };
 }
@@ -341,6 +360,28 @@ export async function togglePostReactionAction(input: {
     profileId,
     reactionType: parsed.reactionType,
   });
+
+  if (result.reacted && parsed.targetType === "post") {
+    const post = await getNetworkPostById(parsed.targetId);
+    const authorProfile = post?.author_profile_id
+      ? await getNetworkProfileById(post.author_profile_id)
+      : null;
+    const session = await auth();
+
+    if (authorProfile?.owner_user_id && authorProfile.owner_user_id !== session?.user?.id) {
+      await emitAndNotify({
+        name: "network.reaction_created",
+        actorId: session?.user?.id ?? null,
+        businessId: post?.business_id ?? null,
+        userId: authorProfile.owner_user_id,
+        payload: {
+          postId: parsed.targetId,
+          reactionType: parsed.reactionType ?? "like",
+          body: "Someone reacted to your post.",
+        },
+      });
+    }
+  }
 
   revalidateAtlas();
   return { success: true, ...result };
@@ -575,6 +616,25 @@ export async function followProfileAction(input: {
   const parsed = followTargetSchema.parse(input);
   const { userId, profileId } = await requireNetworkProfile();
   await followTarget(profileId, userId, parsed);
+
+  if (parsed.targetType === "profile") {
+    const target = await getNetworkProfileById(parsed.targetId);
+    if (target?.owner_user_id && target.owner_user_id !== userId) {
+      await emitAndNotify({
+        name: "network.follow_created",
+        actorId: userId,
+        businessId: null,
+        userId: target.owner_user_id,
+        payload: {
+          followerProfileId: profileId,
+          targetId: parsed.targetId,
+          body: "Someone started following you.",
+          profileSlug: target.slug,
+        },
+      });
+    }
+  }
+
   revalidateAtlas();
   return { success: true };
 }
@@ -599,6 +659,23 @@ export async function requestConnectionAction(
     throw new Error("Cannot connect with yourself");
   }
   await requestConnection(profileId, userId, parsed);
+
+  const recipient = await getNetworkProfileById(parsed.recipientProfileId);
+  if (recipient?.owner_user_id) {
+    await emitAndNotify({
+      name: "network.connection_requested",
+      actorId: userId,
+      businessId: null,
+      userId: recipient.owner_user_id,
+      payload: {
+        requesterProfileId: profileId,
+        recipientProfileId: parsed.recipientProfileId,
+        body: "You received a new connection request.",
+        profileSlug: recipient.slug,
+      },
+    });
+  }
+
   revalidateAtlas();
   return { success: true };
 }
@@ -611,6 +688,24 @@ export async function acceptConnectionAction(input: { connectionId: string }) {
     throw new Error("Not authorized to accept this request");
   }
   await acceptConnection(parsed.connectionId, userId);
+
+  if (connection) {
+    const requester = await getNetworkProfileById(connection.requester_profile_id);
+    if (requester?.owner_user_id) {
+      await emitAndNotify({
+        name: "network.connection_accepted",
+        actorId: userId,
+        businessId: null,
+        userId: requester.owner_user_id,
+        payload: {
+          connectionId: parsed.connectionId,
+          body: "Your connection request was accepted.",
+          profileSlug: requester.slug,
+        },
+      });
+    }
+  }
+
   revalidateAtlas();
   return { success: true };
 }
@@ -636,6 +731,37 @@ export async function searchNetworkAction(
 ) {
   const parsed = searchNetworkSchema.parse(input);
   const session = await auth();
+
+  const type = parsed.type ?? "all";
+  const limit = parsed.limit ?? 20;
+  const offset = parsed.offset ?? 0;
+  const query = parsed.query.trim();
+
+  const canCache =
+    !session?.user?.id &&
+    type !== "messages" &&
+    offset === 0 &&
+    query.length >= 2;
+
+  if (canCache) {
+    const { cacheGetJson, cacheSetJson, cacheKey } = await import(
+      "@/lib/cache/search-cache"
+    );
+    const key = cacheKey(["search", type, query, String(limit)]);
+    const cached = await cacheGetJson<Awaited<ReturnType<typeof runNetworkSearch>>>(key);
+    if (cached) return cached;
+    const result = await runNetworkSearch(parsed, session);
+    void cacheSetJson(key, result, 60);
+    return result;
+  }
+
+  return runNetworkSearch(parsed, session);
+}
+
+async function runNetworkSearch(
+  parsed: import("./validators").SearchNetworkInput,
+  session: { user?: { id?: string } | null } | null,
+) {
   let viewerProfileId: string | undefined;
   if (session?.user?.id) {
     const person = await getPersonProfileByUserId(session.user.id);

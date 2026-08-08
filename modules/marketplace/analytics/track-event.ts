@@ -1,11 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { AnalyticsEventInput } from "../statistics/validators";
 
 export async function trackAnalyticsEvent(
   customerId: string | null,
   input: AnalyticsEventInput
 ): Promise<void> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase.from("commerce_analytics_events").insert({
     store_id: input.storeId ?? null,

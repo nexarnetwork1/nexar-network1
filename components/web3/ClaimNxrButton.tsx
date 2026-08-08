@@ -88,7 +88,7 @@ export function ClaimNxrButton({
       >
         <Gift className="h-4 w-4" aria-hidden />
         Claim NXR
-        <span className="ml-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-400">
+        <span className="ml-1 rounded-full bg-success/20 px-2 py-0.5 text-[10px] text-success">
           {claimableAmount >= 1000
             ? `${(claimableAmount / 1000).toFixed(1)}K`
             : claimableAmount.toFixed(0)}

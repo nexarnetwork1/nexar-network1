@@ -1,9 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getMerchantOrders } from "@/modules/orders/repository";
 import type { MerchantAnalytics } from "@/types";
 
 export async function getMerchantAnalytics(storeId: string): Promise<MerchantAnalytics> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const orders = await getMerchantOrders(storeId);
   const paidOrders = orders.filter((o) => o.status === "paid");
 

@@ -10,6 +10,18 @@ export const securityConfig = {
     api: { limit: 100, windowMs: 60_000 },
   },
   protectedPrefixes: ["/customer", "/merchant", "/admin", "/dashboard", "/profile", "/wallet", "/orders", "/invoices", "/settings", "/treasury", "/security"],
+  /** ATLAS routes that require authentication — public browse routes are excluded. */
+  atlasProtectedPrefixes: [
+    "/atlas/messages",
+    "/atlas/notifications",
+    "/atlas/profile/edit",
+    "/atlas/create-post",
+    "/atlas/jobs/new",
+    "/atlas/jobs/applications",
+    "/atlas/jobs/saved",
+    "/atlas/events/new",
+    "/atlas/business",
+  ],
   roleRoutes: {
     customer: ["/customer", "/dashboard", "/profile", "/wallet", "/orders", "/invoices"],
     merchant: ["/merchant", "/dashboard"],

@@ -186,7 +186,7 @@ export async function runPlatformOwnerWizard(
     })),
   );
 
-  await markBootstrapComplete({
+  const completed = await markBootstrapComplete({
     platformOwnerUserId: userId!,
     nexarBusinessId: businessId!,
     nexarWorkspaceId: workspaceId,
@@ -199,6 +199,9 @@ export async function runPlatformOwnerWizard(
       wizard: true,
     },
   });
+  if (!completed) {
+    throw new Error("Platform bootstrap already completed");
+  }
 
   await publishDomainEvent({
     id: randomUUID(),

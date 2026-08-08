@@ -41,7 +41,7 @@ function MerchantTile({ merchant }: { merchant: CommerceMerchantNetworkItem }) {
           <Globe2 className="h-3 w-3" />
           {merchant.country_code ?? "Global"}
         </span>
-        <span className="text-emerald-400">Verified</span>
+        <span className="text-success">Verified</span>
       </div>
     </motion.div>
   );

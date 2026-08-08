@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { PayNowButton } from "@/components/payments/PayNowButton";
 import { getInvoicePaymentOptions } from "@/modules/payments/repository";
@@ -10,7 +10,7 @@ type Props = { params: Promise<{ token: string }> };
 
 export default async function PublicInvoicePayPage({ params }: Props) {
   const { token } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase.rpc("resolve_invoice_share_token", {
     p_token: token,

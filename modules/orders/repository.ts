@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Order, OrderItem, OrderWithDetails } from "@/types";
 
 export async function getCustomerOrders(customerId: string): Promise<OrderWithDetails[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("orders")
     .select("*, store:stores(id, name, slug), items:order_items(*), invoice:invoices(*)")
@@ -14,7 +14,7 @@ export async function getCustomerOrders(customerId: string): Promise<OrderWithDe
 }
 
 export async function getMerchantOrders(storeId: string): Promise<OrderWithDetails[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("orders")
     .select("*, store:stores(id, name, slug), items:order_items(*), invoice:invoices(*)")
@@ -26,7 +26,7 @@ export async function getMerchantOrders(storeId: string): Promise<OrderWithDetai
 }
 
 export async function getAllOrders(): Promise<OrderWithDetails[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("orders")
     .select("*, store:stores(id, name, slug), items:order_items(*), invoice:invoices(*)")
@@ -38,7 +38,7 @@ export async function getAllOrders(): Promise<OrderWithDetails[]> {
 }
 
 export async function getOrderById(orderId: string): Promise<OrderWithDetails | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("orders")
     .select(
@@ -52,7 +52,7 @@ export async function getOrderById(orderId: string): Promise<OrderWithDetails | 
 }
 
 export async function getOrderItems(orderId: string): Promise<OrderItem[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("order_items")
     .select("*")

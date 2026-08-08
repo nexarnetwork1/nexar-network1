@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { isStripeConfigured } from "@/lib/stripe/server";
 import type { PaymentSession } from "@/types";
 
@@ -11,7 +11,7 @@ export type InvoicePaymentOptions = {
 export async function getInvoicePaymentOptions(
   storeId: string
 ): Promise<InvoicePaymentOptions> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: settings } = await supabase
     .from("store_settings")
     .select("accepts_crypto, accepts_card")
@@ -28,7 +28,7 @@ export async function getInvoicePaymentOptions(
 export async function getPaymentSession(
   sessionId: string
 ): Promise<PaymentSession | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("payment_sessions")
     .select("*")
@@ -42,7 +42,7 @@ export async function getPaymentSession(
 export async function getPaymentSessionByInvoice(
   invoiceId: string
 ): Promise<PaymentSession | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("payment_sessions")
     .select("*")
@@ -56,7 +56,7 @@ export async function getPaymentSessionByInvoice(
 }
 
 export async function getSessionWithInvoice(sessionId: string) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("payment_sessions")
     .select("*, invoice:invoices(*)")

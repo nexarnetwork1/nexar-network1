@@ -43,7 +43,7 @@ export function HeroCounters() {
       );
     }
     return (
-      <Link href="/presale" className="text-emerald-400 hover:underline">
+      <Link href="/presale" className="text-success hover:underline">
         Live · 0 sold
       </Link>
     );

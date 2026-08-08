@@ -43,7 +43,7 @@ export function AtlasIdentityMessage({
 }) {
   const styles = {
     info: "border-gold/30 bg-gold/5 text-gold-secondary",
-    success: "border-emerald-500/25 bg-emerald-500/5 text-emerald-400",
+    success: "border-success/30 bg-success/10 text-success",
     error: "border-red-500/25 bg-red-500/5 text-red-400",
   } as const;
 

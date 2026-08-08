@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/modules/users/repository";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getUnreadNotificationCount } from "@/modules/notifications/repository";
 import {
   DashboardCard,
@@ -27,7 +27,7 @@ export default async function CustomerDashboardPage() {
   redirect("/login?redirect=/customer");
 }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const [
     { count: pendingOrders },

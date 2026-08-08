@@ -195,6 +195,36 @@ export const NOTIFICATION_HUB_EVENTS: Record<
     body: "An event you registered for is starting soon.",
     channels: ["in_app", "push"],
   },
+  "network.follow_created": {
+    title: "New follower",
+    body: "Someone started following you.",
+    channels: ["in_app"],
+  },
+  "network.connection_requested": {
+    title: "Connection request",
+    body: "You received a new connection request.",
+    channels: ["in_app", "push"],
+  },
+  "network.connection_accepted": {
+    title: "Connection accepted",
+    body: "Your connection request was accepted.",
+    channels: ["in_app"],
+  },
+  "network.comment_created": {
+    title: "New comment",
+    body: "Someone commented on your post.",
+    channels: ["in_app", "push"],
+  },
+  "network.reaction_created": {
+    title: "New reaction",
+    body: "Someone reacted to your post.",
+    channels: ["in_app"],
+  },
+  "connect.message_sent": {
+    title: "New message",
+    body: "You have a new message.",
+    channels: ["in_app", "push"],
+  },
 };
 
 export const SEARCH_INDEX_EVENTS: Record<

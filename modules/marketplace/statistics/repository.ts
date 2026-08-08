@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   globalCommerceStatisticsSchema,
   marketplaceStatisticsSchema,
@@ -54,7 +54,7 @@ function parseMarketplaceStats(data: unknown) {
 }
 
 export async function getGlobalCommerceStatistics() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("get_global_commerce_statistics");
   if (error || data == null) {
     if (error) warnUnavailable("get_global_commerce_statistics", error.message);
@@ -64,7 +64,7 @@ export async function getGlobalCommerceStatistics() {
 }
 
 export async function getMarketplaceStatistics(limit = 12) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("get_marketplace_statistics", {
     p_limit: limit,
   });
@@ -76,7 +76,7 @@ export async function getMarketplaceStatistics(limit = 12) {
 }
 
 export async function getMerchantCommerceAnalytics(storeId: string, days = 30) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("get_merchant_commerce_analytics", {
     p_store_id: storeId,
     p_days: days,
@@ -90,7 +90,7 @@ export async function getMerchantCommerceAnalytics(storeId: string, days = 30) {
 }
 
 export async function getLiveCommerceMetrics() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("commerce_live_metrics")
     .select("payload, updated_at")

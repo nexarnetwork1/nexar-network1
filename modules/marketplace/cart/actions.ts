@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCatalogProductById } from "@/modules/marketplace/catalog";
 import { getOrCreateMarketplaceCart } from "./application/get-or-create-cart";
 import { requireRole } from "@/modules/users/repository";
@@ -42,7 +42,7 @@ export async function addToCartAction(
     return { success: false, error: "Could not open cart" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: existing } = await supabase
     .from("cart_items")
     .select("id, quantity")
@@ -91,7 +91,7 @@ export async function updateCartItemQuantityAction(
     return removeCartItemAction(cartItemId);
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: line } = await supabase
     .from("cart_items")
     .select("product_id, cart:carts(customer_id)")
@@ -124,7 +124,7 @@ export async function removeCartItemAction(cartItemId: string): Promise<ActionRe
     return { success: false, error: "Please sign in." };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase.from("cart_items").delete().eq("id", cartItemId);
 
   if (error) return { success: false, error: error.message };

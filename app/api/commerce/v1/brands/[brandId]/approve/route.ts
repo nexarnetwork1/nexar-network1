@@ -6,7 +6,7 @@ import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/o
 type Props = { params: Promise<{ brandId: string }> };
 
 export async function POST(request: Request, { params }: Props) {
-  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+  if (!assertSameOrigin(request, { strict: true })) return crossOriginForbiddenResponse();
 
   try {
     await requireSuperAdmin();

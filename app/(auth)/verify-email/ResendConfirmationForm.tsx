@@ -32,7 +32,7 @@ export function ResendConfirmationForm({ email }: Props) {
 
   return (
     <div>
-      {message && <p className="text-sm text-emerald-400">{message}</p>}
+      {message && <p className="text-sm text-success">{message}</p>}
       {error && <p className="text-sm text-red-400">{error}</p>}
       <Button
         type="button"

@@ -246,6 +246,7 @@ export async function sendMessage(
       messageId: message.id,
       conversationId: input.conversationId,
       messageType: input.messageType,
+      body: input.body ?? undefined,
       nextActions: recommendNextActionsFromMessage({
         messageType: input.messageType,
         body: input.body,
@@ -260,6 +261,24 @@ export async function sendMessage(
       }),
     },
   });
+
+  const participants = await getParticipantsByConversation(input.conversationId);
+  const { dispatchNotificationHub } = await import("@/modules/atlas-core/service");
+  for (const participant of participants) {
+    if (!participant.user_id || participant.user_id === input.senderUserId) continue;
+    await dispatchNotificationHub({
+      userId: participant.user_id,
+      eventName: "connect.message_sent",
+      title: "New message",
+      body: input.body?.slice(0, 120) ?? "You have a new message.",
+      channels: ["in_app", "push"],
+      metadata: {
+        conversationId: input.conversationId,
+        messageId: message.id,
+        event: "connect.message_sent",
+      },
+    }).catch(() => undefined);
+  }
 
   if (input.messageType === "invoice") {
     await emit("connect.invoice_shared", {

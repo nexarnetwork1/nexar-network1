@@ -1,27 +1,31 @@
+/**
+ * Nexar Network — JavaScript design tokens.
+ * CSS custom properties in `app/globals.css` are the runtime source of truth.
+ * Use these constants only where CSS variables cannot apply (charts, canvas, emails).
+ */
 export const COLORS = {
   canvas: "#050505",
   canvasSecondary: "#090909",
   chrome: "#090909",
-  surface: "#090909",
-  card: "#101010",
-  cardHover: "#171717",
-  cardActive: "#1C1C1C",
-  cardElevated: "#121212",
-  border: "rgba(255, 255, 255, 0.06)",
+  surface: "#111111",
+  card: "#151515",
+  cardHover: "#1B1B1B",
+  cardActive: "#1B1B1B",
+  cardElevated: "#151515",
+  border: "rgba(255, 255, 255, 0.08)",
   borderHover: "rgba(212, 175, 55, 0.28)",
   gold: "#D4AF37",
   goldHover: "#F4D27A",
-  goldSecondary: "#F4D27A",
   goldSoft: "rgba(212, 175, 55, 0.14)",
   white: "#FFFFFF",
   textPrimary: "#FFFFFF",
-  textSecondary: "#B8B8B8",
-  muted: "#777777",
+  textSecondary: "#D5D5D5",
+  muted: "#8E8E8E",
   onGold: "#050505",
-  success: "#00C853",
-  danger: "#E74C3C",
+  success: "#22C55E",
+  danger: "#EF4444",
   warning: "#F59E0B",
-  info: "#2EA8FF",
+  info: "rgba(212, 175, 55, 0.72)",
 } as const;
 
 export const CANVAS_LIGHT = {
@@ -44,6 +48,8 @@ export const TYPE_SCALE = {
   body: "1rem",
   small: "0.875rem",
   caption: "0.75rem",
+  label: "0.75rem",
+  button: "0.875rem",
 } as const;
 
 export const ANIMATION = {
@@ -58,9 +64,9 @@ export const ANIMATION = {
 export const RADIUS = {
   sm: "0.5rem",
   md: "0.75rem",
-  lg: "1rem",
-  xl: "1.125rem",
-  card: "1.125rem",
+  lg: "0.875rem",
+  xl: "1rem",
+  card: "1rem",
   button: "0.875rem",
 } as const;
 
@@ -75,4 +81,12 @@ export const SPACING = {
   8: "4rem",
   sectionY: "clamp(3rem, 8vw, 4rem)",
   cardPadding: "1.5rem",
+} as const;
+
+/** Shared control heights — buttons, inputs, selects. */
+export const CONTROL = {
+  heightSm: "2.25rem",
+  heightMd: "2.75rem",
+  heightLg: "3rem",
+  paddingX: "1.25rem",
 } as const;

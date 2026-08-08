@@ -67,7 +67,7 @@ export default async function AdminUsersPage() {
                   <DashboardTableCell className="capitalize">{user.role}</DashboardTableCell>
                   <DashboardTableCell hideBelow="sm">
                     {user.profile_completed ? (
-                      <span className="text-emerald-400">Complete</span>
+                      <span className="text-success">Complete</span>
                     ) : (
                       <span className="text-gold">Incomplete</span>
                     )}

@@ -39,7 +39,7 @@ export function JobCard({ job, compact }: JobCardProps) {
         <span
           className={cn(
             "shrink-0 px-2 py-0.5 rounded text-[10px] font-medium",
-            open ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-muted",
+            open ? "bg-success/10 text-success" : "bg-white/5 text-muted",
           )}
         >
           {open ? "Hiring" : "Closed"}

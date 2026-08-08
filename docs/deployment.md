@@ -25,6 +25,10 @@ Required production environment variables:
 - `PAYMENT_MASTER_SEED`, `TREASURY_WALLET_PRIVATE_KEY` (server-only, never client)
 - `BSC_RPC_URL`, `SENTRY_DSN`, `RESEND_API_KEY`, `EMAIL_FROM`
 - Optional: `ADMIN_ALERT_WEBHOOK_URL` for operational alerts
+- Optional: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` for distributed rate limiting
+- Optional: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` for product analytics
+- Optional: `BETTERSTACK_HEARTBEAT_URL` for uptime monitoring
+- Optional: `NEXT_PUBLIC_SENTRY_DSN` for client-side error capture
 
 ## Netlify Deployment
 
@@ -73,8 +77,11 @@ Backups are gzip SQL dumps retained 14 days under `backups/`.
 
 ## Monitoring
 
-- **Sentry**: errors and 5xx exceptions
+- **Sentry**: errors and 5xx exceptions (`SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`)
 - **Health**: `/api/health` for load balancer probes
+- **Better Stack**: optional uptime heartbeat via `BETTERSTACK_HEARTBEAT_URL`
+- **PostHog**: optional product analytics via `NEXT_PUBLIC_POSTHOG_KEY`
+- **Upstash Redis**: optional distributed cache/rate limit
 - **Admin alerts**: treasury/payment failures via `ADMIN_ALERT_WEBHOOK_URL`
 - **Audit logs**: `audit_logs` and `security_logs` tables
 

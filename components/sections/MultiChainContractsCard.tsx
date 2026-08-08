@@ -126,7 +126,7 @@ export function MultiChainContractsCard() {
               </div>
             ))}
           </div>
-          <p className="mt-4 text-sm text-emerald-400">
+          <p className="mt-4 text-sm text-success">
             Source verified on {PRESALE_NETWORK_LIST[0].explorerName}
           </p>
         </div>

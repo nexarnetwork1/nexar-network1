@@ -90,7 +90,7 @@ export function StoreSettingsForm({ settings }: StoreSettingsFormProps) {
         Accept card payments (Stripe)
       </label>
       {error && <p className="text-sm text-red-400">{error}</p>}
-      {success && <p className="text-sm text-emerald-400">Settings saved</p>}
+      {success && <p className="text-sm text-success">Settings saved</p>}
       <Button type="submit" disabled={submitting}>
         {submitting ? "Saving…" : "Save settings"}
       </Button>

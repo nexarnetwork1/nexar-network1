@@ -33,7 +33,7 @@ export const FEATURES: Feature[] = [
     description:
       "Mint permanently disabled. Smart contracts verified on BscScan with transparent allocation and auditable vesting schedules.",
     icon: Shield,
-    accent: "from-emerald-500/10 to-transparent",
+    accent: "from-gold/15 to-transparent",
     layout: "tall",
   },
   {
@@ -42,7 +42,7 @@ export const FEATURES: Feature[] = [
     description:
       "Built on BSC for high throughput and low fees — optimized for real-world merchant and consumer payment flows.",
     icon: Zap,
-    accent: "from-amber-400/15 to-transparent",
+    accent: "from-gold/15 to-transparent",
     layout: "standard",
   },
   {
@@ -51,7 +51,7 @@ export const FEATURES: Feature[] = [
     description:
       "Wallet, Pay, Explorer, Bridge, and Launchpad modules forming a cohesive network for developers and enterprises.",
     icon: Layers,
-    accent: "from-violet-500/10 to-transparent",
+    accent: "from-gold/10 to-transparent",
     layout: "standard",
   },
   {

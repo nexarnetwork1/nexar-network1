@@ -2,7 +2,7 @@
 
 import "server-only";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/modules/users/repository";
 import { wishlistRepository } from "@/modules/marketplace/wishlist/infrastructure/supabase-wishlist-repository";
 import type { StorefrontProduct } from "@/modules/marketplace/storefront/types";
@@ -29,7 +29,7 @@ export async function getWishlistProducts(): Promise<StorefrontProduct[]> {
   const productIds = await wishlistRepository.listProductIds(profile.id);
   if (!productIds.length) return [];
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)

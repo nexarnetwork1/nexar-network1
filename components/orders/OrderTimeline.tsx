@@ -129,7 +129,7 @@ export function OrderTimeline({
               <span
                 className={cn(
                   "absolute left-[15px] top-8 h-full w-0.5",
-                  step.completed ? "bg-emerald-500/50" : "bg-border"
+                  step.completed ? "bg-success/100" : "bg-border"
                 )}
                 aria-hidden
               />
@@ -140,7 +140,7 @@ export function OrderTimeline({
                 step.current
                   ? "border-gold bg-gold/20 text-gold"
                   : step.completed
-                    ? "border-emerald-500 bg-emerald-500/20 text-emerald-400"
+                    ? "border-success bg-success/20 text-success"
                     : "border-border bg-surface text-muted"
               )}
               aria-current={step.current ? "step" : undefined}

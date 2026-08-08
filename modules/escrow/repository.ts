@@ -1,9 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Escrow, EscrowStatus } from "@/types";
 
 export async function getEscrowByOrderId(orderId: string): Promise<Escrow | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("escrows")
     .select("*")
@@ -13,7 +13,7 @@ export async function getEscrowByOrderId(orderId: string): Promise<Escrow | null
 }
 
 export async function getStoreEscrows(storeId: string, status?: EscrowStatus): Promise<Escrow[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   let query = supabase
     .from("escrows")
     .select("*")
@@ -25,7 +25,7 @@ export async function getStoreEscrows(storeId: string, status?: EscrowStatus): P
 }
 
 export async function getHeldEscrowBalance(storeId: string): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("escrows")
     .select("amount")
@@ -65,7 +65,7 @@ export async function refundEscrow(
 }
 
 export async function getEscrowEvents(escrowId: string) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("escrow_events")
     .select("*")

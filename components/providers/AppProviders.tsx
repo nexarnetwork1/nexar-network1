@@ -12,6 +12,7 @@ import { AdminAccessPrompt } from "@/components/layout/AdminAccessPrompt";
 import { NexarAssistant } from "@/components/assistant/NexarAssistant";
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -59,15 +60,17 @@ export function AppProviders({ children }: AppProvidersProps) {
     <QueryProvider>
       <SessionProvider>
         <ThemeProvider>
-          <Web3Provider>
-            <CommerceAuthShell>
-              <Suspense fallback={null}>
-                <AdminAccessPrompt />
-              </Suspense>
-              {children}
-              <NexarAssistant />
-            </CommerceAuthShell>
-          </Web3Provider>
+          <PostHogProvider>
+            <Web3Provider>
+              <CommerceAuthShell>
+                <Suspense fallback={null}>
+                  <AdminAccessPrompt />
+                </Suspense>
+                {children}
+                <NexarAssistant />
+              </CommerceAuthShell>
+            </Web3Provider>
+          </PostHogProvider>
         </ThemeProvider>
       </SessionProvider>
     </QueryProvider>

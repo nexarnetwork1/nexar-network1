@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { rateLimit } from "@/lib/security/rate-limit";
+import { rateLimitAsync } from "@/lib/security/rate-limit";
 import { authConfig } from "@/config/auth";
 import { securityLogger } from "@/lib/logging/security-logger";
 
@@ -35,7 +35,7 @@ function isRscOrPrefetchRequest(request: NextRequest): boolean {
   );
 }
 
-export function applyRateLimit(request: NextRequest): Response | null {
+export async function applyRateLimit(request: NextRequest): Promise<Response | null> {
   const ip = getClientIp(request);
   const { pathname } = request.nextUrl;
 
@@ -48,7 +48,7 @@ export function applyRateLimit(request: NextRequest): Response | null {
   }
 
   if (pathname.startsWith("/api/webhooks")) {
-    const { allowed } = rateLimit(`webhook:${ip}`, "api");
+    const { allowed } = await rateLimitAsync(`webhook:${ip}`, "api");
     if (!allowed) {
       securityLogger.rateLimitHit(ip, pathname);
       return Response.json({ error: "Too many requests" }, { status: 429 });
@@ -61,7 +61,34 @@ export function applyRateLimit(request: NextRequest): Response | null {
       return null;
     }
 
-    const { allowed } = rateLimit(`auth:${ip}`, "auth");
+    const { allowed } = await rateLimitAsync(`auth:${ip}`, "auth");
+    if (!allowed) {
+      securityLogger.rateLimitHit(ip, pathname);
+      return Response.json({ error: "Too many requests" }, { status: 429 });
+    }
+  }
+
+  if (pathname === "/api/hq/bootstrap" && request.method === "POST") {
+    const { allowed } = await rateLimitAsync(`bootstrap:${ip}`, "bootstrap");
+    if (!allowed) {
+      securityLogger.rateLimitHit(ip, pathname);
+      return Response.json({ error: "Too many requests" }, { status: 429 });
+    }
+  }
+
+  if (pathname === "/api/search" && request.method !== "GET") {
+    const { allowed } = await rateLimitAsync(`search:${ip}`, "search");
+    if (!allowed) {
+      securityLogger.rateLimitHit(ip, pathname);
+      return Response.json({ error: "Too many requests" }, { status: 429 });
+    }
+  }
+
+  if (
+    pathname.startsWith("/api/assistant") ||
+    pathname.includes("/messages")
+  ) {
+    const { allowed } = await rateLimitAsync(`messaging:${ip}`, "messaging");
     if (!allowed) {
       securityLogger.rateLimitHit(ip, pathname);
       return Response.json({ error: "Too many requests" }, { status: 429 });
@@ -69,7 +96,7 @@ export function applyRateLimit(request: NextRequest): Response | null {
   }
 
   if (pathname === "/contact" || pathname.startsWith("/contact/")) {
-    const { allowed } = rateLimit(`contact:${ip}`, "auth");
+    const { allowed } = await rateLimitAsync(`contact:${ip}`, "auth");
     if (!allowed) {
       securityLogger.rateLimitHit(ip, pathname);
       return Response.json({ error: "Too many requests" }, { status: 429 });
@@ -77,7 +104,7 @@ export function applyRateLimit(request: NextRequest): Response | null {
   }
 
   if (pathname.includes("/checkout") || pathname.startsWith("/api/")) {
-    const { allowed } = rateLimit(`api:${ip}`, "api");
+    const { allowed } = await rateLimitAsync(`api:${ip}`, "api");
     if (!allowed && !pathname.startsWith("/api/health")) {
       securityLogger.rateLimitHit(ip, pathname);
       return Response.json({ error: "Too many requests" }, { status: 429 });

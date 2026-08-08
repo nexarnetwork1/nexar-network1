@@ -14,8 +14,13 @@ import { ATLAS_APP_BAR_ITEMS } from "@/config/atlas-app-nav";
 import { getAtlasAppNavIcon } from "@/components/atlas/app/atlas-app-nav-icons";
 import { openAtlasAssistant } from "@/components/atlas/app/AtlasWorkspaceContext";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { AtlasNotificationBell } from "@/components/atlas/app/AtlasNotificationBell";
 
-export function AtlasAppBar() {
+type AtlasAppBarProps = {
+  unreadNotificationCount?: number;
+};
+
+export function AtlasAppBar({ unreadNotificationCount = 0 }: AtlasAppBarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
@@ -70,6 +75,19 @@ export function AtlasAppBar() {
           {ATLAS_APP_BAR_ITEMS.map((item) => {
             const Icon = getAtlasAppNavIcon(item.icon);
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+            if (item.id === "notifications" && session?.user?.id) {
+              return (
+                <AtlasNotificationBell
+                  key={item.id}
+                  userId={session.user.id}
+                  initialCount={unreadNotificationCount}
+                  href={item.href}
+                  isActive={isActive}
+                  title={item.appBarTitle ?? item.label}
+                />
+              );
+            }
 
             if (item.requiresAuth && !session) {
               return (

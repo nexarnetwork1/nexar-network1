@@ -71,7 +71,9 @@ export function handleAuthRouting(
 
     if (
       !profile.profile_completed &&
-      pathname !== authConfig.profileCompletionRoute
+      pathname !== authConfig.profileCompletionRoute &&
+      !pathname.startsWith("/auth/change-password") &&
+      !pathname.startsWith("/auth/enable-2fa")
     ) {
       return NextResponse.redirect(
         new URL(authConfig.profileCompletionRoute, request.url)

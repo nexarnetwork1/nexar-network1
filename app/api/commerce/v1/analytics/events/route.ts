@@ -5,7 +5,7 @@ import { analyticsEventSchema } from "@/modules/marketplace/statistics/validator
 import { assertSameOrigin, crossOriginForbiddenResponse } from "@/lib/security/origin-check";
 
 export async function POST(request: Request) {
-  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+  if (!assertSameOrigin(request, { strict: true })) return crossOriginForbiddenResponse();
 
   let body: unknown;
   try {

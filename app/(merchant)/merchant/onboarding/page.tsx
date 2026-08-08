@@ -5,7 +5,7 @@ import { getMerchantStore } from "@/modules/stores/repository";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { StoreSetupProgress } from "@/components/merchant/StoreSetupProgress";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { merchantCommerceConfig } from "@/config/merchant-commerce";
 import { DashboardActions, DashboardCard } from "@/components/dashboard";
 
@@ -24,7 +24,7 @@ export default async function MerchantOnboardingPage() {
     redirect("/merchant");
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { count: productCount } = await supabase
     .from("products")
     .select("id", { count: "exact", head: true })

@@ -16,7 +16,7 @@ import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 gsap.registerPlugin(ScrollTrigger);
 
 const STATUS_CONFIG = {
-  completed: { icon: Check, color: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10" },
+  completed: { icon: Check, color: "text-success border-success/30 bg-success/10" },
   active: { icon: Circle, color: "text-gold border-gold/30 bg-gold/10" },
   upcoming: { icon: Circle, color: "text-muted border-border bg-card/60" },
 };

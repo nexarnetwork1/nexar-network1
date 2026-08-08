@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile, requireRole } from "@/modules/users/repository";
 import { markNotificationRead } from "./repository";
 import { updateNotificationPreferenceSchema } from "./validators";
@@ -34,7 +34,7 @@ export async function updateNotificationPreferenceAction(
     return { success: false, error: "Invalid notification preference" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase.from("notification_preferences").upsert(
     {
       user_id: profile.id,

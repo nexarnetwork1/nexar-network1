@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { tryCreateAdminClient } from "@/lib/supabase/admin";
 import { contactMessageSchema } from "./validators";
 import { sendEmail } from "@/lib/email/send";

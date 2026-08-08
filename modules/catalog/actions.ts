@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { productSchema, productCategorySchema, updateCategorySchema } from "./validators";
@@ -15,7 +15,7 @@ async function uploadProductImage(
   userId: string,
   file: File
 ): Promise<string | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${userId}/${Date.now()}.${ext}`;
 
@@ -148,7 +148,7 @@ export async function createCategoryAction(
   }
 
   const baseSlug = slugifyCategory(parsed.data.name);
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   let slug = baseSlug;
   let suffix = 0;
@@ -201,7 +201,7 @@ export async function updateCategoryAction(
   }
 
   const baseSlug = slugifyCategory(parsed.data.name);
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase
     .from("product_categories")
@@ -228,7 +228,7 @@ export async function deleteCategoryAction(
     return { success: false, error: "Store not found" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   await supabase
     .from("products")
@@ -301,7 +301,7 @@ export async function createProductAction(
     imageUrl = await uploadProductImage(profile.id, imageFile);
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("products")
     .insert({
@@ -381,7 +381,7 @@ export async function updateProductAction(
     if (uploaded) imageUrl = uploaded;
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const updatePayload: Record<string, unknown> = {
     name: parsed.data.name,
     description: parsed.data.description ?? null,
@@ -448,7 +448,7 @@ export async function deleteProductAction(
     return { success: false, error: "Store not found" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase
     .from("products")
     .delete()
@@ -474,7 +474,7 @@ export async function toggleProductActiveAction(
     return { success: false, error: "Store not found" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase
     .from("products")
     .update({ is_active: isActive })

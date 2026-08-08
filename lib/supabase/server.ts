@@ -3,24 +3,15 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { env } from "@/config/env";
-import { auth } from "@/auth";
-import { createAdminClient, isAdminClientConfigured } from "@/lib/supabase/admin";
 
 /**
- * Server Supabase client for marketplace data.
- * When an Auth.js session exists, uses the service-role client (RLS bypass)
- * because identity is no longer a Supabase JWT. Callers must scope by user id.
+ * Public / anon Supabase client for server components and route handlers.
+ *
+ * Does NOT bypass RLS and does NOT use the service role. Identity comes from
+ * Supabase cookies when present; Auth.js sessions are handled separately via
+ * `createAdminClient()` in guarded server code paths.
  */
 export async function createClient() {
-  try {
-    const session = await auth();
-    if (session?.user?.id && isAdminClientConfigured()) {
-      return createAdminClient();
-    }
-  } catch {
-    // Fall through to anon cookie client for public reads.
-  }
-
   const cookieStore = await cookies();
   return createServerClient(
     env.NEXT_PUBLIC_SUPABASE_URL,

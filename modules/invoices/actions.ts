@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { createNotification } from "@/modules/notifications/repository";
@@ -46,7 +46,7 @@ export async function createPaymentRequestAction(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("create_merchant_payment_request", {
     p_store_id: store.id,
     p_amount: parsed.data.amount,

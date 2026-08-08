@@ -4,6 +4,7 @@ import { privateAreaMetadata } from "@/lib/constants/seo";
 import { auth } from "@/auth";
 import { getActiveBusinesses } from "@/modules/business-hub/repository";
 import { getUpcomingEvents, getSuggestedProfiles, getSuggestedCompanies, getPersonProfileByUserId, getNetworkProfileByBusinessId } from "@/modules/atlas-network/repository";
+import { getUnreadNotificationCount } from "@/modules/notifications/repository";
 
 export const metadata: Metadata = {
   ...privateAreaMetadata,
@@ -23,11 +24,12 @@ export default async function AtlasLayout({
     excludeProfileId = person?.network_profile_id;
   }
 
-  const [businesses, events, suggested, suggestedCompanies] = await Promise.all([
+  const [businesses, events, suggested, suggestedCompanies, unreadCount] = await Promise.all([
     getActiveBusinesses({ limit: 5 }),
     getUpcomingEvents({ limit: 5 }),
     getSuggestedProfiles(excludeProfileId, 5),
     getSuggestedCompanies(5),
+    session?.user?.id ? getUnreadNotificationCount(session.user.id) : Promise.resolve(0),
   ]);
 
   const trendingWithNetwork = await Promise.all(
@@ -65,6 +67,8 @@ export default async function AtlasLayout({
 
   return (
     <AtlasAppShell
+      userId={session?.user?.id}
+      unreadNotificationCount={unreadCount}
       trendingBusinesses={trendingBusinesses}
       upcomingEvents={events}
       suggestedProfiles={suggestedProfiles}

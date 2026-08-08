@@ -73,7 +73,7 @@ export default async function AdminCurrenciesPage() {
                   <DashboardTableCell hideBelow="md">{currency.decimals}</DashboardTableCell>
                   <DashboardTableCell>
                     {currency.is_active ? (
-                      <span className="text-emerald-400">Enabled</span>
+                      <span className="text-success">Enabled</span>
                     ) : (
                       <span className="text-muted">Disabled</span>
                     )}

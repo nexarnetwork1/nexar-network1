@@ -105,7 +105,7 @@ export default async function AdminMerchantsPage() {
                         store.status === "pending"
                           ? "text-gold"
                           : store.status === "active"
-                            ? "text-emerald-400"
+                            ? "text-success"
                             : "text-red-400"
                       }
                     >

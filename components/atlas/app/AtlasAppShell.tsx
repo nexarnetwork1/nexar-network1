@@ -7,10 +7,13 @@ import { AtlasRightSidebar } from "./AtlasRightSidebar";
 import { AtlasMobileNav } from "./AtlasMobileNav";
 import { AtlasAppBar } from "./AtlasAppBar";
 import { AtlasWorkspaceProvider, useAtlasWorkspace } from "./AtlasWorkspaceContext";
+import { AtlasRealtimeProvider } from "@/components/realtime/AtlasRealtimeProvider";
 import type { NetworkEvent } from "@/modules/atlas-network/types";
 
 type AtlasAppShellProps = {
   children: ReactNode;
+  userId?: string;
+  unreadNotificationCount?: number;
   trendingBusinesses?: Array<{
     id: string;
     name: string;
@@ -40,6 +43,8 @@ type AtlasAppShellProps = {
 
 function AtlasAppShellInner({
   children,
+  userId,
+  unreadNotificationCount = 0,
   trendingBusinesses = [],
   upcomingEvents = [],
   suggestedProfiles = [],
@@ -52,7 +57,7 @@ function AtlasAppShellInner({
 
   return (
     <div className="min-h-screen bg-canvas text-foreground pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
-      <AtlasAppBar />
+      <AtlasAppBar unreadNotificationCount={unreadNotificationCount} />
 
       <div className="flex border-t border-border/50">
         <aside
@@ -100,7 +105,9 @@ function AtlasAppShellInner({
 export function AtlasAppShell(props: AtlasAppShellProps) {
   return (
     <AtlasWorkspaceProvider>
-      <AtlasAppShellInner {...props} />
+      <AtlasRealtimeProvider userId={props.userId}>
+        <AtlasAppShellInner {...props} />
+      </AtlasRealtimeProvider>
     </AtlasWorkspaceProvider>
   );
 }

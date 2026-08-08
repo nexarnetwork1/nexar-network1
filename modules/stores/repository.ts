@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Store, StoreSettings, QrCode } from "@/types";
 
 export async function getMerchantStores(ownerId: string): Promise<Store[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("stores")
     .select("*")
@@ -17,7 +17,7 @@ export async function getMerchantStore(
   ownerId: string,
   storeId?: string
 ): Promise<Store | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   let query = supabase.from("stores").select("*").eq("owner_id", ownerId);
   if (storeId) query = query.eq("id", storeId);
   const { data, error } = await query.limit(1).maybeSingle();
@@ -27,7 +27,7 @@ export async function getMerchantStore(
 }
 
 export async function getStoreBySlug(slug: string): Promise<Store | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("stores")
     .select("*")
@@ -40,7 +40,7 @@ export async function getStoreBySlug(slug: string): Promise<Store | null> {
 }
 
 export async function getStoreById(storeId: string): Promise<Store | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("stores")
     .select("*")
@@ -54,7 +54,7 @@ export async function getStoreById(storeId: string): Promise<Store | null> {
 export async function getStoreSettings(
   storeId: string
 ): Promise<StoreSettings | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("store_settings")
     .select("*")
@@ -66,7 +66,7 @@ export async function getStoreSettings(
 }
 
 export async function getStoreQrCodes(storeId: string): Promise<QrCode[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("qr_codes")
     .select("*")
@@ -79,7 +79,7 @@ export async function getStoreQrCodes(storeId: string): Promise<QrCode[]> {
 }
 
 export async function getStoreCustomers(storeId: string, limit = 100) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("orders")
     .select("customer_id, customer:profiles(id, full_name, email, created_at)")

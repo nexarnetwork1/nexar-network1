@@ -3,7 +3,6 @@ import { authConfig } from "@/config/auth";
 import { applyRateLimit, handleAuthRouting } from "@/lib/middleware";
 import { getProxySession } from "@/lib/auth/proxy-session";
 import { isHqRoute, isHqPublicRoute } from "@/lib/admin/routes";
-import { isPlatformOwnerRole } from "@/modules/atlas-hq/founder";
 
 /**
  * NEXAR HQ gate — Auth.js session + platform role with HQ access.
@@ -11,8 +10,8 @@ import { isPlatformOwnerRole } from "@/modules/atlas-hq/founder";
  */
 function handleHqRouting(
   request: NextRequest,
-  profile: { role?: string } | null,
   user: { id: string } | null,
+  hqAccess: boolean,
 ): NextResponse | null {
   const { pathname } = request.nextUrl;
 
@@ -26,13 +25,7 @@ function handleHqRouting(
     return NextResponse.redirect(login);
   }
 
-  const role = profile?.role ?? "";
-  const allowed =
-    isPlatformOwnerRole(role) ||
-    role === "admin" ||
-    role === "super_admin";
-
-  if (!allowed) {
+  if (!hqAccess) {
     return new NextResponse("Forbidden — NEXAR HQ access required", {
       status: 403,
     });
@@ -44,15 +37,15 @@ function handleHqRouting(
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const rateLimitResponse = applyRateLimit(request);
+  const rateLimitResponse = await applyRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
-  const { user, profile } = await getProxySession(request);
+  const { user, profile, hqAccess } = await getProxySession(request);
 
   const hqResponse = handleHqRouting(
     request,
-    profile,
     user ? { id: user.id } : null,
+    hqAccess,
   );
   if (hqResponse) return hqResponse;
 

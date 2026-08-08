@@ -1,11 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { MerchantProfile, MerchantVerificationLevel } from "@/types";
 
 export type VerificationStatus = MerchantProfile["verification_status"];
 
 export async function getMerchantVerification(profileId: string): Promise<MerchantProfile | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("merchant_profiles")
     .select("*")

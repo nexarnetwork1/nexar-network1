@@ -62,7 +62,7 @@ export function PlatformSettingsForm({ defaultValues }: PlatformSettingsFormProp
       <Input label="USDT token address" {...register("usdtToken")} />
 
       {serverError && <p className="text-sm text-red-400">{serverError}</p>}
-      {success && <p className="text-sm text-emerald-400">Settings saved</p>}
+      {success && <p className="text-sm text-success">Settings saved</p>}
 
       <Button type="submit" size="sm" disabled={isSubmitting}>
         {isSubmitting ? "Saving…" : "Save settings"}

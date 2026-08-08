@@ -28,7 +28,7 @@ function encodeSse(event: StreamEvent): string {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+  if (!assertSameOrigin(request, { strict: true })) return crossOriginForbiddenResponse();
 
   const { allowed } = await checkAssistantRateLimit();
   if (!allowed) {

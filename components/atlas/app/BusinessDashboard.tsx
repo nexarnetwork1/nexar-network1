@@ -75,7 +75,7 @@ export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
               <div className="flex items-center justify-between mb-2">
                 <Icon className="h-5 w-5 text-gold" />
                 {stat.change && (
-                  <span className="text-xs text-emerald-400">{stat.change}</span>
+                  <span className="text-xs text-success">{stat.change}</span>
                 )}
               </div>
               <p className="text-2xl font-bold">{stat.value}</p>
@@ -107,7 +107,7 @@ export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
                   <h3 className="font-semibold">{business.name}</h3>
                   <p className="text-sm text-muted">{business.tagline || "No tagline"}</p>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs capitalize">
+                <span className="px-3 py-1 rounded-full bg-success/10 text-success text-xs capitalize">
                   {business.status}
                 </span>
               </Link>

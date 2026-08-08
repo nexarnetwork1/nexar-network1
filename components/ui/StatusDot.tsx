@@ -14,8 +14,8 @@ const colorMap = {
     solid: "bg-gold",
   },
   green: {
-    ping: "bg-emerald-400",
-    solid: "bg-emerald-400",
+    ping: "bg-success",
+    solid: "bg-success",
   },
 };
 

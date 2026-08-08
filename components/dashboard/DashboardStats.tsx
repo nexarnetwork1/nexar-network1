@@ -5,11 +5,11 @@ import { DashboardCard } from "./DashboardCard";
 export type DashboardStatTone = "default" | "gold" | "success" | "warning" | "danger";
 
 const TONE_STYLES: Record<DashboardStatTone, string> = {
-  default: "text-white",
+  default: "text-foreground",
   gold: "text-gold",
   success: "text-success",
   warning: "text-gold-accent",
-  danger: "text-error",
+  danger: "text-danger",
 };
 
 type DashboardStatProps = {

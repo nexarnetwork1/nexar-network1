@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getActiveAtlasModules } from "@/config/atlas-nav";
 import { DashboardSection, DashboardCard, DashboardStats, DashboardStat } from "@/components/dashboard";
 import { ATLAS_BRAND } from "@/config/atlas-branding";
@@ -20,7 +20,7 @@ export default async function AtlasWorkspacePage() {
     redirect(`/login?redirect=/dashboard`);
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, role, full_name, profile_completed")

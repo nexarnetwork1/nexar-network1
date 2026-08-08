@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole } from "@/modules/users/repository";
 import { getExchangeRate, usdToCrypto } from "@/modules/settlement/fee-calculator";
@@ -38,7 +38,7 @@ export async function initiatePaymentAction(
 
   const { invoiceId: validInvoiceId, method: validMethod } = parsed.data;
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: invoice, error: invoiceError } = await supabase
     .from("invoices")
     .select("*")
@@ -181,7 +181,7 @@ export async function cancelPaymentSessionAction(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase.rpc("cancel_payment_session", {
     p_session_id: parsed.data.sessionId,
   });
@@ -203,7 +203,7 @@ export async function verifyPaymentAction(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: session, error } = await supabase
     .from("payment_sessions")
     .select("*, invoice:invoices(*), order:orders(*)")

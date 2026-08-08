@@ -24,7 +24,7 @@ const moderationButtonClass =
   "inline-flex min-h-11 items-center rounded-lg px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50";
 
 const MODERATION_ACTIONS = [
-  { value: "approved", label: "Approve", tone: "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" },
+  { value: "approved", label: "Approve", tone: "bg-success/10 text-success hover:bg-success/20" },
   { value: "hidden", label: "Hide", tone: "bg-surface text-white/80 hover:bg-white/10" },
   { value: "rejected", label: "Reject", tone: "bg-red-500/10 text-red-400 hover:bg-red-500/20" },
 ] as const;

@@ -127,13 +127,11 @@ export function ImprovedWalletConnect() {
 
     try {
       if (walletId === "metamask" || walletId === "rabby" || walletId === "coinbase") {
-        const accounts = await (window as any).ethereum.request({
+        await (window as any).ethereum.request({
           method: "eth_requestAccounts",
         });
-        console.log("Connected accounts:", accounts);
       } else if (walletId === "walletconnect") {
         // WalletConnect integration would go here
-        console.log("WalletConnect connection");
       }
       setIsOpen(false);
     } catch (err: any) {

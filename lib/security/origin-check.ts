@@ -1,21 +1,13 @@
 /**
  * Cross-site request forgery protection for cookie-authenticated route handlers.
- *
- * Server Actions already reject cross-origin submissions: Next.js compares the
- * `Origin` header against the `Host` header on every action POST and returns a
- * 403 on mismatch. Route handlers get no such treatment, so mutating handlers
- * that authenticate with an ambient cookie must check the origin themselves.
- *
- * This is the same defence the double-submit token in `lib/security/csrf.ts`
- * provides, without requiring clients to fetch and attach a token — browsers
- * have sent `Origin` on every POST since 2020, so a same-site caller always
- * passes and a cross-site caller always fails.
- *
- * Not for webhooks (Stripe is cross-origin by design and authenticates with a
- * signature) or cron endpoints (bearer token, no cookie).
  */
 import { securityLogger } from "@/lib/logging/security-logger";
 import { getClientIpFromRequest } from "@/lib/security/request-context";
+
+export type SameOriginOptions = {
+  /** When true, browser mutations without Origin/Referer are rejected. */
+  strict?: boolean;
+};
 
 function hostFromUrl(value: string): string | null {
   try {
@@ -45,13 +37,18 @@ function allowedHosts(request: Request): Set<string> {
 }
 
 /**
- * True when the request either came from an allowed origin or carries no
- * origin information at all (server-to-server callers, which cannot ride on a
- * victim's cookies).
+ * True when the request came from an allowed origin.
+ * Non-strict mode allows missing Origin/Referer (server-to-server callers).
+ * Strict mode rejects missing Origin/Referer for cookie-authenticated mutations.
  */
-export function isSameOriginRequest(request: Request): boolean {
+export function isSameOriginRequest(
+  request: Request,
+  options?: SameOriginOptions,
+): boolean {
   const stated = request.headers.get("origin") ?? request.headers.get("referer");
-  if (!stated) return true;
+  if (!stated) {
+    return !options?.strict;
+  }
 
   const statedHost = hostFromUrl(stated);
   if (!statedHost) return false;
@@ -60,8 +57,11 @@ export function isSameOriginRequest(request: Request): boolean {
 }
 
 /** Same as `isSameOriginRequest` but records rejections for the audit trail. */
-export function assertSameOrigin(request: Request): boolean {
-  if (isSameOriginRequest(request)) return true;
+export function assertSameOrigin(
+  request: Request,
+  options?: SameOriginOptions,
+): boolean {
+  if (isSameOriginRequest(request, options)) return true;
 
   securityLogger.log({
     event: "csrf_failed",
@@ -70,6 +70,7 @@ export function assertSameOrigin(request: Request): boolean {
     metadata: {
       origin: request.headers.get("origin"),
       referer: request.headers.get("referer"),
+      strict: Boolean(options?.strict),
     },
   });
 

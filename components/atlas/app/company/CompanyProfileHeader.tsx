@@ -86,7 +86,7 @@ export function CompanyProfileHeader({
                 <BadgeCheck className="h-5 w-5 text-gold shrink-0" />
               )}
               {isHiring && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-success/10 text-success border border-success/30">
                   We&apos;re hiring
                 </span>
               )}

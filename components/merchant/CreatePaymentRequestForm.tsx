@@ -59,8 +59,8 @@ export function CreatePaymentRequestForm() {
       </div>
       {error && <p className="text-sm text-red-400">{error}</p>}
       {payUrl && invoiceNumber && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm">
-          <p className="font-medium text-emerald-400">Invoice {invoiceNumber} created</p>
+        <div className="rounded-xl border border-success/30 bg-success/10 p-4 text-sm">
+          <p className="font-medium text-success">Invoice {invoiceNumber} created</p>
           <p className="mt-2 break-all text-muted">Share link:</p>
           <a href={payUrl} className="mt-1 block break-all text-gold hover:underline">
             {payUrl}

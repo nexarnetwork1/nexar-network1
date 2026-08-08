@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   ShopFilters,
   ShopSearchResult,
@@ -25,7 +25,7 @@ function mapProduct(row: Record<string, unknown>): StorefrontProduct {
 
 async function getProductRatings(productIds: string[]) {
   if (!productIds.length) return new Map<string, { avg: number; count: number }>();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("product_reviews")
     .select("product_id, rating")
@@ -50,7 +50,7 @@ async function getProductRatings(productIds: string[]) {
 }
 
 export async function getStoreBranding(storeId: string): Promise<StoreBranding | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("store_branding")
     .select("*")
@@ -64,7 +64,7 @@ export async function getStoreBranding(storeId: string): Promise<StoreBranding |
 }
 
 export async function searchShop(filters: ShopFilters): Promise<ShopSearchResult> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const page = Math.max(1, filters.page ?? 1);
   const limit = Math.min(filters.limit ?? 24, 48);
   const offset = (page - 1) * limit;
@@ -150,7 +150,7 @@ export async function getProductDetail(
   handle: string,
   customerId?: string,
 ): Promise<StorefrontProductDetail | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   let query = supabase
     .from("products")

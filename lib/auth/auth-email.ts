@@ -1,10 +1,7 @@
 import { randomBytes, createHash } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/send";
-
-function appUrl() {
-  return (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
-}
+import { getAppBaseUrl } from "@/lib/auth/app-url";
 
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -50,7 +47,7 @@ export async function consumeToken(identifier: string, token: string) {
 export async function sendVerificationEmail(email: string) {
   const raw = randomBytes(32).toString("hex");
   await storeToken(`verify:${email.toLowerCase()}`, raw, 1000 * 60 * 60 * 24);
-  const url = `${appUrl()}/auth/verify?token=${raw}&email=${encodeURIComponent(email)}`;
+  const url = `${getAppBaseUrl()}/auth/verify?token=${raw}&email=${encodeURIComponent(email)}`;
   return sendEmail({
     to: email,
     subject: "Verify your Nexar Network email",
@@ -62,7 +59,7 @@ export async function sendVerificationEmail(email: string) {
 export async function sendPasswordResetEmail(email: string) {
   const raw = randomBytes(32).toString("hex");
   await storeToken(`reset:${email.toLowerCase()}`, raw, 1000 * 60 * 60);
-  const url = `${appUrl()}/reset-password?token=${raw}&email=${encodeURIComponent(email)}`;
+  const url = `${getAppBaseUrl()}/reset-password?token=${raw}&email=${encodeURIComponent(email)}`;
   return sendEmail({
     to: email,
     subject: "Reset your Nexar Network password",
@@ -74,7 +71,7 @@ export async function sendPasswordResetEmail(email: string) {
 export async function sendChangeEmailVerification(newEmail: string, userId: string) {
   const raw = randomBytes(32).toString("hex");
   await storeToken(`change-email:${userId}:${newEmail.toLowerCase()}`, raw, 1000 * 60 * 60);
-  const url = `${appUrl()}/auth/verify-email-change?token=${raw}&email=${encodeURIComponent(newEmail)}&uid=${userId}`;
+  const url = `${getAppBaseUrl()}/auth/verify-email-change?token=${raw}&email=${encodeURIComponent(newEmail)}&uid=${userId}`;
   return sendEmail({
     to: newEmail,
     subject: "Confirm your new email — Nexar Network",

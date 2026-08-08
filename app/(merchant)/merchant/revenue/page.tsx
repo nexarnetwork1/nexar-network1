@@ -4,7 +4,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
 import { getMerchantOrders } from "@/modules/orders/repository";
 import { getMerchantProfile } from "@/modules/wallet/repository";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { UsdAmount } from "@/components/payments/CurrencyAmount";
 import {
   DashboardCard,
@@ -29,7 +29,7 @@ export default async function MerchantRevenuePage() {
   ]);
   const paidOrders = orders.filter((o) => o.status === "paid");
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: settlements } = await supabase
     .from("settlements")
     .select("*")

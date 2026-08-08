@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { handleApiError } from "@/lib/api/errors";
 
 type RouteParams = { params: Promise<{ token: string }> };
@@ -7,7 +7,7 @@ type RouteParams = { params: Promise<{ token: string }> };
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const { token } = await params;
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const { data, error } = await supabase.rpc("resolve_invoice_share_token", {
       p_token: token,

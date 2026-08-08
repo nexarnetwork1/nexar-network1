@@ -353,7 +353,7 @@ function JobPostPreview({ post }: { post: NetworkFeedPost }) {
             <p className="font-medium text-sm line-clamp-2">{post.title ?? "Open Role"}</p>
             <span
               className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded ${
-                open ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-muted"
+                open ? "bg-success/10 text-success" : "bg-white/5 text-muted"
               }`}
             >
               {open ? "Hiring" : "Closed"}

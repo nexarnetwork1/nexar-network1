@@ -155,7 +155,7 @@ export function BlockchainVisualization() {
           const py = from.y + (to.y - from.y) * packetProgress;
           ctx.beginPath();
           ctx.arc(px, py, 2, 0, Math.PI * 2);
-          ctx.fillStyle = `${COLORS.goldSecondary}cc`;
+          ctx.fillStyle = `${COLORS.goldHover}cc`;
           ctx.fill();
         }
       }
@@ -176,7 +176,7 @@ export function BlockchainVisualization() {
         ctx.lineWidth = isCenter ? 1.5 : 1;
         ctx.stroke();
 
-        ctx.fillStyle = isCenter ? COLORS.goldSecondary : COLORS.muted;
+        ctx.fillStyle = isCenter ? COLORS.goldHover : COLORS.muted;
         ctx.font = `${isCenter ? 10 : 8}px var(--font-space-grotesk)`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";

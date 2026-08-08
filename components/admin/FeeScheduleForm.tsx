@@ -97,7 +97,7 @@ export function FeeScheduleForm() {
         {isSubmitting ? "Saving…" : "Add schedule"}
       </Button>
       {serverError && <p className="w-full text-sm text-red-400">{serverError}</p>}
-      {success && <p className="w-full text-sm text-emerald-400">Fee schedule added</p>}
+      {success && <p className="w-full text-sm text-success">Fee schedule added</p>}
     </form>
   );
 }

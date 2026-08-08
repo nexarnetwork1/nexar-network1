@@ -35,7 +35,7 @@ export function PresalePortfolio() {
           </div>
           <div className="flex justify-between text-sm">
             <dt className="text-muted">Claimable</dt>
-            <dd className="font-mono text-emerald-400">{claimableAmount.toLocaleString()} NXR</dd>
+            <dd className="font-mono text-success">{claimableAmount.toLocaleString()} NXR</dd>
           </div>
           <div className="flex justify-between text-sm">
             <dt className="text-muted">Claimed</dt>

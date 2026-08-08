@@ -75,11 +75,20 @@ export default async function RootLayout({
         />
         <Toaster
           position="bottom-center"
-          richColors
           theme="dark"
+          closeButton
           toastOptions={{
             classNames: {
-              toast: "nxr-card border-border text-foreground",
+              toast:
+                "nxr-card !border-border !bg-card !text-foreground !shadow-[var(--nxr-shadow-soft)]",
+              title: "!text-foreground !text-sm !font-medium",
+              description: "!text-muted !text-sm",
+              actionButton: "!nxr-btn-primary !text-on-gold !text-xs",
+              cancelButton: "!nxr-btn-secondary !text-xs",
+              closeButton: "!text-muted hover:!text-foreground",
+              success: "!border-success/30 !bg-success/10",
+              error: "!border-danger/30 !bg-danger/10",
+              warning: "!border-warning/30 !bg-gold-soft",
             },
             duration: 4200,
           }}

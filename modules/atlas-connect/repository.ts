@@ -808,3 +808,103 @@ export async function searchConnectWorkspace(input: {
 
   return rankSearchHits(hits).slice(0, limit);
 }
+
+export type ConnectInboxConversation = {
+  id: string;
+  workspaceId: string;
+  workspaceName: string;
+  title: string | null;
+  conversationKind: string;
+  lastMessageAt: string | null;
+  lastMessagePreview: string | null;
+  unreadCount: number;
+};
+
+export async function getConversationsForUser(
+  userId: string,
+  limit = 50,
+): Promise<ConnectInboxConversation[]> {
+  const { data: memberships } = await db()
+    .from("atlas_connect_participants")
+    .select("conversation_id, last_read_at")
+    .eq("user_id", userId)
+    .is("left_at", null);
+
+  const conversationIds = (memberships ?? []).map((m) => m.conversation_id as string);
+  if (!conversationIds.length) return [];
+
+  const lastReadMap = new Map(
+    (memberships ?? []).map((m) => [m.conversation_id as string, m.last_read_at as string | null]),
+  );
+
+  const { data: conversations } = await db()
+    .from("atlas_connect_conversations")
+    .select("id, workspace_id, title, conversation_kind, last_message_at")
+    .in("id", conversationIds)
+    .is("archived_at", null)
+    .order("last_message_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (!conversations?.length) return [];
+
+  const workspaceIds = [...new Set(conversations.map((c) => c.workspace_id as string))];
+  const { data: workspaces } = await db()
+    .from("atlas_connect_workspaces")
+    .select("id, name")
+    .in("id", workspaceIds);
+
+  const workspaceMap = new Map(
+    (workspaces ?? []).map((w) => [w.id as string, w.name as string]),
+  );
+
+  const inbox: ConnectInboxConversation[] = [];
+
+  for (const conv of conversations) {
+    const convId = conv.id as string;
+    const { data: lastMsg } = await db()
+      .from("atlas_connect_messages")
+      .select("body, sent_at, sender_user_id")
+      .eq("conversation_id", convId)
+      .is("deleted_at", null)
+      .order("sent_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const lastReadAt = lastReadMap.get(convId);
+    let unreadCount = 0;
+    if (lastMsg?.sent_at) {
+      const { count } = await db()
+        .from("atlas_connect_messages")
+        .select("id", { count: "exact", head: true })
+        .eq("conversation_id", convId)
+        .is("deleted_at", null)
+        .neq("sender_user_id", userId)
+        .gt("sent_at", lastReadAt ?? "1970-01-01T00:00:00Z");
+      unreadCount = count ?? 0;
+    }
+
+    inbox.push({
+      id: convId,
+      workspaceId: conv.workspace_id as string,
+      workspaceName: workspaceMap.get(conv.workspace_id as string) ?? "Workspace",
+      title: (conv.title as string | null) ?? null,
+      conversationKind: conv.conversation_kind as string,
+      lastMessageAt: (conv.last_message_at as string | null) ?? null,
+      lastMessagePreview: (lastMsg?.body as string | null) ?? null,
+      unreadCount,
+    });
+  }
+
+  return inbox;
+}
+
+export async function updateParticipantLastRead(
+  conversationId: string,
+  userId: string,
+): Promise<void> {
+  await db()
+    .from("atlas_connect_participants")
+    .update({ last_read_at: new Date().toISOString() })
+    .eq("conversation_id", conversationId)
+    .eq("user_id", userId);
+}

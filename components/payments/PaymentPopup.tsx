@@ -61,7 +61,7 @@ const STATUS_LABELS: Record<DisplayStatus, string> = {
 };
 
 const STATUS_COLORS: Record<DisplayStatus, string> = {
-  pending: "text-zinc-400",
+  pending: "text-muted",
   waiting: "text-gold",
   confirmed: "text-gold",
   completed: "text-success",

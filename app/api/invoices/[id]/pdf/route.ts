@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
-import { createClient } from "@/lib/supabase/server";
 import { generateInvoicePdfBuffer } from "@/modules/invoices/pdf";
 import { getInvoiceById } from "@/modules/invoices/repository";
+import { requireInvoiceAccess, AuthorizationError } from "@/lib/auth/guards";
 import { apiError, handleApiError } from "@/lib/api/errors";
 
 type Props = {
@@ -12,41 +11,11 @@ type Props = {
 export async function GET(_request: Request, { params }: Props) {
   try {
     const { id } = await params;
-    const session = await auth();
-    if (!session?.user?.id) {
-      return apiError("Unauthorized", 401, "UNAUTHORIZED");
-    }
-    const user = { id: session.user.id };
-
-    const supabase = await createClient();
+    await requireInvoiceAccess(id);
 
     const invoice = await getInvoiceById(id);
     if (!invoice) {
       return apiError("Not found", 404, "NOT_FOUND");
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    const isCustomer = invoice.customer_id === user.id;
-    const isAdmin = profile?.role === "admin";
-
-    let isMerchant = false;
-    if (profile?.role === "merchant") {
-      const { data: store } = await supabase
-        .from("stores")
-        .select("id")
-        .eq("id", invoice.store_id)
-        .eq("owner_id", user.id)
-        .single();
-      isMerchant = !!store;
-    }
-
-    if (!isCustomer && !isMerchant && !isAdmin) {
-      return apiError("Forbidden", 403, "FORBIDDEN");
     }
 
     const pdfBuffer = await generateInvoicePdfBuffer(id);
@@ -58,6 +27,9 @@ export async function GET(_request: Request, { params }: Props) {
       },
     });
   } catch (err) {
+    if (err instanceof AuthorizationError) {
+      return apiError(err.message, err.message.includes("Not authenticated") ? 401 : 403, "FORBIDDEN");
+    }
     return handleApiError(err, "/api/invoices/[id]/pdf");
   }
 }

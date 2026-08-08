@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Invoice, InvoiceWithDetails, InvoiceItem } from "@/types";
 
 export async function getCustomerInvoices(customerId: string): Promise<Invoice[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("invoices")
     .select("*")
@@ -14,7 +14,7 @@ export async function getCustomerInvoices(customerId: string): Promise<Invoice[]
 }
 
 export async function getMerchantInvoices(storeId: string): Promise<Invoice[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("invoices")
     .select("*")
@@ -26,7 +26,7 @@ export async function getMerchantInvoices(storeId: string): Promise<Invoice[]> {
 }
 
 export async function getAllInvoices(): Promise<Invoice[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("invoices")
     .select("*")
@@ -38,7 +38,7 @@ export async function getAllInvoices(): Promise<Invoice[]> {
 }
 
 export async function getInvoiceById(invoiceId: string): Promise<InvoiceWithDetails | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("invoices")
     .select(
@@ -60,7 +60,7 @@ export async function getInvoiceById(invoiceId: string): Promise<InvoiceWithDeta
 }
 
 export async function getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("invoice_items")
     .select("*")
@@ -72,7 +72,7 @@ export async function getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]>
 }
 
 export async function getInvoiceByOrderId(orderId: string): Promise<Invoice | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("invoices")
     .select("*")

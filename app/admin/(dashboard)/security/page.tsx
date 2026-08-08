@@ -69,7 +69,7 @@ export default async function AdminSecurityPage() {
                   <p className="mt-1 text-sm text-muted">{check.status}</p>
                 </div>
                 <span
-                  className={`shrink-0 text-sm ${check.ok ? "text-emerald-400" : "text-gold"}`}
+                  className={`shrink-0 text-sm ${check.ok ? "text-success" : "text-gold"}`}
                 >
                   {check.ok ? "OK" : "Action needed"}
                 </span>

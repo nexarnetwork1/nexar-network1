@@ -66,18 +66,24 @@ export async function markBootstrapComplete(input: {
   nexarBusinessId: string;
   nexarWorkspaceId: string | null;
   metadata?: Record<string, unknown>;
-}): Promise<void> {
-  await db()
+}): Promise<boolean> {
+  const { data, error } = await db()
     .from("atlas_hq_bootstrap")
-    .upsert({
-      id: 1,
+    .update({
       completed_at: new Date().toISOString(),
       platform_owner_user_id: input.platformOwnerUserId,
       nexar_business_id: input.nexarBusinessId,
       nexar_workspace_id: input.nexarWorkspaceId,
       metadata: input.metadata ?? {},
       updated_at: new Date().toISOString(),
-    });
+    })
+    .eq("id", 1)
+    .is("completed_at", null)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw error;
+  return Boolean(data);
 }
 
 export async function getPlatformOwnerByUserId(

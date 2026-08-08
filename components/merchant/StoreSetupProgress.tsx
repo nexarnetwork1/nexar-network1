@@ -23,7 +23,7 @@ export function StoreSetupProgress({
           >
             <div className="flex items-center gap-3">
               {done ? (
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
               ) : (
                 <Circle className="h-5 w-5 shrink-0 text-muted" />
               )}

@@ -1,9 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { ReviewsRepository } from "../application/ports";
 
 export class SupabaseReviewsRepository implements ReviewsRepository {
   async listPendingProductReviews(limit = 30): Promise<unknown[]> {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("product_reviews")
       .select("*")
@@ -14,7 +14,7 @@ export class SupabaseReviewsRepository implements ReviewsRepository {
   }
 
   async listPendingStoreReviews(limit = 30): Promise<unknown[]> {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("store_reviews")
       .select("*")

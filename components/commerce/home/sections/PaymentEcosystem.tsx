@@ -56,7 +56,7 @@ export function PaymentEcosystem() {
                       <p className="text-xs text-muted">{meta.label}</p>
                     </div>
                   </div>
-                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-400">
+                  <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] uppercase tracking-wide text-success">
                     {asset.status}
                   </span>
                 </div>

@@ -1,4 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isUpstashConfigured } from "@/lib/cache/upstash";
+import { isPostHogConfigured } from "@/lib/monitoring/posthog";
+import { isBetterStackConfigured } from "@/lib/monitoring/betterstack";
 
 export type HealthCheck = {
   status: "healthy" | "degraded" | "unhealthy";
@@ -14,6 +17,9 @@ export async function runHealthChecks(): Promise<HealthCheck> {
     email: "warn",
     stripe: "warn",
     monitoring: "warn",
+    cache: "warn",
+    analytics: "warn",
+    uptime: "warn",
   };
 
   try {
@@ -55,7 +61,23 @@ export async function runHealthChecks(): Promise<HealthCheck> {
     checks.payments = process.env.NODE_ENV === "production" ? "error" : "warn";
   }
 
-  checks.monitoring = process.env.SENTRY_DSN ? "ok" : "warn";
+  checks.monitoring =
+    process.env.SENTRY_DSN && process.env.NEXT_PUBLIC_SENTRY_DSN ? "ok" : "warn";
+
+  checks.cache = isUpstashConfigured()
+    ? "ok"
+    : process.env.NODE_ENV === "production"
+      ? "warn"
+      : "warn";
+
+  checks.analytics =
+    isPostHogConfigured() || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+      ? "ok"
+      : "warn";
+
+  if (isBetterStackConfigured()) {
+    checks.uptime = "ok";
+  }
 
   const hasResend = Boolean(process.env.RESEND_API_KEY);
   const hasEmailFrom = Boolean(process.env.EMAIL_FROM);

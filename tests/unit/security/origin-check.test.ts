@@ -33,8 +33,12 @@ describe("isSameOriginRequest", () => {
     expect(isSameOriginRequest(requestWith({ origin: "null" }))).toBe(false);
   });
 
-  it("allows requests with no origin information", () => {
+  it("allows requests with no origin information in non-strict mode", () => {
     expect(isSameOriginRequest(requestWith({}))).toBe(true);
+  });
+
+  it("rejects requests with no origin information in strict mode", () => {
+    expect(isSameOriginRequest(requestWith({}), { strict: true })).toBe(false);
   });
 });
 

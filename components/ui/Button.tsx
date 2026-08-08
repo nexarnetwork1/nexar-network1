@@ -22,7 +22,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     "nxr-btn-primary hover:bg-gold-hover border border-gold/35 text-on-gold shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]",
   secondary:
-    "bg-surface-2 text-foreground border border-border hover:bg-[#171717] hover:border-border-default",
+    "nxr-btn-secondary hover:bg-card-hover hover:border-border-default",
   outline:
     "bg-transparent text-foreground border border-border hover:border-gold/30 hover:text-gold",
   ghost:

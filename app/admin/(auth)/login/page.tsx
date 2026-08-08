@@ -3,8 +3,11 @@ import Link from "next/link";
 import { getBootstrapState } from "@/modules/atlas-hq/repository";
 import { auth } from "@/auth";
 import { hasHqAuthority } from "@/lib/hq/authorization";
+import { resolveHqSessionContext } from "@/modules/atlas-hq/service";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Logo } from "@/components/ui/Logo";
 import { ATLAS_BRAND, ATLAS_PORTAL_SUBTITLES } from "@/config/atlas-branding";
+import { safeRedirect } from "@/lib/auth/redirect";
 
 /**
  * NEXAR HQ entry — ATLAS Auth.js login (wallet Super Admin removed).
@@ -23,7 +26,23 @@ export default async function AdminLoginPage({
 
   const session = await auth();
   if (session?.user?.id && (await hasHqAuthority())) {
-    redirect(params.redirect && params.redirect.startsWith("/") ? params.redirect : "/admin/dashboard");
+    const admin = createAdminClient();
+    const { data: profileRow } = await admin
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    const hq = await resolveHqSessionContext(
+      session.user.id,
+      (profileRow as { role?: string } | null)?.role ?? null,
+    );
+    if (hq.mustChangePassword) {
+      redirect("/auth/change-password?hq=1");
+    }
+    if (hq.mustEnable2fa) {
+      redirect("/auth/enable-2fa?hq=1");
+    }
+    redirect(safeRedirect(params.redirect, "/admin/dashboard"));
   }
 
   const redirectTo = encodeURIComponent(params.redirect ?? "/admin/dashboard");

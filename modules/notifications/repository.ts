@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Notification, NotificationPreference, NotificationType } from "@/types";
 
@@ -8,7 +8,7 @@ export async function getUserNotifications(
   userId: string,
   limit = 20
 ): Promise<Notification[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("notifications")
     .select("*")
@@ -23,7 +23,7 @@ export async function getUserNotifications(
 export async function getUnreadNotificationCount(
   userId: string
 ): Promise<number> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { count, error } = await supabase
     .from("notifications")
     .select("*", { count: "exact", head: true })
@@ -38,7 +38,7 @@ export async function markNotificationRead(
   notificationId: string,
   userId: string
 ): Promise<boolean> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
@@ -68,7 +68,7 @@ export async function createNotification(params: {
 export async function getUserNotificationPreferences(
   userId: string
 ): Promise<NotificationPreference[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("notification_preferences")
     .select("*")

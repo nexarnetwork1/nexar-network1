@@ -78,7 +78,7 @@ export function WalletIconButton({ panel, className }: WalletIconButtonProps) {
         <Wallet className="h-5 w-5" aria-hidden />
         {connected && (
           <span
-            className="absolute right-1 top-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-background"
+            className="absolute right-1 top-1 h-2 w-2 rounded-full bg-success ring-2 ring-background"
             aria-hidden
           />
         )}

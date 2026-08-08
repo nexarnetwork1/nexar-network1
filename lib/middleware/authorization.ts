@@ -2,8 +2,16 @@ import { securityConfig } from "@/config";
 import type { UserRole } from "@/types";
 
 export function isProtectedRoute(pathname: string): boolean {
+  if (
+    securityConfig.atlasProtectedPrefixes.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    )
+  ) {
+    return true;
+  }
+
   return securityConfig.protectedPrefixes.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 }
 

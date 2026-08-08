@@ -1,4 +1,4 @@
-export { rateLimit } from "./rate-limit";
+export { rateLimit, rateLimitAsync } from "./rate-limit";
 export { generateCsrfToken, validateCsrfToken, CSRF_COOKIE, CSRF_HEADER } from "./csrf";
 export { escapeHtml, stripHtmlTags, sanitizeString, sanitizeObject } from "./sanitize";
 export {

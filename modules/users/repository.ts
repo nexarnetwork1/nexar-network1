@@ -1,12 +1,12 @@
 import "server-only";
 
 import { auth } from "@/auth";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Profile, UserRole } from "@/types";
 import { requireHqAccess } from "@/lib/hq/authorization";
 
 export async function getProfile(userId: string): Promise<Profile | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("profiles")
     .select("*")

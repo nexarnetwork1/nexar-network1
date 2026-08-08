@@ -1,10 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { MerchantPromotion } from "@/types";
 
 export async function getActiveStorePromotion(
   storeId: string
 ): Promise<MerchantPromotion | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("merchant_promotions")
     .select("*")
@@ -22,7 +22,7 @@ export async function getActiveStorePromotion(
 export async function getStorePromotions(
   storeId: string
 ): Promise<MerchantPromotion[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("merchant_promotions")
     .select("*")

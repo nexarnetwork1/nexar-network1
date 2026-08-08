@@ -209,7 +209,7 @@ export function ProductDetailView({ product, isCustomer = false, shareUrl }: Pro
             </Button>
             {shareUrl ? <ProductShareButton title={product.name} url={shareUrl} /> : null}
           </div>
-          {message ? <p className="mt-3 text-sm text-emerald-400">{message}</p> : null}
+          {message ? <p className="mt-3 text-sm text-success">{message}</p> : null}
           {error ? <p className="mt-3 text-sm text-red-400">{error}</p> : null}
           {isCustomer ? (
             <Link href={MARKETPLACE_ROUTES.cart} className="mt-3 inline-block text-sm text-gold hover:underline">
@@ -290,7 +290,7 @@ function ProductReviewsSection({
                 <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold" />
               ))}
               {review.is_verified_purchase && (
-                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400">
+                <span className="inline-flex items-center gap-1 text-[10px] text-success">
                   <ShieldCheck className="h-3 w-3" />
                   Verified purchase
                 </span>

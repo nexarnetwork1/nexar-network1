@@ -1,8 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import type { Adapter } from "next-auth/adapters";
 import { SupabaseAuthjsAdapter } from "@/lib/auth/authjs-adapter";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { UserRole } from "@/types";
@@ -17,17 +15,11 @@ export type AppSessionUser = {
   emailVerified?: Date | null;
 };
 
-function resolveAdapter(): Adapter {
-  if (process.env.DATABASE_URL) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { PrismaClient } = require("@prisma/client") as typeof import("@prisma/client");
-      const prisma = new PrismaClient();
-      return PrismaAdapter(prisma) as Adapter;
-    } catch {
-      // Fall through to REST adapter
-    }
-  }
+/**
+ * Single Auth.js adapter — must match `lib/auth/proxy-session.ts` and
+ * `lib/auth/database-session.ts` (both read authjs_* via Supabase service role).
+ */
+function resolveAdapter() {
   return SupabaseAuthjsAdapter();
 }
 
@@ -115,7 +107,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientId: process.env.AUTH_GOOGLE_ID ?? process.env.GOOGLE_CLIENT_ID!,
             clientSecret:
               process.env.AUTH_GOOGLE_SECRET ?? process.env.GOOGLE_CLIENT_SECRET!,
-            allowDangerousEmailAccountLinking: true,
+            allowDangerousEmailAccountLinking: false,
             authorization: {
               params: {
                 prompt: "select_account",
@@ -130,7 +122,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             clientId: process.env.AUTH_GITHUB_ID ?? process.env.GITHUB_CLIENT_ID!,
             clientSecret:
               process.env.AUTH_GITHUB_SECRET ?? process.env.GITHUB_CLIENT_SECRET!,
-            allowDangerousEmailAccountLinking: true,
+            allowDangerousEmailAccountLinking: false,
           }),
         ]
       : []),

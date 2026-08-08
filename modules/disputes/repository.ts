@@ -1,15 +1,15 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Dispute, DisputeEvidence, DisputeMessage, DisputeStatus } from "@/types";
 
 export async function getDisputeById(disputeId: string): Promise<Dispute | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase.from("disputes").select("*").eq("id", disputeId).maybeSingle();
   return (data as Dispute) ?? null;
 }
 
 export async function getCustomerDisputes(customerId: string): Promise<Dispute[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("disputes")
     .select("*")
@@ -19,7 +19,7 @@ export async function getCustomerDisputes(customerId: string): Promise<Dispute[]
 }
 
 export async function getStoreDisputes(storeId: string): Promise<Dispute[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("disputes")
     .select("*")
@@ -41,7 +41,7 @@ export async function openDispute(
   customerId: string,
   reason: string
 ): Promise<{ disputeId?: string; error?: string }> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("open_dispute", {
     p_order_id: orderId,
     p_customer_id: customerId,
@@ -52,7 +52,7 @@ export async function openDispute(
 }
 
 export async function getDisputeMessages(disputeId: string): Promise<DisputeMessage[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("dispute_messages")
     .select("*")
@@ -67,7 +67,7 @@ export async function addDisputeMessage(params: {
   senderRole: DisputeMessage["sender_role"];
   message: string;
 }): Promise<boolean> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase.from("dispute_messages").insert({
     dispute_id: params.disputeId,
     sender_id: params.senderId,
@@ -84,7 +84,7 @@ export async function addDisputeEvidence(params: {
   fileType?: string;
   description?: string;
 }): Promise<boolean> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase.from("dispute_evidence").insert({
     dispute_id: params.disputeId,
     uploaded_by: params.uploadedBy,
@@ -96,7 +96,7 @@ export async function addDisputeEvidence(params: {
 }
 
 export async function getDisputeEvidence(disputeId: string): Promise<DisputeEvidence[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("dispute_evidence")
     .select("*")

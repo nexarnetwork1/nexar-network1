@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Coupon, CouponScope, CouponType } from "@/types";
 
@@ -18,7 +18,7 @@ export async function validateCoupon(
   storeId?: string,
   orderTotalUsd = 0
 ): Promise<{ valid: boolean; coupon?: Coupon; discountUsd?: number; freeShipping?: boolean; error?: string }> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const query = supabase
     .from("coupons")
     .select("*")
@@ -51,7 +51,7 @@ export async function validateCoupon(
 }
 
 export async function getStoreCoupons(storeId: string): Promise<Coupon[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("coupons")
     .select("*")

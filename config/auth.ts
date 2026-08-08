@@ -27,6 +27,8 @@ export const authConfig = {
     "/auth/verify",
     "/auth/complete-profile",
     "/auth/verify-email-change",
+    "/auth/change-password",
+    "/auth/enable-2fa",
     "/api/auth",
     "/forgot-password",
     "/reset-password",

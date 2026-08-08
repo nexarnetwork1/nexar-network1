@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { signOutAction } from "@/modules/auth/actions";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { Button } from "@/components/ui/Button";
@@ -24,7 +24,7 @@ export default async function AtlasDashboardLayout({
     redirect(`/login?redirect=/dashboard`);
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, role, full_name, profile_completed")

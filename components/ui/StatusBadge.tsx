@@ -5,7 +5,7 @@ const STATUS_STYLES: Record<string, string> = {
   pending_payment: "text-gold border-gold/30 bg-gold/10",
   paid: "text-success border-success/30 bg-success/10",
   expired: "text-muted border-border bg-surface/50",
-  cancelled: "text-error border-error/30 bg-error/10",
+  cancelled: "text-danger border-danger/30 bg-danger/10",
   refunded: "text-gold-secondary border-gold-secondary/30 bg-gold-secondary/10",
   processing: "text-gold-accent border-gold-accent/30 bg-gold-accent/10",
   shipped: "text-gold border-gold/25 bg-gold/8",

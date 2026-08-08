@@ -69,7 +69,7 @@ export function ActiveSessionsPanel({ sessions }: ActiveSessionsPanelProps) {
               <p className="text-sm font-medium">
                 {formatAgent(session.user_agent)}
                 {index === 0 && (
-                  <span className="ml-2 text-xs text-emerald-400">Current</span>
+                  <span className="ml-2 text-xs text-success">Current</span>
                 )}
               </p>
               <p className="text-xs text-muted">

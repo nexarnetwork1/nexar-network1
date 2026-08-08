@@ -146,7 +146,7 @@ export function ProfileSettingsForm({ profile }: ProfileSettingsFormProps) {
         ))}
       </div>
 
-      {message && <p className="mt-4 text-sm text-emerald-400">{message}</p>}
+      {message && <p className="mt-4 text-sm text-success">{message}</p>}
       {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
 
       {tab === "profile" && (

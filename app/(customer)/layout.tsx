@@ -5,7 +5,7 @@ import { NotificationBadge } from "@/components/notifications/NotificationBadge"
 import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
 import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
 import { Button } from "@/components/ui/Button";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { ATLAS_BRAND, ATLAS_PORTAL_SUBTITLES } from "@/config/atlas-branding";
 import { DashboardShell } from "@/components/dashboard";
 import { customerNav } from "@/config/dashboard-nav";
@@ -24,7 +24,7 @@ export default async function CustomerLayout({
     redirect(`/login?redirect=/customer`);
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { count: pendingInvoices } = await supabase
     .from("invoices")
     .select("id", { count: "exact", head: true })

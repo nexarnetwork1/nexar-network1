@@ -1,4 +1,6 @@
 import { emailConfig } from "@/config/email";
+import { deferBackground } from "@/lib/jobs/defer";
+import { captureException } from "@/lib/monitoring/sentry";
 
 export type SendEmailParams = {
   to: string;
@@ -12,7 +14,14 @@ export type SendEmailResult = {
   error?: string;
 };
 
-export async function sendEmail(params: SendEmailParams): Promise<SendEmailResult> {
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 750;
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function sendEmailOnce(params: SendEmailParams): Promise<SendEmailResult> {
   const apiKey = emailConfig.apiKey;
 
   if (!apiKey) {
@@ -33,6 +42,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
         html: params.html,
         text: params.text,
       }),
+      signal: AbortSignal.timeout(15_000),
     });
 
     if (!response.ok) {
@@ -47,6 +57,35 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
       error: err instanceof Error ? err.message : "Send failed",
     };
   }
+}
+
+export async function sendEmail(params: SendEmailParams): Promise<SendEmailResult> {
+  let lastError: string | undefined;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    const result = await sendEmailOnce(params);
+    if (result.success) return result;
+
+    lastError = result.error;
+    const retryable =
+      result.error?.includes("429") ||
+      result.error?.includes("5") ||
+      result.error?.toLowerCase().includes("timeout") ||
+      result.error?.toLowerCase().includes("network");
+
+    if (!retryable || attempt === MAX_ATTEMPTS) break;
+    await sleep(RETRY_DELAY_MS * attempt);
+  }
+
+  deferBackground(() =>
+    captureException(new Error("Email delivery failed"), {
+      to: params.to,
+      subject: params.subject,
+      error: lastError,
+    }),
+  );
+
+  return { success: false, error: lastError ?? "Send failed" };
 }
 
 export async function sendInvoiceReadyEmail(params: {

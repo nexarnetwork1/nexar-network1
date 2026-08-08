@@ -47,7 +47,7 @@ export default async function AtlasJobDetailPage({
               <span
                 className={`text-xs px-2 py-1 rounded ${
                   isJobOpen(job)
-                    ? "bg-emerald-500/10 text-emerald-400"
+                    ? "bg-success/10 text-success"
                     : "bg-white/5 text-muted"
                 }`}
               >

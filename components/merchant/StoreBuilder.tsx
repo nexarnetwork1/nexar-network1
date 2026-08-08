@@ -38,7 +38,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
 
   const [preview, setPreview] = useState({
     primaryColor: profile.primary_color ?? branding?.primary_color ?? "#D4AF37",
-    secondaryColor: profile.secondary_color ?? branding?.secondary_color ?? "#1a1a1a",
+    secondaryColor: profile.secondary_color ?? branding?.secondary_color ?? "#151515",
     borderRadius: profile.border_radius ?? "1rem",
     buttonStyle: profile.button_style ?? "rounded",
   });
@@ -193,7 +193,7 @@ export function StoreBuilder({ store, settings, branding }: Props) {
         )}
 
         {error && <p className="text-sm text-red-400">{error}</p>}
-        {success && <p className="text-sm text-emerald-400">Store saved successfully</p>}
+        {success && <p className="text-sm text-success">Store saved successfully</p>}
 
         <Button type="submit" disabled={submitting} glow>
           {submitting ? "Saving…" : "Save store builder"}

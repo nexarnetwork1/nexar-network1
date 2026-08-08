@@ -99,7 +99,7 @@ export function ExchangeRateForm({ currencies = [] }: ExchangeRateFormProps) {
         {isSubmitting ? "Updating…" : "Update rate"}
       </Button>
       {serverError && <p className="w-full text-sm text-red-400">{serverError}</p>}
-      {success && <p className="w-full text-sm text-emerald-400">Rate updated</p>}
+      {success && <p className="w-full text-sm text-success">Rate updated</p>}
     </form>
   );
 }

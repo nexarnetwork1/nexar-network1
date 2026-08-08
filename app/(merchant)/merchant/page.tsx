@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/modules/users/repository";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Button } from "@/components/ui/Button";
 import {
   DashboardActions,
@@ -11,7 +11,7 @@ import {
 
 export default async function MerchantDashboardPage() {
   const profile = await getCurrentProfile();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: store } = await supabase
     .from("stores")

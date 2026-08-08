@@ -241,7 +241,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
         <span
           className={cn(
             "rounded-full px-3 py-1 text-xs font-medium",
-            presale.status === "live" && "bg-emerald-500/15 text-emerald-400",
+            presale.status === "live" && "bg-success/15 text-success",
             presale.status === "upcoming" && "bg-gold-soft text-gold",
             presale.status === "sold_out" && "bg-red-500/15 text-red-400",
             presale.status === "ended" && "bg-muted/20 text-muted",
@@ -317,7 +317,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
           </div>
           <div className="rounded-xl border border-border bg-background/50 p-3">
             <dt className="text-muted">Claimable</dt>
-            <dd className="mt-1 font-mono font-medium text-emerald-400">
+            <dd className="mt-1 font-mono font-medium text-success">
               {presale.claimableAmount.toLocaleString()}
             </dd>
           </div>
@@ -420,7 +420,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
         <div className="mt-4 border-t border-border pt-4">
           <h3 className="font-heading text-lg font-semibold">Claim Tokens</h3>
           {allClaimed ? (
-            <p className="mt-3 flex items-center gap-2 text-sm text-emerald-400">
+            <p className="mt-3 flex items-center gap-2 text-sm text-success">
               <CheckCircle2 className="h-4 w-4" aria-hidden />
               All purchased NXR tokens have been successfully claimed.
             </p>
@@ -428,7 +428,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
             <>
               <p className="mt-2 text-sm text-muted">
                 Claimable:{" "}
-                <span className="font-mono text-emerald-400">
+                <span className="font-mono text-success">
                   {presale.claimableAmount.toLocaleString()} NXR
                 </span>
               </p>
@@ -451,7 +451,7 @@ export function PresalePanel({ compact, className }: PresalePanelProps) {
       )}
 
       {isSuccess && (
-        <div className="mt-4 flex items-center justify-center gap-2 text-sm text-emerald-400">
+        <div className="mt-4 flex items-center justify-center gap-2 text-sm text-success">
           <CheckCircle2 className="h-4 w-4" aria-hidden />
           {step === "claim" ? "Claim successful!" : "Purchase successful!"}
           {txHash && (

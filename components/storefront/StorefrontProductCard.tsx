@@ -68,7 +68,7 @@ export function StorefrontProductCard({ product, index = 0 }: StorefrontProductC
             <span className="text-xs font-normal text-muted">{product.currency}</span>
           </p>
           {product.stock <= 0 && (
-            <p className="text-xs text-error">Out of stock</p>
+            <p className="text-xs text-danger">Out of stock</p>
           )}
         </div>
       </Link>

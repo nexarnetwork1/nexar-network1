@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireSuperAdmin } from "@/modules/users/repository";
 import type { ActionResult } from "@/modules/auth/actions";
 
@@ -26,7 +26,7 @@ export async function moderateReviewAction(formData: FormData): Promise<ActionRe
   }
 
   const table = parsed.data.type === "product" ? "product_reviews" : "store_reviews";
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase
     .from(table)
     .update({ status: parsed.data.status })
@@ -41,7 +41,7 @@ export async function moderateReviewAction(formData: FormData): Promise<ActionRe
 
 export async function listRecentProductReviews(limit = 50) {
   await requireSuperAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("product_reviews")
     .select("id, rating, title, body, status, created_at, product:products(name, slug), customer:profiles(full_name)")
@@ -52,7 +52,7 @@ export async function listRecentProductReviews(limit = 50) {
 
 export async function listRecentStoreReviews(limit = 50) {
   await requireSuperAdmin();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("store_reviews")
     .select("id, rating, title, body, status, created_at, store:stores(name, slug), customer:profiles(full_name)")

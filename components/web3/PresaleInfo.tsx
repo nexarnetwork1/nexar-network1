@@ -20,7 +20,7 @@ function formatDate(timestamp: bigint | undefined): string {
 
 const STATUS_LABELS = {
   upcoming: { label: "Upcoming", color: "text-gold" },
-  live: { label: "Live", color: "text-emerald-400" },
+  live: { label: "Live", color: "text-success" },
   sold_out: { label: "Sold Out", color: "text-red-400" },
   ended: { label: "Ended", color: "text-muted" },
   loading: { label: "Loading", color: "text-muted" },
@@ -134,7 +134,7 @@ export function PresaleInfo({ className, compact = false }: PresaleInfoProps) {
                     <p className="font-mono text-[11px] text-white">
                       {purchasedAmount > 0 ? purchasedAmount.toLocaleString() : "—"}
                       {claimableAmount > 0 && (
-                        <span className="block text-emerald-400">{claimableAmount.toLocaleString()} claimable</span>
+                        <span className="block text-success">{claimableAmount.toLocaleString()} claimable</span>
                       )}
                       {claimedAmount > 0 && (
                         <span className="block text-muted">{claimedAmount.toLocaleString()} claimed</span>

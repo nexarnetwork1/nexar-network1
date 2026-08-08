@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Product,
   ProductCategory,
@@ -7,7 +7,7 @@ import type {
 } from "@/types";
 
 export async function getMerchantProducts(storeId: string): Promise<Product[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -19,7 +19,7 @@ export async function getMerchantProducts(storeId: string): Promise<Product[]> {
 }
 
 export async function getProductById(productId: string): Promise<Product | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("products")
     .select("*")
@@ -36,7 +36,7 @@ export async function getMerchantProductsWithInventory(
   const products = await getMerchantProducts(storeId);
   if (products.length === 0) return [];
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: inventoryRows } = await supabase
     .from("inventory")
     .select("*")
@@ -56,7 +56,7 @@ export async function getMerchantProductsWithInventory(
 }
 
 export async function getStoreCategories(storeId: string): Promise<ProductCategory[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("product_categories")
     .select("*")
@@ -69,7 +69,7 @@ export async function getStoreCategories(storeId: string): Promise<ProductCatego
 }
 
 export async function getProductImages(productId: string): Promise<ProductImage[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("product_images")
     .select("*")
@@ -81,7 +81,7 @@ export async function getProductImages(productId: string): Promise<ProductImage[
 }
 
 export async function getProductInventory(productId: string): Promise<Inventory | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("inventory")
     .select("*")

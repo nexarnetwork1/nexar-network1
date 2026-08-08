@@ -11,10 +11,10 @@ type Props = {
 export function OrderConfirmationBanner({ status, invoiceNumber, confirmed }: Props) {
   if (status === "paid") {
     return (
-      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
-        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-success/30 bg-success/10 p-5">
+        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success" />
         <div>
-          <p className="font-semibold text-emerald-300">Order confirmed — payment received</p>
+          <p className="font-semibold text-success">Order confirmed — payment received</p>
           {invoiceNumber && (
             <p className="mt-1 text-sm text-muted">Invoice {invoiceNumber} is paid.</p>
           )}

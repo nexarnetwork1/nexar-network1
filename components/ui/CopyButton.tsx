@@ -30,7 +30,7 @@ export function CopyButton({ text, label, className }: CopyButtonProps) {
       aria-label={label}
     >
       {copied ? (
-        <Check className="h-4 w-4 text-emerald-400" />
+        <Check className="h-4 w-4 text-success" />
       ) : (
         <Copy className="h-4 w-4" />
       )}

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
 import { requireRole } from "@/modules/users/repository";
 import { getMerchantStore } from "@/modules/stores/repository";
@@ -76,7 +76,7 @@ async function uploadStoreLogo(
   storeId: string,
   file: File
 ): Promise<string | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const ext = file.name.split(".").pop() ?? "png";
   const path = `${storeId}/${Date.now()}.${ext}`;
   const { error } = await supabase.storage
@@ -93,7 +93,7 @@ async function uploadStoreAsset(
   file: File,
   bucket: "store-logos" | "store-banners",
 ): Promise<string | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const ext = file.name.split(".").pop() ?? "png";
   const path = `${storeId}/${Date.now()}.${ext}`;
   const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
@@ -107,7 +107,7 @@ async function syncStoreBranding(
   profile: ReturnType<typeof buildMarketplaceProfile>,
   tagline?: string,
 ) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const social_links = {
     website: profile.website,
     facebook: profile.facebook,
@@ -210,7 +210,7 @@ export async function updateStoreSettingsAction(
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase
     .from("store_settings")
     .update({
@@ -259,7 +259,7 @@ export async function updateStoreMarketplaceProfileAction(
 
   const marketplace_profile = buildMarketplaceProfile(parsed.data);
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase
     .from("store_settings")
     .update({ marketplace_profile })
@@ -321,7 +321,7 @@ export async function updateStoreAppearanceAction(
     logoUrl = uploaded;
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   if (logoUrl) {
     const { error: logoError } = await supabase
@@ -436,7 +436,7 @@ export async function saveStoreBuilderAction(formData: FormData): Promise<Action
     bannerUrl = uploaded;
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const slugChanged = general.data.slug !== store.slug;
 
   const { error: storeError } = await supabase

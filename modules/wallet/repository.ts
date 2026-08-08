@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   CustomerProfile,
   MerchantProfile,
@@ -10,7 +10,7 @@ import type {
 export async function getCustomerProfile(
   profileId: string
 ): Promise<CustomerProfile | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("customer_profiles")
     .select("*")
@@ -24,7 +24,7 @@ export async function getCustomerProfile(
 export async function getMerchantProfile(
   profileId: string
 ): Promise<MerchantProfile | null> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("merchant_profiles")
     .select("*")
@@ -39,7 +39,7 @@ export async function getUserWallets(
   ownerType: Extract<WalletOwnerType, "customer" | "merchant">,
   ownerId: string
 ): Promise<Wallet[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("wallets")
     .select("*")
@@ -55,7 +55,7 @@ export async function getWalletTransactions(
   walletId: string,
   limit = 20
 ): Promise<WalletTransaction[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("wallet_transactions")
     .select("*")
@@ -99,7 +99,7 @@ export async function getCustomerPurchaseHistory(
   profileId: string,
   limit = 50
 ): Promise<CustomerPurchaseRow[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("v_customer_purchase_history")
     .select("*")

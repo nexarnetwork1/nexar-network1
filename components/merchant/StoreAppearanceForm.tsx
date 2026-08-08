@@ -58,7 +58,7 @@ export function StoreAppearanceForm({ store, settings }: Props) {
           </div>
         )}
         <div className="flex-1">
-          <label className="text-xs text-zinc-400">Store logo</label>
+          <label className="nxr-label">Store logo</label>
           <input
             type="file"
             name="logo"
@@ -72,7 +72,7 @@ export function StoreAppearanceForm({ store, settings }: Props) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="text-xs text-zinc-400">Primary theme color</label>
+          <label className="nxr-label">Primary theme color</label>
           <div className="mt-1 flex items-center gap-2">
             <input
               type="color"
@@ -84,15 +84,15 @@ export function StoreAppearanceForm({ store, settings }: Props) {
           </div>
         </div>
         <div>
-          <label className="text-xs text-zinc-400">Secondary theme color</label>
+          <label className="nxr-label">Secondary theme color</label>
           <div className="mt-1 flex items-center gap-2">
             <input
               type="color"
               name="secondaryColor"
-              defaultValue={profile.secondary_color ?? "#1a1a1a"}
+              defaultValue={profile.secondary_color ?? "#151515"}
               className="h-10 w-12 cursor-pointer rounded border border-border bg-transparent"
             />
-            <Input name="secondaryColorText" defaultValue={profile.secondary_color ?? "#1a1a1a"} className="flex-1" />
+            <Input name="secondaryColorText" defaultValue={profile.secondary_color ?? "#151515"} className="flex-1" />
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@ export function StoreAppearanceForm({ store, settings }: Props) {
       </label>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
-      {success && <p className="text-sm text-emerald-400">Store appearance saved</p>}
+      {success && <p className="text-sm text-success">Store appearance saved</p>}
 
       <Button type="submit" disabled={submitting}>
         {submitting ? "Saving…" : "Save store appearance"}

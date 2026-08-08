@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole, getCurrentProfile } from "@/modules/users/repository";
 import { wishlistRepository } from "@/modules/marketplace/wishlist/infrastructure/supabase-wishlist-repository";
 import type { ActionResult } from "@/modules/auth/actions";
@@ -40,7 +40,7 @@ export async function submitProductReviewAction(formData: FormData): Promise<Act
     return { success: false, error: parsed.error?.issues[0]?.message ?? "Invalid review" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: product } = await supabase
     .from("products")
     .select("store_id")
@@ -80,7 +80,7 @@ export async function recordProductViewAction(productId: string): Promise<void> 
   const profile = await getCurrentProfile();
   if (!profile) return;
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   await supabase.from("recently_viewed_products").upsert(
     {
       customer_id: profile.id,

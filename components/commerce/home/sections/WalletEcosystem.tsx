@@ -50,8 +50,8 @@ export function WalletEcosystem() {
             <div className="mt-4 flex items-center gap-2 text-xs">
               {web3Ready ? (
                 <>
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Supported</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                  <span className="text-success">Supported</span>
                 </>
               ) : (
                 <>

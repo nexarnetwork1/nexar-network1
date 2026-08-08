@@ -1,13 +1,13 @@
 import "server-only";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Cart, CartItemWithProduct } from "@/types";
 import type { CartRepository } from "../application/ports";
 import type { CartSnapshot } from "../../shared/types";
 
 export class SupabaseCartRepository implements CartRepository {
   async getOrCreateCart(customerId: string): Promise<Cart | null> {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const { data: existing } = await supabase
       .from("carts")
@@ -28,7 +28,7 @@ export class SupabaseCartRepository implements CartRepository {
   }
 
   async getCartSnapshot(customerId: string): Promise<CartSnapshot | null> {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const cart = await this.getOrCreateCart(customerId);
     if (!cart) return null;
 
@@ -51,7 +51,7 @@ export class SupabaseCartRepository implements CartRepository {
   async getCartWithItems(
     customerId: string
   ): Promise<{ cart: Cart | null; items: CartItemWithProduct[] }> {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const cart = await this.getOrCreateCart(customerId);
     if (!cart) return { cart: null, items: [] };
 

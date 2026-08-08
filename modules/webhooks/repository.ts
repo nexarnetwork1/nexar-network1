@@ -1,5 +1,5 @@
 import { createHash, createHmac, randomBytes } from "crypto";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { webhooksConfig } from "@/config/webhooks";
 import { assertSafeExternalUrl } from "@/lib/security/ssrf";
@@ -17,7 +17,7 @@ export function signWebhookPayload(secret: string, payload: string, timestamp: n
 }
 
 export async function getStoreWebhooks(storeId: string): Promise<MerchantWebhook[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("merchant_webhooks")
     .select("id, store_id, url, secret_prefix, events, is_active, created_by, created_at, updated_at")

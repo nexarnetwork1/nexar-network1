@@ -1,10 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getHeldEscrowBalance } from "@/modules/escrow/repository";
 import type { WithdrawalRequest, WithdrawalStatus } from "@/types";
 
 export async function getMerchantWithdrawals(merchantId: string): Promise<WithdrawalRequest[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("withdrawal_requests")
     .select("*")
@@ -36,7 +36,7 @@ export async function createWithdrawalRequest(params: {
     return { error: "Withdrawals blocked while escrow funds are held" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("withdrawal_requests")
     .insert({

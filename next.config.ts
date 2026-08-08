@@ -7,7 +7,7 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const cspHeader = [
   "default-src 'self'",
 
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
 
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 
@@ -48,7 +48,12 @@ wss://*.supabase.co \
 https://www.googletagmanager.com \
 https://www.google-analytics.com \
 https://*.google-analytics.com \
-https://*.analytics.google.com",
+https://*.analytics.google.com \
+https://*.ingest.sentry.io \
+https://*.sentry.io \
+https://*.posthog.com \
+https://us.i.posthog.com \
+https://eu.i.posthog.com",
   "frame-src 'self' https://auth.privy.io",
 
   "object-src 'none'",

@@ -80,7 +80,7 @@ export default async function AdminProductsPage() {
                     <DashboardTableCell hideBelow="sm">{product.stock}</DashboardTableCell>
                     <DashboardTableCell>
                       {product.is_active ? (
-                        <span className="text-emerald-400">Active</span>
+                        <span className="text-success">Active</span>
                       ) : (
                         <span className="text-red-400">Hidden</span>
                       )}
@@ -103,7 +103,7 @@ export default async function AdminProductsPage() {
                             <input type="hidden" name="isActive" value="true" />
                             <button
                               type="submit"
-                              className={`${moderationButtonClass} text-emerald-400 hover:text-emerald-300`}
+                              className={`${moderationButtonClass} text-success hover:text-success`}
                             >
                               Approve
                             </button>

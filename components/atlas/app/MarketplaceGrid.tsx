@@ -108,7 +108,7 @@ function ProductCard({ product, isLiked, onLike, onInteraction }: { product: any
         <div className="flex items-center justify-between">
           <p className="text-lg font-bold">${Number(product.price).toFixed(2)}</p>
           {product.stock > 0 ? (
-            <span className="text-xs text-emerald-400">In Stock</span>
+            <span className="text-xs text-success">In Stock</span>
           ) : (
             <span className="text-xs text-red-400">Out of Stock</span>
           )}

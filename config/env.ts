@@ -6,7 +6,14 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "staging", "production"])
       .default("development"),
-    SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+    SUPABASE_SERVICE_ROLE_KEY: z
+      .string()
+      .min(1)
+      .optional()
+      .refine(
+        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        "SUPABASE_SERVICE_ROLE_KEY is required in production",
+      ),
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
     TREASURY_WALLET_PRIVATE_KEY: z.string().min(1).optional(),
@@ -14,15 +21,51 @@ export const env = createEnv({
     HD_WALLET_MNEMONIC: z.string().min(1).optional(),
     PAYMENT_MASTER_SEED: z.string().min(1).optional(),
     BSC_RPC_URL: z.string().url().optional(),
-    CRON_SECRET: z.string().min(1).optional(),
+    CRON_SECRET: z
+      .string()
+      .min(1)
+      .optional()
+      .refine(
+        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        "CRON_SECRET is required in production",
+      ),
     SUPER_ADMIN_SESSION_SECRET: z.string().min(32).optional(),
-    AUTH_SECRET: z.string().min(32).optional(),
+    AUTH_SECRET: z
+      .string()
+      .min(32)
+      .optional()
+      .refine(
+        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        "AUTH_SECRET is required in production (min 32 characters)",
+      ),
+    AUTH_URL: z.string().url().optional(),
+    NEXTAUTH_URL: z.string().url().optional(),
     AUTH_GOOGLE_ID: z.string().min(1).optional(),
     AUTH_GOOGLE_SECRET: z.string().min(1).optional(),
+    AUTH_GITHUB_ID: z.string().min(1).optional(),
+    AUTH_GITHUB_SECRET: z.string().min(1).optional(),
     DATABASE_URL: z.string().url().optional(),
     SENTRY_DSN: z.string().url().optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
     EMAIL_FROM: z.string().email().optional(),
+    UPSTASH_REDIS_REST_URL: z
+      .string()
+      .url()
+      .optional()
+      .refine(
+        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        "UPSTASH_REDIS_REST_URL is required in production",
+      ),
+    UPSTASH_REDIS_REST_TOKEN: z
+      .string()
+      .min(1)
+      .optional()
+      .refine(
+        (val) => process.env.NODE_ENV !== "production" || Boolean(val),
+        "UPSTASH_REDIS_REST_TOKEN is required in production",
+      ),
+    BOOTSTRAP_TOKEN: z.string().min(32).optional(),
+    BETTERSTACK_HEARTBEAT_URL: z.string().url().optional(),
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
     ADMIN_ALERT_WEBHOOK_URL: z.string().url().optional(),
     OPENAI_API_KEY: z.string().min(1).optional(),
@@ -38,6 +81,8 @@ export const env = createEnv({
     NEXT_PUBLIC_TREASURY_WALLET_ADDRESS: z.string().optional(),
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+    NEXT_PUBLIC_POSTHOG_KEY: z.string().min(1).optional(),
+    NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
     NEXT_PUBLIC_OAUTH_GOOGLE_ENABLED: z.enum(["true", "false"]).optional(),
     NEXT_PUBLIC_OAUTH_APPLE_ENABLED: z.enum(["true", "false"]).optional(),
     /** GA4 measurement ID. Analytics stays off entirely when unset. */
@@ -59,13 +104,22 @@ export const env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET,
     SUPER_ADMIN_SESSION_SECRET: process.env.SUPER_ADMIN_SESSION_SECRET,
     AUTH_SECRET: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+    AUTH_URL: process.env.AUTH_URL ?? process.env.NEXTAUTH_URL,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL ?? process.env.AUTH_URL,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID ?? process.env.GOOGLE_CLIENT_ID,
     AUTH_GOOGLE_SECRET:
       process.env.AUTH_GOOGLE_SECRET ?? process.env.GOOGLE_CLIENT_SECRET,
+    AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID ?? process.env.GITHUB_CLIENT_ID,
+    AUTH_GITHUB_SECRET:
+      process.env.AUTH_GITHUB_SECRET ?? process.env.GITHUB_CLIENT_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     SENTRY_DSN: process.env.SENTRY_DSN,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    BOOTSTRAP_TOKEN: process.env.BOOTSTRAP_TOKEN,
+    BETTERSTACK_HEARTBEAT_URL: process.env.BETTERSTACK_HEARTBEAT_URL,
     LOG_LEVEL: process.env.LOG_LEVEL,
     ADMIN_ALERT_WEBHOOK_URL: process.env.ADMIN_ALERT_WEBHOOK_URL,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
@@ -83,11 +137,15 @@ export const env = createEnv({
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NEXT_PUBLIC_OAUTH_GOOGLE_ENABLED: process.env.NEXT_PUBLIC_OAUTH_GOOGLE_ENABLED,
     NEXT_PUBLIC_OAUTH_APPLE_ENABLED: process.env.NEXT_PUBLIC_OAUTH_APPLE_ENABLED,
     NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
   },
-  skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
+  skipValidation:
+    process.env.SKIP_ENV_VALIDATION === "true" &&
+    process.env.NODE_ENV !== "production",
   emptyStringAsUndefined: true,
 });
 

@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { COLORS } from "@/lib/constants/design";
 
 type MerchantAnalyticsChartProps = {
   data: Array<{ date: string; revenue: number }>;
@@ -34,7 +35,7 @@ export function MerchantAnalyticsChart({ data }: MerchantAnalyticsChartProps) {
               "Revenue",
             ]}
           />
-          <Bar dataKey="revenue" fill="#C9A227" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="revenue" fill={COLORS.gold} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

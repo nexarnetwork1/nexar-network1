@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole } from "@/modules/users/repository";
 import type { ActionResult } from "@/modules/auth/actions";
 import type { ReportTarget } from "@/types";
@@ -17,7 +17,7 @@ export async function reportContentAction(formData: FormData): Promise<ActionRes
     return { success: false, error: "Missing report details" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const profile = await requireRole(["customer", "merchant", "admin"]);
 
   const { error } = await supabase.from("content_reports").insert({

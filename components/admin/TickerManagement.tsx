@@ -233,7 +233,7 @@ export function TickerManagement({ initialAnnouncements }: Props) {
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
                         isCurrentlyActive(item)
-                          ? "bg-emerald-500/15 text-emerald-400"
+                          ? "bg-success/15 text-success"
                           : item.is_enabled
                             ? "bg-gold-soft text-gold"
                             : "bg-white/5 text-muted"

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole } from "@/modules/users/repository";
 import {
   getOrCreateMarketplaceCart,
@@ -23,7 +23,7 @@ type CheckoutResult = ActionResult & {
 
 export async function cancelOrderAction(orderId: string): Promise<ActionResult> {
   const profile = await requireRole(["customer"]);
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase.rpc("cancel_pending_order", {
     p_order_id: orderId,
@@ -50,7 +50,7 @@ export async function cancelOrderAction(orderId: string): Promise<ActionResult> 
 
 export async function merchantCancelOrderAction(orderId: string): Promise<ActionResult> {
   const profile = await requireRole(["merchant"]);
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase.rpc("merchant_cancel_pending_order", {
     p_order_id: orderId,
@@ -90,7 +90,7 @@ export async function checkoutAction(): Promise<CheckoutResult> {
   }
 
   const storeIds = [...new Set(items.map((i) => i.product.store_id))];
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const orderIds: string[] = [];
 
   for (const storeId of storeIds) {
@@ -185,7 +185,7 @@ export async function updateOrderFulfillmentAction(
   fulfillmentStatus: "processing" | "shipped" | "delivered"
 ): Promise<ActionResult> {
   const profile = await requireRole(["merchant", "admin"]);
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase.rpc("update_order_fulfillment", {
     p_order_id: orderId,
@@ -245,7 +245,7 @@ export async function buyNowAction(
     return { success: false, error: "Could not create cart" };
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: existing } = await supabase
     .from("cart_items")
     .select("id")

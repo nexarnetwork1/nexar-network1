@@ -24,23 +24,23 @@ describe("applyRateLimit", () => {
     rateLimit(`auth:203.0.113.11`, "auth");
   });
 
-  it("does not rate limit OAuth callback routes", () => {
+  it("does not rate limit OAuth callback routes", async () => {
     for (let i = 0; i < 10; i += 1) {
-      const response = applyRateLimit(createRequest("/auth/callback?code=test", { ip: "203.0.113.11" }));
+      const response = await applyRateLimit(createRequest("/auth/callback?code=test", { ip: "203.0.113.11" }));
       expect(response).toBeNull();
     }
   });
 
-  it("does not rate limit GET requests to auth pages", () => {
+  it("does not rate limit GET requests to auth pages", async () => {
     for (let i = 0; i < 10; i += 1) {
-      const response = applyRateLimit(createRequest("/login", { ip: "203.0.113.11" }));
+      const response = await applyRateLimit(createRequest("/login", { ip: "203.0.113.11" }));
       expect(response).toBeNull();
     }
   });
 
-  it("does not rate limit RSC requests to auth pages", () => {
+  it("does not rate limit RSC requests to auth pages", async () => {
     for (let i = 0; i < 10; i += 1) {
-      const response = applyRateLimit(
+      const response = await applyRateLimit(
         createRequest("/login", {
           ip: "203.0.113.11",
           headers: { RSC: "1" },
@@ -50,17 +50,17 @@ describe("applyRateLimit", () => {
     }
   });
 
-  it("rate limits repeated POST submissions to auth pages", () => {
+  it("rate limits repeated POST submissions to auth pages", async () => {
     const ip = "203.0.113.12";
 
     for (let i = 0; i < 5; i += 1) {
-      const response = applyRateLimit(
+      const response = await applyRateLimit(
         createRequest("/login", { method: "POST", ip })
       );
       expect(response).toBeNull();
     }
 
-    const blocked = applyRateLimit(createRequest("/login", { method: "POST", ip }));
+    const blocked = await applyRateLimit(createRequest("/login", { method: "POST", ip }));
     expect(blocked?.status).toBe(429);
   });
 });

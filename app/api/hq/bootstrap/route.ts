@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { env } from "@/config/env";
 import {
   assertSameOrigin,
   crossOriginForbiddenResponse,
@@ -13,9 +14,24 @@ const bodySchema = z.object({
   fullName: z.string().min(2).max(120).optional(),
 });
 
+function assertBootstrapToken(request: Request): boolean {
+  const configured = env.BOOTSTRAP_TOKEN;
+  if (!configured) return true;
+  const provided =
+    request.headers.get("x-bootstrap-token") ??
+    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  return provided === configured;
+}
+
 /** First-install only. Rejects once bootstrap is complete. */
 export async function POST(request: Request) {
-  if (!assertSameOrigin(request)) return crossOriginForbiddenResponse();
+  if (!assertSameOrigin(request, { strict: true })) {
+    return crossOriginForbiddenResponse();
+  }
+
+  if (!assertBootstrapToken(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const state = await getBootstrapState().catch(() => null);
   if (state?.completed) {
@@ -42,10 +58,9 @@ export async function POST(request: Request) {
       alreadyComplete: result.alreadyComplete,
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Bootstrap failed" },
-      { status: 500 },
-    );
+    const message = err instanceof Error ? err.message : "Bootstrap failed";
+    const status = message.includes("already") ? 409 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
 
