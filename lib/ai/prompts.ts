@@ -1,7 +1,7 @@
 import { SITE } from "@/lib/constants/site";
 import { ATLAS_PLATFORM } from "@/domains/atlas";
 import type { EnrichedAssistantContext } from "@/modules/ai/global-assistant/types";
-import { buildMemorySummary } from "./context";
+import { buildMemorySummary } from "./context-server";
 
 const ROLE_GUIDANCE: Record<string, string> = {
   guest:
@@ -96,21 +96,4 @@ export function buildSuggestedPromptsForContext(context: EnrichedAssistantContex
   ];
 
   return [...pagePrompts, ...defaults].slice(0, 6);
-}
-
-export function inferLoadingMessage(message: string): string {
-  const q = message.toLowerCase();
-  if (/\b(price|convert|nxr|usd|egp|eur|market)\b/.test(q)) {
-    return "Checking live market data…";
-  }
-  if (/\b(whitepaper|tokenomics|roadmap|vision)\b/.test(q)) {
-    return "Reading the Whitepaper…";
-  }
-  if (/\b(product|find|search|shop|marketplace)\b/.test(q)) {
-    return "Finding products…";
-  }
-  if (/\b(convert|calculat)\b/.test(q)) {
-    return "Calculating conversion…";
-  }
-  return "Thinking…";
 }

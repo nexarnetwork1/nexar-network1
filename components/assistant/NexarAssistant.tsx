@@ -23,8 +23,8 @@ import type {
   GlobalAssistantAction,
   GlobalAssistantLink,
 } from "@/modules/ai/types";
-import { parseRouteContext } from "@/modules/ai/global-assistant/context";
-import { inferLoadingMessage } from "@/lib/ai/prompts";
+import { parseRouteContext } from "@/modules/ai/client-context";
+import { inferLoadingMessage } from "@/modules/ai/client-ui";
 import { useAssistantSession } from "@/hooks/useAssistantSession";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useMediaQuery, usePrefersReducedMotion } from "@/hooks/useMediaQuery";

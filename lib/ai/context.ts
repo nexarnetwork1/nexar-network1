@@ -1,6 +1,5 @@
 import type { ConversationTurn } from "@/modules/ai/types";
 import type { EnrichedAssistantContext } from "@/modules/ai/global-assistant/types";
-import { getContextSummary } from "@/modules/ai/global-assistant/enrich-context";
 import { resolveContextualQuery } from "@/modules/ai/global-assistant/conversation";
 
 export type OpenAIMessage =
@@ -24,19 +23,6 @@ export function formatConversationInput(
 
   messages.push({ role: "user", content: rewritten });
   return messages;
-}
-
-export function buildMemorySummary(context: EnrichedAssistantContext): string {
-  const parts: string[] = [getContextSummary(context)];
-
-  if (context.lastTopic) {
-    parts.push(`Last discussed topic: ${context.lastTopic}`);
-  }
-  if (context.lastEntity) {
-    parts.push(`Last entity: ${context.lastEntity.type} — ${context.lastEntity.name}`);
-  }
-
-  return parts.join("\n");
 }
 
 export function extractTopicFromContent(content: string): string | undefined {

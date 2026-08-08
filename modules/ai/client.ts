@@ -11,3 +11,6 @@ export type {
   ConversationTurn,
 } from "./types";
 export { ASSISTANT_SUGGESTED_PROMPTS } from "./site-knowledge";
+export { inferLoadingMessage } from "./client-ui";
+export { parseRouteContext } from "./client-context";
+export type { AssistantPageContext, AssistantPageType } from "./client-context";
