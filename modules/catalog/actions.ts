@@ -64,7 +64,7 @@ async function emitProductPublished(input: {
 }
 
 async function syncProductCatalogData(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createAdminClient>,
   productId: string,
   stock: number,
   imageUrl: string | null

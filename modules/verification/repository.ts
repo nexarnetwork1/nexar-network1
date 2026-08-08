@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { MerchantProfile, MerchantVerificationLevel } from "@/types";
 
 export type VerificationStatus = MerchantProfile["verification_status"];

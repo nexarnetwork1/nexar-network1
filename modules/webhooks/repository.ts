@@ -1,6 +1,5 @@
 import { createHash, createHmac, randomBytes } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { webhooksConfig } from "@/config/webhooks";
 import { assertSafeExternalUrl } from "@/lib/security/ssrf";
 import type { MerchantWebhook, WebhookEvent } from "@/types";

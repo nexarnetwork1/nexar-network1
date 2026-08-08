@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { Notification, NotificationPreference, NotificationType } from "@/types";
 
 export { resolveNotificationPreference } from "./preferences";

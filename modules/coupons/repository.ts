@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { Coupon, CouponScope, CouponType } from "@/types";
 
 export function calculateCouponDiscount(

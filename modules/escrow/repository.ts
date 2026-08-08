@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { Escrow, EscrowStatus } from "@/types";
 
 export async function getEscrowByOrderId(orderId: string): Promise<Escrow | null> {
