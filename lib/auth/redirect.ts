@@ -96,3 +96,47 @@ export function resolvePostLoginRedirect(
 ): string {
   return safeRedirect(path, fallback);
 }
+
+/** Treat localhost and 127.0.0.1 as the same dev host for Auth.js redirect matching. */
+function normalizeAuthOrigin(origin: string): string {
+  try {
+    const url = new URL(origin);
+    const hostname = url.hostname === "127.0.0.1" ? "localhost" : url.hostname;
+    const port = url.port ? `:${url.port}` : "";
+    return `${url.protocol}//${hostname}${port}`;
+  } catch {
+    return origin;
+  }
+}
+
+function originsMatchAuthHost(a: string, b: string): boolean {
+  return normalizeAuthOrigin(a) === normalizeAuthOrigin(b);
+}
+
+/**
+ * Auth.js redirect callback — keep post-OAuth landing on the active host and
+ * preserve `/auth/callback` query params (e.g. `redirect=/atlas`).
+ */
+export function resolveAuthJsRedirectUrl(url: string, baseUrl: string): string {
+  if (url.startsWith("/")) return `${baseUrl}${url}`;
+
+  try {
+    const target = new URL(url);
+    const base = new URL(baseUrl);
+
+    if (originsMatchAuthHost(target.origin, base.origin)) {
+      if (target.origin === base.origin) return url;
+      return `${base.origin}${target.pathname}${target.search}${target.hash}`;
+    }
+  } catch {
+    // Malformed URL — fall through to default callback.
+  }
+
+  return `${baseUrl.replace(/\/$/, "")}/auth/callback`;
+}
+
+/** Safe relative OAuth callback path for Auth.js signIn({ callbackUrl }). */
+export function buildOAuthCallbackPath(destination: string | null | undefined): string {
+  const redirect = safeRedirect(destination);
+  return `/auth/callback?${new URLSearchParams({ redirect }).toString()}`;
+}

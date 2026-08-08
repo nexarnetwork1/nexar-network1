@@ -1,4 +1,4 @@
-import type { GlobalAssistantLink } from "../types";
+import type { AssistantCard, GlobalAssistantLink } from "../types";
 
 export type AssistantUserRole = "guest" | "customer" | "merchant" | "admin" | "treasury_admin";
 
@@ -17,6 +17,7 @@ export type AssistantPageType =
   | "about"
   | "legal"
   | "market"
+  | "atlas"
   | "pay"
   | "contact"
   | "other";
@@ -77,6 +78,7 @@ export type GlobalAssistantResult = {
   searchResults?: AssistantSearchHit[];
   matchedTopic?: string;
   mode: "demo" | "openai";
+  cards?: AssistantCard[];
 };
 
 export interface GlobalAssistantProvider {

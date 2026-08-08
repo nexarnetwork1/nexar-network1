@@ -14,6 +14,13 @@ import {
   pickActionsForTopic,
 } from "./navigation-actions";
 import { assistantSearch, extractSearchTerm, isSearchQuery } from "./search";
+import {
+  convertNxrAmount,
+  fetchNxrMarketSnapshot,
+  formatConversionForModel,
+  formatMarketSnapshotForModel,
+} from "@/lib/ai/market-data";
+import { formatWhitepaperSectionsForModel, searchWhitepaperSections } from "@/lib/ai/whitepaper-knowledge";
 import type {
   AssistantAction,
   EnrichedAssistantContext,
@@ -213,6 +220,77 @@ export async function resolveGlobalAssistantQuery(
   const pageAnswer = answerCurrentPage({ ...context, conversationHistory: [{ role: "user", content: trimmed }] });
   if (pageAnswer) {
     return pageAnswer;
+  }
+
+  if (/\b(convert|how much is|worth in|كام|جنيه|دولار)\b/i.test(trimmed)) {
+    const amountMatch = trimmed.match(/(\d+(?:\.\d+)?)\s*nxr/i);
+    if (amountMatch) {
+      const amount = Number.parseFloat(amountMatch[1]);
+      const conversion = await convertNxrAmount(amount);
+      if (conversion) {
+        return {
+          content: formatConversionForModel(conversion),
+          links: [{ label: "Open Market", href: "/market" }],
+          actions: [{ label: "Open Market", href: "/market" }],
+          cards: [
+            {
+              type: "market",
+              symbol: conversion.symbol,
+              priceUsd: conversion.priceUsd,
+              amount: conversion.amount,
+              convertedValues: conversion.conversions,
+              href: "/market",
+              live: true,
+            },
+          ],
+          suggestedPrompts: suggestPromptsForContext(context),
+          matchedTopic: "NXR Conversion",
+          mode: "demo",
+        };
+      }
+    }
+  }
+
+  if (/\b(price|market data|nxr price|سعر)\b/i.test(trimmed)) {
+    const snapshot = await fetchNxrMarketSnapshot();
+    return {
+      content: formatMarketSnapshotForModel(snapshot),
+      links: [{ label: "Open Market", href: "/market" }],
+      actions: [{ label: "Open Market", href: "/market" }],
+      cards: [
+        {
+          type: "market",
+          symbol: snapshot.symbol,
+          priceUsd: snapshot.priceUsd,
+          change24h: snapshot.change24h,
+          href: "/market",
+          live: snapshot.source === "coingecko" && snapshot.priceUsd != null,
+        },
+      ],
+      suggestedPrompts: suggestPromptsForContext(context),
+      matchedTopic: "NXR Market",
+      mode: "demo",
+    };
+  }
+
+  if (/\b(whitepaper|tokenomics section|roadmap section)\b/i.test(trimmed)) {
+    const sections = searchWhitepaperSections(trimmed, 2);
+    if (sections.length) {
+      return {
+        content: formatWhitepaperSectionsForModel(sections),
+        links: [{ label: "Open Whitepaper", href: "/whitepaper" }],
+        actions: [{ label: "Open Whitepaper", href: "/whitepaper" }],
+        cards: sections.map((section) => ({
+          type: "document" as const,
+          title: section.title,
+          excerpt: section.body.slice(0, 220),
+          href: `/whitepaper#${section.id}`,
+        })),
+        suggestedPrompts: suggestPromptsForContext(context),
+        matchedTopic: "Whitepaper",
+        mode: "demo",
+      };
+    }
   }
 
   if (NAVIGATION_VERBS.test(trimmed) || normalized.startsWith("open ")) {

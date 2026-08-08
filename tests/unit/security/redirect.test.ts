@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isValidRedirect, safeRedirect } from "@/lib/auth/redirect";
+import {
+  buildOAuthCallbackPath,
+  isValidRedirect,
+  resolveAuthJsRedirectUrl,
+  safeRedirect,
+} from "@/lib/auth/redirect";
 
 describe("isValidRedirect", () => {
   it("accepts internal paths", () => {
@@ -47,5 +52,56 @@ describe("safeRedirect", () => {
     expect(safeRedirect("//evil.com", "/atlas")).toBe("/atlas");
     expect(safeRedirect(null, "/atlas")).toBe("/atlas");
     expect(safeRedirect(undefined)).toBe("/atlas");
+  });
+});
+
+describe("resolveAuthJsRedirectUrl", () => {
+  const baseUrl = "http://localhost:3000";
+
+  it("preserves relative callback paths with query params", () => {
+    expect(resolveAuthJsRedirectUrl("/auth/callback?redirect=%2Fatlas", baseUrl)).toBe(
+      "http://localhost:3000/auth/callback?redirect=%2Fatlas",
+    );
+  });
+
+  it("accepts same-origin absolute callback URLs", () => {
+    expect(
+      resolveAuthJsRedirectUrl(
+        "http://localhost:3000/auth/callback?redirect=%2Fmerchant",
+        baseUrl,
+      ),
+    ).toBe("http://localhost:3000/auth/callback?redirect=%2Fmerchant");
+  });
+
+  it("maps 127.0.0.1 callback URLs onto the active localhost host", () => {
+    expect(
+      resolveAuthJsRedirectUrl(
+        "http://127.0.0.1:3000/auth/callback?redirect=%2Fatlas",
+        baseUrl,
+      ),
+    ).toBe("http://localhost:3000/auth/callback?redirect=%2Fatlas");
+  });
+
+  it("rejects external origins while preserving internal callback params", () => {
+    expect(
+      resolveAuthJsRedirectUrl(
+        "https://evil.com/auth/callback?redirect=%2Fatlas",
+        baseUrl,
+      ),
+    ).toBe("http://localhost:3000/auth/callback");
+  });
+});
+
+describe("buildOAuthCallbackPath", () => {
+  it("builds a safe relative Auth.js callback path", () => {
+    expect(buildOAuthCallbackPath("/merchant")).toBe(
+      "/auth/callback?redirect=%2Fmerchant",
+    );
+  });
+
+  it("blocks open redirects in callback destination", () => {
+    expect(buildOAuthCallbackPath("//evil.com")).toBe(
+      "/auth/callback?redirect=%2Fatlas",
+    );
   });
 });

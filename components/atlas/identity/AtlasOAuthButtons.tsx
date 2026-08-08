@@ -9,7 +9,7 @@ import { isWeb3Configured } from "@/components/providers/Web3Provider";
 import { markWalletSessionActive } from "@/lib/web3/wallet-session";
 import { linkOrLoginWalletAction } from "@/modules/auth/actions";
 import { cn } from "@/lib/utils/cn";
-import { getOAuthCallbackOrigin } from "@/lib/auth/app-url";
+import { buildOAuthCallbackPath } from "@/lib/auth/redirect";
 
 type AtlasOAuthButtonsProps = {
   redirectTo?: string;
@@ -71,9 +71,7 @@ export function AtlasOAuthButtons({
     setError(null);
 
     try {
-      const appUrl = getOAuthCallbackOrigin().replace(/\/$/, "");
-      const destination = redirectTo ?? "/atlas";
-      const callbackUrl = `${appUrl}/auth/callback?${new URLSearchParams({ redirect: destination }).toString()}`;
+      const callbackUrl = buildOAuthCallbackPath(redirectTo ?? "/atlas");
       await signIn(provider, { callbackUrl, redirect: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : `${provider} sign-in failed`);

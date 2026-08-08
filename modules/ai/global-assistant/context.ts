@@ -23,6 +23,7 @@ const PAGE_LABELS: Record<AssistantPageType, string> = {
   about: "About",
   legal: "Legal",
   market: "NXR Market",
+  atlas: "ATLAS",
   pay: "Payment",
   contact: "Contact",
   other: "Nexar Network",
@@ -93,6 +94,13 @@ export function parseRouteContext(pathname: string, hash?: string): AssistantPag
   }
   if (path.startsWith("/market") || path.startsWith("/presale")) {
     return { pageType: "market", label: PAGE_LABELS.market };
+  }
+  if (path.startsWith("/atlas")) {
+    const sub = path.replace("/atlas", "").replace(/^\//, "") || "home";
+    return {
+      pageType: "atlas",
+      label: sub === "home" ? PAGE_LABELS.atlas : `ATLAS · ${sub.replace(/\//g, " › ")}`,
+    };
   }
   if (path.startsWith("/pay")) {
     return { pageType: "pay", label: PAGE_LABELS.pay };

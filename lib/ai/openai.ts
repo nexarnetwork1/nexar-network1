@@ -1,7 +1,6 @@
 import OpenAI from "openai";
-import type { ResponseStreamEvent } from "openai/resources/responses/responses";
 import { getOpenAIApiKey, getOpenAIModelName, isOpenAIConfigured } from "./config";
-import { ASSISTANT_TOOLS, executeAssistantTool, parseToolCall } from "./tools";
+import { ASSISTANT_TOOLS, executeAssistantTool, parseToolCall, type ToolExecutionState } from "./tools";
 import { buildAssistantInstructions, buildSuggestedPromptsForContext } from "./prompts";
 import { assembleKnowledgeContext } from "./knowledge";
 import { formatConversationInput, extractTopicFromContent } from "./context";
@@ -48,10 +47,11 @@ async function runWithTools(
   input: ResponseInput,
   context: EnrichedAssistantContext,
   signal?: AbortSignal,
-): Promise<{ text: string; navigateTo?: string }> {
+): Promise<{ text: string; navigateTo?: string; cards: ToolExecutionState["cards"] }> {
   let currentInput: ResponseInput = input;
   let finalText = "";
   let navigateTo: string | undefined;
+  const toolState: ToolExecutionState = { cards: [] };
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
     const response = await client.responses.create(
@@ -78,7 +78,7 @@ async function runWithTools(
       const parsed = parseToolCall(call.name, call.arguments);
       if (!parsed) continue;
 
-      const output = await executeAssistantTool(parsed, context);
+      const output = await executeAssistantTool(parsed, context, toolState);
       if (parsed.name === "suggest_navigation") {
         const hrefMatch = output.match(/Navigate to: (\S+)/);
         if (hrefMatch?.[1]) navigateTo = hrefMatch[1];
@@ -94,7 +94,7 @@ async function runWithTools(
     currentInput = [...currentInput, ...response.output, ...toolOutputs] as ResponseInput;
   }
 
-  return { text: finalText, navigateTo };
+  return { text: finalText, navigateTo, cards: toolState.cards };
 }
 
 function enrichResult(
@@ -102,6 +102,7 @@ function enrichResult(
   context: EnrichedAssistantContext,
   message: string,
   navigateTo?: string,
+  cards?: GlobalAssistantResult["cards"],
 ): GlobalAssistantResult {
   const topic = extractTopicFromContent(text) ?? extractTopicFromContent(message);
   const navHref = navigateTo ?? detectNavigationIntent(message);
@@ -121,6 +122,7 @@ function enrichResult(
     suggestedPrompts: [],
     matchedTopic: topic,
     mode: "openai",
+    cards: cards?.length ? cards : undefined,
   };
 }
 
@@ -135,8 +137,8 @@ export async function createAssistantResponse(
   const instructions = buildAssistantInstructions(context, knowledge);
   const input = buildInputMessages(message, context);
 
-  const { text, navigateTo } = await runWithTools(client, instructions, input, context, signal);
-  const result = enrichResult(text, context, message, navigateTo);
+  const { text, navigateTo, cards } = await runWithTools(client, instructions, input, context, signal);
+  const result = enrichResult(text, context, message, navigateTo, cards);
   result.suggestedPrompts = buildSuggestedPromptsForContext(context);
   return result;
 }
@@ -146,54 +148,22 @@ export type StreamEvent =
   | { type: "done"; result: GlobalAssistantResult }
   | { type: "error"; message: string };
 
-/** Streaming OpenAI response — yields text deltas then final enriched result. */
+/** Streaming — runs tools first, then streams the verified response in chunks. */
 export async function* streamAssistantResponse(
   message: string,
   context: EnrichedAssistantContext,
   signal?: AbortSignal,
 ): AsyncGenerator<StreamEvent> {
-  const client = createOpenAIClient();
-  const knowledge = await assembleKnowledgeContext(context, message);
-  const instructions = buildAssistantInstructions(context, knowledge);
-  const input = buildInputMessages(message, context);
-
-  let accumulated = "";
-
   try {
-    const stream = await client.responses.create(
-      {
-        model: getOpenAIModel(),
-        instructions,
-        input,
-        max_output_tokens: 800,
-        temperature: 0.3,
-        stream: true,
-      },
-      { signal },
-    );
+    const result = await createAssistantResponse(message, context, signal);
+    if (signal?.aborted) return;
 
-    for await (const event of stream as AsyncIterable<ResponseStreamEvent>) {
-      if (signal?.aborted) break;
-
-      if (event.type === "response.output_text.delta") {
-        accumulated += event.delta;
-        yield { type: "delta", text: event.delta };
-      }
-
-      if (event.type === "response.completed") {
-        const text = accumulated.trim() || event.response.output_text?.trim() || "";
-        const result = enrichResult(text, context, message);
-        result.suggestedPrompts = buildSuggestedPromptsForContext(context);
-        yield { type: "done", result };
-        return;
-      }
+    const chunks = result.content.match(/[^\s]+\s*|\s+/g) ?? [result.content];
+    for (const chunk of chunks) {
+      if (signal?.aborted) return;
+      yield { type: "delta", text: chunk };
     }
-
-    if (accumulated.trim()) {
-      const result = enrichResult(accumulated.trim(), context, message);
-      result.suggestedPrompts = buildSuggestedPromptsForContext(context);
-      yield { type: "done", result };
-    }
+    yield { type: "done", result };
   } catch (error) {
     if (signal?.aborted) return;
     const msg = error instanceof Error ? error.message : "Stream failed";

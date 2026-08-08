@@ -4,6 +4,8 @@ import { COMMERCE_FAQ_ITEMS } from "@/lib/commerce/faq-content";
 import { getPageKnowledge, summarizeCurrentPage } from "@/modules/ai/site-knowledge/page-index";
 import { SITE_KNOWLEDGE } from "@/modules/ai/site-knowledge";
 import { isNexarTopicQuery, searchKnowledgeEntries } from "@/modules/ai/site-knowledge/query-match";
+import { searchWhitepaperSections, formatWhitepaperSectionsForModel } from "@/lib/ai/whitepaper-knowledge";
+import { ATLAS_PLATFORM } from "@/domains/atlas";
 import type { EnrichedAssistantContext } from "@/modules/ai/global-assistant/types";
 import { assistantSearch } from "@/modules/ai/global-assistant/search";
 
@@ -63,6 +65,17 @@ export async function assembleKnowledgeContext(
   }
 
   sections.push(`## Platform knowledge\n${buildStaticKnowledgeDigest()}`);
+
+  sections.push(
+    `## ATLAS\n${ATLAS_PLATFORM.name} (${ATLAS_PLATFORM.tagline}) is the Business Operating System of Nexar Network. Public entry: /atlas. Modules include Business, Marketplace, Network, Feed, Connect, Wallet, AI, Analytics, Documents, CRM, HR, Finance, Inventory. Guests can browse public ATLAS areas; authenticated users access workspace features per role.`,
+  );
+
+  if (/\b(whitepaper|tokenomics|roadmap|vision|mission|architecture|security)\b/i.test(query)) {
+    const wpSections = searchWhitepaperSections(query, 2);
+    if (wpSections.length) {
+      sections.push(`## Whitepaper excerpts\n${formatWhitepaperSectionsForModel(wpSections)}`);
+    }
+  }
 
   if (shouldRunKnowledgeSearch(query, context)) {
     const matchedEntries = searchKnowledgeEntries(SITE_KNOWLEDGE, query, 4);

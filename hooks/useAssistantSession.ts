@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, startTransition } from "react";
 
+import type { AssistantCard } from "@/modules/ai/types";
+
 const SESSION_KEY = "nxr-assistant-session";
 
 export type AssistantSessionMessage = {
@@ -13,6 +15,7 @@ export type AssistantSessionMessage = {
   navigateTo?: string;
   topic?: string;
   entityRef?: string;
+  cards?: AssistantCard[];
 };
 
 type StoredSession = {

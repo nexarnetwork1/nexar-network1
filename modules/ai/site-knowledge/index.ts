@@ -43,6 +43,26 @@ const CORE_SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
     primaryLink: "/#about",
   },
   {
+    id: "atlas",
+    title: "ATLAS",
+    keywords: [
+      "atlas",
+      "operating system",
+      "business os",
+      "workspace",
+      "what is atlas",
+      "atlas ai",
+    ],
+    answer:
+      "ATLAS is the Business Operating System of Nexar Network — connecting commerce, finance, network, analytics, documents, CRM, HR, Finance, and business operations. Public entry: /atlas. Sign in for workspace features.",
+    links: [
+      { label: "Open ATLAS", href: "/atlas" },
+      { label: "Marketplace", href: MARKETPLACE_ROUTES.root },
+      { label: "Sign in to ATLAS", href: "/login?redirect=%2Fatlas" },
+    ],
+    primaryLink: "/atlas",
+  },
+  {
     id: "vision",
     title: "Company vision",
     keywords: ["vision", "mission", "goal", "purpose", "why nexar", "future"],
@@ -252,14 +272,12 @@ const CORE_SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
 export const SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [...CORE_SITE_KNOWLEDGE, ...NEXAR_KNOWLEDGE];
 
 export const ASSISTANT_SUGGESTED_PROMPTS = [
-  "What is Nexar Network?",
-  "Open Whitepaper",
-  "Who is the founder?",
-  "How do I join the NXR presale?",
-  "Register as a merchant",
-  "Take me to Marketplace",
-  "Explain NXR token utility",
-  "Official social links",
+  "What is Nexar?",
+  "What is ATLAS?",
+  "Explain NXR",
+  "Open Marketplace",
+  "Show NXR market data",
+  "Explain this page",
 ] as const;
 
 /** Alias map for natural navigation commands. */
@@ -275,6 +293,8 @@ export const NAVIGATION_ALIASES: Record<string, string> = {
   market: "/market",
   presale: "/market",
   marketplace: MARKETPLACE_ROUTES.root,
+  atlas: "/atlas",
+  "open atlas": "/atlas",
   shop: MARKETPLACE_ROUTES.root,
   cart: MARKETPLACE_ROUTES.cart,
   wishlist: MARKETPLACE_ROUTES.wishlist,

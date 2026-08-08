@@ -33,6 +33,38 @@ export type GlobalAssistantAction = GlobalAssistantLink & {
   prompt?: string;
 };
 
+export type AssistantMarketCard = {
+  type: "market";
+  symbol: string;
+  priceUsd: number | null;
+  change24h?: number | null;
+  amount?: number;
+  convertedValues?: Array<{ currency: string; value: number }>;
+  href?: string;
+  live: boolean;
+};
+
+export type AssistantProductCard = {
+  type: "product";
+  title: string;
+  price?: string;
+  merchant?: string;
+  href: string;
+  availability?: string;
+};
+
+export type AssistantDocumentCard = {
+  type: "document";
+  title: string;
+  excerpt: string;
+  href: string;
+};
+
+export type AssistantCard =
+  | AssistantMarketCard
+  | AssistantProductCard
+  | AssistantDocumentCard;
+
 export type GlobalAssistantSearchHit = {
   type: string;
   id: string;
@@ -64,4 +96,5 @@ export type GlobalAssistantResponse = {
   searchResults?: GlobalAssistantSearchHit[];
   matchedTopic?: string;
   mode: "demo" | "openai";
+  cards?: AssistantCard[];
 };

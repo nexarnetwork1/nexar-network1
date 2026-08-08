@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import { SupabaseAuthjsAdapter } from "@/lib/auth/authjs-adapter";
+import { resolveAuthJsRedirectUrl } from "@/lib/auth/redirect";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { UserRole } from "@/types";
 
@@ -129,14 +130,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      try {
-        const target = new URL(url);
-        if (target.origin === baseUrl) return url;
-      } catch {
-        // Malformed URL — fall through to ATLAS callback.
-      }
-      return `${baseUrl}/auth/callback`;
+      return resolveAuthJsRedirectUrl(url, baseUrl);
     },
     async signIn({ user, account }) {
       if (

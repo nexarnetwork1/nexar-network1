@@ -4,14 +4,32 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Bot, Send, Sparkles, X } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowUpRight,
+  Copy,
+  Check,
+  Plus,
+  RotateCcw,
+  Sparkles,
+  Trash2,
+  X,
+} from "lucide-react";
 import { askGlobalAssistantAction } from "@/modules/ai/actions";
 import { ASSISTANT_SUGGESTED_PROMPTS } from "@/modules/ai/site-knowledge";
-import type { ConversationTurn, GlobalAssistantAction, GlobalAssistantLink } from "@/modules/ai/types";
+import type {
+  AssistantCard,
+  ConversationTurn,
+  GlobalAssistantAction,
+  GlobalAssistantLink,
+} from "@/modules/ai/types";
 import { parseRouteContext } from "@/modules/ai/global-assistant/context";
+import { inferLoadingMessage } from "@/lib/ai/prompts";
 import { useAssistantSession } from "@/hooks/useAssistantSession";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useMediaQuery, usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { AssistantMarkdown } from "@/components/assistant/AssistantMarkdown";
+import { AssistantCards } from "@/components/assistant/AssistantCards";
 import { cn } from "@/lib/utils/cn";
 
 function createId(): string {
@@ -29,6 +47,10 @@ function toConversationHistory(
   }));
 }
 
+function containsArabic(text: string): boolean {
+  return /[\u0600-\u06FF]/.test(text);
+}
+
 export function NexarAssistant() {
   const router = useRouter();
   const pathname = usePathname();
@@ -37,20 +59,44 @@ export function NexarAssistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Thinking…");
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>([...ASSISTANT_SUGGESTED_PROMPTS]);
   const [hash, setHash] = useState("");
   const [assistantMode, setAssistantMode] = useState<"demo" | "openai" | null>(null);
-  const { messages, unreadCount, appendMessage, updateMessage, setPanelOpen, hydrated } =
-    useAssistantSession();
+  const {
+    messages,
+    unreadCount,
+    appendMessage,
+    updateMessage,
+    clearMessages,
+    setPanelOpen,
+    hydrated,
+  } = useAssistantSession();
 
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const lastUserMessageRef = useRef<string>("");
 
   const pageContext = useMemo(
     () => parseRouteContext(pathname, hash || undefined),
     [pathname, hash],
   );
+
+  const contextualPrompts = useMemo(() => {
+    const pageSpecific =
+      pageContext.pageType === "market"
+        ? ["What is the NXR price?", "Convert 100 NXR to USD"]
+        : pageContext.pageType === "whitepaper"
+          ? ["Explain tokenomics", "Explain this section"]
+          : pageContext.pageType === "atlas"
+            ? ["What can I do in ATLAS?", "Open Marketplace"]
+            : pageContext.pageType === "marketplace"
+              ? ["Find a product", "How does checkout work?"]
+              : [];
+
+    return [...pageSpecific, ...suggestedPrompts].slice(0, 6);
+  }, [pageContext.pageType, suggestedPrompts]);
 
   useScrollLock(open);
 
@@ -95,6 +141,13 @@ export function NexarAssistant() {
     });
   }, [messages, loading, reducedMotion]);
 
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  }, [input]);
+
   const sendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
@@ -105,8 +158,9 @@ export function NexarAssistant() {
       abortRef.current = controller;
 
       setInput("");
-      const userMessageId = createId();
-      appendMessage({ id: userMessageId, role: "user", content: trimmed });
+      lastUserMessageRef.current = trimmed;
+      setLoadingMessage(inferLoadingMessage(trimmed));
+      appendMessage({ id: createId(), role: "user", content: trimmed });
       setLoading(true);
 
       const history = toConversationHistory(
@@ -137,30 +191,26 @@ export function NexarAssistant() {
         suggestedPrompts?: string[];
         matchedTopic?: string;
         mode?: "demo" | "openai";
+        cards?: AssistantCard[];
       }) => {
         if (result.suggestedPrompts?.length) {
           setSuggestedPrompts(result.suggestedPrompts);
         }
         if (result.mode) setAssistantMode(result.mode);
 
+        const patch = {
+          content: result.content,
+          links: result.links,
+          actions: result.actions,
+          navigateTo: result.navigateTo,
+          topic: result.matchedTopic,
+          cards: result.cards,
+        };
+
         if (streamStarted) {
-          updateMessage(assistantId, {
-            content: result.content,
-            links: result.links,
-            actions: result.actions,
-            navigateTo: result.navigateTo,
-            topic: result.matchedTopic,
-          });
+          updateMessage(assistantId, patch);
         } else {
-          appendMessage({
-            id: assistantId,
-            role: "assistant",
-            content: result.content,
-            links: result.links,
-            actions: result.actions,
-            navigateTo: result.navigateTo,
-            topic: result.matchedTopic,
-          });
+          appendMessage({ id: assistantId, role: "assistant", ...patch });
         }
       };
 
@@ -200,6 +250,7 @@ export function NexarAssistant() {
                     suggestedPrompts?: string[];
                     matchedTopic?: string;
                     mode?: "demo" | "openai";
+                    cards?: AssistantCard[];
                   };
                 };
 
@@ -257,7 +308,7 @@ export function NexarAssistant() {
           appendMessage({
             id: createId(),
             role: "assistant",
-            content: "Nexar Assistant is temporarily unavailable. Please try again.",
+            content: "ATLAS AI is temporarily unavailable. Please try again.",
           });
         }
       } finally {
@@ -289,13 +340,19 @@ export function NexarAssistant() {
     [navigate, sendMessage],
   );
 
+  const handleRetry = useCallback(() => {
+    if (lastUserMessageRef.current) {
+      void sendMessage(lastUserMessageRef.current);
+    }
+  }, [sendMessage]);
+
   const panelTransition = reducedMotion
     ? { duration: 0 }
     : { type: "spring" as const, stiffness: 380, damping: 36 };
 
-  const panelInitial = isMobile ? { y: "100%" } : { x: "100%" };
-  const panelAnimate = isMobile ? { y: 0 } : { x: 0 };
-  const panelExit = isMobile ? { y: "100%" } : { x: "100%" };
+  const panelInitial = isMobile ? { y: "100%" } : { x: "100%", opacity: 0.96 };
+  const panelAnimate = isMobile ? { y: 0 } : { x: 0, opacity: 1 };
+  const panelExit = isMobile ? { y: "100%" } : { x: "100%", opacity: 0.96 };
 
   if (!hydrated) return null;
 
@@ -312,8 +369,8 @@ export function NexarAssistant() {
             transition={{ duration: reducedMotion ? 0 : 0.25 }}
             aria-label={
               unreadCount > 0
-                ? `Open Nexar Assistant, ${unreadCount} unread`
-                : "Open Nexar Assistant"
+                ? `Open ATLAS AI, ${unreadCount} unread`
+                : "Open ATLAS AI"
             }
             onClick={() => setOpen(true)}
             className={cn(
@@ -338,80 +395,104 @@ export function NexarAssistant() {
           <>
             <motion.button
               type="button"
-              aria-label="Close assistant backdrop"
+              aria-label="Close ATLAS AI backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: reducedMotion ? 0 : 0.2 }}
-              className="fixed inset-0 z-[124] bg-black/45 backdrop-blur-[2px]"
+              className="fixed inset-0 z-[124] bg-black/50 backdrop-blur-[3px]"
               onClick={() => setOpen(false)}
             />
 
             <motion.aside
               role="dialog"
               aria-modal="true"
-              aria-labelledby="nexar-assistant-title"
+              aria-labelledby="atlas-ai-title"
               initial={panelInitial}
               animate={panelAnimate}
               exit={panelExit}
               transition={panelTransition}
               className={cn(
-                "fixed z-[125] flex flex-col border-border/80 bg-chrome/95 shadow-2xl shadow-black/50 backdrop-blur-2xl",
+                "fixed z-[125] flex flex-col overflow-hidden border-border/80 bg-[#0a0a0c]/95 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.75)] backdrop-blur-2xl",
                 isMobile
-                  ? "inset-x-0 bottom-0 top-auto max-h-[min(90vh,640px)] rounded-t-2xl border-t"
-                  : "inset-y-0 right-0 w-full max-w-[min(100vw,24rem)] border-l",
+                  ? "inset-x-0 bottom-0 top-[var(--nxr-header-offset,4rem)] rounded-t-[1.25rem] border-t pb-[env(safe-area-inset-bottom)]"
+                  : "inset-y-4 right-4 w-[min(100vw-2rem,35rem)] rounded-[1.25rem] border",
               )}
             >
-              <header className="flex items-center justify-between gap-3 border-b border-border/70 px-4 py-4">
+              <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border/60 px-5 py-4">
                 <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/10">
-                    <Bot className="h-5 w-5 text-gold" aria-hidden />
+                  <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gold/25 bg-gold/10">
+                    <Sparkles className="h-5 w-5 text-gold" aria-hidden />
+                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0a0a0c] bg-emerald-500" aria-hidden />
                   </span>
                   <div className="min-w-0">
-                    <h2 id="nexar-assistant-title" className="font-heading text-sm font-semibold text-white">
-                      Nexar Assistant
+                    <h2 id="atlas-ai-title" className="font-heading text-base font-semibold tracking-tight text-white">
+                      ATLAS AI
                     </h2>
                     <p className="truncate text-[11px] text-muted">
-                      {pageContext.label} ·{" "}
-                      {assistantMode === "openai" ? "AI powered" : "Enterprise guide"}
+                      Nexar Intelligence · {pageContext.label}
+                      {assistantMode === "openai" ? " · Live" : ""}
                     </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  aria-label="Close Nexar Assistant"
-                  onClick={() => setOpen(false)}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/70 text-muted transition-colors hover:border-gold/30 hover:text-white"
-                >
-                  <X className="h-4 w-4" aria-hidden />
-                </button>
+                <div className="flex shrink-0 items-center gap-1">
+                  {messages.length > 0 ? (
+                    <>
+                      <button
+                        type="button"
+                        aria-label="New conversation"
+                        title="New conversation"
+                        onClick={() => clearMessages()}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 text-muted transition-colors hover:border-gold/30 hover:text-white"
+                      >
+                        <RotateCcw className="h-4 w-4" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Clear conversation"
+                        title="Clear conversation"
+                        onClick={() => clearMessages()}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 text-muted transition-colors hover:border-gold/30 hover:text-white"
+                      >
+                        <Trash2 className="h-4 w-4" aria-hidden />
+                      </button>
+                    </>
+                  ) : null}
+                  <button
+                    type="button"
+                    aria-label="Close ATLAS AI"
+                    onClick={() => setOpen(false)}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 text-muted transition-colors hover:border-gold/30 hover:text-white"
+                  >
+                    <X className="h-4 w-4" aria-hidden />
+                  </button>
+                </div>
               </header>
-
-              <div className="border-b border-border/50 px-4 py-2">
-                <p className="truncate text-[10px] tracking-wide text-gold/80 uppercase">
-                  Context: {pageContext.label}
-                </p>
-              </div>
 
               <div
                 ref={listRef}
-                className="flex-1 space-y-4 overflow-y-auto px-4 py-4"
+                className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5"
                 data-scroll-lock-scrollable
               >
                 {messages.length === 0 ? (
-                  <div className="rounded-2xl border border-gold/20 bg-gold/5 p-4">
-                    <p className="text-sm leading-relaxed text-white/90">
-                      Hi — I&apos;m your Nexar Assistant. I know where you are on the site and can
-                      help with NXR, marketplace, merchants, and navigation. Try &quot;Explain this
-                      section&quot; on any page.
+                  <div className="rounded-2xl border border-gold/15 bg-gradient-to-br from-gold/[0.06] to-transparent p-5">
+                    <p className="text-[10px] font-semibold tracking-[0.24em] text-gold uppercase">
+                      ATLAS AI
                     </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {suggestedPrompts.map((prompt) => (
+                    <p className="mt-2 font-heading text-lg font-semibold text-white">
+                      Your intelligence layer for Nexar.
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">
+                      Ask me about Nexar, ATLAS, NXR, the Marketplace, the Whitepaper, live market
+                      information, or the page you&apos;re currently viewing.
+                    </p>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                      {contextualPrompts.map((prompt) => (
                         <button
                           key={prompt}
                           type="button"
                           onClick={() => void sendMessage(prompt)}
-                          className="rounded-full border border-border/70 bg-background/50 px-3 py-1.5 text-[11px] text-muted transition-colors hover:border-gold/25 hover:text-white"
+                          className="rounded-xl border border-border/70 bg-black/30 px-3 py-2.5 text-left text-xs text-white/90 transition-colors hover:border-gold/25 hover:bg-gold/5"
                         >
                           {prompt}
                         </button>
@@ -426,12 +507,14 @@ export function NexarAssistant() {
                     message={message}
                     onNavigate={navigate}
                     onAction={handleAction}
+                    onRetry={handleRetry}
                   />
                 ))}
 
                 {loading ? (
-                  <div className="max-w-[85%] nxr-card px-4 py-3">
-                    <div className="flex gap-1.5" aria-busy="true" aria-label="Assistant is typing">
+                  <div className="max-w-[90%] rounded-2xl border border-border/50 bg-card/40 px-4 py-3">
+                    <p className="mb-2 text-xs text-gold/80">{loadingMessage}</p>
+                    <div className="flex gap-1.5" aria-busy="true" aria-label="ATLAS AI is thinking">
                       <span className="h-2 w-2 animate-pulse rounded-full bg-gold/70" />
                       <span className="h-2 w-2 animate-pulse rounded-full bg-gold/50 [animation-delay:120ms]" />
                       <span className="h-2 w-2 animate-pulse rounded-full bg-gold/30 [animation-delay:240ms]" />
@@ -440,10 +523,10 @@ export function NexarAssistant() {
                 ) : null}
               </div>
 
-              <footer className="border-t border-border/70 p-4">
-                {messages.length > 0 ? (
+              <footer className="shrink-0 border-t border-border/60 bg-[#0a0a0c]/90 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-5">
+                {messages.length > 0 && !loading ? (
                   <div className="mb-3 flex flex-wrap gap-2">
-                    {suggestedPrompts.slice(0, 4).map((prompt) => (
+                    {contextualPrompts.slice(0, 3).map((prompt) => (
                       <button
                         key={prompt}
                         type="button"
@@ -461,8 +544,14 @@ export function NexarAssistant() {
                     event.preventDefault();
                     void sendMessage(input);
                   }}
-                  className="flex items-end gap-2"
+                  className="flex items-end gap-2 rounded-2xl border border-border/70 bg-black/40 p-2 focus-within:border-gold/30"
                 >
+                  <span
+                    className="mb-2 ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted"
+                    aria-hidden
+                  >
+                    <Plus className="h-4 w-4" />
+                  </span>
                   <textarea
                     ref={inputRef}
                     value={input}
@@ -473,21 +562,21 @@ export function NexarAssistant() {
                         void sendMessage(input);
                       }
                     }}
-                    rows={2}
-                    placeholder="Ask about Nexar, NXR, marketplace…"
-                    className="min-h-[2.75rem] flex-1 resize-none rounded-xl border border-border/70 bg-background/60 px-3 py-2 text-sm text-white outline-none placeholder:text-muted focus:border-gold/35 focus:ring-2 focus:ring-gold/10"
+                    rows={1}
+                    placeholder="Ask ATLAS anything…"
+                    className="max-h-40 min-h-[2.5rem] flex-1 resize-none bg-transparent py-2 text-sm text-white outline-none placeholder:text-muted"
                   />
                   <button
                     type="submit"
                     disabled={loading || !input.trim()}
                     aria-label="Send message"
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gold/30 bg-gold text-background transition-opacity disabled:opacity-40"
+                    className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gold/30 bg-gold text-background transition-opacity disabled:opacity-40"
                   >
-                    <Send className="h-4 w-4" aria-hidden />
+                    <ArrowUp className="h-4 w-4" aria-hidden />
                   </button>
                 </form>
                 <p className="mt-2 text-center text-[10px] text-muted">
-                  Enter to send · Shift+Enter for new line · Esc to close ·{" "}
+                  Enter to send · Shift+Enter for new line ·{" "}
                   <Link href="/whitepaper" className="text-gold/80 hover:text-gold">
                     Whitepaper
                   </Link>
@@ -509,70 +598,124 @@ type AssistantBubbleProps = {
     navigateTo?: string;
     links?: GlobalAssistantLink[];
     actions?: GlobalAssistantAction[];
+    cards?: AssistantCard[];
   };
   onNavigate: (href: string) => void;
   onAction: (action: GlobalAssistantAction) => void;
+  onRetry: () => void;
 };
 
-function AssistantBubble({ message, onNavigate, onAction }: AssistantBubbleProps) {
+function AssistantBubble({ message, onNavigate, onAction, onRetry }: AssistantBubbleProps) {
+  const [copied, setCopied] = useState(false);
   const actionHrefs = new Set(message.actions?.map((a) => a.href) ?? []);
+  const isRtl = message.role === "assistant" && containsArabic(message.content);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  };
 
   return (
     <div
       className={cn(
-        "max-w-[95%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
-        message.role === "user"
-          ? "ml-auto bg-gold/15 text-white"
-          : "border border-border/60 bg-card/50 text-white/90",
+        "group max-w-[92%]",
+        message.role === "user" ? "ml-auto" : "mr-auto",
       )}
     >
-      {message.topic && message.role === "assistant" ? (
-        <p className="mb-1 text-[10px] tracking-wide text-gold uppercase">{message.topic}</p>
-      ) : null}
-      <p className="whitespace-pre-wrap">{message.content}</p>
+      <div
+        className={cn(
+          "rounded-2xl px-4 py-3",
+          message.role === "user"
+            ? "bg-gold/12 text-white"
+            : "border border-border/50 bg-card/35 text-white/90",
+        )}
+        dir={message.role === "user" && containsArabic(message.content) ? "rtl" : isRtl ? "rtl" : "ltr"}
+      >
+        {message.topic && message.role === "assistant" ? (
+          <p className="mb-1.5 text-[10px] font-semibold tracking-[0.16em] text-gold uppercase">
+            {message.topic}
+          </p>
+        ) : null}
 
-      {message.role === "assistant" && message.navigateTo ? (
-        <button
-          type="button"
-          onClick={() => onNavigate(message.navigateTo!)}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-xs font-medium text-gold transition-colors hover:bg-gold/15"
-        >
-          Go there
-          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-        </button>
-      ) : null}
+        {message.role === "assistant" ? (
+          <AssistantMarkdown content={message.content || "…"} dir={isRtl ? "rtl" : "ltr"} />
+        ) : (
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
+        )}
 
-      {message.role === "assistant" && message.actions?.length ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {message.actions.slice(0, 5).map((action) => (
-            <button
-              key={`action-${action.href}-${action.label}`}
-              type="button"
-              onClick={() => onAction(action)}
-              className="inline-flex items-center gap-1 rounded-full border border-gold/25 bg-gold/5 px-3 py-1 text-[11px] font-medium text-gold transition-colors hover:bg-gold/10"
-            >
-              {action.label}
-              <ArrowUpRight className="h-3 w-3" aria-hidden />
-            </button>
-          ))}
-        </div>
-      ) : null}
+        {message.role === "assistant" && message.cards?.length ? (
+          <AssistantCards cards={message.cards} onNavigate={onNavigate} />
+        ) : null}
 
-      {message.role === "assistant" && message.links?.length ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {message.links
-            .filter((link) => !actionHrefs.has(link.href))
-            .slice(0, 4)
-            .map((link) => (
+        {message.role === "assistant" && message.navigateTo ? (
+          <button
+            type="button"
+            onClick={() => onNavigate(message.navigateTo!)}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-xs font-medium text-gold transition-colors hover:bg-gold/15"
+          >
+            Go there
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        ) : null}
+
+        {message.role === "assistant" && message.actions?.length ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {message.actions.slice(0, 5).map((action) => (
               <button
-                key={link.href}
+                key={`action-${action.href}-${action.label}`}
                 type="button"
-                onClick={() => onNavigate(link.href)}
-                className="rounded-full border border-border/70 px-3 py-1 text-[11px] text-muted transition-colors hover:border-gold/25 hover:text-white"
+                onClick={() => onAction(action)}
+                className="inline-flex items-center gap-1 rounded-full border border-gold/25 bg-gold/5 px-3 py-1 text-[11px] font-medium text-gold transition-colors hover:bg-gold/10"
               >
-                {link.label}
+                {action.label}
+                <ArrowUpRight className="h-3 w-3" aria-hidden />
               </button>
             ))}
+          </div>
+        ) : null}
+
+        {message.role === "assistant" && message.links?.length ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {message.links
+              .filter((link) => !actionHrefs.has(link.href))
+              .slice(0, 4)
+              .map((link) => (
+                <button
+                  key={link.href}
+                  type="button"
+                  onClick={() => onNavigate(link.href)}
+                  className="rounded-full border border-border/70 px-3 py-1 text-[11px] text-muted transition-colors hover:border-gold/25 hover:text-white"
+                >
+                  {link.label}
+                </button>
+              ))}
+          </div>
+        ) : null}
+      </div>
+
+      {message.role === "assistant" && message.content ? (
+        <div className="mt-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+          <button
+            type="button"
+            onClick={() => void handleCopy()}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] text-muted hover:text-white"
+          >
+            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+            {copied ? "Copied" : "Copy"}
+          </button>
+          <button
+            type="button"
+            onClick={onRetry}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] text-muted hover:text-white"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Retry
+          </button>
         </div>
       ) : null}
     </div>
