@@ -8,6 +8,8 @@ export function mapAuthJsError(error: string | null | undefined): string | null 
       return "Sign-in was cancelled or access was denied.";
     case "Verification":
       return "The sign-in link expired or was already used. Try again.";
+    case "OAuthAccountNotLinked":
+      return "An account with this email already exists. Sign in with your password, then connect Google or GitHub from Settings.";
     case "OAuthSignin":
     case "OAuthCallback":
     case "OAuthCreateAccount":

@@ -62,22 +62,13 @@ const optionalText = z
 
 export const completeProfileSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100),
+  username: optionalText.pipe(z.string().min(2).max(32).optional()),
   walletAddress: z
     .string()
-    .regex(walletRegex, "Invalid BSC wallet address"),
-  role: z.enum(["customer", "merchant"]).optional(),
-  storeName: optionalText.pipe(z.string().min(2).max(100).optional()),
-  businessType: optionalText.pipe(z.string().min(2).max(100).optional()),
-  mode: z.enum(["marketplace", "payments_only"]).optional(),
-}).refine(
-  (data) => {
-    if (data.role === "merchant") {
-      return data.storeName && data.businessType && data.mode;
-    }
-    return true;
-  },
-  { message: "Store name, business type, and mode are required for merchants" }
-);
+    .optional()
+    .transform((value) => (value?.trim() ? value.trim() : undefined))
+    .refine((value) => !value || walletRegex.test(value), "Invalid BSC wallet address"),
+});
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CustomerRegisterInput = z.infer<typeof customerRegisterSchema>;

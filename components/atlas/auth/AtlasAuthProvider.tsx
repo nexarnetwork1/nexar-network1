@@ -10,68 +10,62 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { safeRedirect } from "@/lib/auth/redirect";
-import {
-  AtlasIdentityModal,
-} from "@/components/atlas/identity/AtlasIdentityModal";
+import { AtlasIdentityModal } from "@/components/atlas/identity/AtlasIdentityModal";
 import type { AtlasIdentityMode } from "@/components/atlas/identity/AtlasIdentityCard";
+import type { AtlasAuthIntent, OpenAtlasAuthOptions } from "@/modules/atlas-auth/types";
 
-type OpenCommerceAuthOptions = {
-  mode?: AtlasIdentityMode;
-  /** @deprecated Role selection removed — unified ATLAS identity only. */
-  role?: "customer" | "merchant";
-  redirect?: string;
-  message?: string;
-};
-
-type CommerceAuthContextValue = {
+type AtlasAuthContextValue = {
   open: boolean;
   mode: AtlasIdentityMode;
   redirect: string | null;
+  intent: AtlasAuthIntent | null;
   message: string | null;
-  openCommerceAuth: (options?: OpenCommerceAuthOptions) => void;
-  closeCommerceAuth: () => void;
+  openAtlasAuth: (options?: OpenAtlasAuthOptions) => void;
+  closeAtlasAuth: () => void;
 };
 
-const CommerceAuthContext = createContext<CommerceAuthContextValue | null>(null);
+const AtlasAuthContext = createContext<AtlasAuthContextValue | null>(null);
 
-export function useCommerceAuth(): CommerceAuthContextValue {
-  const ctx = useContext(CommerceAuthContext);
+export function useAtlasAuth(): AtlasAuthContextValue {
+  const ctx = useContext(AtlasAuthContext);
   if (!ctx) {
-    throw new Error("useCommerceAuth must be used within NexarCommerceAuthProvider");
+    throw new Error("useAtlasAuth must be used within AtlasAuthProvider");
   }
   return ctx;
 }
 
-type NexarCommerceAuthProviderProps = {
+type AtlasAuthProviderProps = {
   children: ReactNode;
 };
 
-export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProviderProps) {
+export function AtlasAuthProvider({ children }: AtlasAuthProviderProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<AtlasIdentityMode>("signin");
   const [redirect, setRedirect] = useState<string | null>(null);
+  const [intent, setIntent] = useState<AtlasAuthIntent | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const openCommerceAuth = useCallback((options?: OpenCommerceAuthOptions) => {
+  const openAtlasAuth = useCallback((options?: OpenAtlasAuthOptions) => {
     setMode(options?.mode ?? "signin");
     setRedirect(options?.redirect ?? null);
+    setIntent(options?.intent ?? null);
     setMessage(options?.message ?? null);
     setOpen(true);
   }, []);
 
-  const closeCommerceAuth = useCallback(() => {
+  const closeAtlasAuth = useCallback(() => {
     setOpen(false);
     setMessage(null);
   }, []);
 
   const handleSuccess = useCallback(
     (destination: string) => {
-      closeCommerceAuth();
+      closeAtlasAuth();
       router.push(safeRedirect(destination));
       router.refresh();
     },
-    [closeCommerceAuth, router],
+    [closeAtlasAuth, router],
   );
 
   const value = useMemo(
@@ -79,47 +73,48 @@ export function NexarCommerceAuthProvider({ children }: NexarCommerceAuthProvide
       open,
       mode,
       redirect,
+      intent,
       message,
-      openCommerceAuth,
-      closeCommerceAuth,
+      openAtlasAuth,
+      closeAtlasAuth,
     }),
-    [open, mode, redirect, message, openCommerceAuth, closeCommerceAuth],
+    [open, mode, redirect, intent, message, openAtlasAuth, closeAtlasAuth],
   );
 
   return (
-    <CommerceAuthContext.Provider value={value}>
+    <AtlasAuthContext.Provider value={value}>
       {children}
       <AtlasIdentityModal
         open={open}
         mode={mode}
         redirect={redirect}
         message={message}
-        onClose={closeCommerceAuth}
+        onClose={closeAtlasAuth}
         onModeChange={setMode}
         onSuccess={handleSuccess}
       />
-    </CommerceAuthContext.Provider>
+    </AtlasAuthContext.Provider>
   );
 }
 
-type CommerceAuthTriggerProps = {
+type AtlasAuthTriggerProps = {
   children: ReactNode;
   mode?: AtlasIdentityMode;
-  /** @deprecated Ignored — unified identity only. */
-  role?: "customer" | "merchant";
   redirect?: string;
+  intent?: AtlasAuthIntent;
   className?: string;
   onClick?: () => void;
 };
 
-export function CommerceAuthTrigger({
+export function AtlasAuthTrigger({
   children,
   mode = "signin",
   redirect,
+  intent,
   className,
   onClick,
-}: CommerceAuthTriggerProps) {
-  const { openCommerceAuth } = useCommerceAuth();
+}: AtlasAuthTriggerProps) {
+  const { openAtlasAuth } = useAtlasAuth();
 
   return (
     <button
@@ -127,7 +122,7 @@ export function CommerceAuthTrigger({
       className={className}
       onClick={() => {
         onClick?.();
-        openCommerceAuth({ mode, redirect });
+        openAtlasAuth({ mode, redirect, intent });
       }}
     >
       {children}

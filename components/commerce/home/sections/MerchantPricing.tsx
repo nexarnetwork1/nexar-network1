@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check, Store } from "lucide-react";
-import { CommerceAuthTrigger } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { AtlasAuthTrigger } from "@/components/atlas/auth/AtlasAuthProvider";
 import { SectionShell } from "@/components/commerce/home/shared/SectionShell";
 import { merchantCommerceConfig } from "@/config/merchant-commerce";
 import { formatPlatformFeePercent } from "@/lib/commerce/payment-fees";
@@ -85,13 +85,12 @@ export function MerchantPricing({ plans }: MerchantPricingProps) {
               </li>
             ))}
           </ul>
-          <CommerceAuthTrigger
+          <AtlasAuthTrigger
             mode="register"
-            role="merchant"
             className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-full border border-gold/30 bg-gold text-sm font-medium text-background transition-colors hover:bg-gold-secondary"
           >
             Start your store
-          </CommerceAuthTrigger>
+          </AtlasAuthTrigger>
         </motion.div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -127,13 +126,12 @@ export function MerchantPricing({ plans }: MerchantPricingProps) {
                   View merchant store
                 </Link>
               ) : (
-                <CommerceAuthTrigger
+                <AtlasAuthTrigger
                   mode="register"
-                  role="merchant"
                   className="mt-5 text-sm text-gold hover:underline"
                 >
                   Get started
-                </CommerceAuthTrigger>
+                </AtlasAuthTrigger>
               )}
             </motion.div>
           ))}

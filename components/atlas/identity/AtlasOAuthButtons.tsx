@@ -1,20 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2, Wallet } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { signIn } from "next-auth/react";
-import { usePrivy } from "@privy-io/react-auth";
-import { isWeb3Configured } from "@/components/providers/Web3Provider";
-import { markWalletSessionActive } from "@/lib/web3/wallet-session";
-import { linkOrLoginWalletAction } from "@/modules/auth/actions";
-import { cn } from "@/lib/utils/cn";
 import { buildOAuthCallbackPath } from "@/lib/auth/redirect";
+import { cn } from "@/lib/utils/cn";
+import { AtlasWalletConnectPanel } from "@/components/atlas/auth/AtlasWalletConnectPanel";
 
 type AtlasOAuthButtonsProps = {
   redirectTo?: string;
   onWalletAddress?: (address: string) => void;
   layout?: "stack" | "grid";
+  /** When true, wallet connect only captures address for optional registration field. */
+  walletOptional?: boolean;
 };
 
 function OAuthButton({
@@ -52,14 +51,13 @@ export function AtlasOAuthButtons({
   redirectTo,
   onWalletAddress,
   layout = "stack",
+  walletOptional = true,
 }: AtlasOAuthButtonsProps) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
-  const [walletLoading, setWalletLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const googleStartedRef = useRef(false);
   const githubStartedRef = useRef(false);
-  const { login, ready, authenticated, user } = usePrivy();
 
   async function startOAuth(provider: "google" | "github") {
     const startedRef = provider === "google" ? googleStartedRef : githubStartedRef;
@@ -80,47 +78,6 @@ export function AtlasOAuthButtons({
     }
   }
 
-  async function handleWallet() {
-    if (!isWeb3Configured()) {
-      setError("Wallet provider is not configured.");
-      return;
-    }
-    if (!ready || walletLoading) return;
-
-    setWalletLoading(true);
-    setError(null);
-    try {
-      if (!authenticated) {
-        await login();
-      }
-      markWalletSessionActive();
-      const address =
-        user?.wallet?.address ??
-        (window as unknown as { ethereum?: { selectedAddress?: string } }).ethereum
-          ?.selectedAddress;
-      if (address) {
-        onWalletAddress?.(address);
-        const result = await linkOrLoginWalletAction(address, redirectTo ?? "/atlas");
-        if (!result.success) {
-          setError(result.error ?? "Wallet link failed");
-        } else if (result.redirectTo) {
-          window.location.href = result.redirectTo;
-          return;
-        }
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Wallet connection failed");
-    } finally {
-      setWalletLoading(false);
-    }
-  }
-
-  const walletLabel = authenticated
-    ? "Wallet connected"
-    : walletLoading
-      ? "Connecting…"
-      : "Connect Wallet";
-
   return (
     <div className="space-y-2">
       <div className={cn(layout === "grid" ? "grid grid-cols-1 sm:grid-cols-2 gap-2" : "space-y-2")}>
@@ -136,20 +93,18 @@ export function AtlasOAuthButtons({
           loading={githubLoading}
           onClick={() => void startOAuth("github")}
         />
-        <OAuthButton
-          label={walletLabel}
-          icon={
-            walletLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            ) : (
-              <Wallet className="h-4 w-4 shrink-0 text-gold" aria-hidden />
-            )
-          }
-          disabled={!isWeb3Configured() || !ready}
-          onClick={() => void handleWallet()}
-          className="border-gold/25 bg-gold/5 text-gold hover:border-gold/40 hover:bg-gold/10"
+      </div>
+
+      <div className="pt-1">
+        <p className="mb-2 text-[10px] font-medium tracking-[0.16em] text-muted uppercase text-center">
+          Optional
+        </p>
+        <AtlasWalletConnectPanel
+          requireAuth={!walletOptional}
+          onAddress={onWalletAddress}
         />
       </div>
+
       {error ? <p className="text-xs text-red-400">{error}</p> : null}
     </div>
   );

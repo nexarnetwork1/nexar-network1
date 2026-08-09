@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils/cn";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import {
   createAtlasPostAction,
   createAtlasPollPostAction,
@@ -57,7 +57,7 @@ export function PostComposer({
   redirectOnSuccess = "/atlas",
 }: PostComposerProps) {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
@@ -79,7 +79,7 @@ export function PostComposer({
   const [draftLoaded, setDraftLoaded] = useState(false);
 
   const requireAuth = () => {
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: "/atlas/create-post",
       message: "Sign in to create a post",

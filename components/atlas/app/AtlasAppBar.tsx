@@ -6,7 +6,7 @@ import { Search, User, Sparkles } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils/cn";
 import { ConnectWalletButton } from "@/components/web3/ConnectWalletButton";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { NetworkSearchBar } from "@/components/atlas/app/network/NetworkSearchBar";
 import Image from "next/image";
 import { ATLAS_BRAND } from "@/config/atlas-branding";
@@ -24,10 +24,10 @@ export function AtlasAppBar({ unreadNotificationCount = 0 }: AtlasAppBarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   const handleAuthAction = (href: string) => {
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: href,
       message: "Sign in to continue on ATLAS",
@@ -138,7 +138,7 @@ export function AtlasAppBar({ unreadNotificationCount = 0 }: AtlasAppBarProps) {
             <button
               type="button"
               onClick={() =>
-                openCommerceAuth({
+                openAtlasAuth({
                   mode: "signin",
                   redirect: pathname,
                   message: "Sign in to ATLAS",

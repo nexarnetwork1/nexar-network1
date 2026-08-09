@@ -1,6 +1,6 @@
 "use client";
 
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { Building2 } from "lucide-react";
 
 type AtlasGuestGateProps = {
@@ -10,7 +10,7 @@ type AtlasGuestGateProps = {
 };
 
 export function AtlasGuestGate({ title, description, redirect }: AtlasGuestGateProps) {
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   return (
     <div className="max-w-lg mx-auto py-16 px-4 text-center">
@@ -22,7 +22,7 @@ export function AtlasGuestGate({ title, description, redirect }: AtlasGuestGateP
       <button
         type="button"
         onClick={() =>
-          openCommerceAuth({
+          openAtlasAuth({
             mode: "signin",
             redirect,
             message: description,

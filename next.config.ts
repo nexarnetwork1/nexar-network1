@@ -7,7 +7,7 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const cspHeader = [
   "default-src 'self'",
 
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com",
 
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 
@@ -53,8 +53,9 @@ https://*.ingest.sentry.io \
 https://*.sentry.io \
 https://*.posthog.com \
 https://us.i.posthog.com \
-https://eu.i.posthog.com",
-  "frame-src 'self' https://auth.privy.io",
+https://eu.i.posthog.com \
+https://challenges.cloudflare.com",
+  "frame-src 'self' https://auth.privy.io https://challenges.cloudflare.com",
 
   "object-src 'none'",
 
@@ -106,6 +107,13 @@ const nextConfig: NextConfig = {
         destination: "/#contact",
         permanent: false,
       },
+      { source: "/signup", destination: "/login?mode=register", permanent: false },
+      { source: "/register", destination: "/login?mode=register", permanent: false },
+      { source: "/register/customer", destination: "/login?mode=register", permanent: false },
+      { source: "/register/merchant", destination: "/login?mode=register", permanent: false },
+      { source: "/auth/register", destination: "/login?mode=register", permanent: false },
+      { source: "/customer/login", destination: "/login", permanent: false },
+      { source: "/merchant/login", destination: "/login", permanent: false },
     ];
   },
 

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { cn } from "@/lib/utils/cn";
 import type {
   NetworkFeedPost,
@@ -105,7 +105,7 @@ export function ProfileView({
   }
 
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
   const [posts, setPosts] = useState(initialPosts);
   const [activities, setActivities] = useState<PresentedNetworkActivity[]>([]);
@@ -120,12 +120,12 @@ export function ProfileView({
 
   const sessionActive = !!session?.user;
   const onAuth = useCallback(() => {
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: `/atlas/network/${profile.slug}`,
       message: "Sign in to connect on ATLAS",
     });
-  }, [openCommerceAuth, profile.slug]);
+  }, [openAtlasAuth, profile.slug]);
 
   useEffect(() => {
     if (loaded[activeTab] || pending) return;

@@ -10,7 +10,7 @@ import { Web3Provider } from "@/components/providers/Web3Provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { AdminAccessPrompt } from "@/components/layout/AdminAccessPrompt";
 import { NexarAssistant } from "@/components/assistant/NexarAssistant";
-import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
+import { AtlasAuthShell } from "@/components/atlas/auth/AtlasAuthShell";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 
@@ -62,13 +62,13 @@ export function AppProviders({ children }: AppProvidersProps) {
         <ThemeProvider>
           <PostHogProvider>
             <Web3Provider>
-              <CommerceAuthShell>
+              <AtlasAuthShell>
                 <Suspense fallback={null}>
                   <AdminAccessPrompt />
                 </Suspense>
                 {children}
                 <NexarAssistant />
-              </CommerceAuthShell>
+              </AtlasAuthShell>
             </Web3Provider>
           </PostHogProvider>
         </ThemeProvider>

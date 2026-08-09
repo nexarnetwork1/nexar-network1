@@ -17,13 +17,13 @@ export const NAVIGATION_ACTIONS: ActionDef[] = [
   { label: "Open Wallet", href: "/customer/wallet", roles: ["customer"], keywords: ["wallet"] },
   {
     label: "Become a Merchant",
-    href: "/login?mode=register&role=merchant",
+    href: "/login?mode=register",
     roles: ["guest", "customer"],
     keywords: ["merchant", "sell", "register"],
   },
   {
     label: "Register Merchant",
-    href: "/login?mode=register&role=merchant",
+    href: "/login?mode=register",
     roles: ["guest", "customer"],
     keywords: ["register merchant"],
   },

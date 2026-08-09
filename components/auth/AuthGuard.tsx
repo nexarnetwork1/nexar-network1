@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 
 type AuthGuardProps = {
   children: React.ReactNode;
@@ -32,7 +32,7 @@ export function AuthGuard({
 }: AuthGuardProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   // Show loading state while checking session
   if (status === "loading") {
@@ -42,7 +42,7 @@ export function AuthGuard({
   // If auth is required but user is not authenticated
   if (requireAuth && !session?.user?.id) {
     // Open auth modal instead of redirecting
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: redirectTo ?? window.location.pathname,
     });
@@ -69,7 +69,7 @@ export function AuthGuard({
  */
 export function useAuthGuard() {
   const { data: session, status } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   const requireAuth = (
     callback: () => void,
@@ -80,7 +80,7 @@ export function useAuthGuard() {
     }
 
     if (!session?.user?.id) {
-      openCommerceAuth({
+      openAtlasAuth({
         mode: "signin",
         redirect: options?.redirect ?? window.location.pathname,
       });

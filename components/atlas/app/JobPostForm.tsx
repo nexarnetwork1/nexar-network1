@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { createAtlasJobPostAction } from "@/modules/atlas-network/actions";
 import { AiAssistMenu } from "@/components/atlas/ai/AiAssistMenu";
 import { JOB_CATEGORIES, type JobCategoryId } from "@/lib/atlas/job-categories";
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export function JobPostForm() {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [jobTitle, setJobTitle] = useState("");
@@ -31,7 +31,7 @@ export function JobPostForm() {
         <button
           type="button"
           onClick={() =>
-            openCommerceAuth({ mode: "signin", redirect: "/atlas/jobs/new" })
+            openAtlasAuth({ mode: "signin", redirect: "/atlas/jobs/new" })
           }
           className="px-4 py-2 rounded-lg bg-gold text-background font-medium"
         >

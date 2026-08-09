@@ -5,14 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Search, LogIn } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 
 export function PremiumNavigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,7 +83,7 @@ export function PremiumNavigation() {
               </Link>
             ) : (
               <button
-                onClick={() => openCommerceAuth({ mode: "signin", redirect: "/dashboard" })}
+                onClick={() => openAtlasAuth({ mode: "signin", redirect: "/dashboard" })}
                 className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
               >
                 <LogIn className="h-4 w-4" />

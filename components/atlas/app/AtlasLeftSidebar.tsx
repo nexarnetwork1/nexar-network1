@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import {
   ATLAS_APP_NAV_ITEMS,
   ATLAS_APP_BUSINESS_ITEMS,
@@ -84,7 +84,7 @@ function SidebarLink({
 export function AtlasLeftSidebar({ collapsed = false }: AtlasLeftSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const { toggleSidebar } = useAtlasWorkspace();
 
   const renderItem = (item: (typeof ATLAS_APP_NAV_ITEMS)[number]) => {
@@ -99,7 +99,7 @@ export function AtlasLeftSidebar({ collapsed = false }: AtlasLeftSidebarProps) {
           icon={Icon}
           collapsed={collapsed}
           onClick={() =>
-            openCommerceAuth({
+            openAtlasAuth({
               mode: "signin",
               redirect: item.href,
             })
@@ -140,7 +140,7 @@ export function AtlasLeftSidebar({ collapsed = false }: AtlasLeftSidebarProps) {
             type="button"
             title="Create Post"
             onClick={() =>
-              openCommerceAuth({
+              openAtlasAuth({
                 mode: "signin",
                 redirect: "/atlas/create-post",
                 message: "Sign in to create a post",

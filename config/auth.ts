@@ -13,14 +13,9 @@ export const authConfig = {
   profileCompletionRoute: "/auth/complete-profile",
   authRoutes: [
     "/login",
-    "/register",
-    "/signup",
     "/forgot-password",
     "/reset-password",
     "/verify-email",
-    // Legacy aliases — all redirect to /login
-    "/customer/login",
-    "/merchant/login",
   ],
   publicAuthRoutes: [
     "/auth/callback",

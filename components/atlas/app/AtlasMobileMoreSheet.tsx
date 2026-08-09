@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { ATLAS_APP_MOBILE_MORE } from "@/config/atlas-app-nav";
 import { getAtlasAppNavIcon } from "@/components/atlas/app/atlas-app-nav-icons";
 
@@ -18,7 +18,7 @@ type AtlasMobileMoreSheetProps = {
 export function AtlasMobileMoreSheet({ open, onClose }: AtlasMobileMoreSheetProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   if (!open) return null;
 
@@ -56,7 +56,7 @@ export function AtlasMobileMoreSheet({ open, onClose }: AtlasMobileMoreSheetProp
                   type="button"
                   onClick={() => {
                     onClose();
-                    openCommerceAuth({ mode: "signin", redirect: item.href });
+                    openAtlasAuth({ mode: "signin", redirect: item.href });
                   }}
                   className="flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/5 text-left text-muted"
                 >

@@ -14,7 +14,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { AiAssistMenu } from "@/components/atlas/ai/AiAssistMenu";
 import Link from "next/link";
 import { ATLAS_ECOSYSTEM_LINKS } from "@/config/atlas-app-nav";
@@ -75,7 +75,7 @@ export function MessagingInterface({
 }: MessagingInterfaceProps) {
   const { data: session } = useSession();
   const router = useRouter();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [conversations, setConversations] = useState(initialConversations);
   const [selectedId, setSelectedId] = useState<string | null>(
     initialConversationId ?? initialConversations[0]?.id ?? null,
@@ -90,7 +90,7 @@ export function MessagingInterface({
 
   const handleInteraction = () => {
     if (!session) {
-      openCommerceAuth({
+      openAtlasAuth({
         mode: "signin",
         redirect: "/atlas/messages",
         message: "Sign in to message on ATLAS",

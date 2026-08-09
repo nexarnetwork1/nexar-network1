@@ -5,13 +5,13 @@ import Link from "next/link";
 import { Menu, X, LogIn, User } from "lucide-react";
 import { ATLAS_BRAND, ATLAS_ASSETS } from "@/config/atlas-branding";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { cn } from "@/lib/utils/cn";
 
 export function AtlasNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   return (
     <header className="nxr-navbar fixed top-0 left-0 right-0 z-50">
@@ -47,7 +47,7 @@ export function AtlasNavbar() {
             </Link>
           ) : (
             <button
-              onClick={() => openCommerceAuth({ mode: "signin", redirect: "/dashboard" })}
+              onClick={() => openAtlasAuth({ mode: "signin", redirect: "/dashboard" })}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold border border-gold/30 text-background hover:bg-gold-secondary transition-colors text-sm font-medium"
             >
               <LogIn className="h-4 w-4" />

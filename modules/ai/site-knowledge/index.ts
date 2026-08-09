@@ -171,12 +171,12 @@ const CORE_SITE_KNOWLEDGE: SiteKnowledgeEntry[] = [
     links: [
      {
   label: "Become a merchant",
-  href: "/login?mode=register&role=merchant",
+  href: "/login?mode=register",
 },
       { label: "Merchant dashboard", href: "/merchant" },
       { label: "Marketplace", href: MARKETPLACE_ROUTES.root },
     ],
-    primaryLink: "/login?mode=register&role=merchant",
+    primaryLink: "/login?mode=register",
   },
   {
     id: "customer",

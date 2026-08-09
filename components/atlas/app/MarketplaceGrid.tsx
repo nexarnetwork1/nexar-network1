@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ShoppingCart, Heart, Store } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 
 interface MarketplaceGridProps {
   products: any[];
@@ -12,11 +12,11 @@ interface MarketplaceGridProps {
 
 export function MarketplaceGrid({ products }: MarketplaceGridProps) {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
 
   const promptAuth = () => {
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: "/atlas/marketplace",
     });

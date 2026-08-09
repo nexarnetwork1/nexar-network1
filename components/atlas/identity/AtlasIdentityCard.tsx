@@ -42,8 +42,9 @@ export function AtlasIdentityCard({
         <p className="text-[10px] font-semibold tracking-[0.28em] text-gold uppercase">
           {ATLAS_BRAND.name}
         </p>
+        <p className="mt-1 text-[11px] text-muted">Nexar Network Identity</p>
         <h1 className="mt-2 font-heading text-xl font-semibold tracking-tight text-foreground">
-          {mode === "signin" ? "Welcome back" : "Create your identity"}
+          {mode === "signin" ? "Sign in" : "Create your account"}
         </h1>
         <p className="mt-1.5 text-xs leading-relaxed text-muted">
           {mode === "signin"

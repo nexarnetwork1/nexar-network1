@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Globe2, Shield, Zap } from "lucide-react";
 import Link from "next/link";
-import { CommerceAuthTrigger } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { AtlasAuthTrigger } from "@/components/atlas/auth/AtlasAuthProvider";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { MARKETPLACE_ROUTES } from "@/modules/marketplace/shared/constants";
@@ -72,13 +72,12 @@ export function CommerceHero({ initialMetrics }: CommerceHeroProps) {
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Button>
             </Link>
-            <CommerceAuthTrigger
+            <AtlasAuthTrigger
               mode="register"
-              role="merchant"
               className="inline-flex h-12 min-w-[10.5rem] items-center justify-center rounded-[0.625rem] border border-gold/45 px-8 text-sm font-semibold tracking-[0.06em] text-gold uppercase transition-all hover:bg-gold hover:text-background"
             >
               Start Selling
-            </CommerceAuthTrigger>
+            </AtlasAuthTrigger>
           </div>
         </motion.div>
       </Container>

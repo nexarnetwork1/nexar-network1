@@ -3,7 +3,7 @@
 import { Building2, Users, Store, Package, BarChart3, Settings, Plus, TrendingUp, DollarSign, FileText, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 
 interface Business {
   id: string;
@@ -20,11 +20,11 @@ interface BusinessDashboardProps {
 
 export function BusinessDashboard({ businesses }: BusinessDashboardProps) {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   const handleInteraction = () => {
     if (!session) {
-      openCommerceAuth({
+      openAtlasAuth({
         mode: "signin",
         redirect: "/atlas/business",
       });

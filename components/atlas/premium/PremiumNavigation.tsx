@@ -6,14 +6,14 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Search, Bell, User, LogIn, Globe } from "lucide-react";
 import { ATLAS_BRAND } from "@/config/atlas-branding";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { cn } from "@/lib/utils/cn";
 
 export function PremiumNavigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   const navItems = [
     { label: "Platform", href: "/atlas" },
@@ -78,7 +78,7 @@ export function PremiumNavigation() {
               </>
             ) : (
               <button
-                onClick={() => openCommerceAuth({ mode: "signin", redirect: "/dashboard" })}
+                onClick={() => openAtlasAuth({ mode: "signin", redirect: "/dashboard" })}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gold border border-gold/30 text-background hover:bg-gold-secondary transition-colors font-medium"
               >
                 <LogIn className="h-4 w-4" />

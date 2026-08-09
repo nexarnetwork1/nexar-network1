@@ -3,7 +3,7 @@ import { getCurrentProfile } from "@/modules/users/repository";
 import { signOutAction } from "@/modules/auth/actions";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { CustomerRealtimeProvider } from "@/components/realtime/CustomerRealtimeProvider";
-import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
+import { AtlasAuthShell } from "@/components/atlas/auth/AtlasAuthShell";
 import { Button } from "@/components/ui/Button";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ATLAS_BRAND, ATLAS_PORTAL_SUBTITLES } from "@/config/atlas-branding";
@@ -32,7 +32,7 @@ export default async function CustomerLayout({
     .in("status", ["pending", "draft"]);
 
   return (
-    <CommerceAuthShell>
+    <AtlasAuthShell>
       <DashboardShell
         sections={customerNav({ pendingInvoices })}
         brand={ATLAS_BRAND.name}
@@ -52,6 +52,6 @@ export default async function CustomerLayout({
       >
         <CustomerRealtimeProvider>{children}</CustomerRealtimeProvider>
       </DashboardShell>
-    </CommerceAuthShell>
+    </AtlasAuthShell>
   );
 }

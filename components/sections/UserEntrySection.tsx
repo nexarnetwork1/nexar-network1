@@ -40,7 +40,7 @@ const ENTRY_ACTIONS: EntryAction[] = [
       "Register as a merchant, launch your store, and sell through Nexar Commerce with crypto and card payments.",
     icon: ShoppingBag,
     hrefAuthed: "/merchant",
-    hrefGuest: "/login?mode=register&role=merchant&redirect=%2Fmerchant",
+    hrefGuest: "/login?mode=register&redirect=%2Fmerchant",
   },
   {
     id: "manage-business",

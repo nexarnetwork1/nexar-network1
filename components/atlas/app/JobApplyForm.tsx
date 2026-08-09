@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import {
   applyToJobAction,
 } from "@/modules/atlas-network/actions";
@@ -17,7 +17,7 @@ export function JobApplyForm({
   initialApplied?: boolean;
 }) {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [message, setMessage] = useState("");
   const [applied, setApplied] = useState(initialApplied);
   const [pending, startTransition] = useTransition();
@@ -29,7 +29,7 @@ export function JobApplyForm({
         <button
           type="button"
           onClick={() =>
-            openCommerceAuth({
+            openAtlasAuth({
               mode: "signin",
               redirect: `/atlas/jobs/${postId}`,
             })

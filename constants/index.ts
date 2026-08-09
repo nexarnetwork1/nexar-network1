@@ -13,7 +13,7 @@ export const ROUTES = {
     marketplace: "/marketplace",
     contact: "/contact",
     login: "/login",
-    signup: "/signup",
+    signup: "/login?mode=register",
   },
   private: {
     dashboard: "/dashboard",

@@ -93,7 +93,7 @@ export const NEXAR_KNOWLEDGE: SiteKnowledgeEntry[] = [
       "Nexar Commerce is the enterprise marketplace on Nexar Network. Merchants register, create verified stores, list products, and accept crypto and card payments. Customers browse the marketplace, add items to cart and wishlist, checkout securely, and manage orders from their customer dashboard. Store creation requires merchant registration and approval before appearing in the marketplace directory.",
     links: [
       { label: "Nexar Commerce", href: MARKETPLACE_ROUTES.root },
-      { label: "Become a merchant", href: `${MARKETPLACE_ROUTES.root}?auth=register&role=merchant` },
+      { label: "Become a merchant", href: `${MARKETPLACE_ROUTES.root}?mode=register` },
       { label: "Whitepaper marketplace", href: "/whitepaper#marketplace" },
     ],
     primaryLink: MARKETPLACE_ROUTES.root,
@@ -105,7 +105,7 @@ export const NEXAR_KNOWLEDGE: SiteKnowledgeEntry[] = [
     answer: commerceFaqById["create-store"]?.answer ?? "",
     links: [
       { label: "Merchant onboarding", href: "/merchant/onboarding" },
-      { label: "Register as merchant", href: `${MARKETPLACE_ROUTES.root}?auth=register&role=merchant` },
+      { label: "Register as merchant", href: `${MARKETPLACE_ROUTES.root}?mode=register` },
       { label: "Commerce FAQ", href: `${MARKETPLACE_ROUTES.root}#faq` },
     ],
     primaryLink: "/merchant/onboarding",
@@ -117,7 +117,7 @@ export const NEXAR_KNOWLEDGE: SiteKnowledgeEntry[] = [
     answer: `${commerceFaqById["store-price"]?.answer ?? ""}\n\n${commerceFaqById["subscriptions"]?.answer ?? ""}`,
     links: [
       { label: "Commerce pricing", href: `${MARKETPLACE_ROUTES.root}#pricing` },
-      { label: "Become a merchant", href: `${MARKETPLACE_ROUTES.root}?auth=register&role=merchant` },
+      { label: "Become a merchant", href: `${MARKETPLACE_ROUTES.root}?mode=register` },
     ],
     primaryLink: `${MARKETPLACE_ROUTES.root}#pricing`,
   },

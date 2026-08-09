@@ -6,7 +6,7 @@ import { getMerchantStore } from "@/modules/stores/repository";
 import { signOutAction } from "@/modules/auth/actions";
 import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 import { MerchantRealtimeProvider } from "@/components/realtime/MerchantRealtimeProvider";
-import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
+import { AtlasAuthShell } from "@/components/atlas/auth/AtlasAuthShell";
 import { Button } from "@/components/ui/Button";
 import { ATLAS_BRAND, ATLAS_PORTAL_SUBTITLES } from "@/config/atlas-branding";
 import { DashboardShell } from "@/components/dashboard";
@@ -49,7 +49,7 @@ export default async function MerchantLayout({
     ) : null;
 
   return (
-    <CommerceAuthShell>
+    <AtlasAuthShell>
       <DashboardShell
         sections={merchantNav({ paymentsOnly: isPaymentsOnly })}
         brand={ATLAS_BRAND.name}
@@ -70,6 +70,6 @@ export default async function MerchantLayout({
       >
         <MerchantRealtimeProvider>{children}</MerchantRealtimeProvider>
       </DashboardShell>
-    </CommerceAuthShell>
+    </AtlasAuthShell>
   );
 }

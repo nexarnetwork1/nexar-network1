@@ -12,6 +12,7 @@ import {
   AtlasIdentityField,
 } from "@/components/atlas/identity/AtlasIdentityFields";
 import { AtlasOAuthButtons } from "@/components/atlas/identity/AtlasOAuthButtons";
+import { AtlasTurnstile } from "@/components/atlas/auth/AtlasTurnstile";
 
 type AtlasRegisterFormProps = {
   redirect: string | null;
@@ -25,6 +26,7 @@ export function AtlasRegisterForm({
   onSwitchSignIn,
 }: AtlasRegisterFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const {
     register,
@@ -46,7 +48,9 @@ export function AtlasRegisterForm({
   async function onSubmit(data: AtlasRegisterFormInput) {
     setServerError(null);
     const { confirmPassword: _confirm, ...payload } = data;
-    const result = await registerCustomerAction(objectToFormData(payload));
+    const formData = objectToFormData(payload);
+    if (captchaToken) formData.set("captchaToken", captchaToken);
+    const result = await registerCustomerAction(formData);
     if (!result.success) {
       setServerError(result.error ?? "Registration failed");
       return;
@@ -75,6 +79,7 @@ export function AtlasRegisterForm({
         redirectTo={redirect ?? undefined}
         onWalletAddress={(address) => setValue("walletAddress", address, { shouldValidate: true })}
         layout="stack"
+        walletOptional
       />
       <AtlasIdentityDivider />
 
@@ -131,6 +136,7 @@ export function AtlasRegisterForm({
           error={errors.walletAddress?.message}
           {...register("walletAddress")}
         />
+        <AtlasTurnstile onToken={setCaptchaToken} className="flex justify-center" />
         {serverError ? (
           <p className="rounded-xl border border-red-500/25 bg-red-500/5 px-4 py-3 text-sm text-red-400">
             {serverError}

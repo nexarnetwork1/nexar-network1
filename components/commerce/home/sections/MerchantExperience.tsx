@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, CheckCircle2, Circle } from "lucide-react";
-import { CommerceAuthTrigger } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { AtlasAuthTrigger } from "@/components/atlas/auth/AtlasAuthProvider";
 import { SectionShell } from "@/components/commerce/home/shared/SectionShell";
 import { merchantCommerceConfig } from "@/config/merchant-commerce";
 import { cn } from "@/lib/utils/cn";
@@ -54,14 +54,13 @@ export function MerchantExperience() {
               </li>
             ))}
           </ol>
-          <CommerceAuthTrigger
+          <AtlasAuthTrigger
             mode="register"
-            role="merchant"
             className="mt-8 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold text-sm font-medium text-background"
           >
             Create merchant account
             <ArrowUpRight className="h-4 w-4" />
-          </CommerceAuthTrigger>
+          </AtlasAuthTrigger>
         </div>
 
         <div className="space-y-4">

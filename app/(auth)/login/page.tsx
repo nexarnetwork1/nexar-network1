@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { auth } from "@/auth";
 import { safeRedirect } from "@/lib/auth/redirect";
 import { mapAuthJsError } from "@/lib/auth/oauth-errors";
-import { CommerceAuthShell } from "@/components/commerce/auth/CommerceAuthShell";
+import { AtlasAuthShell } from "@/components/atlas/auth/AtlasAuthShell";
 import { AtlasIdentityPage } from "@/components/atlas/identity/AtlasIdentityModal";
 import { privateAreaMetadata } from "@/lib/constants/seo";
 
@@ -32,13 +32,13 @@ export default async function LoginPage({ searchParams }: Props) {
 
   return (
     <Suspense>
-      <CommerceAuthShell>
+      <AtlasAuthShell>
         <AtlasIdentityPage
           initialMode={initialMode}
           redirect={sp.redirect ?? "/atlas"}
           message={message}
         />
-      </CommerceAuthShell>
+      </AtlasAuthShell>
     </Suspense>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { Loader2, Bell } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import {
   registerForEventAction,
   setEventReminderAction,
@@ -20,7 +20,7 @@ export function EventRegisterForm({
   meetingUrl?: string | null;
 }) {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [registered, setRegistered] = useState(initialRegistered);
   const [reminderSet, setReminderSet] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -32,7 +32,7 @@ export function EventRegisterForm({
         <button
           type="button"
           onClick={() =>
-            openCommerceAuth({
+            openAtlasAuth({
               mode: "signin",
               redirect: `/atlas/events/${eventId}`,
             })

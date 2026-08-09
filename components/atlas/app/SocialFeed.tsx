@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useInView } from "react-intersection-observer";
 import { Image as ImageIcon, Video, BarChart3, AlertCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import type { NetworkFeedPost } from "@/modules/atlas-network/types";
 import { fetchNetworkFeedAction } from "@/modules/atlas-network/actions";
 import { FeedPostCard } from "./feed/FeedPostCard";
@@ -20,7 +20,7 @@ interface SocialFeedProps {
 
 export function SocialFeed({ posts: initialPosts, initialHasMore = true }: SocialFeedProps) {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [posts, setPosts] = useState(initialPosts);
   const [hasMore, setHasMore] = useState(initialHasMore && initialPosts.length >= PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -28,13 +28,13 @@ export function SocialFeed({ posts: initialPosts, initialHasMore = true }: Socia
 
   const requireAuth = useCallback(
     (redirect?: string) => {
-      openCommerceAuth({
+      openAtlasAuth({
         mode: "signin",
         redirect: redirect ?? "/atlas",
         message: "Sign in to interact on ATLAS",
       });
     },
-    [openCommerceAuth],
+    [openAtlasAuth],
   );
 
   const loadMore = useCallback(async () => {

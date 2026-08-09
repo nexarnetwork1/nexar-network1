@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 /**
  * Public Marketplace layout.
- * Authentication is handled globally via AppProviders > CommerceAuthShell.
+ * Authentication is handled globally via AppProviders > AtlasAuthShell.
  * This layout is now a pure public shell with no auth modal.
  *
  * Classification: Public Website

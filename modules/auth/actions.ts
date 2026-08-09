@@ -24,7 +24,6 @@ import {
 import {
   loginSchema,
   customerRegisterSchema,
-  merchantRegisterSchema,
   completeProfileSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -46,6 +45,7 @@ import {
   recordFailedLoginAttempt,
   clearLoginAttempts,
 } from "@/lib/security/brute-force";
+import { verifyTurnstileToken } from "@/modules/atlas-auth/captcha";
 import type { UserRole } from "@/types";
 
 const BCRYPT_ROUNDS = 12;
@@ -57,30 +57,6 @@ export type ActionResult = {
   needsEmailConfirmation?: boolean;
 };
 
-function slugifyStoreName(name: string, userId: string): string {
-  const base =
-    name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || `store-${userId.slice(0, 8)}`;
-  return base;
-}
-
-async function resolveUniqueStoreSlug(
-  admin: ReturnType<typeof createAdminClient>,
-  storeName: string,
-  userId: string,
-): Promise<string> {
-  let slug = slugifyStoreName(storeName, userId);
-  let counter = 0;
-  while (true) {
-    const { data } = await admin.from("stores").select("id").eq("slug", slug).maybeSingle();
-    if (!data) return slug;
-    counter += 1;
-    slug = `${slugifyStoreName(storeName, userId)}-${counter}`;
-  }
-}
-
 async function requireSessionUserId(): Promise<string> {
   const session = await auth();
   const id = session?.user?.id;
@@ -89,6 +65,11 @@ async function requireSessionUserId(): Promise<string> {
 }
 
 export async function loginAction(formData: FormData): Promise<ActionResult> {
+  const captcha = await verifyTurnstileToken(formData.get("captchaToken")?.toString());
+  if (!captcha.ok) {
+    return { success: false, error: captcha.error ?? "Human verification failed." };
+  }
+
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -195,6 +176,11 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
 export async function registerCustomerAction(
   formData: FormData,
 ): Promise<ActionResult> {
+  const captcha = await verifyTurnstileToken(formData.get("captchaToken")?.toString());
+  if (!captcha.ok) {
+    return { success: false, error: captcha.error ?? "Human verification failed." };
+  }
+
   const parsed = customerRegisterSchema.safeParse({
     fullName: formData.get("fullName"),
     username: formData.get("username"),
@@ -260,112 +246,6 @@ export async function registerCustomerAction(
   };
 }
 
-export async function registerMerchantAction(
-  formData: FormData,
-): Promise<ActionResult> {
-  const parsed = merchantRegisterSchema.safeParse({
-    merchantName: formData.get("merchantName"),
-    storeName: formData.get("storeName"),
-    businessType: formData.get("businessType"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-    walletAddress: formData.get("walletAddress"),
-    mode: formData.get("mode"),
-  });
-  if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  }
-
-  const email = parsed.data.email.toLowerCase().trim();
-  const admin = tryCreateAdminClient();
-  if (!admin) return { success: false, error: "Server auth is not configured" };
-
-  if (await getUserPasswordHash(email)) {
-    return { success: false, error: "An account with this email already exists" };
-  }
-
-  const passwordHash = await bcrypt.hash(parsed.data.password, BCRYPT_ROUNDS);
-  const userId = randomUUID();
-
-  const { error: userError } = await admin.from("authjs_users").insert({
-    id: userId,
-    email,
-    name: parsed.data.merchantName,
-    password: passwordHash,
-    emailVerified: null,
-  });
-  if (userError) return { success: false, error: userError.message };
-
-  const { error: profileError } = await admin.from("profiles").insert({
-    id: userId,
-    email,
-    full_name: parsed.data.merchantName,
-    wallet_address: parsed.data.walletAddress.toLowerCase(),
-    role: "merchant",
-    profile_completed: true,
-  });
-  if (profileError) {
-    await admin.from("authjs_users").delete().eq("id", userId);
-    return { success: false, error: profileError.message };
-  }
-
-  const slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, userId);
-  let logoUrl: string | null = null;
-  const logoFile = formData.get("logo") as File | null;
-  if (logoFile && logoFile.size > 0) {
-    const ext = logoFile.name.split(".").pop() ?? "png";
-    const filePath = `${userId}/${Date.now()}.${ext}`;
-    const { error: uploadError } = await admin.storage
-      .from("store-logos")
-      .upload(filePath, logoFile, { upsert: true });
-    if (!uploadError) {
-      const { data: pub } = admin.storage.from("store-logos").getPublicUrl(filePath);
-      logoUrl = pub.publicUrl;
-    }
-  }
-
-  await admin.from("stores").insert({
-    owner_id: userId,
-    name: parsed.data.storeName,
-    slug,
-    business_type: parsed.data.businessType,
-    mode: parsed.data.mode,
-    status: "pending",
-    logo_url: logoUrl,
-    wallet_address: parsed.data.walletAddress.toLowerCase(),
-  });
-
-  // Business Hub: store insert trigger creates/links Business; ensure ownership + events.
-  const { data: createdStore } = await admin
-    .from("stores")
-    .select("id, business_id, status")
-    .eq("owner_id", userId)
-    .eq("slug", slug)
-    .maybeSingle();
-  if (createdStore?.id) {
-    const { ensureBusinessForStoreOwner } = await import(
-      "@/modules/business-hub/service"
-    );
-    await ensureBusinessForStoreOwner({
-      ownerUserId: userId,
-      storeId: createdStore.id,
-      storeName: parsed.data.storeName,
-      storeSlug: slug,
-      businessType: parsed.data.businessType,
-      logoUrl,
-      storeStatus: "pending",
-    }).catch(() => undefined);
-  }
-
-  await sendVerificationEmail(email);
-
-  return {
-    success: true,
-    needsEmailConfirmation: true,
-    redirectTo: "/login?message=confirm_email",
-  };
-}
-
 export async function completeProfileAction(
   formData: FormData,
 ): Promise<ActionResult> {
@@ -376,59 +256,29 @@ export async function completeProfileAction(
 
   const parsed = completeProfileSchema.safeParse({
     fullName: formData.get("fullName"),
-    walletAddress: formData.get("walletAddress"),
-    role: formData.get("role") || undefined,
-    storeName: formData.get("storeName") || undefined,
-    businessType: formData.get("businessType") || undefined,
-    mode: formData.get("mode") || undefined,
+    username: formData.get("username") || undefined,
+    walletAddress: formData.get("walletAddress") || undefined,
   });
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const admin = createAdminClient();
-  const role = (parsed.data.role ?? "customer") as UserRole;
+  const wallet =
+    parsed.data.walletAddress && parsed.data.walletAddress.length > 0
+      ? parsed.data.walletAddress.toLowerCase()
+      : null;
+
   const { error } = await admin
     .from("profiles")
     .update({
       full_name: parsed.data.fullName,
-      wallet_address: parsed.data.walletAddress.toLowerCase(),
-      role,
+      wallet_address: wallet,
+      role: "customer",
       profile_completed: true,
     })
     .eq("id", session.user.id);
   if (error) return { success: false, error: error.message };
-
-  if (role === "merchant" && parsed.data.storeName) {
-    const slug = await resolveUniqueStoreSlug(admin, parsed.data.storeName, session.user.id);
-    const { data: storeRow, error: storeError } = await admin
-      .from("stores")
-      .insert({
-        owner_id: session.user.id,
-        name: parsed.data.storeName,
-        slug,
-        business_type: parsed.data.businessType,
-        mode: parsed.data.mode ?? "marketplace",
-        status: "pending",
-        wallet_address: parsed.data.walletAddress.toLowerCase(),
-      })
-      .select("id")
-      .single();
-    if (storeError) return { success: false, error: storeError.message };
-    if (storeRow?.id) {
-      const { ensureBusinessForStoreOwner } = await import(
-        "@/modules/business-hub/service"
-      );
-      await ensureBusinessForStoreOwner({
-        ownerUserId: session.user.id,
-        storeId: storeRow.id,
-        storeName: parsed.data.storeName,
-        storeSlug: slug,
-        businessType: parsed.data.businessType,
-        storeStatus: "pending",
-      }).catch(() => undefined);
-    }
-  }
 
   return { success: true, redirectTo: resolvePostLoginRedirect(undefined, DEFAULT_POST_LOGIN) };
 }
@@ -629,57 +479,6 @@ export async function changeWalletAction(
     .from("profiles")
     .update({ wallet_address: wallet })
     .eq("id", userId);
-  if (error) return { success: false, error: error.message };
-  return { success: true };
-}
-
-export async function linkOrLoginWalletAction(
-  walletAddress: string,
-  redirectAfter?: string | null,
-): Promise<ActionResult> {
-  const wallet = walletAddress.toLowerCase();
-  if (!/^0x[a-f0-9]{40}$/.test(wallet)) {
-    return { success: false, error: "Invalid wallet address" };
-  }
-
-  const admin = createAdminClient();
-  const session = await auth();
-
-  const { data: linked } = await admin
-    .from("profiles")
-    .select("id, role, profile_completed")
-    .ilike("wallet_address", wallet)
-    .maybeSingle();
-
-  if (linked) {
-    if (session?.user?.id && session.user.id !== linked.id) {
-      return {
-        success: false,
-        error: "This wallet is already linked to another account.",
-      };
-    }
-    await rotateDatabaseSession(linked.id);
-    await trackUserSession(linked.id).catch(() => undefined);
-    if (!linked.profile_completed) {
-      return { success: true, redirectTo: "/auth/complete-profile" };
-    }
-    return {
-      success: true,
-      redirectTo: resolvePostLoginRedirect(redirectAfter),
-    };
-  }
-
-  if (!session?.user?.id) {
-    return {
-      success: false,
-      error: "Sign in or register first, then connect your wallet to link it.",
-    };
-  }
-
-  const { error } = await admin
-    .from("profiles")
-    .update({ wallet_address: wallet })
-    .eq("id", session.user.id);
   if (error) return { success: false, error: error.message };
   return { success: true };
 }

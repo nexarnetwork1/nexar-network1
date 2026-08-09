@@ -4,7 +4,7 @@ import type { ComponentType, ReactNode } from "react";
 import Link from "next/link";
 import { Building2, Users, Calendar, Flame, MapPin, Activity } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import type { NetworkEvent } from "@/modules/atlas-network/types";
 import { FollowButton } from "@/components/atlas/app/network/FollowButton";
 import { format } from "date-fns";
@@ -71,10 +71,10 @@ export function AtlasRightSidebar({
   upcomingEvents = [],
 }: AtlasRightSidebarProps) {
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
 
   const onAuth = () => {
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: "/atlas",
       message: "Sign in to follow on ATLAS",

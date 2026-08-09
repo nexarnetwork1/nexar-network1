@@ -8,12 +8,14 @@ import { useZodForm } from "@/hooks/useZodForm";
 import { loginSchema, type LoginInput } from "@/schemas";
 import { loginAction, resendConfirmationAction } from "@/modules/auth/actions";
 import { objectToFormData } from "@/utils/form-data";
+import { mapAuthJsError } from "@/lib/auth/oauth-errors";
 import {
   AtlasIdentityDivider,
   AtlasIdentityField,
   AtlasIdentityMessage,
 } from "@/components/atlas/identity/AtlasIdentityFields";
 import { AtlasOAuthButtons } from "@/components/atlas/identity/AtlasOAuthButtons";
+import { AtlasTurnstile } from "@/components/atlas/auth/AtlasTurnstile";
 
 type AtlasSignInFormProps = {
   redirect: string | null;
@@ -30,6 +32,13 @@ export function AtlasSignInForm({
 }: AtlasSignInFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [resendEmail, setResendEmail] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const authError = typeof message === "string" ? mapAuthJsError(message) : null;
+  const displayMessage =
+    authError ??
+    (message && !authError && message !== "confirm_email" && message !== "password_reset" && message !== "auth_callback_failed"
+      ? message
+      : null);
 
   const {
     register,
@@ -47,6 +56,7 @@ export function AtlasSignInForm({
     const rememberMe = (document.getElementById("atlas-identity-remember") as HTMLInputElement)
       ?.checked;
     formData.set("rememberMe", rememberMe ? "true" : "false");
+    if (captchaToken) formData.set("captchaToken", captchaToken);
 
     const result = await loginAction(formData);
     if (!result.success) {
@@ -81,14 +91,11 @@ export function AtlasSignInForm({
           Social sign-in could not be completed. Try again or use email and password.
         </AtlasIdentityMessage>
       ) : null}
-      {message &&
-      message !== "confirm_email" &&
-      message !== "password_reset" &&
-      message !== "auth_callback_failed" ? (
-        <AtlasIdentityMessage tone="error">{message}</AtlasIdentityMessage>
+      {displayMessage ? (
+        <AtlasIdentityMessage tone="error">{displayMessage}</AtlasIdentityMessage>
       ) : null}
 
-      <AtlasOAuthButtons redirectTo={redirect ?? undefined} layout="stack" />
+      <AtlasOAuthButtons redirectTo={redirect ?? undefined} layout="stack" walletOptional={false} />
       <AtlasIdentityDivider />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5" noValidate>
@@ -123,6 +130,7 @@ export function AtlasSignInForm({
             Forgot password?
           </Link>
         </div>
+        <AtlasTurnstile onToken={setCaptchaToken} className="flex justify-center" />
         {serverError ? (
           <div className="rounded-xl border border-red-500/25 bg-red-500/5 px-4 py-3">
             <p className="text-sm text-red-400">{serverError}</p>

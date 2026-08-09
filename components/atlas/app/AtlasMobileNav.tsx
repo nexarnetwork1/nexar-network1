@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { ATLAS_APP_MOBILE_PRIMARY } from "@/config/atlas-app-nav";
 import { getAtlasAppNavIcon } from "@/components/atlas/app/atlas-app-nav-icons";
 import { AtlasMobileMoreSheet } from "@/components/atlas/app/AtlasMobileMoreSheet";
@@ -13,11 +13,11 @@ import { AtlasMobileMoreSheet } from "@/components/atlas/app/AtlasMobileMoreShee
 export function AtlasMobileNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [moreOpen, setMoreOpen] = useState(false);
 
   const openAuth = (href: string) => {
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: href,
       message: "Sign in to continue",

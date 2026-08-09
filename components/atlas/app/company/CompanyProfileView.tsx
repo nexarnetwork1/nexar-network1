@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useCommerceAuth } from "@/components/commerce/auth/NexarCommerceAuthProvider";
+import { useAtlasAuth } from "@/components/atlas/auth/AtlasAuthProvider";
 import { cn } from "@/lib/utils/cn";
 import {
   Briefcase,
@@ -97,7 +97,7 @@ export function CompanyProfileView({
 }: CompanyProfileViewProps) {
   const businessId = profile.business_id;
   const { data: session } = useSession();
-  const { openCommerceAuth } = useCommerceAuth();
+  const { openAtlasAuth } = useAtlasAuth();
   const [activeTab, setActiveTab] = useState<CompanyTab>("posts");
   const [posts, setPosts] = useState(initialPosts);
   const [products, setProducts] = useState<EnrichedMarketplaceListing[]>([]);
@@ -123,12 +123,12 @@ export function CompanyProfileView({
 
   const sessionActive = !!session?.user;
   const onAuth = useCallback(() => {
-    openCommerceAuth({
+    openAtlasAuth({
       mode: "signin",
       redirect: `/atlas/network/${profile.slug}`,
       message: "Sign in to follow this company on ATLAS",
     });
-  }, [openCommerceAuth, profile.slug]);
+  }, [openAtlasAuth, profile.slug]);
 
   useEffect(() => {
     if (!businessId || loaded[activeTab] || pending) return;

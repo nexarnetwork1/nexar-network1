@@ -15,11 +15,8 @@ export async function GET(request: Request) {
 
   const session = await auth();
   if (!session?.user?.id) {
-    const role =
-      intent === "merchant" || intent === "customer" ? intent : undefined;
     const loginUrl = new URL("/login", origin);
     if (redirect && isValidRedirect(redirect)) loginUrl.searchParams.set("redirect", redirect);
-    if (role) loginUrl.searchParams.set("role", role);
     loginUrl.searchParams.set("message", "auth_callback_failed");
     return NextResponse.redirect(loginUrl.toString());
   }
